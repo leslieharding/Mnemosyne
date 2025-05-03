@@ -1,0 +1,139 @@
+[gd_scene load_steps=2 format=3 uid="uid://ch3w657mo8m13"]
+
+[ext_resource type="Script" uid="uid://vyruggp7tt0s" path="res://Scripts/settings_menu.gd" id="1_8uw7q"]
+
+[node name="SettingsMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8uw7q")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SettingsContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -198.0
+offset_top = -101.0
+offset_right = 198.0
+offset_bottom = 124.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="SettingsContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "SETTINGS"
+horizontal_alignment = 1
+
+[node name="TabContainer" type="TabContainer" parent="SettingsContainer"]
+layout_mode = 2
+current_tab = 1
+
+[node name="AudioTab" type="VBoxContainer" parent="SettingsContainer/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="MasterVolumeContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/AudioTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/AudioTab/MasterVolumeContainer"]
+layout_mode = 2
+text = "Master Volume"
+
+[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/AudioTab/MasterVolumeContainer"]
+layout_mode = 2
+value = 80.0
+
+[node name="MusicVolumeContainer2" type="HBoxContainer" parent="SettingsContainer/TabContainer/AudioTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/AudioTab/MusicVolumeContainer2"]
+layout_mode = 2
+text = "Music Volume"
+
+[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/AudioTab/MusicVolumeContainer2"]
+layout_mode = 2
+value = 80.0
+
+[node name="SFXVolumeContainer3" type="HBoxContainer" parent="SettingsContainer/TabContainer/AudioTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/AudioTab/SFXVolumeContainer3"]
+layout_mode = 2
+text = "SFX Volume"
+
+[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/AudioTab/SFXVolumeContainer3"]
+layout_mode = 2
+value = 80.0
+
+[node name="VoiceVolumeContainer4" type="HBoxContainer" parent="SettingsContainer/TabContainer/AudioTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/AudioTab/VoiceVolumeContainer4"]
+layout_mode = 2
+text = "Voice Volume"
+
+[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/AudioTab/VoiceVolumeContainer4"]
+layout_mode = 2
+value = 80.0
+
+[node name="VideoTab" type="VBoxContainer" parent="SettingsContainer/TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="ResolutionContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/VideoTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/VideoTab/ResolutionContainer"]
+layout_mode = 2
+text = "Resolution"
+
+[node name="OptionButton" type="OptionButton" parent="SettingsContainer/TabContainer/VideoTab/ResolutionContainer"]
+layout_mode = 2
+
+[node name="FullscreenToggleContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/VideoTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/VideoTab/FullscreenToggleContainer"]
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="CheckBox" type="CheckBox" parent="SettingsContainer/TabContainer/VideoTab/FullscreenToggleContainer"]
+layout_mode = 2
+
+[node name="BrightnessContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/VideoTab"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/VideoTab/BrightnessContainer"]
+layout_mode = 2
+text = "Brightness"
+
+[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/VideoTab/BrightnessContainer"]
+layout_mode = 2
+value = 50.0
+
+[node name="GameplayTab" type="VBoxContainer" parent="SettingsContainer/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="BackButton" type="Button" parent="SettingsContainer"]
+layout_mode = 2
+text = "Back"
+
+[connection signal="pressed" from="SettingsContainer/BackButton" to="." method="_on_back_button_pressed"]
