@@ -17,15 +17,15 @@ var resolutions = [
 ]
 
 # References to UI nodes
-@onready var master_slider = $SettingsContainer/TabContainer/AudioTab/MasterVolumeContainer/HSlider
-@onready var music_slider = $SettingsContainer/TabContainer/AudioTab/MusicVolumeContainer2/HSlider
-@onready var sfx_slider = $SettingsContainer/TabContainer/AudioTab/SFXVolumeContainer3/HSlider
-@onready var voice_slider = $SettingsContainer/TabContainer/AudioTab/VoiceVolumeContainer4/HSlider
+@onready var master_slider = $SettingsContainer/TabContainer/Audio/MasterVolumeContainer/HSlider
+@onready var music_slider = $SettingsContainer/TabContainer/Audio/MusicVolumeContainer2/HSlider
+@onready var sfx_slider = $SettingsContainer/TabContainer/Audio/SFXVolumeContainer3/HSlider
+@onready var voice_slider = $SettingsContainer/TabContainer/Audio/VoiceVolumeContainer4/HSlider
 
 # Video settings UI references
-@onready var resolution_dropdown = $SettingsContainer/TabContainer/VideoTab/ResolutionContainer/OptionButton
-@onready var fullscreen_checkbox = $SettingsContainer/TabContainer/VideoTab/FullscreenToggleContainer/CheckBox
-@onready var brightness_slider = $SettingsContainer/TabContainer/VideoTab/BrightnessContainer/HSlider
+@onready var resolution_dropdown = $SettingsContainer/TabContainer/Video/ResolutionContainer/OptionButton
+@onready var fullscreen_checkbox = $SettingsContainer/TabContainer/Video/FullscreenToggleContainer/CheckBox
+@onready var brightness_slider = $SettingsContainer/TabContainer/Video/BrightnessContainer/HSlider
 
 func _ready():
 	# Setup resolution dropdown

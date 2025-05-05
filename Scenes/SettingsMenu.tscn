@@ -43,91 +43,91 @@ horizontal_alignment = 1
 layout_mode = 2
 current_tab = 1
 
-[node name="AudioTab" type="VBoxContainer" parent="SettingsContainer/TabContainer"]
+[node name="Audio" type="VBoxContainer" parent="SettingsContainer/TabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="MasterVolumeContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/AudioTab"]
+[node name="MasterVolumeContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/Audio"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsContainer/TabContainer/AudioTab/MasterVolumeContainer"]
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/Audio/MasterVolumeContainer"]
 layout_mode = 2
 text = "Master Volume"
 
-[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/AudioTab/MasterVolumeContainer"]
+[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/Audio/MasterVolumeContainer"]
 layout_mode = 2
 value = 80.0
 
-[node name="MusicVolumeContainer2" type="HBoxContainer" parent="SettingsContainer/TabContainer/AudioTab"]
+[node name="MusicVolumeContainer2" type="HBoxContainer" parent="SettingsContainer/TabContainer/Audio"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsContainer/TabContainer/AudioTab/MusicVolumeContainer2"]
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/Audio/MusicVolumeContainer2"]
 layout_mode = 2
 text = "Music Volume"
 
-[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/AudioTab/MusicVolumeContainer2"]
+[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/Audio/MusicVolumeContainer2"]
 layout_mode = 2
 value = 80.0
 
-[node name="SFXVolumeContainer3" type="HBoxContainer" parent="SettingsContainer/TabContainer/AudioTab"]
+[node name="SFXVolumeContainer3" type="HBoxContainer" parent="SettingsContainer/TabContainer/Audio"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsContainer/TabContainer/AudioTab/SFXVolumeContainer3"]
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/Audio/SFXVolumeContainer3"]
 layout_mode = 2
 text = "SFX Volume"
 
-[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/AudioTab/SFXVolumeContainer3"]
+[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/Audio/SFXVolumeContainer3"]
 layout_mode = 2
 value = 80.0
 
-[node name="VoiceVolumeContainer4" type="HBoxContainer" parent="SettingsContainer/TabContainer/AudioTab"]
+[node name="VoiceVolumeContainer4" type="HBoxContainer" parent="SettingsContainer/TabContainer/Audio"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsContainer/TabContainer/AudioTab/VoiceVolumeContainer4"]
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/Audio/VoiceVolumeContainer4"]
 layout_mode = 2
 text = "Voice Volume"
 
-[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/AudioTab/VoiceVolumeContainer4"]
+[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/Audio/VoiceVolumeContainer4"]
 layout_mode = 2
 value = 80.0
 
-[node name="VideoTab" type="VBoxContainer" parent="SettingsContainer/TabContainer"]
+[node name="Video" type="VBoxContainer" parent="SettingsContainer/TabContainer"]
 layout_mode = 2
 metadata/_tab_index = 1
 
-[node name="ResolutionContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/VideoTab"]
+[node name="ResolutionContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/Video"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsContainer/TabContainer/VideoTab/ResolutionContainer"]
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/Video/ResolutionContainer"]
 layout_mode = 2
 text = "Resolution"
 
-[node name="OptionButton" type="OptionButton" parent="SettingsContainer/TabContainer/VideoTab/ResolutionContainer"]
+[node name="OptionButton" type="OptionButton" parent="SettingsContainer/TabContainer/Video/ResolutionContainer"]
 layout_mode = 2
 
-[node name="FullscreenToggleContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/VideoTab"]
+[node name="FullscreenToggleContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/Video"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsContainer/TabContainer/VideoTab/FullscreenToggleContainer"]
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/Video/FullscreenToggleContainer"]
 layout_mode = 2
 text = "Fullscreen"
 
-[node name="CheckBox" type="CheckBox" parent="SettingsContainer/TabContainer/VideoTab/FullscreenToggleContainer"]
+[node name="CheckBox" type="CheckBox" parent="SettingsContainer/TabContainer/Video/FullscreenToggleContainer"]
 layout_mode = 2
 
-[node name="BrightnessContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/VideoTab"]
+[node name="BrightnessContainer" type="HBoxContainer" parent="SettingsContainer/TabContainer/Video"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsContainer/TabContainer/VideoTab/BrightnessContainer"]
+[node name="Label" type="Label" parent="SettingsContainer/TabContainer/Video/BrightnessContainer"]
 layout_mode = 2
 text = "Brightness"
 
-[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/VideoTab/BrightnessContainer"]
+[node name="HSlider" type="HSlider" parent="SettingsContainer/TabContainer/Video/BrightnessContainer"]
 layout_mode = 2
 value = 50.0
 
-[node name="GameplayTab" type="VBoxContainer" parent="SettingsContainer/TabContainer"]
+[node name="Gameplay" type="VBoxContainer" parent="SettingsContainer/TabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2
