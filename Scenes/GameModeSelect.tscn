@@ -83,4 +83,6 @@ layout_mode = 2
 text = "Back"
 
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/ApolloButton" to="." method="_on_apollo_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/HermesButton" to="." method="_on_hermes_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/ArtemisButton" to="." method="_on_artemis_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/Button" to="." method="_on_button_pressed"]
