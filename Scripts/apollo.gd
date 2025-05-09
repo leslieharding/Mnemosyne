@@ -22,13 +22,15 @@ func _on_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
 
 # Connect these in the editor or use the existing connections
-func _on_deck1_button_pressed() -> void:
+func _on_deck_1_button_pressed() -> void:
 	select_deck(0)
-	
-func _on_deck2_button_pressed() -> void:
+
+
+func _on_deck_2_button_pressed() -> void:
 	select_deck(1)
-	
-func _on_deck3_button_pressed() -> void:
+
+
+func _on_deck_3_button_pressed() -> void:
 	select_deck(2)
 	
 func _on_start_game_button_pressed() -> void:
@@ -58,15 +60,3 @@ func select_deck(index: int) -> void:
 	# Optionally, you could display the deck description somewhere
 	print("Selected deck: ", apollo_collection.decks[index].deck_name)
 	print("Description: ", apollo_collection.decks[index].deck_description)
-
-
-func _on_deck_1_button_pressed() -> void:
-	pass # Replace with function body.
-
-
-func _on_deck_2_button_pressed() -> void:
-	pass # Replace with function body.
-
-
-func _on_deck_3_button_pressed() -> void:
-	pass # Replace with function body.
