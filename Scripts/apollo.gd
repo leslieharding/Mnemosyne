@@ -35,9 +35,13 @@ func _on_deck_3_button_pressed() -> void:
 	
 func _on_start_game_button_pressed() -> void:
 	if selected_deck_index >= 0:
-		# Here you would transition to the game scene with the selected deck
-		# (We'll implement this later)
-		print("Starting game with deck: ", apollo_collection.decks[selected_deck_index].deck_name)
+		# Pass the selected deck index to the game scene
+		get_tree().set_meta("scene_params", {
+			"deck_index": selected_deck_index
+		})
+		
+		# Change to the game scene
+		get_tree().change_scene_to_file("res://Scenes/ApolloGame.tscn")
 	
 # Helper function to handle deck selection
 func select_deck(index: int) -> void:
