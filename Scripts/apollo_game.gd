@@ -1,8 +1,13 @@
+# res://Scripts/apollo_game.gd
 extends Node2D
 
 # Player's deck (received from deck selection)
 var player_deck: Array[CardResource] = []
 var selected_deck_index: int = -1
+var selected_card_index: int = -1
+
+# Reference to the card hand
+@onready var hand_container = $VBoxContainer/HBoxContainer
 
 func _ready():
 	# Initialize game board
@@ -45,23 +50,13 @@ func setup_empty_board():
 # Load player's selected deck
 func load_player_deck(deck_index: int):
 	# Load Apollo collection
-	var apollo_collection: GodCardCollection = load("res://Resources/Collections/apollo.tres")
+	var apollo_collection: GodCardCollection = load("res://Resources/Collections/Apollo.tres")
 	if apollo_collection:
 		# Get the deck based on index
 		player_deck = apollo_collection.get_deck(deck_index)
 		
-		# Update deck info display - Add a label for displaying deck info if not already present
+		# Update deck info display
 		var deck_info = $VBoxContainer/DeckName
-		if not deck_info:
-			# Create a deck info label if it doesn't exist
-			deck_info = Label.new()
-			deck_info.name = "DeckInfoLabel"
-			deck_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			# Insert it at the top of the VBoxContainer, before the GameGrid
-			$VBoxContainer.add_child(deck_info)
-			$VBoxContainer.move_child(deck_info, 0)  # Move to top position
-		
-		# Now set the text
 		deck_info.text = "Selected Deck: " + apollo_collection.decks[deck_index].deck_name
 		
 		# Display cards in hand
@@ -69,11 +64,9 @@ func load_player_deck(deck_index: int):
 	else:
 		push_error("Failed to load Apollo collection!")
 
-# Display player's hand of cards
+# Display player's hand of cards using the CardDisplay scenes
 func display_player_hand():
-	var hand_container = $VBoxContainer/HBoxContainer
-	
-	# Clear existing cards
+	# First, clear existing cards
 	for child in hand_container.get_children():
 		child.queue_free()
 	
@@ -81,19 +74,26 @@ func display_player_hand():
 	for i in range(player_deck.size()):
 		var card = player_deck[i]
 		
-		# Create a simple card display
-		var card_display = VBoxContainer.new()
-		card_display.name = "Card" + str(i)
-		
-		# Card name
-		var name_label = Label.new()
-		name_label.text = card.card_name
-		card_display.add_child(name_label)
-		
-		# Card values (Up, Right, Down, Left)
-		var values_label = Label.new()
-		values_label.text = str(card.values[0]) + "|" + str(card.values[1]) + "|" + str(card.values[2]) + "|" + str(card.values[3])
-		card_display.add_child(values_label)
-		
-		# Add to hand container
+		# Create a card display instance
+		var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 		hand_container.add_child(card_display)
+		
+		# Setup the card with its data
+		card_display.setup(card)
+		
+		# Connect to input events if needed
+		card_display.connect("gui_input", _on_card_gui_input.bind(card_display, i))
+
+# Handle card input events
+func _on_card_gui_input(event, card_display, card_index):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			# Deselect previous card if any
+			for child in hand_container.get_children():
+				if child is CardDisplay and child.is_selected:
+					child.deselect()
+			
+			# Select this card
+			card_display.select()
+			selected_card_index = card_index
+			print("Selected card: ", player_deck[card_index].card_name)

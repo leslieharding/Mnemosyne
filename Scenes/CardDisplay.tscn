@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://dqm5ij71lj0bi"]
+[gd_scene load_steps=3 format=3 uid="uid://dqm5ij71lj0bi"]
+
+[ext_resource type="Script" uid="uid://desdj2gldiy12" path="res://Scripts/card_display.gd" id="1_bcrn8"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_048ni"]
 bg_color = Color(0.581033, 0.581033, 0.581033, 1)
@@ -13,6 +15,7 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [node name="CardDisplay" type="Node2D"]
+script = ExtResource("1_bcrn8")
 
 [node name="Panel" type="Panel" parent="."]
 custom_minimum_size = Vector2(100, 140)
