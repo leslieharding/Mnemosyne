@@ -1,4 +1,16 @@
-[gd_scene format=3 uid="uid://dqm5ij71lj0bi"]
+[gd_scene load_steps=2 format=3 uid="uid://dqm5ij71lj0bi"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_048ni"]
+bg_color = Color(0.581033, 0.581033, 0.581033, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.133333, 0.4, 0.666667, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="CardDisplay" type="Node2D"]
 
@@ -6,6 +18,7 @@
 custom_minimum_size = Vector2(100, 140)
 offset_right = 40.0
 offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_048ni")
 
 [node name="MarginContainer" type="MarginContainer" parent="Panel"]
 layout_mode = 1
