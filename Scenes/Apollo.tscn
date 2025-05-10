@@ -20,6 +20,7 @@ grow_vertical = 2
 
 [node name="Label" type="Label" parent="VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 4
 text = "Apollo"
 
 [node name="Deck1Button" type="Button" parent="VBoxContainer"]
