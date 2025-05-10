@@ -64,32 +64,50 @@ func load_player_deck(deck_index: int):
 	else:
 		push_error("Failed to load Apollo collection!")
 
-# Display player's hand of cards using the CardDisplay scenes
+# Display player's hand of cards using manual positioning
 func display_player_hand():
 	# First, clear existing cards
 	for child in hand_container.get_children():
 		child.queue_free()
 	
-	# Add each card from the deck
+	# Card width and spacing parameters
+	var card_width = 110  # Base card width
+	var card_spacing = 30  # Adjust this value to increase/decrease spacing between cards
+	var total_spacing = card_width + card_spacing  # Total space each card takes horizontally
+	
+	# Calculate the total width needed
+	var total_width = player_deck.size() * total_spacing
+	var start_x = -total_width / 2 + card_width / 2  # Center the cards
+	
+	# Create a Node2D as a container for all cards
+	var cards_container = Node2D.new()
+	cards_container.name = "CardsContainer"
+	hand_container.add_child(cards_container)
+	
+	# Add each card from the deck with explicit positioning
 	for i in range(player_deck.size()):
 		var card = player_deck[i]
 		
 		# Create a card display instance
 		var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
-		hand_container.add_child(card_display)
+		cards_container.add_child(card_display)
+		
+		# Position the card explicitly with the new spacing
+		card_display.position.x = start_x + i * total_spacing
 		
 		# Setup the card with its data
 		card_display.setup(card)
 		
-		# Connect to input events if needed
-		card_display.connect("gui_input", _on_card_gui_input.bind(card_display, i))
+		# Connect to detect clicks on the card
+		card_display.panel.gui_input.connect(_on_card_gui_input.bind(card_display, i))
 
 # Handle card input events
 func _on_card_gui_input(event, card_display, card_index):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			# Deselect previous card if any
-			for child in hand_container.get_children():
+			var cards_container = hand_container.get_node("CardsContainer")
+			for child in cards_container.get_children():
 				if child is CardDisplay and child.is_selected:
 					child.deselect()
 			
