@@ -76,7 +76,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bufwg"]
 script = ExtResource("1_vqrrp")
-card_name = "The Oracle At Delphi"
+card_name = "Delphic Oracle"
 values = Array[int]([3, 3, 3, 3])
 description = "The power and curse of knowing"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
