@@ -70,8 +70,31 @@ func move_grid_selection(dx: int, dy: int):
 	
 	var new_index = new_y * grid_size + new_x
 	
-	# Check if the new position is different and not already occupied
-	if new_index != current_grid_index and not grid_occupied[new_index]:
+	# If the slot is already occupied, try to find the next available slot in that direction
+	if grid_occupied[new_index]:
+		# Continue in the same direction if possible
+		var attempts = 0
+		var test_x = new_x
+		var test_y = new_y
+		
+		# Try up to grid_size attempts to find an empty slot in that direction
+		while attempts < grid_size and grid_occupied[new_index]:
+			test_x += dx
+			test_y += dy
+			
+			# Ensure we stay within bounds
+			if test_x < 0 or test_x >= grid_size or test_y < 0 or test_y >= grid_size:
+				break
+				
+			new_index = test_y * grid_size + test_x
+			attempts += 1
+		
+		# If we couldn't find an empty slot in that direction, keep the current selection
+		if grid_occupied[new_index]:
+			new_index = current_grid_index
+	
+	# Check if the new position is different
+	if new_index != current_grid_index:
 		# Deselect current grid
 		if current_grid_index != -1:
 			grid_slots[current_grid_index].add_theme_stylebox_override("panel", default_grid_style)
@@ -132,8 +155,13 @@ func setup_empty_board():
 	# Add 9 empty slots
 	for i in range(grid_size * grid_size):
 		var slot = Panel.new()
-		slot.custom_minimum_size = Vector2(100, 100)
+		# Increase the slot size to better fit cards
+		slot.custom_minimum_size = Vector2(120, 160)  # Larger size to accommodate cards
 		slot.name = "Slot" + str(i)
+		
+		# Add some margin to the grid container
+		board_container.add_theme_constant_override("h_separation", 10)  # Horizontal space between slots
+		board_container.add_theme_constant_override("v_separation", 10)  # Vertical space between slots
 		
 		# Connect mouse signals for hover and click
 		slot.mouse_entered.connect(_on_grid_mouse_entered.bind(i))
@@ -267,30 +295,32 @@ func place_card_on_grid():
 	# Mark the grid as occupied
 	grid_occupied[current_grid_index] = true
 	
+	# Get the current slot
+	var slot = grid_slots[current_grid_index]
+	
 	# Create a card display for the grid
 	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 	
-	# Remove the current panel
-	grid_slots[current_grid_index].queue_free()
+	# Add the card as a child of the slot panel
+	# This ensures proper positioning within the grid
+	slot.add_child(card_display)
 	
-	# Replace with card display
+	# Center the card within the slot
+	card_display.position = Vector2(
+		(slot.custom_minimum_size.x - 100) / 2,  # Assuming card width is 100
+		(slot.custom_minimum_size.y - 140) / 2   # Assuming card height is 140
+	)
+	
+	# Set higher z-index so the card appears on top
+	card_display.z_index = 1
+	
+	# Setup the card with the card resource data
 	card_display.setup(player_deck[selected_card_index])
-	board_container.add_child(card_display)
-	board_container.move_child(card_display, current_grid_index)
 	
-	# Update grid slot reference
-	grid_slots[current_grid_index] = card_display
+	print("Card placed on grid at position", current_grid_index)
 	
-	# Reset selection
+	# Reset card selection
 	selected_card_index = -1
-	current_grid_index = -1
-	
-	# Find the next available grid slot
-	for i in range(grid_slots.size()):
-		if not grid_occupied[i]:
-			current_grid_index = i
-			grid_slots[i].add_theme_stylebox_override("panel", selected_grid_style)
-			break
 	
 	# Deselect card in hand
 	var cards_container = hand_container.get_node("CardsContainer")
@@ -298,4 +328,19 @@ func place_card_on_grid():
 		if child is CardDisplay and child.is_selected:
 			child.deselect()
 	
-	print("Card placed on grid at position", current_grid_index)
+	# Reset grid selection and find next available slot
+	current_grid_index = -1
+	
+	# Find the next available slot
+	var found_next_slot = false
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:
+			current_grid_index = i
+			grid_slots[i].add_theme_stylebox_override("panel", selected_grid_style)
+			found_next_slot = true
+			break
+	
+	# If all slots are filled, deselect everything
+	if not found_next_slot:
+		current_grid_index = -1
+		print("All slots are filled!")
