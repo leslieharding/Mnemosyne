@@ -61,39 +61,107 @@ func _input(event):
 
 # Helper to move grid selection based on direction
 func move_grid_selection(dx: int, dy: int):
-	# Calculate new position
+	# Calculate current position
 	var current_x = current_grid_index % grid_size
 	var current_y = current_grid_index / grid_size
 	
-	var new_x = clamp(current_x + dx, 0, grid_size - 1)
-	var new_y = clamp(current_y + dy, 0, grid_size - 1)
+	# Initialize new position to current
+	var new_x = current_x
+	var new_y = current_y
+	var new_index = current_grid_index
 	
-	var new_index = new_y * grid_size + new_x
-	
-	# If the slot is already occupied, try to find the next available slot in that direction
-	if grid_occupied[new_index]:
-		# Continue in the same direction if possible
-		var attempts = 0
-		var test_x = new_x
-		var test_y = new_y
+	# Handle horizontal movement with row wrapping
+	if dx != 0:
+		new_x = current_x + dx
 		
-		# Try up to grid_size attempts to find an empty slot in that direction
-		while attempts < grid_size and grid_occupied[new_index]:
-			test_x += dx
-			test_y += dy
+		# Handle wrapping for right edge to next row
+		if new_x >= grid_size:
+			new_x = 0
+			new_y = (current_y + 1) % grid_size  # Wrap to next row or back to first row
+		
+		# Handle wrapping for left edge to previous row
+		elif new_x < 0:
+			new_x = grid_size - 1
+			new_y = (current_y - 1 + grid_size) % grid_size  # Wrap to previous row or back to last row
+	
+	# Handle vertical movement
+	elif dy != 0:
+		new_y = current_y + dy
+		
+		# Handle wrapping for bottom edge
+		if new_y >= grid_size:
+			new_y = 0
+		
+		# Handle wrapping for top edge
+		elif new_y < 0:
+			new_y = grid_size - 1
+	
+	# Calculate the target index
+	new_index = new_y * grid_size + new_x
+	
+	# If target slot is occupied, find another free slot
+	if grid_occupied[new_index]:
+		# Set up search order based on direction of movement
+		var row_order = []
+		var col_order = []
+		
+		# For horizontal movement
+		if dx != 0:
+			# Prioritize the row we're trying to move to
+			row_order.append(new_y)
 			
-			# Ensure we stay within bounds
-			if test_x < 0 or test_x >= grid_size or test_y < 0 or test_y >= grid_size:
+			# Then add other rows in order of proximity
+			for offset in range(1, grid_size):
+				row_order.append((new_y + offset) % grid_size)
+				row_order.append((new_y - offset + grid_size) % grid_size)
+			
+			# For right movement, prioritize columns from left to right
+			# For left movement, prioritize columns from right to left
+			if dx > 0:
+				for i in range(grid_size):
+					col_order.append((new_x + i) % grid_size)
+			else:
+				for i in range(grid_size):
+					col_order.append((new_x - i + grid_size) % grid_size)
+		
+		# For vertical movement
+		elif dy != 0:
+			# Prioritize the column we're trying to move to
+			col_order.append(new_x)
+			
+			# Then add other columns in order of proximity
+			for offset in range(1, grid_size):
+				col_order.append((new_x + offset) % grid_size)
+				col_order.append((new_x - offset + grid_size) % grid_size)
+			
+			# For down movement, prioritize rows from top to bottom
+			# For up movement, prioritize rows from bottom to top
+			if dy > 0:
+				for i in range(grid_size):
+					row_order.append((new_y + i) % grid_size)
+			else:
+				for i in range(grid_size):
+					row_order.append((new_y - i + grid_size) % grid_size)
+		
+		# Search for the first unoccupied slot based on our priorities
+		var found_empty = false
+		
+		for r in row_order:
+			for c in col_order:
+				var check_index = r * grid_size + c
+				if not grid_occupied[check_index] and check_index != current_grid_index:
+					new_index = check_index
+					found_empty = true
+					break
+			
+			if found_empty:
 				break
 				
-			new_index = test_y * grid_size + test_x
-			attempts += 1
-		
-		# If we couldn't find an empty slot in that direction, keep the current selection
-		if grid_occupied[new_index]:
+		# If we somehow couldn't find any empty slot, stay put
+		if not found_empty:
 			new_index = current_grid_index
 	
-	# Check if the new position is different
+	# Check if the new position is different from current
 	if new_index != current_grid_index:
 		# Deselect current grid
 		if current_grid_index != -1:
@@ -199,6 +267,11 @@ func display_player_hand():
 	for child in hand_container.get_children():
 		child.queue_free()
 	
+	# If the deck is empty, nothing to display
+	if player_deck.size() == 0:
+		print("No cards left in hand")
+		return
+		
 	# Card width and spacing parameters
 	var card_width = 110  # Base card width
 	var card_spacing = 30  # Adjust this value to increase/decrease spacing between cards
@@ -234,11 +307,17 @@ func display_player_hand():
 func _on_card_gui_input(event, card_display, card_index):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			# Validate that we have a valid card index
+			if card_index >= player_deck.size():
+				print("Invalid card index: ", card_index)
+				return
+				
 			# Deselect previous card if any
-			var cards_container = hand_container.get_node("CardsContainer")
-			for child in cards_container.get_children():
-				if child is CardDisplay and child.is_selected:
-					child.deselect()
+			var cards_container = hand_container.get_node_or_null("CardsContainer")
+			if cards_container:
+				for child in cards_container.get_children():
+					if child is CardDisplay and child.is_selected:
+						child.deselect()
 			
 			# Select this card
 			card_display.select()
@@ -291,6 +370,15 @@ func place_card_on_grid():
 	if grid_occupied[current_grid_index]:
 		print("Grid slot is already occupied!")
 		return
+		
+	# Make sure the selected card index is valid
+	if selected_card_index >= player_deck.size():
+		print("Invalid card index: ", selected_card_index)
+		selected_card_index = -1
+		return
+	
+	# Store a reference to the card data before removing it
+	var card_data = player_deck[selected_card_index]
 	
 	# Mark the grid as occupied
 	grid_occupied[current_grid_index] = true
@@ -314,19 +402,15 @@ func place_card_on_grid():
 	# Set higher z-index so the card appears on top
 	card_display.z_index = 1
 	
-	# Setup the card with the card resource data
-	card_display.setup(player_deck[selected_card_index])
+	# Setup the card with the card resource data (using our stored reference)
+	card_display.setup(card_data)
 	
 	print("Card placed on grid at position", current_grid_index)
 	
-	# Reset card selection
-	selected_card_index = -1
-	
-	# Deselect card in hand
-	var cards_container = hand_container.get_node("CardsContainer")
-	for child in cards_container.get_children():
-		if child is CardDisplay and child.is_selected:
-			child.deselect()
+	# Remove the card from the hand
+	var temp_index = selected_card_index
+	selected_card_index = -1  # Reset before removing to avoid issues with callbacks
+	remove_card_from_hand(temp_index)
 	
 	# Reset grid selection and find next available slot
 	current_grid_index = -1
@@ -344,3 +428,23 @@ func place_card_on_grid():
 	if not found_next_slot:
 		current_grid_index = -1
 		print("All slots are filled!")
+
+# Remove a card from the player's hand after it's played
+func remove_card_from_hand(card_index: int):
+	# Check if the index is valid
+	if card_index < 0 or card_index >= player_deck.size():
+		print("Invalid card index to remove:", card_index)
+		return
+		
+	# Store the card we're removing for reference
+	var played_card = player_deck[card_index]
+	print("Removing card from hand: ", played_card.card_name)
+	
+	# Remove the card from the deck array
+	player_deck.remove_at(card_index)
+	
+	# Reset the selected card index
+	selected_card_index = -1
+	
+	# Redisplay the hand to update visuals
+	display_player_hand()
