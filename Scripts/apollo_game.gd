@@ -241,7 +241,7 @@ func setup_empty_board():
 	for i in range(grid_size * grid_size):
 		var slot = Panel.new()
 		# Increase the slot size to better fit cards
-		slot.custom_minimum_size = Vector2(120, 160)  # Larger size to accommodate cards
+		slot.custom_minimum_size = Vector2(100, 140)  # Larger size to accommodate cards
 		slot.name = "Slot" + str(i)
 		
 		# Add some margin to the grid container
