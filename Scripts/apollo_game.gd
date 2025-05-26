@@ -65,104 +65,43 @@ func move_grid_selection(dx: int, dy: int):
 	var current_x = current_grid_index % grid_size
 	var current_y = current_grid_index / grid_size
 	
-	# Initialize new position to current
-	var new_x = current_x
-	var new_y = current_y
 	var new_index = current_grid_index
 	
-	# Handle horizontal movement with row wrapping
-	if dx != 0:
-		new_x = current_x + dx
+	# Rule 1: Check if there's a free adjacent space in the direction pressed
+	if dx != 0:  # Horizontal movement
+		var target_x = current_x + dx
+		var target_y = current_y
 		
-		# Handle wrapping for right edge to next row
-		if new_x >= grid_size:
-			new_x = 0
-			new_y = (current_y + 1) % grid_size  # Wrap to next row or back to first row
-		
-		# Handle wrapping for left edge to previous row
-		elif new_x < 0:
-			new_x = grid_size - 1
-			new_y = (current_y - 1 + grid_size) % grid_size  # Wrap to previous row or back to last row
-	
-	# Handle vertical movement
-	elif dy != 0:
-		new_y = current_y + dy
-		
-		# Handle wrapping for bottom edge
-		if new_y >= grid_size:
-			new_y = 0
-		
-		# Handle wrapping for top edge
-		elif new_y < 0:
-			new_y = grid_size - 1
-	
-	# Calculate the target index
-	new_index = new_y * grid_size + new_x
-	
-	# If target slot is occupied, find another free slot
-	if grid_occupied[new_index]:
-		# Set up search order based on direction of movement
-		var row_order = []
-		var col_order = []
-		
-		# For horizontal movement
-		if dx != 0:
-			# Prioritize the row we're trying to move to
-			row_order.append(new_y)
-			
-			# Then add other rows in order of proximity
-			for offset in range(1, grid_size):
-				row_order.append((new_y + offset) % grid_size)
-				row_order.append((new_y - offset + grid_size) % grid_size)
-			
-			# For right movement, prioritize columns from left to right
-			# For left movement, prioritize columns from right to left
-			if dx > 0:
-				for i in range(grid_size):
-					col_order.append((new_x + i) % grid_size)
+		# Check if target is within bounds and free
+		if target_x >= 0 and target_x < grid_size:
+			var adjacent_index = target_y * grid_size + target_x
+			if not grid_occupied[adjacent_index]:
+				new_index = adjacent_index
 			else:
-				for i in range(grid_size):
-					col_order.append((new_x - i + grid_size) % grid_size)
-		
-		# For vertical movement
-		elif dy != 0:
-			# Prioritize the column we're trying to move to
-			col_order.append(new_x)
-			
-			# Then add other columns in order of proximity
-			for offset in range(1, grid_size):
-				col_order.append((new_x + offset) % grid_size)
-				col_order.append((new_x - offset + grid_size) % grid_size)
-			
-			# For down movement, prioritize rows from top to bottom
-			# For up movement, prioritize rows from bottom to top
-			if dy > 0:
-				for i in range(grid_size):
-					row_order.append((new_y + i) % grid_size)
-			else:
-				for i in range(grid_size):
-					row_order.append((new_y - i + grid_size) % grid_size)
-		
-		# Search for the first unoccupied slot based on our priorities
-		var found_empty = false
-		
-		for r in row_order:
-			for c in col_order:
-				var check_index = r * grid_size + c
-				if not grid_occupied[check_index] and check_index != current_grid_index:
-					new_index = check_index
-					found_empty = true
-					break
-			
-			if found_empty:
-				break
-				
-		# If we somehow couldn't find any empty slot, stay put
-		if not found_empty:
-			new_index = current_grid_index
+				# Rule 2: No free adjacent space, apply horizontal overflow rules
+				new_index = handle_horizontal_overflow(current_x, current_y, dx)
+		else:
+			# Rule 2: Moving outside bounds, apply horizontal overflow rules
+			new_index = handle_horizontal_overflow(current_x, current_y, dx)
 	
-	# Check if the new position is different from current
-	if new_index != current_grid_index:
+	elif dy != 0:  # Vertical movement
+		var target_x = current_x
+		var target_y = current_y + dy
+		
+		# Check if target is within bounds and free
+		if target_y >= 0 and target_y < grid_size:
+			var adjacent_index = target_y * grid_size + target_x
+			if not grid_occupied[adjacent_index]:
+				new_index = adjacent_index
+			else:
+				# Rule 4: No free adjacent space, apply vertical overflow rules
+				new_index = handle_vertical_overflow(current_x, current_y, dy)
+		else:
+			# Rule 4: Moving outside bounds, apply vertical overflow rules
+			new_index = handle_vertical_overflow(current_x, current_y, dy)
+	
+	# Apply the movement if we found a valid new position
+	if new_index != current_grid_index and new_index != -1:
 		# Deselect current grid
 		if current_grid_index != -1:
 			grid_slots[current_grid_index].add_theme_stylebox_override("panel", default_grid_style)
@@ -170,6 +109,84 @@ func move_grid_selection(dx: int, dy: int):
 		# Select new grid
 		current_grid_index = new_index
 		grid_slots[current_grid_index].add_theme_stylebox_override("panel", selected_grid_style)
+
+# Handle horizontal overflow when moving left/right
+func handle_horizontal_overflow(current_x: int, current_y: int, dx: int) -> int:
+	# First, try to wrap within the same row
+	if dx > 0:  # Moving right, wrap to leftmost of same row
+		for x in range(grid_size):
+			var check_index = current_y * grid_size + x
+			if not grid_occupied[check_index] and check_index != current_grid_index:
+				return check_index
+	else:  # Moving left, wrap to rightmost of same row
+		for x in range(grid_size - 1, -1, -1):  # Start from rightmost
+			var check_index = current_y * grid_size + x
+			if not grid_occupied[check_index] and check_index != current_grid_index:
+				return check_index
+	
+	# No free slot in current row, move to next row
+	if dx > 0:  # Moving right, overflow to leftmost of next row
+		return find_slot_in_direction(current_y, 1, 0)  # Start from leftmost
+	else:  # Moving left, overflow to rightmost of next row
+		return find_slot_in_direction(current_y, 1, grid_size - 1)  # Start from rightmost
+
+# Handle vertical overflow when moving up/down
+func handle_vertical_overflow(current_x: int, current_y: int, dy: int) -> int:
+	# First, try to wrap within the same column
+	if dy > 0:  # Moving down, wrap to topmost of same column
+		for y in range(grid_size):
+			var check_index = y * grid_size + current_x
+			if not grid_occupied[check_index] and check_index != current_grid_index:
+				return check_index
+	else:  # Moving up, wrap to bottommost of same column
+		for y in range(grid_size - 1, -1, -1):  # Start from bottommost
+			var check_index = y * grid_size + current_x
+			if not grid_occupied[check_index] and check_index != current_grid_index:
+				return check_index
+	
+	# No free slot in current column, move to next column
+	if dy > 0:  # Moving down, overflow to topmost of next column
+		return find_slot_in_direction_vertical(current_x, 1, 0)  # Start from topmost
+	else:  # Moving up, overflow to bottommost of next column
+		return find_slot_in_direction_vertical(current_x, 1, grid_size - 1)  # Start from bottommost
+
+# Find a free slot starting from a specific row, moving in a direction
+func find_slot_in_direction(start_row: int, row_step: int, preferred_x: int) -> int:
+	# Try rows in order: start_row + row_step, start_row + 2*row_step, etc.
+	for row_offset in range(1, grid_size):
+		var target_row = (start_row + row_offset * row_step) % grid_size
+		
+		# Check preferred position first
+		var preferred_index = target_row * grid_size + preferred_x
+		if not grid_occupied[preferred_index]:
+			return preferred_index
+		
+		# If preferred position is occupied, check other positions in this row
+		for x in range(grid_size):
+			var check_index = target_row * grid_size + x
+			if not grid_occupied[check_index]:
+				return check_index
+	
+	return -1  # No free slot found
+
+# Find a free slot starting from a specific column, moving in a direction
+func find_slot_in_direction_vertical(start_col: int, col_step: int, preferred_y: int) -> int:
+	# Try columns in order: start_col + col_step, start_col + 2*col_step, etc.
+	for col_offset in range(1, grid_size):
+		var target_col = (start_col + col_offset * col_step) % grid_size
+		
+		# Check preferred position first
+		var preferred_index = preferred_y * grid_size + target_col
+		if not grid_occupied[preferred_index]:
+			return preferred_index
+		
+		# If preferred position is occupied, check other positions in this column
+		for y in range(grid_size):
+			var check_index = y * grid_size + target_col
+			if not grid_occupied[check_index]:
+				return check_index
+	
+	return -1  # No free slot found
 
 # Create the different styles for grid slots
 func create_grid_styles():
