@@ -11,11 +11,21 @@ var current_grid_index: int = -1  # Current selected grid position
 var grid_size: int = 3  # 3x3 grid
 var grid_slots: Array = []  # References to grid slot panels
 var grid_occupied: Array = []  # Track which slots have cards
+var grid_ownership: Array = []  # Track who owns each card (can change via combat)
+var grid_card_data: Array = []  # Track the actual card data for each slot
+
+# Player types for ownership tracking
+enum Owner {
+	NONE,
+	PLAYER,
+	OPPONENT
+}
 
 # Selected card visuals
 var selected_grid_style: StyleBoxFlat
 var default_grid_style: StyleBoxFlat
 var hover_grid_style: StyleBoxFlat
+var player_card_style: StyleBoxFlat
 var opponent_card_style: StyleBoxFlat
 
 # Game managers
@@ -115,17 +125,31 @@ func _on_turn_changed(is_player_turn: bool):
 		else:
 			print("Opponent already thinking, skipping turn start")
 
+# Calculate and return current scores
+func get_current_scores() -> Dictionary:
+	var player_score = 0
+	var opponent_score = 0
+	
+	for owner in grid_ownership:
+		if owner == Owner.PLAYER:
+			player_score += 1
+		elif owner == Owner.OPPONENT:
+			opponent_score += 1
+	
+	return {"player": player_score, "opponent": opponent_score}
+
 # Update the game status display
 func update_game_status():
-	var opponent_info = opponent_manager.get_opponent_info()
+	var scores = get_current_scores()
 	
 	if turn_manager.is_player_turn():
 		game_status_label.text = "Your Turn - Select a card and place it"
 	else:
+		var opponent_info = opponent_manager.get_opponent_info()
 		game_status_label.text = "Opponent's Turn - " + opponent_info.name + " is thinking..."
 	
-	# Update deck info to show both players' remaining cards
-	deck_name_label.text = "Your cards: " + str(player_deck.size()) + " | Opponent cards: " + str(opponent_info.cards_remaining)
+	# Update to show scores instead of card counts
+	deck_name_label.text = "Score - Player: " + str(scores.player) + " | Opponent: " + str(scores.opponent)
 
 # Enable player input controls
 func enable_player_input():
@@ -173,6 +197,69 @@ func opponent_take_turn():
 	# Let opponent make their move
 	opponent_manager.take_turn(available_slots)
 
+# Resolve combat when a card is placed
+func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource):
+	print("Resolving combat for card at slot ", grid_index)
+	
+	var captures = []
+	var grid_x = grid_index % grid_size
+	var grid_y = grid_index / grid_size
+	
+	# Check all 4 adjacent positions
+	var directions = [
+		{"dx": 0, "dy": -1, "my_value_index": 0, "their_value_index": 2, "name": "North"},  # North: my North vs their South
+		{"dx": 1, "dy": 0, "my_value_index": 1, "their_value_index": 3, "name": "East"},   # East: my East vs their West
+		{"dx": 0, "dy": 1, "my_value_index": 2, "their_value_index": 0, "name": "South"},  # South: my South vs their North
+		{"dx": -1, "dy": 0, "my_value_index": 3, "their_value_index": 1, "name": "West"}   # West: my West vs their East
+	]
+	
+	for direction in directions:
+		var adj_x = grid_x + direction.dx
+		var adj_y = grid_y + direction.dy
+		var adj_index = adj_y * grid_size + adj_x
+		
+		# Check if adjacent position is within bounds and occupied
+		if adj_x >= 0 and adj_x < grid_size and adj_y >= 0 and adj_y < grid_size:
+			if grid_occupied[adj_index]:
+				var adjacent_owner = grid_ownership[adj_index]
+				
+				# Only battle if the adjacent card is owned by the opponent
+				if adjacent_owner != Owner.NONE and adjacent_owner != attacking_owner:
+					var adjacent_card = grid_card_data[adj_index]
+					
+					var my_value = attacking_card.values[direction.my_value_index]
+					var their_value = adjacent_card.values[direction.their_value_index]
+					
+					print("Combat ", direction.name, ": My ", my_value, " vs Their ", their_value)
+					
+					# If my value is greater, I capture their card
+					if my_value > their_value:
+						print("Captured card at slot ", adj_index, "!")
+						captures.append(adj_index)
+	
+	# Apply all captures
+	for captured_index in captures:
+		grid_ownership[captured_index] = attacking_owner
+		print("Card at slot ", captured_index, " is now owned by ", "Player" if attacking_owner == Owner.PLAYER else "Opponent")
+	
+	# Update visuals for all affected cards
+	update_board_visuals()
+	
+	return captures.size()  # Return number of captures for potential future use
+
+# Update all card visuals based on current ownership
+func update_board_visuals():
+	for i in range(grid_slots.size()):
+		if grid_occupied[i]:
+			var slot = grid_slots[i]
+			var card_display = slot.get_child(0)  # The card display should be the first child
+			
+			# Apply styling based on current ownership
+			if grid_ownership[i] == Owner.PLAYER:
+				card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+			elif grid_ownership[i] == Owner.OPPONENT:
+				card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+
 # Handle opponent card placement
 func _on_opponent_card_placed(grid_index: int):
 	print("Opponent card placed signal received for slot: ", grid_index)
@@ -187,8 +274,17 @@ func _on_opponent_card_placed(grid_index: int):
 		opponent_is_thinking = false  # Reset thinking flag on error
 		return
 	
-	# Mark the slot as occupied
+	# Get the card data that the opponent just played
+	var opponent_card_data = opponent_manager.get_last_played_card()
+	if not opponent_card_data:
+		print("Warning: Could not get opponent card data!")
+		opponent_is_thinking = false
+		return
+	
+	# Mark the slot as occupied and set ownership
 	grid_occupied[grid_index] = true
+	grid_ownership[grid_index] = Owner.OPPONENT
+	grid_card_data[grid_index] = opponent_card_data
 	
 	# Get the slot
 	var slot = grid_slots[grid_index]
@@ -208,19 +304,18 @@ func _on_opponent_card_placed(grid_index: int):
 	# Set higher z-index so the card appears on top
 	card_display.z_index = 1
 	
-	# Get the card data that the opponent just played
-	var opponent_card_data = opponent_manager.get_last_played_card()
-	if opponent_card_data:
-		# Setup the card display with the actual card data
-		card_display.setup(opponent_card_data)
-		
-		# Apply opponent styling to distinguish from player cards
-		var opponent_style = opponent_card_style.duplicate()
-		card_display.panel.add_theme_stylebox_override("panel", opponent_style)
-	else:
-		print("Warning: Could not get opponent card data!")
+	# Setup the card display with the actual card data
+	card_display.setup(opponent_card_data)
 	
-	print("Opponent placed card: ", opponent_card_data.card_name if opponent_card_data else "Unknown", " at slot ", grid_index)
+	# Apply opponent styling
+	card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+	
+	print("Opponent placed card: ", opponent_card_data.card_name, " at slot ", grid_index)
+	
+	# Resolve combat
+	var captures = resolve_combat(grid_index, Owner.OPPONENT, opponent_card_data)
+	if captures > 0:
+		print("Opponent captured ", captures, " cards!")
 	
 	# Clear the thinking flag since opponent finished their turn
 	opponent_is_thinking = false
@@ -248,13 +343,22 @@ func should_game_end() -> bool:
 
 # End the game
 func end_game():
-	game_status_label.text = "Game Over!"
+	var scores = get_current_scores()
+	var winner = ""
+	
+	if scores.player > scores.opponent:
+		winner = "You win!"
+	elif scores.opponent > scores.player:
+		winner = "Opponent wins!"
+	else:
+		winner = "It's a tie!"
+	
+	game_status_label.text = "Game Over! " + winner
 	disable_player_input()
 	opponent_is_thinking = false  # Reset thinking flag
 	turn_manager.end_game()
 	
-	# TODO: Add win/loss logic and scoring
-	print("Game ended - implement scoring logic here")
+	print("Game ended - Final score: Player ", scores.player, " | Opponent ", scores.opponent)
 
 # Set up input processing for keyboard navigation (only when player's turn)
 func _input(event):
@@ -434,6 +538,15 @@ func create_grid_styles():
 	hover_grid_style.border_width_bottom = 1
 	hover_grid_style.border_color = Color("#888888")
 	
+	# Player card style (blue border)
+	player_card_style = StyleBoxFlat.new()
+	player_card_style.bg_color = Color("#444444")
+	player_card_style.border_width_left = 2
+	player_card_style.border_width_top = 2
+	player_card_style.border_width_right = 2
+	player_card_style.border_width_bottom = 2
+	player_card_style.border_color = Color("#4444FF")  # Blue for player
+	
 	# Opponent card style (red border)
 	opponent_card_style = StyleBoxFlat.new()
 	opponent_card_style.bg_color = Color("#444444")
@@ -462,6 +575,8 @@ func setup_empty_board():
 	# Clear tracking arrays
 	grid_slots.clear()
 	grid_occupied.clear()
+	grid_ownership.clear()
+	grid_card_data.clear()
 	
 	# Add 9 empty slots
 	for i in range(grid_size * grid_size):
@@ -483,6 +598,8 @@ func setup_empty_board():
 		board_container.add_child(slot)
 		grid_slots.append(slot)
 		grid_occupied.append(false)
+		grid_ownership.append(Owner.NONE)
+		grid_card_data.append(null)
 		
 		# Apply default style
 		slot.add_theme_stylebox_override("panel", default_grid_style)
@@ -632,8 +749,10 @@ func place_card_on_grid():
 	# Store a reference to the card data before removing it
 	var card_data = player_deck[selected_card_index]
 	
-	# Mark the grid as occupied
+	# Mark the slot as occupied and set ownership
 	grid_occupied[current_grid_index] = true
+	grid_ownership[current_grid_index] = Owner.PLAYER
+	grid_card_data[current_grid_index] = card_data
 	
 	# Get the current slot
 	var slot = grid_slots[current_grid_index]
@@ -657,7 +776,15 @@ func place_card_on_grid():
 	# Setup the card with the card resource data (using our stored reference)
 	card_display.setup(card_data)
 	
+	# Apply player styling initially
+	card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+	
 	print("Card placed on grid at position", current_grid_index)
+	
+	# Resolve combat
+	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
+	if captures > 0:
+		print("Player captured ", captures, " cards!")
 	
 	# Remove the card from the hand
 	var temp_index = selected_card_index
