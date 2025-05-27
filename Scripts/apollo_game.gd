@@ -16,12 +16,22 @@ var grid_occupied: Array = []  # Track which slots have cards
 var selected_grid_style: StyleBoxFlat
 var default_grid_style: StyleBoxFlat
 var hover_grid_style: StyleBoxFlat
+var opponent_card_style: StyleBoxFlat
 
-# Reference to the card hand
+# Game managers
+var turn_manager: TurnManager
+var opponent_manager: OpponentManager
+
+# UI References
 @onready var hand_container = $VBoxContainer/HBoxContainer
 @onready var board_container = $VBoxContainer/GameGrid
+@onready var game_status_label = $VBoxContainer/Title
+@onready var deck_name_label = $VBoxContainer/DeckName
 
 func _ready():
+	# Initialize game managers
+	setup_managers()
+	
 	# Initialize game board
 	setup_empty_board()
 	
@@ -36,13 +46,162 @@ func _ready():
 	else:
 		push_error("No deck was selected!")
 	
-	# Set up input handling
+	# Set up input handling (only when it's player's turn)
+	set_process_input(false)  # Start disabled
+	
+	# Start the game
+	start_game()
+
+# Set up the game managers
+func setup_managers():
+	# Create turn manager
+	turn_manager = TurnManager.new()
+	add_child(turn_manager)
+	
+	# Connect turn manager signals
+	turn_manager.coin_flip_result.connect(_on_coin_flip_result)
+	turn_manager.game_started.connect(_on_game_started)
+	turn_manager.turn_changed.connect(_on_turn_changed)
+	
+	# Create opponent manager
+	opponent_manager = OpponentManager.new()
+	add_child(opponent_manager)
+	
+	# Connect opponent manager signals
+	opponent_manager.opponent_card_placed.connect(_on_opponent_card_placed)
+
+# Start the game sequence
+func start_game():
+	game_status_label.text = "Flipping coin to determine who goes first..."
+	disable_player_input()
+	turn_manager.start_game()
+
+# Handle coin flip result
+func _on_coin_flip_result(player_goes_first: bool):
+	if player_goes_first:
+		game_status_label.text = "You won the coin flip! You go first."
+	else:
+		game_status_label.text = "Opponent won the coin flip! They go first."
+	
+	# Brief pause to show result
+	await get_tree().create_timer(2.0).timeout
+
+# Handle game start after coin flip
+func _on_game_started():
+	update_game_status()
+	
+	# If it's opponent's turn, let them play
+	if turn_manager.is_opponent_turn():
+		opponent_take_turn()
+
+# Handle turn changes
+func _on_turn_changed(is_player_turn: bool):
+	update_game_status()
+	
+	if is_player_turn:
+		enable_player_input()
+	else:
+		disable_player_input()
+		opponent_take_turn()
+
+# Update the game status display
+func update_game_status():
+	var opponent_info = opponent_manager.get_opponent_info()
+	
+	if turn_manager.is_player_turn():
+		game_status_label.text = "Your Turn - Select a card and place it"
+	else:
+		game_status_label.text = "Opponent's Turn - " + opponent_info.name + " is thinking..."
+	
+	# Update deck info to show both players' remaining cards
+	deck_name_label.text = "Your cards: " + str(player_deck.size()) + " | Opponent cards: " + str(opponent_info.cards_remaining)
+
+# Enable player input controls
+func enable_player_input():
 	set_process_input(true)
 
-# Set up input processing for keyboard navigation
+# Disable player input controls
+func disable_player_input():
+	set_process_input(false)
+	
+	# Clear any current selection
+	if current_grid_index != -1:
+		grid_slots[current_grid_index].add_theme_stylebox_override("panel", default_grid_style)
+		current_grid_index = -1
+
+# Let opponent take their turn
+func opponent_take_turn():
+	# Get list of available slots
+	var available_slots: Array[int] = []
+	for i in range(grid_occupied.size()):
+		if not grid_occupied[i]:
+			available_slots.append(i)
+	
+	# Check if game should end
+	if available_slots.is_empty() or not opponent_manager.has_cards():
+		end_game()
+		return
+	
+	# Let opponent make their move
+	opponent_manager.take_turn(available_slots)
+
+# Handle opponent card placement
+func _on_opponent_card_placed(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		print("Invalid grid index from opponent: ", grid_index)
+		return
+	
+	if grid_occupied[grid_index]:
+		print("Opponent tried to place card on occupied slot!")
+		return
+	
+	# Mark the slot as occupied
+	grid_occupied[grid_index] = true
+	
+	# Get the slot and add visual indication that opponent placed a card here
+	var slot = grid_slots[grid_index]
+	slot.add_theme_stylebox_override("panel", opponent_card_style)
+	
+	# Add a simple label to show it's an opponent card
+	var opponent_label = Label.new()
+	opponent_label.text = "OPP"
+	opponent_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	opponent_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	slot.add_child(opponent_label)
+	
+	print("Opponent placed card at slot ", grid_index)
+	
+	# Check if game should end
+	if should_game_end():
+		end_game()
+		return
+	
+	# Switch turns
+	turn_manager.next_turn()
+
+# Check if the game should end
+func should_game_end() -> bool:
+	# Game ends if board is full or both players are out of cards
+	var available_slots = 0
+	for occupied in grid_occupied:
+		if not occupied:
+			available_slots += 1
+	
+	return available_slots == 0 or (player_deck.is_empty() and not opponent_manager.has_cards())
+
+# End the game
+func end_game():
+	game_status_label.text = "Game Over!"
+	disable_player_input()
+	turn_manager.end_game()
+	
+	# TODO: Add win/loss logic and scoring
+	print("Game ended - implement scoring logic here")
+
+# Set up input processing for keyboard navigation (only when player's turn)
 func _input(event):
-	# Only process input if a card is selected
-	if selected_card_index == -1 or current_grid_index == -1:
+	# Only process input if it's the player's turn and a card is selected
+	if not turn_manager.is_player_turn() or selected_card_index == -1 or current_grid_index == -1:
 		return
 	
 	# Arrow key / WASD navigation
@@ -216,6 +375,15 @@ func create_grid_styles():
 	hover_grid_style.border_width_right = 1
 	hover_grid_style.border_width_bottom = 1
 	hover_grid_style.border_color = Color("#888888")
+	
+	# Opponent card style (red border)
+	opponent_card_style = StyleBoxFlat.new()
+	opponent_card_style.bg_color = Color("#444444")
+	opponent_card_style.border_width_left = 2
+	opponent_card_style.border_width_top = 2
+	opponent_card_style.border_width_right = 2
+	opponent_card_style.border_width_bottom = 2
+	opponent_card_style.border_color = Color("#FF4444")  # Red for opponent
 
 # Helper to get passed parameters from previous scene
 func get_scene_params() -> Dictionary:
@@ -248,7 +416,7 @@ func setup_empty_board():
 		board_container.add_theme_constant_override("h_separation", 10)  # Horizontal space between slots
 		board_container.add_theme_constant_override("v_separation", 10)  # Vertical space between slots
 		
-		# Connect mouse signals for hover and click
+		# Connect mouse signals for hover and click (only for player turns)
 		slot.mouse_entered.connect(_on_grid_mouse_entered.bind(i))
 		slot.mouse_exited.connect(_on_grid_mouse_exited.bind(i))
 		slot.gui_input.connect(_on_grid_gui_input.bind(i))
@@ -268,10 +436,6 @@ func load_player_deck(deck_index: int):
 	if apollo_collection:
 		# Get the deck based on index
 		player_deck = apollo_collection.get_deck(deck_index)
-		
-		# Update deck info display
-		var deck_info = $VBoxContainer/DeckName
-		deck_info.text = "Selected Deck: " + apollo_collection.decks[deck_index].deck_name
 		
 		# Display cards in hand
 		display_player_hand()
@@ -317,11 +481,15 @@ func display_player_hand():
 		# Setup the card with its data
 		card_display.setup(card)
 		
-		# Connect to detect clicks on the card
+		# Connect to detect clicks on the card (only when it's player's turn)
 		card_display.panel.gui_input.connect(_on_card_gui_input.bind(card_display, i))
 
 # Handle card input events
 func _on_card_gui_input(event, card_display, card_index):
+	# Only allow card selection during player's turn
+	if not turn_manager.is_player_turn():
+		return
+		
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			# Validate that we have a valid card index
@@ -350,19 +518,28 @@ func _on_card_gui_input(event, card_display, card_index):
 						grid_slots[i].add_theme_stylebox_override("panel", selected_grid_style)
 						break
 
-# Grid hover handlers
+# Grid hover handlers (only during player's turn)
 func _on_grid_mouse_entered(grid_index):
+	if not turn_manager.is_player_turn():
+		return
+		
 	# Only apply hover effect if not selected and not occupied
 	if grid_index != current_grid_index and not grid_occupied[grid_index]:
 		grid_slots[grid_index].add_theme_stylebox_override("panel", hover_grid_style)
 
 func _on_grid_mouse_exited(grid_index):
+	if not turn_manager.is_player_turn():
+		return
+		
 	# Restore default style if not the currently selected one
 	if grid_index != current_grid_index and not grid_occupied[grid_index]:
 		grid_slots[grid_index].add_theme_stylebox_override("panel", default_grid_style)
 
-# Grid click handler
+# Grid click handler (only during player's turn)
 func _on_grid_gui_input(event, grid_index):
+	if not turn_manager.is_player_turn():
+		return
+		
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			# Only select if a card is selected and grid is not occupied
@@ -429,22 +606,16 @@ func place_card_on_grid():
 	selected_card_index = -1  # Reset before removing to avoid issues with callbacks
 	remove_card_from_hand(temp_index)
 	
-	# Reset grid selection and find next available slot
+	# Reset grid selection
 	current_grid_index = -1
 	
-	# Find the next available slot
-	var found_next_slot = false
-	for i in range(grid_slots.size()):
-		if not grid_occupied[i]:
-			current_grid_index = i
-			grid_slots[i].add_theme_stylebox_override("panel", selected_grid_style)
-			found_next_slot = true
-			break
+	# Check if game should end
+	if should_game_end():
+		end_game()
+		return
 	
-	# If all slots are filled, deselect everything
-	if not found_next_slot:
-		current_grid_index = -1
-		print("All slots are filled!")
+	# Switch turns
+	turn_manager.next_turn()
 
 # Remove a card from the player's hand after it's played
 func remove_card_from_hand(card_index: int):
