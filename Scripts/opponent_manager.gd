@@ -7,6 +7,7 @@ signal opponent_card_placed(grid_index: int)
 # Opponent's deck - for now always the same, but structured for future variation
 var opponent_deck: Array[CardResource] = []
 var opponent_name: String = "Apollo's Shadow"
+var last_played_card: CardResource = null  # Track the last played card
 
 # AI decision making
 var think_time_min: float = 1.0
@@ -53,16 +54,22 @@ func take_turn(available_slots: Array[int]):
 	if available_slots.size() > 0:
 		var chosen_slot = available_slots[randi() % available_slots.size()]
 		
+		# Store the card before removing it so we can track what was played
+		last_played_card = opponent_deck[0]
+		
 		# Remove the first card from opponent's hand
-		var played_card = opponent_deck[0]
 		opponent_deck.remove_at(0)
 		
-		print("Opponent plays: ", played_card.card_name, " at slot ", chosen_slot)
+		print("Opponent plays: ", last_played_card.card_name, " at slot ", chosen_slot)
 		
 		# Emit signal with the chosen slot
 		emit_signal("opponent_card_placed", chosen_slot)
 	else:
 		print("No available slots for opponent!")
+
+# Get the last card that was played by the opponent
+func get_last_played_card() -> CardResource:
+	return last_played_card
 
 # Get remaining cards count
 func get_remaining_cards() -> int:

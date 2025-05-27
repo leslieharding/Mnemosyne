@@ -27,7 +27,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_dwe15"]
 script = ExtResource("1_vqrrp")
-card_name = "Rosey Fingered Eos"
+card_name = "Eos, the dawn"
 values = Array[int]([4, 4, 7, 7])
 description = "Welcome to a new day"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

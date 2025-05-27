@@ -22,6 +22,9 @@ var opponent_card_style: StyleBoxFlat
 var turn_manager: TurnManager
 var opponent_manager: OpponentManager
 
+# State management to prevent multiple opponent turns
+var opponent_is_thinking: bool = false
+
 # UI References
 @onready var hand_container = $VBoxContainer/HBoxContainer
 @onready var board_container = $VBoxContainer/GameGrid
@@ -88,21 +91,29 @@ func _on_coin_flip_result(player_goes_first: bool):
 
 # Handle game start after coin flip
 func _on_game_started():
+	print("Game started - current player is: ", "Player" if turn_manager.is_player_turn() else "Opponent")
 	update_game_status()
 	
-	# If it's opponent's turn, let them play
+	# If it's opponent's turn, let them play - but only once!
 	if turn_manager.is_opponent_turn():
-		opponent_take_turn()
+		print("Starting opponent's first turn")
+		call_deferred("opponent_take_turn")  # Use call_deferred to avoid async issues
 
 # Handle turn changes
 func _on_turn_changed(is_player_turn: bool):
+	print("Turn changed - is_player_turn: ", is_player_turn, " | opponent_is_thinking: ", opponent_is_thinking)
 	update_game_status()
 	
 	if is_player_turn:
 		enable_player_input()
 	else:
 		disable_player_input()
-		opponent_take_turn()
+		# Only start opponent turn if they're not already thinking
+		if not opponent_is_thinking:
+			print("Starting opponent turn via turn change")
+			call_deferred("opponent_take_turn")  # Use call_deferred to avoid async issues
+		else:
+			print("Opponent already thinking, skipping turn start")
 
 # Update the game status display
 func update_game_status():
@@ -131,6 +142,20 @@ func disable_player_input():
 
 # Let opponent take their turn
 func opponent_take_turn():
+	# Double-check that it's actually the opponent's turn to prevent multiple calls
+	if not turn_manager.is_opponent_turn():
+		print("Warning: opponent_take_turn called when it's not opponent's turn!")
+		return
+	
+	# Check if opponent is already thinking to prevent concurrent turns
+	if opponent_is_thinking:
+		print("Warning: opponent_take_turn called while opponent is already thinking!")
+		return
+	
+	# Set the thinking flag
+	opponent_is_thinking = true
+	print("Opponent starting turn - setting thinking flag to true")
+	
 	# Get list of available slots
 	var available_slots: Array[int] = []
 	for i in range(grid_occupied.size()):
@@ -139,44 +164,76 @@ func opponent_take_turn():
 	
 	# Check if game should end
 	if available_slots.is_empty() or not opponent_manager.has_cards():
+		opponent_is_thinking = false
 		end_game()
 		return
+	
+	print("Opponent taking turn - available slots: ", available_slots.size())
 	
 	# Let opponent make their move
 	opponent_manager.take_turn(available_slots)
 
 # Handle opponent card placement
 func _on_opponent_card_placed(grid_index: int):
+	print("Opponent card placed signal received for slot: ", grid_index)
+	
 	if grid_index < 0 or grid_index >= grid_slots.size():
 		print("Invalid grid index from opponent: ", grid_index)
+		opponent_is_thinking = false  # Reset thinking flag on error
 		return
 	
 	if grid_occupied[grid_index]:
 		print("Opponent tried to place card on occupied slot!")
+		opponent_is_thinking = false  # Reset thinking flag on error
 		return
 	
 	# Mark the slot as occupied
 	grid_occupied[grid_index] = true
 	
-	# Get the slot and add visual indication that opponent placed a card here
+	# Get the slot
 	var slot = grid_slots[grid_index]
-	slot.add_theme_stylebox_override("panel", opponent_card_style)
 	
-	# Add a simple label to show it's an opponent card
-	var opponent_label = Label.new()
-	opponent_label.text = "OPP"
-	opponent_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	opponent_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	slot.add_child(opponent_label)
+	# Create a card display for the opponent's card
+	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 	
-	print("Opponent placed card at slot ", grid_index)
+	# Add the card as a child of the slot panel
+	slot.add_child(card_display)
+	
+	# Center the card within the slot (same as player cards)
+	card_display.position = Vector2(
+		(slot.custom_minimum_size.x - 100) / 2,  # Assuming card width is 100
+		(slot.custom_minimum_size.y - 140) / 2   # Assuming card height is 140
+	)
+	
+	# Set higher z-index so the card appears on top
+	card_display.z_index = 1
+	
+	# Get the card data that the opponent just played
+	var opponent_card_data = opponent_manager.get_last_played_card()
+	if opponent_card_data:
+		# Setup the card display with the actual card data
+		card_display.setup(opponent_card_data)
+		
+		# Apply opponent styling to distinguish from player cards
+		var opponent_style = opponent_card_style.duplicate()
+		card_display.panel.add_theme_stylebox_override("panel", opponent_style)
+	else:
+		print("Warning: Could not get opponent card data!")
+	
+	print("Opponent placed card: ", opponent_card_data.card_name if opponent_card_data else "Unknown", " at slot ", grid_index)
+	
+	# Clear the thinking flag since opponent finished their turn
+	opponent_is_thinking = false
+	print("Opponent finished turn - setting thinking flag to false")
 	
 	# Check if game should end
 	if should_game_end():
 		end_game()
 		return
 	
-	# Switch turns
+	print("Switching turns after opponent move")
+	
+	# Switch turns - this should make it the player's turn
 	turn_manager.next_turn()
 
 # Check if the game should end
@@ -193,6 +250,7 @@ func should_game_end() -> bool:
 func end_game():
 	game_status_label.text = "Game Over!"
 	disable_player_input()
+	opponent_is_thinking = false  # Reset thinking flag
 	turn_manager.end_game()
 	
 	# TODO: Add win/loss logic and scoring
