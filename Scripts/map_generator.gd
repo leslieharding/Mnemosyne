@@ -39,12 +39,13 @@ static func generate_map() -> MapData:
 
 # Generate nodes for a specific layer
 static func generate_layer_nodes(layer: int, starting_id: int) -> Array[MapNode]:
-	var layer_nodes: Array[MapN ode] = []
+	var layer_nodes: Array[MapNode] = []
 	var node_count = NODES_PER_LAYER[layer]
 	
 	# Calculate horizontal spacing for this layer
 	var horizontal_spacing = MAP_WIDTH / (node_count + 1)
-	var y_position = layer * LAYER_SPACING
+# Invert the Y position so layer 0 is at the bottom and final layer is at top
+	var y_position = (LAYER_COUNT - 1 - layer) * LAYER_SPACING
 	
 	for i in range(node_count):
 		var x_position = (i + 1) * horizontal_spacing
@@ -67,19 +68,19 @@ static func determine_node_type(layer: int, index_in_layer: int) -> MapNode.Node
 	else:
 		return MapNode.NodeType.BATTLE
 
-# Connect nodes between layers
+# Connect nodes between layers - REVERSE the connection direction
 static func connect_layers(nodes_by_layer: Array, map_data: MapData):
-	# Connect each layer to the next
-	for layer in range(LAYER_COUNT - 1):
+	# Connect each layer to the PREVIOUS layer (so starting nodes have no connections)
+	for layer in range(1, LAYER_COUNT):  # Start from layer 1, not 0
 		var current_layer_nodes = nodes_by_layer[layer]
-		var next_layer_nodes = nodes_by_layer[layer + 1]
+		var previous_layer_nodes = nodes_by_layer[layer - 1]
 		
-		# Each node in current layer connects to some nodes in next layer
+		# Each node in current layer connects to some nodes in previous layer
 		for current_node in current_layer_nodes:
 			var connections = generate_connections_for_node(
 				current_node, 
 				current_layer_nodes, 
-				next_layer_nodes
+				previous_layer_nodes
 			)
 			current_node.connections = connections
 
