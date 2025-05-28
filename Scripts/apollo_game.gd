@@ -349,16 +349,53 @@ func end_game():
 	if scores.player > scores.opponent:
 		winner = "You win!"
 	elif scores.opponent > scores.player:
-		winner = "Opponent wins!"
+		winner = "You lose!"
+		# If player loses, end the entire run
+		game_status_label.text = "Defeat! " + winner
+		disable_player_input()
+		opponent_is_thinking = false
+		turn_manager.end_game()
+		
+		# Add a delay then return to god selection
+		await get_tree().create_timer(3.0).timeout
+		get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+		return
 	else:
 		winner = "It's a tie!"
 	
-	game_status_label.text = "Game Over! " + winner
+	# Player won or tied - continue the run
+	game_status_label.text = "Victory! " + winner
 	disable_player_input()
-	opponent_is_thinking = false  # Reset thinking flag
+	opponent_is_thinking = false
 	turn_manager.end_game()
 	
-	print("Game ended - Final score: Player ", scores.player, " | Opponent ", scores.opponent)
+	print("Battle ended - Final score: Player ", scores.player, " | Opponent ", scores.opponent)
+	
+	# Add a brief celebration delay
+	await get_tree().create_timer(2.0).timeout
+	
+	# Return to map with updated progress
+	return_to_map()
+
+# Return to the map after completing an encounter
+func return_to_map():
+	# Get the current map data and node info
+	var params = get_scene_params()
+	if params.has("map_data"):
+		# Pass the updated map data back to the map scene
+		get_tree().set_meta("scene_params", {
+			"god": params.get("god", "Apollo"),
+			"deck_index": params.get("deck_index", 0),
+			"map_data": params.get("map_data"),
+			"returning_from_battle": true
+		})
+		
+		# Return to the map scene
+		get_tree().change_scene_to_file("res://Scenes/RunMap.tscn")
+	else:
+		# Fallback if no map data
+		print("Warning: No map data found, returning to god selection")
+		get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
 
 # Set up input processing for keyboard navigation (only when player's turn)
 func _input(event):

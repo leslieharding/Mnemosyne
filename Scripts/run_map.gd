@@ -22,8 +22,15 @@ func _ready():
 	# Get run parameters from previous scene
 	get_run_parameters()
 	
-	# Generate and display the map
-	generate_new_map()
+	# Check if we're returning from a battle or starting fresh
+	var params = get_scene_params()
+	if params.has("returning_from_battle") and params.has("map_data"):
+		# Returning from battle - use existing map data
+		current_map = params.map_data
+		display_map()
+	else:
+		# Starting fresh - generate new map
+		generate_new_map()
 	
 	# Update UI
 	update_ui()
@@ -97,11 +104,13 @@ func style_map_node_button(button: Button, map_node: MapNode):
 		style.border_color = Color("#4A8A4A")
 		button.disabled = true
 		button.text += " ✓"
-	elif map_node.is_available or map_node.can_be_accessed(current_map.completed_nodes):
+		button.modulate.a = 1.0
+	elif map_node.is_available:
 		# Available nodes - blue/white
 		style.bg_color = Color("#2D4A5A")
 		style.border_color = Color("#4A7A8A")
 		button.disabled = false
+		button.modulate.a = 1.0
 	else:
 		# Unavailable nodes - gray
 		style.bg_color = Color("#3A3A3A")
@@ -165,6 +174,31 @@ func update_ui():
 	var completed_count = current_map.completed_nodes.size()
 	var total_count = current_map.nodes.size()
 	progress_label.text = "Progress: " + str(completed_count) + "/" + str(total_count) + " nodes completed"
+	
+	# Check if run is complete
+	check_run_completion()
+
+# Check if the run is complete after returning from battle
+func check_run_completion():
+	if current_map.is_map_complete():
+		title_label.text = "Run Complete! " + selected_god + " Victorious!"
+		progress_label.text = "Congratulations! You've completed this run."
+		
+		# Disable all remaining buttons
+		for button in map_node_buttons:
+			button.disabled = true
+		
+		# Add a "Continue" or "New Run" button
+		var continue_button = Button.new()
+		continue_button.text = "Start New Run"
+		continue_button.position = Vector2(400, 500)
+		continue_button.pressed.connect(_on_new_run_pressed)
+		map_container.add_child(continue_button)
+
+# Handle starting a new run
+func _on_new_run_pressed():
+	get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+
 
 # Handle back button press
 func _on_back_button_pressed():
