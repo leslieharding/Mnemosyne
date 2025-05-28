@@ -109,12 +109,22 @@ func set_layer_based_availability():
 	# Layer 0 (starting layer) should always be available if not completed
 	var layer_0_nodes = get_nodes_in_layer(0)
 	var layer_0_has_completed = false
-	
+
+# First, check if any node in layer 0 is completed
 	for node in layer_0_nodes:
 		if node.is_completed:
 			layer_0_has_completed = true
-		elif not layer_0_has_completed:
-			node.is_available = true
+			break
+
+# Then set availability based on whether layer 0 has any completed nodes
+	for node in layer_0_nodes:
+		if not node.is_completed:
+			if layer_0_has_completed:
+			# If any node in layer 0 is completed, disable all other nodes
+				node.is_available = false
+			else:
+			# If no nodes are completed yet, all should be available
+				node.is_available = true
 	
 	# For subsequent layers, only make available if previous layer is completed
 	for layer in range(1, total_layers):
