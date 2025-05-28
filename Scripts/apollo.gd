@@ -35,13 +35,14 @@ func _on_deck_3_button_pressed() -> void:
 	
 func _on_start_game_button_pressed() -> void:
 	if selected_deck_index >= 0:
-		# Pass the selected deck index to the game scene
+		# Pass the selected god and deck index to the map scene
 		get_tree().set_meta("scene_params", {
+			"god": "Apollo",
 			"deck_index": selected_deck_index
 		})
 		
-		# Change to the game scene
-		get_tree().change_scene_to_file("res://Scenes/ApolloGame.tscn")
+		# Change to the map scene instead of directly to game
+		get_tree().change_scene_to_file("res://Scenes/RunMap.tscn")
 	
 # Helper function to handle deck selection
 func select_deck(index: int) -> void:

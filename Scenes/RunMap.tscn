@@ -1,0 +1,49 @@
+[gd_scene load_steps=2 format=3 uid="uid://pp46piyj2qbs"]
+
+[ext_resource type="Script" uid="uid://cduy0ci6au10" path="res://Scripts/run_map.gd" id="1_3231i"]
+
+[node name="RunMap" type="Node2D"]
+script = ExtResource("1_3231i")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 62.0
+grow_horizontal = 2
+
+[node name="Title" type="Label" parent="UI/VBoxContainer"]
+layout_mode = 2
+text = "Choose Your Path"
+horizontal_alignment = 1
+
+[node name="ProgressLabel" type="Label" parent="UI/VBoxContainer"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="UI/VBoxContainer"]
+layout_mode = 2
+text = "Back to God Select"
+
+[node name="Background" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch_mode = 6
+
+[node name="MapContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
