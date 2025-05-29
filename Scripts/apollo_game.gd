@@ -321,6 +321,9 @@ func _on_opponent_card_placed(grid_index: int):
 	var captures = resolve_combat(grid_index, Owner.OPPONENT, opponent_card_data)
 	if captures > 0:
 		print("Opponent captured ", captures, " cards!")
+		
+	# Update the score display immediately after combat
+	update_game_status()
 	
 	# Clear the thinking flag since opponent finished their turn
 	opponent_is_thinking = false
@@ -829,20 +832,23 @@ func place_card_on_grid():
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 	if captures > 0:
 		print("Player captured ", captures, " cards!")
-	
+
+	# Update the score display immediately after combat
+	update_game_status()
+
 	# Remove the card from the hand
 	var temp_index = selected_card_index
 	selected_card_index = -1  # Reset before removing to avoid issues with callbacks
 	remove_card_from_hand(temp_index)
-	
+
 	# Reset grid selection
 	current_grid_index = -1
-	
+
 	# Check if game should end
 	if should_game_end():
 		end_game()
 		return
-	
+
 	# Switch turns
 	turn_manager.next_turn()
 
