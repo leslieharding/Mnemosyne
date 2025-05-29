@@ -348,6 +348,8 @@ func should_game_end() -> bool:
 
 # End the game
 func end_game():
+	await get_tree().process_frame
+	
 	var scores = get_current_scores()
 	var winner = ""
 	
