@@ -125,16 +125,21 @@ func _on_turn_changed(is_player_turn: bool):
 		else:
 			print("Opponent already thinking, skipping turn start")
 
-# Calculate and return current scores
+# Calculate and return current scores (Triple Triad style)
 func get_current_scores() -> Dictionary:
-	var player_score = 0
-	var opponent_score = 0
+	# Count cards owned on the board
+	var player_board_cards = 0
+	var opponent_board_cards = 0
 	
 	for owner in grid_ownership:
 		if owner == Owner.PLAYER:
-			player_score += 1
+			player_board_cards += 1
 		elif owner == Owner.OPPONENT:
-			opponent_score += 1
+			opponent_board_cards += 1
+	
+	# Total score = cards in hand + cards owned on board
+	var player_score = player_deck.size() + player_board_cards
+	var opponent_score = opponent_manager.get_remaining_cards() + opponent_board_cards
 	
 	return {"player": player_score, "opponent": opponent_score}
 
