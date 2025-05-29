@@ -375,7 +375,7 @@ func end_game():
 	await get_tree().create_timer(2.0).timeout
 	
 	# Return to map with updated progress
-	return_to_map()
+	show_reward_screen()
 
 # Return to the map after completing an encounter
 func return_to_map():
@@ -858,3 +858,15 @@ func remove_card_from_hand(card_index: int):
 	
 	# Redisplay the hand to update visuals
 	display_player_hand()
+
+
+func show_reward_screen():
+	var params = get_scene_params()
+	
+	get_tree().set_meta("scene_params", {
+		"god": params.get("god", "Apollo"),
+		"deck_index": params.get("deck_index", 0),
+		"map_data": params.get("map_data"),
+		"current_node": params.get("current_node")
+	})
+	get_tree().change_scene_to_file("res://Scenes/RewardScreen.tscn")
