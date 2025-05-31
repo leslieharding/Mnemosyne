@@ -35,6 +35,9 @@ func setup_deck(deck: Array[CardResource], deck_indices: Array[int]):
 		var mini_display = create_mini_card_display(card, card_index)
 		card_container.add_child(mini_display)
 		card_displays[card_index] = mini_display
+	
+	# Initialize displays with current experience totals from the tracker
+	refresh_display()
 
 # Create a mini card display
 func create_mini_card_display(card: CardResource, card_index: int) -> Control:
@@ -50,9 +53,13 @@ func create_mini_card_display(card: CardResource, card_index: int) -> Control:
 	# Experience displays
 	var exp_container = VBoxContainer.new()
 	
+	# Get current experience from tracker
+	var tracker = get_node("/root/RunExperienceTrackerAutoload")
+	var exp_data = tracker.get_card_experience(card_index)
+	
 	# Capture exp
 	var capture_label = Label.new()
-	capture_label.text = "⚔️ +0"
+	capture_label.text = "⚔️ +" + str(exp_data["capture_exp"])
 	capture_label.add_theme_color_override("font_color", Color("#FFD700"))  # Gold
 	capture_label.add_theme_font_size_override("font_size", 12)
 	capture_label.name = "CaptureExp"
@@ -60,7 +67,7 @@ func create_mini_card_display(card: CardResource, card_index: int) -> Control:
 	
 	# Defense exp
 	var defense_label = Label.new()
-	defense_label.text = "🛡️ +0"
+	defense_label.text = "🛡️ +" + str(exp_data["defense_exp"])
 	defense_label.add_theme_color_override("font_color", Color("#87CEEB"))  # Sky blue
 	defense_label.add_theme_font_size_override("font_size", 12)
 	defense_label.name = "DefenseExp"
@@ -76,11 +83,11 @@ func _on_experience_updated(card_index: int, exp_type: String, amount: int):
 		return
 	
 	var display = card_displays[card_index]
-	var exp_data = get_node("/root/RunExperienceTracker").get_card_experience(card_index)
+	var exp_data = get_node("/root/RunExperienceTrackerAutoload").get_card_experience(card_index)
 	
-	# Update the appropriate label
-	var capture_label = display.get_node("VBoxContainer/CaptureExp")
-	var defense_label = display.get_node("VBoxContainer/DefenseExp")
+	# Update the appropriate label - find them more robustly
+	var capture_label = display.find_child("CaptureExp", true, false)
+	var defense_label = display.find_child("DefenseExp", true, false)
 	
 	if capture_label:
 		capture_label.text = "⚔️ +" + str(exp_data["capture_exp"])
@@ -107,8 +114,23 @@ func _on_collapse_toggled():
 	else:
 		title_label.text = "Experience"
 
+
 # Refresh the entire display
 func refresh_display():
 	if RunExperienceTrackerAutoload:
+		# Get the tracker reference
+		var tracker = get_node("/root/RunExperienceTrackerAutoload")
+		
+		# Update each card display with current totals
 		for card_index in card_displays:
-			_on_experience_updated(card_index, "", 0)
+			var exp_data = tracker.get_card_experience(card_index)
+			var display = card_displays[card_index]
+			
+			# Find and update the labels
+			var capture_label = display.find_child("CaptureExp", true, false)
+			var defense_label = display.find_child("DefenseExp", true, false)
+			
+			if capture_label:
+				capture_label.text = "⚔️ +" + str(exp_data["capture_exp"])
+			if defense_label:
+				defense_label.text = "🛡️ +" + str(exp_data["defense_exp"])
