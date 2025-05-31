@@ -12,6 +12,11 @@ var deck_index: int = 0
 var victory: bool = true
 
 func _ready():
+	
+	# Connect button signals
+	$VBoxContainer/ButtonContainer/NewRunButton.pressed.connect(_on_new_run_button_pressed)
+	$VBoxContainer/ButtonContainer/MainMenuButton.pressed.connect(_on_main_menu_button_pressed)
+	
 	# Get parameters from previous scene
 	var params = get_scene_params()
 	god_name = params.get("god", "Apollo")
@@ -102,19 +107,23 @@ func create_card_exp_display(card: CardResource, exp_data: Dictionary) -> Contro
 	
 	return container
 
-func _on_new_run_pressed():
-	# Clear the run data before starting a new run
-	get_node("/root/RunExperienceTrackerAutoload").clear_run()
-	# Go to god selection
-	get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
-
-func _on_main_menu_pressed():
-	# Clear the run data before going to main menu
-	get_node("/root/RunExperienceTrackerAutoload").clear_run()
-	# Go to main menu
-	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
 
 func get_scene_params() -> Dictionary:
 	if get_tree().has_meta("scene_params"):
 		return get_tree().get_meta("scene_params")
 	return {}
+
+
+func _on_new_run_button_pressed() -> void:
+	# Clear the run data before starting a new run
+	get_node("/root/RunExperienceTrackerAutoload").clear_run()
+	# Go to god selection
+	get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+	
+
+
+func _on_main_menu_button_pressed() -> void:
+	# Clear the run data before going to main menu
+	get_node("/root/RunExperienceTrackerAutoload").clear_run()
+	# Go to main menu
+	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
