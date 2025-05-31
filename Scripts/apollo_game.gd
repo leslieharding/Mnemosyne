@@ -688,12 +688,17 @@ func load_player_deck(deck_index: int):
 		# Get the deck based on index
 		player_deck = apollo_collection.get_deck(deck_index)
 		
-		# Only initialize the experience tracker if this is a new run (not returning from battle)
+		# Only initialize the experience tracker if this is truly a new run (starting from god selection)
 		var params = get_scene_params()
-		if not params.has("returning_from_battle"):
+		var is_new_run = not params.has("map_data") or not params.has("returning_from_battle")
+
+		if is_new_run:
 			# This is a new run - initialize the tracker
 			get_node("/root/RunExperienceTrackerAutoload").start_new_run(deck_card_indices)
-		# If returning from battle, the tracker already has the experience data
+			print("Starting new run - initialized experience tracker")
+		else:
+			print("Continuing existing run - preserving experience data")
+		# If continuing a run, the tracker already has the experience data
 		
 		# Set up experience panel
 		setup_experience_panel()
