@@ -11,8 +11,8 @@ var card_displays: Dictionary = {}  # card_index -> mini card display
 
 func _ready():
 	# Connect to the experience tracker
-	if RunExperienceTracker:
-		get_node("/root/RunExperienceTracker").experience_updated.connect(_on_experience_updated)
+	if RunExperienceTrackerAutoload:
+		get_node("/root/RunExperienceTrackerAutoload").experience_updated.connect(_on_experience_updated)
 	
 	# Connect collapse button
 	collapse_button.pressed.connect(_on_collapse_toggled)
@@ -102,13 +102,13 @@ func _on_collapse_toggled():
 	
 	# Update title with total exp when collapsed
 	if is_collapsed:
-		var totals = get_node("/root/RunExperienceTracker").get_total_experience()
+		var totals = get_node("/root/RunExperienceTrackerAutoload").get_total_experience()
 		title_label.text = "Experience (⚔️ " + str(totals["capture_exp"]) + " | 🛡️ " + str(totals["defense_exp"]) + ")"
 	else:
 		title_label.text = "Experience"
 
 # Refresh the entire display
 func refresh_display():
-	if RunExperienceTracker:
+	if RunExperienceTrackerAutoload:
 		for card_index in card_displays:
 			_on_experience_updated(card_index, "", 0)
