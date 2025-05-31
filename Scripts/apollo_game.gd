@@ -251,13 +251,13 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 						if attacking_owner == Owner.PLAYER:
 							var card_collection_index = get_card_collection_index(grid_index)
 							if card_collection_index != -1:
-								RunExperienceTracker.add_capture_exp(card_collection_index, 10)
+								get_node("/root/RunExperienceTracker").add_capture_exp(card_collection_index, 10)
 					else:
 						# Defense successful - award defense exp if defending card is player's
 						if attacking_owner == Owner.OPPONENT and grid_ownership[adj_index] == Owner.PLAYER:
 							var defending_card_index = get_card_collection_index(adj_index)
 							if defending_card_index != -1:
-								RunExperienceTracker.add_defense_exp(defending_card_index, 5)
+								get_node("/root/RunExperienceTracker").add_defense_exp(defending_card_index, 5)
 	
 	# Apply all captures
 	for captured_index in captures:
@@ -689,7 +689,7 @@ func load_player_deck(deck_index: int):
 		player_deck = apollo_collection.get_deck(deck_index)
 		
 		# Initialize the experience tracker for this run
-		RunExperienceTracker.start_new_run(deck_card_indices)
+		get_node("/root/RunExperienceTracker").start_new_run(deck_card_indices)
 		
 		# Set up experience panel
 		setup_experience_panel()
