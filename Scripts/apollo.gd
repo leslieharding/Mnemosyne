@@ -35,6 +35,11 @@ func _on_deck_3_button_pressed() -> void:
 	
 func _on_start_game_button_pressed() -> void:
 	if selected_deck_index >= 0:
+		# Initialize the experience tracker for this new run
+		var deck_def = apollo_collection.decks[selected_deck_index]
+		get_node("/root/RunExperienceTrackerAutoload").start_new_run(deck_def.card_indices)
+		print("Initialized experience tracker for new run with deck: ", deck_def.deck_name)
+		
 		# Pass the selected god and deck index to the map scene
 		get_tree().set_meta("scene_params", {
 			"god": "Apollo",

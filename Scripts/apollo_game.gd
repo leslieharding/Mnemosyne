@@ -675,6 +675,7 @@ func setup_empty_board():
 		slot.add_theme_stylebox_override("panel", default_grid_style)
 
 # Load player's selected deck
+# Load player's selected deck
 func load_player_deck(deck_index: int):
 	# Load Apollo collection
 	var apollo_collection: GodCardCollection = load("res://Resources/Collections/Apollo.tres")
@@ -688,17 +689,8 @@ func load_player_deck(deck_index: int):
 		# Get the deck based on index
 		player_deck = apollo_collection.get_deck(deck_index)
 		
-		# Only initialize the experience tracker if this is truly a new run (starting from god selection)
-		var params = get_scene_params()
-		var is_new_run = not params.has("map_data") or not params.has("returning_from_battle")
-
-		if is_new_run:
-			# This is a new run - initialize the tracker
-			get_node("/root/RunExperienceTrackerAutoload").start_new_run(deck_card_indices)
-			print("Starting new run - initialized experience tracker")
-		else:
-			print("Continuing existing run - preserving experience data")
-		# If continuing a run, the tracker already has the experience data
+		# The experience tracker should already be initialized from the god selection screen
+		print("Loading deck for battle - experience tracker should already be initialized")
 		
 		# Set up experience panel
 		setup_experience_panel()
