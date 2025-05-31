@@ -213,16 +213,26 @@ func check_run_completion():
 		for button in map_node_buttons:
 			button.disabled = true
 		
-		# Add a "Continue" or "New Run" button
-		var continue_button = Button.new()
-		continue_button.text = "Start New Run"
-		continue_button.position = Vector2(400, 500)
-		continue_button.pressed.connect(_on_new_run_pressed)
-		map_container.add_child(continue_button)
+		# Add a "View Run Summary" button
+		var summary_button = Button.new()
+		summary_button.text = "View Run Summary"
+		summary_button.position = Vector2(400, 500)
+		summary_button.pressed.connect(_on_view_summary_pressed)
+		map_container.add_child(summary_button)
 
 # Handle starting a new run
 func _on_new_run_pressed():
 	get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+
+# Handle viewing run summary
+func _on_view_summary_pressed():
+	# Pass run data to summary screen
+	get_tree().set_meta("scene_params", {
+		"god": selected_god,
+		"deck_index": selected_deck_index,
+		"victory": true
+	})
+	get_tree().change_scene_to_file("res://Scenes/RunSummary.tscn")
 
 
 # Handle back button press

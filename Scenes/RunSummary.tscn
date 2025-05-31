@@ -1,0 +1,95 @@
+[gd_scene load_steps=2 format=3 uid="uid://cfh3r1ruou4l2"]
+
+[ext_resource type="Script" uid="uid://y74vj50c3yq" path="res://Scripts/run_summary.gd" id="1_3mjj1"]
+
+[node name="RunSummary" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3mjj1")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -76.0
+offset_right = 20.0
+offset_bottom = 76.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Run Summary"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ResultLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Victory!"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ExpSummaryLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Experience Gained"
+horizontal_alignment = 1
+
+[node name="TotalExpContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="CaptureTotal" type="Label" parent="VBoxContainer/TotalExpContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "⚔️ Total Capture: 0"
+
+[node name="VSeparator" type="VSeparator" parent="VBoxContainer/TotalExpContainer"]
+layout_mode = 2
+
+[node name="DefenseTotal" type="Label" parent="VBoxContainer/TotalExpContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "🛡️ Total Defense: 0"
+
+[node name="HSeparator3" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="CardDetailsContainer" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HSeparator4" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="NewRunButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Start New Run"
+
+[node name="MainMenuButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Main Menu"
+
+[connection signal="pressed" from="VBoxContainer/ButtonContainer/NewRunButton" to="." method="_on_new_run_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]

@@ -383,15 +383,23 @@ func end_game():
 		winner = "You win!"
 	elif scores.opponent > scores.player:
 		winner = "You lose!"
-		# If player loses, end the entire run
+		# If player loses, show run summary before ending
 		game_status_label.text = "Defeat! " + winner
 		disable_player_input()
 		opponent_is_thinking = false
 		turn_manager.end_game()
 		
-		# Add a delay then return to god selection
+		# Add a delay then go to run summary
 		await get_tree().create_timer(3.0).timeout
-		get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+		
+		# Pass data to summary screen
+		var params = get_scene_params()
+		get_tree().set_meta("scene_params", {
+			"god": params.get("god", "Apollo"),
+			"deck_index": params.get("deck_index", 0),
+			"victory": false
+		})
+		get_tree().change_scene_to_file("res://Scenes/RunSummary.tscn")
 		return
 	else:
 		winner = "It's a tie!"
@@ -409,7 +417,6 @@ func end_game():
 	
 	# Return to map with updated progress
 	show_reward_screen()
-
 # Return to the map after completing an encounter
 func return_to_map():
 	# Get the current map data and node info
