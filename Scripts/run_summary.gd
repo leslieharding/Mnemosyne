@@ -118,11 +118,3 @@ func get_scene_params() -> Dictionary:
 	if get_tree().has_meta("scene_params"):
 		return get_tree().get_meta("scene_params")
 	return {}
-
-
-func _on_new_run_button_pressed() -> void:
-	pass # Replace with function body.
-
-
-func _on_main_menu_button_pressed() -> void:
-	pass # Replace with function body.
