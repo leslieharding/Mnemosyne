@@ -15,12 +15,18 @@ var map_node_buttons: Array[Button] = []
 var selected_god: String = "Apollo"
 var selected_deck_index: int = 0
 
+# Experience panel reference
+var exp_panel: ExpPanel
+
 func _ready():
 	# Connect back button
 	back_button.pressed.connect(_on_back_button_pressed)
 	
 	# Get run parameters from previous scene
 	get_run_parameters()
+	
+	# Add experience panel
+	setup_experience_panel()
 	
 	# Check if we're returning from a battle or starting fresh
 	var params = get_scene_params()
@@ -44,6 +50,25 @@ func get_run_parameters():
 		selected_deck_index = params.deck_index
 	
 	print("Starting run with: ", selected_god, " deck ", selected_deck_index)
+
+# Add new function to set up experience panel
+func setup_experience_panel():
+	# Only show if we have deck data
+	var params = get_scene_params()
+	if not params.has("deck_index"):
+		return
+		
+	# Create experience panel
+	exp_panel = preload("res://Scenes/ExpPanel.tscn").instantiate()
+	exp_panel.position = Vector2(900, 10)
+	$UI.add_child(exp_panel)
+	
+	# Load the deck to display
+	var apollo_collection = load("res://Resources/Collections/Apollo.tres")
+	if apollo_collection and params.has("deck_index"):
+		var deck = apollo_collection.get_deck(params.deck_index)
+		var deck_def = apollo_collection.decks[params.deck_index]
+		exp_panel.setup_deck(deck, deck_def.card_indices)
 
 # Generate a new map for this run
 func generate_new_map():

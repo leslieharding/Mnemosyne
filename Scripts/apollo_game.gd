@@ -14,6 +14,11 @@ var grid_occupied: Array = []  # Track which slots have cards
 var grid_ownership: Array = []  # Track who owns each card (can change via combat)
 var grid_card_data: Array = []  # Track the actual card data for each slot
 
+# Experience tracking
+var deck_card_indices: Array[int] = []  # Original indices in Apollo's collection
+var exp_panel: ExpPanel  # Reference to experience panel
+var grid_to_collection_index: Dictionary = {}  # grid_index -> collection_index
+
 # Player types for ownership tracking
 enum Owner {
 	NONE,
@@ -241,6 +246,18 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 					if my_value > their_value:
 						print("Captured card at slot ", adj_index, "!")
 						captures.append(adj_index)
+						
+						# Award capture experience if it's a player card
+						if attacking_owner == Owner.PLAYER:
+							var card_collection_index = get_card_collection_index(grid_index)
+							if card_collection_index != -1:
+								RunExperienceTracker.add_capture_exp(card_collection_index, 10)
+					else:
+						# Defense successful - award defense exp if defending card is player's
+						if attacking_owner == Owner.OPPONENT and grid_ownership[adj_index] == Owner.PLAYER:
+							var defending_card_index = get_card_collection_index(adj_index)
+							if defending_card_index != -1:
+								RunExperienceTracker.add_defense_exp(defending_card_index, 5)
 	
 	# Apply all captures
 	for captured_index in captures:
@@ -251,6 +268,12 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 	update_board_visuals()
 	
 	return captures.size()  # Return number of captures for potential future use
+
+# Add helper function to get collection index from grid position
+func get_card_collection_index(grid_index: int) -> int:
+	if grid_index in grid_to_collection_index:
+		return grid_to_collection_index[grid_index]
+	return -1
 
 # Update all card visuals based on current ownership
 func update_board_visuals():
@@ -656,14 +679,41 @@ func load_player_deck(deck_index: int):
 	# Load Apollo collection
 	var apollo_collection: GodCardCollection = load("res://Resources/Collections/Apollo.tres")
 	if apollo_collection:
+		# Get the deck definition
+		var deck_def = apollo_collection.decks[deck_index]
+		
+		# Store the original indices
+		deck_card_indices = deck_def.card_indices.duplicate()
+		
 		# Get the deck based on index
 		player_deck = apollo_collection.get_deck(deck_index)
+		
+		# Initialize the experience tracker for this run
+		RunExperienceTracker.start_new_run(deck_card_indices)
+		
+		# Set up experience panel
+		setup_experience_panel()
 		
 		# Display cards in hand
 		display_player_hand()
 	else:
 		push_error("Failed to load Apollo collection!")
 
+# Add new function to set up experience panel
+func setup_experience_panel():
+	# Create and add the experience panel
+	exp_panel = preload("res://Scenes/ExpPanel.tscn").instantiate()
+	
+	# Position it in the top-right corner
+	exp_panel.position = Vector2(900, 10)
+	
+	# Add to the scene
+	add_child(exp_panel)
+	
+	# Set up with current deck
+	exp_panel.setup_deck(player_deck, deck_card_indices)
+
+# Display player's hand of cards using manual positioning
 # Display player's hand of cards using manual positioning
 func display_player_hand():
 	# First, clear existing cards
@@ -801,6 +851,9 @@ func place_card_on_grid():
 	grid_ownership[current_grid_index] = Owner.PLAYER
 	grid_card_data[current_grid_index] = card_data
 	
+	# Track which collection index this card is from
+	grid_to_collection_index[current_grid_index] = deck_card_indices[selected_card_index]
+	
 	# Get the current slot
 	var slot = grid_slots[current_grid_index]
 	
@@ -866,12 +919,14 @@ func remove_card_from_hand(card_index: int):
 	# Remove the card from the deck array
 	player_deck.remove_at(card_index)
 	
+	# Also remove from the deck indices tracking
+	deck_card_indices.remove_at(card_index)
+	
 	# Reset the selected card index
 	selected_card_index = -1
 	
 	# Redisplay the hand to update visuals
 	display_player_hand()
-
 
 func show_reward_screen():
 	var params = get_scene_params()
