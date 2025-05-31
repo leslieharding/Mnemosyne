@@ -16,9 +16,7 @@ func _ready():
 	
 	# Connect collapse button
 	collapse_button.pressed.connect(_on_collapse_toggled)
-	
-	# Initialize display
-	refresh_display()
+
 
 # Set up the panel with the current deck
 func setup_deck(deck: Array[CardResource], deck_indices: Array[int]):
@@ -36,7 +34,10 @@ func setup_deck(deck: Array[CardResource], deck_indices: Array[int]):
 		card_container.add_child(mini_display)
 		card_displays[card_index] = mini_display
 	
-	# Initialize displays with current experience totals from the tracker
+	# Wait one frame to ensure all child nodes are properly added
+	await get_tree().process_frame
+	
+	# Now refresh with the current experience totals from the tracker
 	refresh_display()
 
 # Create a mini card display
