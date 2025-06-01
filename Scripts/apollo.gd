@@ -195,18 +195,15 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	exp_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	right_side.add_child(exp_title)
 	
-	# Get experience data from GlobalProgressTracker if it exists
+	# Get experience data from GlobalProgressTracker
 	var capture_exp = 0
 	var defense_exp = 0
 	
-	# TODO: Replace this with actual GlobalProgressTracker call when implemented
-	# For now, we'll show placeholder values or load from a simple system
-	if has_node("/root/GlobalProgressTracker"):
-		var progress_tracker = get_node("/root/GlobalProgressTracker")
-		if progress_tracker.has_method("get_card_total_experience"):
-			var exp_data = progress_tracker.get_card_total_experience("Apollo", card_index)
-			capture_exp = exp_data.get("capture_exp", 0)
-			defense_exp = exp_data.get("defense_exp", 0)
+	if has_node("/root/GlobalProgressTrackerAutoload"):
+		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		var exp_data = progress_tracker.get_card_total_experience("Apollo", card_index)
+		capture_exp = exp_data.get("capture_exp", 0)
+		defense_exp = exp_data.get("defense_exp", 0)
 	
 	# Experience display
 	var exp_container = HBoxContainer.new()

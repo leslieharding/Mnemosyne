@@ -112,7 +112,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 [sub_resource type="Resource" id="Resource_tn03x"]
 script = ExtResource("2_w7xgs")
 deck_name = "The Sun"
-deck_description = "Unleash the sun upon your enemies"
+deck_description = "Shining forth from the utmost heights of heaven"
 card_indices = Array[int]([0, 1, 2, 3, 4])
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 

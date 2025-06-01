@@ -1,0 +1,81 @@
+# res://Scripts/global_progress_tracker.gd
+extends Node
+class_name GlobalProgressTracker
+
+# Structure: {god_name: {card_index: {capture_exp: X, defense_exp: Y}}}
+var progress_data: Dictionary = {}
+var save_path: String = "user://card_progress.save"
+
+func _ready():
+	load_progress()
+
+# Add experience from a completed run
+func add_run_experience(god_name: String, run_experience: Dictionary):
+	# Ensure the god exists in our data
+	if not god_name in progress_data:
+		progress_data[god_name] = {}
+	
+	# Add each card's experience
+	for card_index in run_experience:
+		var card_exp = run_experience[card_index]
+		
+		# Ensure this card exists in our data
+		if not card_index in progress_data[god_name]:
+			progress_data[god_name][card_index] = {
+				"capture_exp": 0,
+				"defense_exp": 0
+			}
+		
+		# Add the experience
+		progress_data[god_name][card_index]["capture_exp"] += card_exp["capture_exp"]
+		progress_data[god_name][card_index]["defense_exp"] += card_exp["defense_exp"]
+	
+	print("Added run experience for ", god_name, ": ", run_experience)
+	save_progress()
+
+# Get total experience for a specific card
+func get_card_total_experience(god_name: String, card_index: int) -> Dictionary:
+	if god_name in progress_data and card_index in progress_data[god_name]:
+		return progress_data[god_name][card_index].duplicate()
+	return {"capture_exp": 0, "defense_exp": 0}
+
+# Get all card experience for a god
+func get_god_progress(god_name: String) -> Dictionary:
+	if god_name in progress_data:
+		return progress_data[god_name].duplicate()
+	return {}
+
+# Save progress to disk
+func save_progress():
+	var save_file = FileAccess.open(save_path, FileAccess.WRITE)
+	if save_file:
+		save_file.store_var(progress_data)
+		save_file.close()
+		print("Progress saved to ", save_path)
+	else:
+		print("Failed to save progress!")
+
+# Load progress from disk
+func load_progress():
+	if FileAccess.file_exists(save_path):
+		var save_file = FileAccess.open(save_path, FileAccess.READ)
+		if save_file:
+			progress_data = save_file.get_var()
+			save_file.close()
+			print("Progress loaded from ", save_path)
+			print("Current progress data: ", progress_data)
+		else:
+			print("Failed to load progress!")
+	else:
+		print("No save file found, starting fresh")
+
+# Clear all progress (for testing or reset)
+func clear_all_progress():
+	progress_data.clear()
+	save_progress()
+
+# Clear progress for a specific god
+func clear_god_progress(god_name: String):
+	if god_name in progress_data:
+		progress_data.erase(god_name)
+		save_progress()

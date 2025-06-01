@@ -115,6 +115,9 @@ func get_scene_params() -> Dictionary:
 
 
 func _on_new_run_button_pressed() -> void:
+	# Add run experience to global tracker before clearing
+	save_run_to_global_progress()
+	
 	# Clear the run data before starting a new run
 	get_node("/root/RunExperienceTrackerAutoload").clear_run()
 	# Go to god selection
@@ -123,7 +126,24 @@ func _on_new_run_button_pressed() -> void:
 
 
 func _on_main_menu_button_pressed() -> void:
+	# Add run experience to global tracker before clearing
+	save_run_to_global_progress()
+	
 	# Clear the run data before going to main menu
 	get_node("/root/RunExperienceTrackerAutoload").clear_run()
 	# Go to main menu
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+	
+	
+# Save the run experience to global progress
+func save_run_to_global_progress():
+	var tracker = get_node("/root/RunExperienceTrackerAutoload")
+	var global_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	
+	# Get all experience from this run
+	var run_exp = tracker.get_all_experience()
+	
+	# Add it to the global tracker
+	if run_exp.size() > 0:
+		global_tracker.add_run_experience(god_name, run_exp)
+		print("Saved run experience to global progress for ", god_name)	
