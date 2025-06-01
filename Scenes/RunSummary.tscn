@@ -71,6 +71,7 @@ text = "🛡️ Total Defense: 0"
 layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(600, 200)
 layout_mode = 2
 
 [node name="CardDetailsContainer" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
