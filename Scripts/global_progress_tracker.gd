@@ -9,6 +9,18 @@ var save_path: String = "user://card_progress.save"
 func _ready():
 	load_progress()
 
+# Check if there's any progress data saved
+func has_any_progress() -> bool:
+	for god_name in progress_data:
+		var god_progress = progress_data[god_name]
+		for card_index in god_progress:
+			var card_exp = god_progress[card_index]
+			if card_exp["capture_exp"] > 0 or card_exp["defense_exp"] > 0:
+				return true
+	return false
+
+
+
 # Add experience from a completed run
 func add_run_experience(god_name: String, run_experience: Dictionary):
 	# Ensure the god exists in our data
