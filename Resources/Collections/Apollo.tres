@@ -6,7 +6,7 @@
 
 [sub_resource type="Resource" id="Resource_vqrrp"]
 script = ExtResource("1_vqrrp")
-card_name = "Strike"
+card_name = "Helios"
 values = Array[int]([5, 5, 5, 5])
 description = "Sometimes you just gotta whack something very hard"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

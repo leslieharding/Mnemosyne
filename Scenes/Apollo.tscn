@@ -5,46 +5,74 @@
 [node name="Apollo" type="Node2D"]
 script = ExtResource("1_80u87")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 513.0
-offset_top = 228.0
-offset_right = 563.0
-offset_bottom = 257.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="MainContainer" type="HBoxContainer" parent="."]
+offset_left = 375.0
+offset_top = 234.0
+offset_right = 720.0
+offset_bottom = 432.0
 
-[node name="Label" type="Label" parent="VBoxContainer"]
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainContainer/LeftPanel"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Apollo"
 
-[node name="Deck1Button" type="Button" parent="VBoxContainer"]
+[node name="Deck1Button" type="Button" parent="MainContainer/LeftPanel"]
 layout_mode = 2
 text = "Deck 1"
 
-[node name="Deck2Button" type="Button" parent="VBoxContainer"]
+[node name="Deck2Button" type="Button" parent="MainContainer/LeftPanel"]
 layout_mode = 2
 text = "Deck 2"
 
-[node name="Deck3Button" type="Button" parent="VBoxContainer"]
+[node name="Deck3Button" type="Button" parent="MainContainer/LeftPanel"]
 layout_mode = 2
 text = "Deck 3"
 
-[node name="Button" type="Button" parent="VBoxContainer"]
+[node name="Button" type="Button" parent="MainContainer/LeftPanel"]
 layout_mode = 2
 text = "Back"
 
-[node name="StartGameButton" type="Button" parent="VBoxContainer"]
+[node name="StartGameButton" type="Button" parent="MainContainer/LeftPanel"]
 layout_mode = 2
 text = "Start Game"
 
-[connection signal="pressed" from="VBoxContainer/Deck1Button" to="." method="_on_deck_1_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/Deck2Button" to="." method="_on_deck_2_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/Deck3Button" to="." method="_on_deck_3_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/Button" to="." method="_on_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/StartGameButton" to="." method="_on_start_game_button_pressed"]
+[node name="VSeparator" type="VSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="DeckTitleContainer" type="VBoxContainer" parent="MainContainer/RightPanel"]
+layout_mode = 2
+
+[node name="SelectedDeckTitle" type="Label" parent="MainContainer/RightPanel/DeckTitleContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Selected Deck Name"
+
+[node name="SelectedDeckDescription" type="Label" parent="MainContainer/RightPanel/DeckTitleContainer"]
+layout_mode = 2
+text = "Deck description appears here"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer/RightPanel"]
+layout_mode = 2
+
+[node name="CardDisplayLabel" type="Label" parent="MainContainer/RightPanel"]
+layout_mode = 2
+text = "Cards in Deck"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/RightPanel"]
+custom_minimum_size = Vector2(400, 250)
+layout_mode = 2
+
+[node name="CardContainer" type="VBoxContainer" parent="MainContainer/RightPanel/ScrollContainer"]
+layout_mode = 2
+
+[connection signal="pressed" from="MainContainer/LeftPanel/Deck1Button" to="." method="_on_deck_1_button_pressed"]
+[connection signal="pressed" from="MainContainer/LeftPanel/Deck2Button" to="." method="_on_deck_2_button_pressed"]
+[connection signal="pressed" from="MainContainer/LeftPanel/Deck3Button" to="." method="_on_deck_3_button_pressed"]
+[connection signal="pressed" from="MainContainer/LeftPanel/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="MainContainer/LeftPanel/StartGameButton" to="." method="_on_start_game_button_pressed"]
