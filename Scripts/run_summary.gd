@@ -1,28 +1,20 @@
 # res://Scripts/run_summary.gd
 extends Control
 
-@onready var title_label = $VBoxContainer/Title
-@onready var result_label = $VBoxContainer/ResultLabel
-@onready var capture_total_label = $VBoxContainer/TotalExpContainer/CaptureTotal
-@onready var defense_total_label = $VBoxContainer/TotalExpContainer/DefenseTotal
-@onready var card_details_container = $VBoxContainer/ScrollContainer/CardDetailsContainer
+
 
 var god_name: String = "Apollo"
 var deck_index: int = 0
 var victory: bool = true
 
 func _ready():
-	# Wait multiple frames to ensure scene is fully loaded
-	await get_tree().process_frame
-	await get_tree().process_frame
-	
-	# Get parameters from previous scene
+	# Get parameters from previous scene first
 	var params = get_scene_params()
 	god_name = params.get("god", "Apollo")
 	deck_index = params.get("deck_index", 0)
 	victory = params.get("victory", true)
 	
-	# Use call_deferred to ensure all nodes are ready
+	# Use call_deferred to ensure scene tree is ready
 	call_deferred("setup_ui_safely")
 
 func setup_ui_safely():
@@ -282,7 +274,8 @@ func _on_new_run_button_pressed() -> void:
 	save_run_to_global_progress()
 	
 	# Clear the run data before starting a new run
-	get_node("/root/RunExperienceTrackerAutoload").clear_run()
+	if has_node("/root/RunExperienceTrackerAutoload"):
+		get_node("/root/RunExperienceTrackerAutoload").clear_run()
 	# Go to god selection
 	get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
 
@@ -297,6 +290,14 @@ func _on_main_menu_button_pressed() -> void:
 
 # Save the run experience to global progress
 func save_run_to_global_progress():
+	if not has_node("/root/RunExperienceTrackerAutoload"):
+		print("Warning: RunExperienceTrackerAutoload not found")
+		return
+		
+	if not has_node("/root/GlobalProgressTrackerAutoload"):
+		print("Warning: GlobalProgressTrackerAutoload not found")
+		return
+		
 	var tracker = get_node("/root/RunExperienceTrackerAutoload")
 	var global_tracker = get_node("/root/GlobalProgressTrackerAutoload")
 	
