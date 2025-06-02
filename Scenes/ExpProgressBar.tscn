@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bsaj6aconrjfm"]
+
+[node name="ExpProgressBar" type="HBoxContainer"]
+custom_minimum_size = Vector2(120, 20)
+
+[node name="LevelLabel" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 12
+text = "Lvl 0"
+
+[node name="ProgressContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="ProgressContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 50.0
+show_percentage = false
+
+[node name="ProgressLabel" type="Label" parent="ProgressContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 10
+text = "0/50"

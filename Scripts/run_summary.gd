@@ -51,12 +51,15 @@ func display_experience_summary():
 		print("Failed to load collection for " + god_name)
 		return
 	
+	# Get global progress for before/after comparison
+	var global_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	
 	# Create detailed view for each card that gained experience
 	for card_index in all_exp:
-		var exp_data = all_exp[card_index]
+		var run_exp_data = all_exp[card_index]
 		
 		# Skip cards with no experience
-		if exp_data["capture_exp"] == 0 and exp_data["defense_exp"] == 0:
+		if run_exp_data["capture_exp"] == 0 and run_exp_data["defense_exp"] == 0:
 			continue
 		
 		# Get card data
@@ -64,13 +67,148 @@ func display_experience_summary():
 		if not card:
 			continue
 		
+		# Get total experience (before this run was added to global)
+		var total_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
+		
+		# Calculate before experience (total minus this run)
+		var before_capture = total_exp_data["capture_exp"] - run_exp_data["capture_exp"]
+		var before_defense = total_exp_data["defense_exp"] - run_exp_data["defense_exp"]
+		
 		# Create a container for this card
-		var card_container = create_card_exp_display(card, exp_data)
+		var card_container = create_detailed_card_exp_display(
+			card, 
+			before_capture, total_exp_data["capture_exp"],
+			before_defense, total_exp_data["defense_exp"],
+			run_exp_data["capture_exp"], run_exp_data["defense_exp"]
+		)
 		card_details_container.add_child(card_container)
 		
 		# Add separator
 		var separator = HSeparator.new()
 		card_details_container.add_child(separator)
+
+func create_detailed_card_exp_display(
+	card: CardResource, 
+	before_capture: int, after_capture: int,
+	before_defense: int, after_defense: int,
+	capture_gain: int, defense_gain: int
+) -> Control:
+	var container = VBoxContainer.new()
+	container.custom_minimum_size = Vector2(0, 120)
+	
+	# Card name
+	var name_label = Label.new()
+	name_label.text = card.card_name
+	name_label.add_theme_font_size_override("font_size", 18)
+	name_label.add_theme_color_override("font_color", Color("#DDDDDD"))
+	container.add_child(name_label)
+	
+	# Experience gained summary
+	var summary_container = HBoxContainer.new()
+	
+	if capture_gain > 0:
+		var capture_gain_label = Label.new()
+		capture_gain_label.text = "⚔️ +" + str(capture_gain) + " Capture XP"
+		capture_gain_label.add_theme_color_override("font_color", Color("#FFD700"))
+		capture_gain_label.add_theme_font_size_override("font_size", 14)
+		summary_container.add_child(capture_gain_label)
+	
+	if defense_gain > 0:
+		if capture_gain > 0:
+			var spacer = Control.new()
+			spacer.custom_minimum_size.x = 20
+			summary_container.add_child(spacer)
+		
+		var defense_gain_label = Label.new()
+		defense_gain_label.text = "🛡️ +" + str(defense_gain) + " Defense XP"
+		defense_gain_label.add_theme_color_override("font_color", Color("#87CEEB"))
+		defense_gain_label.add_theme_font_size_override("font_size", 14)
+		summary_container.add_child(defense_gain_label)
+	
+	container.add_child(summary_container)
+	
+	# Progress bars container
+	var progress_container = HBoxContainer.new()
+	container.add_child(progress_container)
+	
+	# Capture progress (if any experience gained)
+	if capture_gain > 0:
+		var capture_section = VBoxContainer.new()
+		capture_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		
+		var capture_title = Label.new()
+		capture_title.text = "Capture Progress"
+		capture_title.add_theme_font_size_override("font_size", 12)
+		capture_title.add_theme_color_override("font_color", Color("#FFD700"))
+		capture_section.add_child(capture_title)
+		
+		# Before state
+		var before_capture_bar = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
+		before_capture_bar.setup_progress(before_capture, "capture", ExpProgressBar.DisplayMode.DETAILED)
+		capture_section.add_child(before_capture_bar)
+		
+		# Arrow
+		var arrow_label = Label.new()
+		arrow_label.text = "↓"
+		arrow_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		arrow_label.add_theme_font_size_override("font_size", 16)
+		capture_section.add_child(arrow_label)
+		
+		# After state (will be animated)
+		var after_capture_bar = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
+		after_capture_bar.setup_progress(before_capture, "capture", ExpProgressBar.DisplayMode.DETAILED)
+		capture_section.add_child(after_capture_bar)
+		
+		# Schedule animation
+		call_deferred("animate_progress_bar", after_capture_bar, before_capture, after_capture)
+		
+		progress_container.add_child(capture_section)
+	
+	# Spacer between progress bars
+	if capture_gain > 0 and defense_gain > 0:
+		var spacer = VSeparator.new()
+		progress_container.add_child(spacer)
+	
+	# Defense progress (if any experience gained)
+	if defense_gain > 0:
+		var defense_section = VBoxContainer.new()
+		defense_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		
+		var defense_title = Label.new()
+		defense_title.text = "Defense Progress"
+		defense_title.add_theme_font_size_override("font_size", 12)
+		defense_title.add_theme_color_override("font_color", Color("#87CEEB"))
+		defense_section.add_child(defense_title)
+		
+		# Before state
+		var before_defense_bar = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
+		before_defense_bar.setup_progress(before_defense, "defense", ExpProgressBar.DisplayMode.DETAILED)
+		defense_section.add_child(before_defense_bar)
+		
+		# Arrow
+		var arrow_label = Label.new()
+		arrow_label.text = "↓"
+		arrow_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		arrow_label.add_theme_font_size_override("font_size", 16)
+		defense_section.add_child(arrow_label)
+		
+		# After state (will be animated)
+		var after_defense_bar = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
+		after_defense_bar.setup_progress(before_defense, "defense", ExpProgressBar.DisplayMode.DETAILED)
+		defense_section.add_child(after_defense_bar)
+		
+		# Schedule animation
+		call_deferred("animate_progress_bar", after_defense_bar, before_defense, after_defense)
+		
+		progress_container.add_child(defense_section)
+	
+	return container
+
+# Helper function to animate progress bars with a delay
+func animate_progress_bar(progress_bar: ExpProgressBar, old_xp: int, new_xp: int):
+	# Add a small delay so the UI settles first
+	await get_tree().create_timer(0.5).timeout
+	progress_bar.animate_progress_change(old_xp, new_xp, 1.5)
 
 func create_card_exp_display(card: CardResource, exp_data: Dictionary) -> Control:
 	var container = VBoxContainer.new()

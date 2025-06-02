@@ -118,7 +118,7 @@ func display_deck_cards(deck_index: int) -> void:
 func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	# Main container for this card
 	var card_panel = PanelContainer.new()
-	card_panel.custom_minimum_size = Vector2(0, 100)
+	card_panel.custom_minimum_size = Vector2(0, 120)  # Slightly taller for progress bars
 	
 	# Create a style for the panel
 	var style = StyleBoxFlat.new()
@@ -181,10 +181,10 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	var v_separator = VSeparator.new()
 	h_container.add_child(v_separator)
 	
-	# Right side - Experience info
+	# Right side - Experience info with progress bars
 	var right_side = VBoxContainer.new()
 	right_side.size_flags_horizontal = Control.SIZE_SHRINK_END
-	right_side.custom_minimum_size.x = 150
+	right_side.custom_minimum_size.x = 180  # Slightly wider for progress bars
 	h_container.add_child(right_side)
 	
 	# Experience title
@@ -205,37 +205,37 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 		capture_exp = exp_data.get("capture_exp", 0)
 		defense_exp = exp_data.get("defense_exp", 0)
 	
-	# Experience display
-	var exp_container = HBoxContainer.new()
-	exp_container.alignment = BoxContainer.ALIGNMENT_CENTER
-	right_side.add_child(exp_container)
+	# Capture experience progress bar
+	var capture_container = VBoxContainer.new()
+	right_side.add_child(capture_container)
 	
-	# Capture experience
 	var capture_label = Label.new()
-	capture_label.text = "⚔️ " + str(capture_exp)
-	capture_label.add_theme_font_size_override("font_size", 12)
-	capture_label.add_theme_color_override("font_color", Color("#FFD700"))  # Gold
-	exp_container.add_child(capture_label)
+	capture_label.text = "⚔️ Capture"
+	capture_label.add_theme_font_size_override("font_size", 11)
+	capture_label.add_theme_color_override("font_color", Color("#FFD700"))
+	capture_container.add_child(capture_label)
+	
+	var capture_progress = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
+	capture_progress.setup_progress(capture_exp, "capture", ExpProgressBar.DisplayMode.COMPACT)
+	capture_container.add_child(capture_progress)
 	
 	# Small spacer
-	var exp_spacer = Control.new()
-	exp_spacer.custom_minimum_size.x = 10
-	exp_container.add_child(exp_spacer)
+	var spacer = Control.new()
+	spacer.custom_minimum_size.y = 5
+	right_side.add_child(spacer)
 	
-	# Defense experience
+	# Defense experience progress bar
+	var defense_container = VBoxContainer.new()
+	right_side.add_child(defense_container)
+	
 	var defense_label = Label.new()
-	defense_label.text = "🛡️ " + str(defense_exp)
-	defense_label.add_theme_font_size_override("font_size", 12)
-	defense_label.add_theme_color_override("font_color", Color("#87CEEB"))  # Sky blue
-	exp_container.add_child(defense_label)
+	defense_label.text = "🛡️ Defense"
+	defense_label.add_theme_font_size_override("font_size", 11)
+	defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
+	defense_container.add_child(defense_label)
 	
-	# Total experience
-	var total_exp = capture_exp + defense_exp
-	var total_label = Label.new()
-	total_label.text = "Total: " + str(total_exp)
-	total_label.add_theme_font_size_override("font_size", 11)
-	total_label.add_theme_color_override("font_color", Color("#BBBBBB"))
-	total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	right_side.add_child(total_label)
+	var defense_progress = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
+	defense_progress.setup_progress(defense_exp, "defense", ExpProgressBar.DisplayMode.COMPACT)
+	defense_container.add_child(defense_progress)
 	
 	return card_panel
