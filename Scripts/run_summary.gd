@@ -12,7 +12,8 @@ var deck_index: int = 0
 var victory: bool = true
 
 func _ready():
-	# Wait a frame to ensure all @onready variables are properly initialized
+	# Wait multiple frames to ensure scene is fully loaded
+	await get_tree().process_frame
 	await get_tree().process_frame
 	
 	# Get parameters from previous scene
@@ -21,45 +22,37 @@ func _ready():
 	deck_index = params.get("deck_index", 0)
 	victory = params.get("victory", true)
 	
-	# Validate that all UI references are valid before using them
-	if not validate_ui_references():
-		push_error("Some UI references are invalid in RunSummary scene")
+	# Use call_deferred to ensure all nodes are ready
+	call_deferred("setup_ui_safely")
+
+func setup_ui_safely():
+	# Get references manually instead of relying on @onready
+	var title = get_node("VBoxContainer/Title")
+	var result = get_node("VBoxContainer/ResultLabel")
+	var capture_total = get_node("VBoxContainer/TotalExpContainer/CaptureTotal")
+	var defense_total = get_node("VBoxContainer/TotalExpContainer/DefenseTotal")
+	var card_details = get_node("VBoxContainer/ScrollContainer/CardDetailsContainer")
+	
+	# Validate all nodes exist
+	if not title or not result or not capture_total or not defense_total or not card_details:
+		push_error("Failed to find required UI nodes in RunSummary")
 		return
 	
-	# Update title and result
-	title_label.text = god_name + " - Run Summary"
+	# Set up the UI
+	title.text = god_name + " - Run Summary"
 	if victory:
-		result_label.text = "Victory!"
-		result_label.add_theme_color_override("font_color", Color("#4A8A4A"))
+		result.text = "Victory!"
+		result.add_theme_color_override("font_color", Color("#4A8A4A"))
 	else:
-		result_label.text = "Defeat"
-		result_label.add_theme_color_override("font_color", Color("#8A4A4A"))
+		result.text = "Defeat"
+		result.add_theme_color_override("font_color", Color("#8A4A4A"))
 	
-	# Display experience summary
-	display_experience_summary()
+	# Set up experience summary
+	setup_experience_summary(capture_total, defense_total, card_details)
 
-func validate_ui_references() -> bool:
-	var valid = true
-	
-	if not title_label:
-		print("ERROR: title_label is null")
-		valid = false
-	if not result_label:
-		print("ERROR: result_label is null")
-		valid = false
-	if not capture_total_label:
-		print("ERROR: capture_total_label is null")
-		valid = false
-	if not defense_total_label:
-		print("ERROR: defense_total_label is null")
-		valid = false
-	if not card_details_container:
-		print("ERROR: card_details_container is null")
-		valid = false
-	
-	return valid
 
-func display_experience_summary():
+
+func setup_experience_summary(capture_total_node: Label, defense_total_node: Label, card_details_node: VBoxContainer):
 	# Double-check that tracker exists
 	if not has_node("/root/RunExperienceTrackerAutoload"):
 		print("ERROR: RunExperienceTrackerAutoload not found")
@@ -70,16 +63,9 @@ func display_experience_summary():
 	var all_exp = tracker.get_all_experience()
 	var totals = tracker.get_total_experience()
 	
-	# Validate totals labels again before assignment
-	if capture_total_label:
-		capture_total_label.text = "⚔️ Total Capture: " + str(totals["capture_exp"])
-	else:
-		print("ERROR: capture_total_label is null in display_experience_summary")
-		
-	if defense_total_label:
-		defense_total_label.text = "🛡️ Total Defense: " + str(totals["defense_exp"])
-	else:
-		print("ERROR: defense_total_label is null in display_experience_summary")
+	# Set totals safely
+	capture_total_node.text = "⚔️ Total Capture: " + str(totals["capture_exp"])
+	defense_total_node.text = "🛡️ Total Defense: " + str(totals["defense_exp"])
 	
 	# Load the god's collection to get card names
 	var collection_path = "res://Resources/Collections/" + god_name.to_lower() + ".tres"
@@ -94,11 +80,6 @@ func display_experience_summary():
 		return
 		
 	var global_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-	
-	# Validate card_details_container before using it
-	if not card_details_container:
-		print("ERROR: card_details_container is null, cannot display card details")
-		return
 	
 	# Create detailed view for each card that gained experience
 	for card_index in all_exp:
@@ -127,11 +108,11 @@ func display_experience_summary():
 			before_defense, total_exp_data["defense_exp"],
 			run_exp_data["capture_exp"], run_exp_data["defense_exp"]
 		)
-		card_details_container.add_child(card_container)
+		card_details_node.add_child(card_container)
 		
 		# Add separator
 		var separator = HSeparator.new()
-		card_details_container.add_child(separator)
+		card_details_node.add_child(separator)
 
 func create_detailed_card_exp_display(
 	card: CardResource, 
@@ -326,15 +307,3 @@ func save_run_to_global_progress():
 	if run_exp.size() > 0:
 		global_tracker.add_run_experience(god_name, run_exp)
 		print("Saved run experience to global progress for ", god_name)
-
-
-# Helper function to safely find labels by name
-func find_label_by_name(parent: Node, label_name: String) -> Label:
-	for child in parent.get_children():
-		if child.name == label_name and child is Label:
-			return child
-		# Recursively search in children
-		var found = find_label_by_name(child, label_name)
-		if found:
-			return found
-	return null
