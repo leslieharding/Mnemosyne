@@ -1,78 +1,158 @@
 # res://Scripts/run_summary.gd
 extends Control
 
-
-
 var god_name: String = "Apollo"
 var deck_index: int = 0
 var victory: bool = true
 
 func _ready():
+	print("RunSummary _ready() called")
+	
 	# Get parameters from previous scene first
 	var params = get_scene_params()
 	god_name = params.get("god", "Apollo")
 	deck_index = params.get("deck_index", 0)
 	victory = params.get("victory", true)
 	
-	# Use call_deferred to ensure scene tree is ready
-	call_deferred("setup_ui_safely")
+	# Let's debug the scene tree
+	print("Scene tree structure:")
+	print_tree_pretty()
+	
+	# Try to set up UI after a delay
+	await get_tree().create_timer(0.1).timeout
+	setup_ui_safely()
+
+func print_tree_pretty(node: Node = self, indent: String = ""):
+	print(indent + node.name + " (" + node.get_class() + ")")
+	for child in node.get_children():
+		print_tree_pretty(child, indent + "  ")
 
 func setup_ui_safely():
-	# Get references manually instead of relying on @onready
-	var title = get_node("VBoxContainer/Title")
-	var result = get_node("VBoxContainer/ResultLabel")
-	var capture_total = get_node("VBoxContainer/TotalExpContainer/CaptureTotal")
-	var defense_total = get_node("VBoxContainer/TotalExpContainer/DefenseTotal")
-	var card_details = get_node("VBoxContainer/ScrollContainer/CardDetailsContainer")
+	print("\n=== Setting up UI ===")
 	
-	# Validate all nodes exist
-	if not title or not result or not capture_total or not defense_total or not card_details:
-		push_error("Failed to find required UI nodes in RunSummary")
+	# Debug each node access
+	print("Looking for VBoxContainer...")
+	var vbox = get_node_or_null("VBoxContainer")
+	if not vbox:
+		push_error("VBoxContainer not found!")
 		return
+	print("VBoxContainer found")
 	
-	# Set up the UI
+	print("Looking for Title...")
+	var title = vbox.get_node_or_null("Title")
+	if not title:
+		push_error("Title not found in VBoxContainer!")
+		# Let's see what's actually in VBoxContainer
+		print("Children of VBoxContainer:")
+		for child in vbox.get_children():
+			print("  - " + child.name + " (" + child.get_class() + ")")
+		return
+	print("Title found")
+	
+	print("Looking for ResultLabel...")
+	var result = vbox.get_node_or_null("ResultLabel")
+	if not result:
+		push_error("ResultLabel not found!")
+		return
+	print("ResultLabel found")
+	
+	print("Looking for TotalExpContainer...")
+	var total_exp_container = vbox.get_node_or_null("TotalExpContainer")
+	if not total_exp_container:
+		push_error("TotalExpContainer not found!")
+		return
+	print("TotalExpContainer found")
+	
+	print("Looking for CaptureTotal...")
+	var capture_total = total_exp_container.get_node_or_null("CaptureTotal")
+	if not capture_total:
+		push_error("CaptureTotal not found!")
+		return
+	print("CaptureTotal found")
+	
+	print("Looking for DefenseTotal...")
+	var defense_total = total_exp_container.get_node_or_null("DefenseTotal")
+	if not defense_total:
+		push_error("DefenseTotal not found!")
+		return
+	print("DefenseTotal found")
+	
+	print("Looking for ScrollContainer...")
+	var scroll_container = vbox.get_node_or_null("ScrollContainer")
+	if not scroll_container:
+		push_error("ScrollContainer not found!")
+		return
+	print("ScrollContainer found")
+	
+	print("Looking for CardDetailsContainer...")
+	var card_details = scroll_container.get_node_or_null("CardDetailsContainer")
+	if not card_details:
+		push_error("CardDetailsContainer not found!")
+		return
+	print("CardDetailsContainer found")
+	
+	print("\n=== All nodes found successfully! ===")
+	
+	# NOW we can safely set text
+	print("Setting title text...")
 	title.text = god_name + " - Run Summary"
+	print("Title text set successfully")
+	
+	print("Setting result text...")
 	if victory:
 		result.text = "Victory!"
 		result.add_theme_color_override("font_color", Color("#4A8A4A"))
 	else:
 		result.text = "Defeat"
 		result.add_theme_color_override("font_color", Color("#8A4A4A"))
+	print("Result text set successfully")
 	
-	# Set up experience summary
+	print("Setting up experience summary...")
 	setup_experience_summary(capture_total, defense_total, card_details)
 
-
-
 func setup_experience_summary(capture_total_node: Label, defense_total_node: Label, card_details_node: VBoxContainer):
-	# Double-check that tracker exists
+	print("\n=== Setting up experience summary ===")
+	
+	# Check autoloads
 	if not has_node("/root/RunExperienceTrackerAutoload"):
 		print("ERROR: RunExperienceTrackerAutoload not found")
 		return
+	print("RunExperienceTrackerAutoload found")
 	
 	# Get experience data from the tracker
 	var tracker = get_node("/root/RunExperienceTrackerAutoload")
 	var all_exp = tracker.get_all_experience()
 	var totals = tracker.get_total_experience()
 	
+	print("Total experience - Capture: " + str(totals["capture_exp"]) + ", Defense: " + str(totals["defense_exp"]))
+	
 	# Set totals safely
+	print("Setting capture total text...")
 	capture_total_node.text = "⚔️ Total Capture: " + str(totals["capture_exp"])
+	print("Capture total set")
+	
+	print("Setting defense total text...")
 	defense_total_node.text = "🛡️ Total Defense: " + str(totals["defense_exp"])
+	print("Defense total set")
 	
 	# Load the god's collection to get card names
 	var collection_path = "res://Resources/Collections/" + god_name.to_lower() + ".tres"
+	print("Loading collection from: " + collection_path)
 	var collection: GodCardCollection = load(collection_path)
 	if not collection:
 		print("Failed to load collection at: " + collection_path)
 		return
+	print("Collection loaded successfully")
 	
 	# Get global progress for before/after comparison
 	if not has_node("/root/GlobalProgressTrackerAutoload"):
 		print("ERROR: GlobalProgressTrackerAutoload not found")
 		return
+	print("GlobalProgressTrackerAutoload found")
 		
 	var global_tracker = get_node("/root/GlobalProgressTrackerAutoload")
 	
+	print("\nCreating card displays...")
 	# Create detailed view for each card that gained experience
 	for card_index in all_exp:
 		var run_exp_data = all_exp[card_index]
@@ -81,10 +161,15 @@ func setup_experience_summary(capture_total_node: Label, defense_total_node: Lab
 		if run_exp_data["capture_exp"] == 0 and run_exp_data["defense_exp"] == 0:
 			continue
 		
+		print("Processing card index: " + str(card_index))
+		
 		# Get card data
 		var card = collection.cards[card_index] if card_index < collection.cards.size() else null
 		if not card:
+			print("Card not found at index: " + str(card_index))
 			continue
+		
+		print("Card name: " + card.card_name)
 		
 		# Get total experience (before this run was added to global)
 		var total_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
@@ -105,7 +190,10 @@ func setup_experience_summary(capture_total_node: Label, defense_total_node: Lab
 		# Add separator
 		var separator = HSeparator.new()
 		card_details_node.add_child(separator)
+	
+	print("\n=== Experience summary setup complete ===")
 
+# Rest of the functions remain the same...
 func create_detailed_card_exp_display(
 	card: CardResource, 
 	before_capture: int, after_capture: int,
@@ -223,46 +311,10 @@ func create_detailed_card_exp_display(
 	
 	return container
 
-# Helper function to animate progress bars with a delay
 func animate_progress_bar(progress_bar: ExpProgressBar, old_xp: int, new_xp: int):
 	# Add a small delay so the UI settles first
 	await get_tree().create_timer(0.5).timeout
 	progress_bar.animate_progress_change(old_xp, new_xp, 1.5)
-
-func create_card_exp_display(card: CardResource, exp_data: Dictionary) -> Control:
-	var container = VBoxContainer.new()
-	
-	# Card name
-	var name_label = Label.new()
-	name_label.text = card.card_name
-	name_label.add_theme_font_size_override("font_size", 18)
-	container.add_child(name_label)
-	
-	# Experience details
-	var exp_container = HBoxContainer.new()
-	
-	if exp_data["capture_exp"] > 0:
-		var capture_label = Label.new()
-		capture_label.text = "⚔️ Capture: +" + str(exp_data["capture_exp"])
-		capture_label.add_theme_color_override("font_color", Color("#FFD700"))
-		capture_label.add_theme_font_size_override("font_size", 16)
-		exp_container.add_child(capture_label)
-	
-	if exp_data["defense_exp"] > 0:
-		if exp_data["capture_exp"] > 0:
-			var spacer = Control.new()
-			spacer.custom_minimum_size.x = 20
-			exp_container.add_child(spacer)
-		
-		var defense_label = Label.new()
-		defense_label.text = "🛡️ Defense: +" + str(exp_data["defense_exp"])
-		defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
-		defense_label.add_theme_font_size_override("font_size", 16)
-		exp_container.add_child(defense_label)
-	
-	container.add_child(exp_container)
-	
-	return container
 
 func get_scene_params() -> Dictionary:
 	if get_tree().has_meta("scene_params"):
@@ -284,11 +336,11 @@ func _on_main_menu_button_pressed() -> void:
 	save_run_to_global_progress()
 	
 	# Clear the run data before going to main menu
-	get_node("/root/RunExperienceTrackerAutoload").clear_run()
+	if has_node("/root/RunExperienceTrackerAutoload"):
+		get_node("/root/RunExperienceTrackerAutoload").clear_run()
 	# Go to main menu
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
 
-# Save the run experience to global progress
 func save_run_to_global_progress():
 	if not has_node("/root/RunExperienceTrackerAutoload"):
 		print("Warning: RunExperienceTrackerAutoload not found")
