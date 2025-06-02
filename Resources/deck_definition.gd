@@ -39,8 +39,8 @@ func is_unlocked(god_name: String) -> bool:
 		
 		return capture_met and defense_met
 	
-	# If no progress tracker, assume unlocked (fallback)
-	return true
+	# If no progress tracker found, only starter decks are unlocked
+	return false
 
 # Get unlock status description for UI
 func get_unlock_description(god_name: String) -> String:
