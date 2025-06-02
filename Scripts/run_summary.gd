@@ -326,3 +326,15 @@ func save_run_to_global_progress():
 	if run_exp.size() > 0:
 		global_tracker.add_run_experience(god_name, run_exp)
 		print("Saved run experience to global progress for ", god_name)
+
+
+# Helper function to safely find labels by name
+func find_label_by_name(parent: Node, label_name: String) -> Label:
+	for child in parent.get_children():
+		if child.name == label_name and child is Label:
+			return child
+		# Recursively search in children
+		var found = find_label_by_name(child, label_name)
+		if found:
+			return found
+	return null
