@@ -153,13 +153,22 @@ func setup_experience_summary(capture_total_node: Label, defense_total_node: Lab
 	var global_tracker = get_node("/root/GlobalProgressTrackerAutoload")
 	
 	print("\nCreating card displays...")
+	print("Total cards in all_exp: ", all_exp.size())
+	print("all_exp contents: ", all_exp)
+	
 	# Create detailed view for each card that gained experience
 	for card_index in all_exp:
 		var run_exp_data = all_exp[card_index]
 		
+		print("Processing card index: " + str(card_index))
+		print("  Run exp data: ", run_exp_data)
+		
 		# Skip cards with no experience
 		if run_exp_data["capture_exp"] == 0 and run_exp_data["defense_exp"] == 0:
+			print("  Skipping card with no experience")
 			continue
+		
+		print("  Card has experience, proceeding...")
 		
 		print("Processing card index: " + str(card_index))
 		
@@ -188,6 +197,7 @@ func setup_experience_summary(capture_total_node: Label, defense_total_node: Lab
 			run_exp_data["capture_exp"], run_exp_data["defense_exp"]
 		)
 		card_details_node.add_child(card_container)
+		print("Added card container to card_details_node. Total children now: ", card_details_node.get_child_count())
 		
 		# Add separator
 		var separator = HSeparator.new()
