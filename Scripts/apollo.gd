@@ -14,21 +14,99 @@ var selected_deck_index: int = -1  # -1 means no deck selected
 @onready var selected_deck_description = $MainContainer/RightPanel/DeckTitleContainer/SelectedDeckDescription
 @onready var card_container = $MainContainer/RightPanel/ScrollContainer/CardContainer
 
+# Tooltip for locked decks
+var tooltip_label: Label
+
 func _ready():
 	# Load the Apollo card collection
 	apollo_collection = load("res://Resources/Collections/apollo.tres")
 	
-	# Update the deck button labels with actual deck names
+	# Create tooltip
+	create_tooltip()
+	
+	# Update the deck button labels and unlock states
 	if apollo_collection:
-		deck1_button.text = apollo_collection.decks[0].deck_name
-		deck2_button.text = apollo_collection.decks[1].deck_name
-		deck3_button.text = apollo_collection.decks[2].deck_name
+		setup_deck_buttons()
 	
 	# The StartGameButton should start disabled until a deck is selected
 	start_game_button.disabled = true
 	
 	# Right panel starts hidden
 	right_panel.visible = false
+
+# Create tooltip for showing unlock conditions
+func create_tooltip():
+	tooltip_label = Label.new()
+	tooltip_label.add_theme_color_override("font_color", Color.WHITE)
+	tooltip_label.add_theme_font_size_override("font_size", 12)
+	tooltip_label.z_index = 1000
+	tooltip_label.visible = false
+	
+	# Create background for tooltip
+	var tooltip_bg = PanelContainer.new()
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.1, 0.1, 0.1, 0.9)
+	style.border_color = Color.WHITE
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	tooltip_bg.add_theme_stylebox_override("panel", style)
+	
+	tooltip_bg.add_child(tooltip_label)
+	add_child(tooltip_bg)
+	tooltip_bg.visible = false
+	tooltip_bg.name = "TooltipContainer"
+
+# Set up deck buttons with unlock conditions
+func setup_deck_buttons():
+	var deck_buttons = [deck1_button, deck2_button, deck3_button]
+	
+	for i in range(apollo_collection.decks.size()):
+		var deck_def = apollo_collection.decks[i]
+		var button = deck_buttons[i]
+		var is_unlocked = deck_def.is_unlocked("Apollo")
+		
+		# Set button text
+		button.text = deck_def.deck_name
+		
+		# Style button based on unlock status
+		if not is_unlocked:
+			# Gray out locked deck
+			button.modulate = Color(0.6, 0.6, 0.6)
+			button.disabled = false  # Keep enabled for tooltip
+			
+			# Connect mouse events for tooltip
+			button.mouse_entered.connect(_on_deck_button_hover_start.bind(i))
+			button.mouse_exited.connect(_on_deck_button_hover_end)
+		else:
+			# Normal appearance for unlocked decks
+			button.modulate = Color.WHITE
+			button.disabled = false
+
+# Show tooltip on locked deck hover
+func _on_deck_button_hover_start(deck_index: int):
+	var deck_def = apollo_collection.decks[deck_index]
+	
+	if not deck_def.is_unlocked("Apollo"):
+		var unlock_desc = deck_def.get_unlock_description("Apollo")
+		tooltip_label.text = unlock_desc
+		
+		var tooltip_container = get_node("TooltipContainer")
+		tooltip_container.visible = true
+		
+		# Position tooltip near mouse
+		var mouse_pos = get_global_mouse_position()
+		tooltip_container.global_position = mouse_pos + Vector2(10, -30)
+
+# Hide tooltip
+func _on_deck_button_hover_end():
+	var tooltip_container = get_node("TooltipContainer")
+	tooltip_container.visible = false
 
 # Back button
 func _on_button_pressed() -> void:
@@ -62,18 +140,26 @@ func _on_start_game_button_pressed() -> void:
 	
 # Helper function to handle deck selection
 func select_deck(index: int) -> void:
+	var deck_def = apollo_collection.decks[index]
+	
+	# Check if deck is unlocked
+	if not deck_def.is_unlocked("Apollo"):
+		print("Deck is locked: ", deck_def.deck_name)
+		return
+	
 	selected_deck_index = index
 	
-	# Reset all buttons to normal appearance
-	deck1_button.disabled = false
-	deck2_button.disabled = false
-	deck3_button.disabled = false
+	# Reset all buttons to normal appearance (only for unlocked decks)
+	for i in range(apollo_collection.decks.size()):
+		var button = [deck1_button, deck2_button, deck3_button][i]
+		var deck = apollo_collection.decks[i]
+		if deck.is_unlocked("Apollo"):
+			button.disabled = false
+			button.modulate = Color.WHITE
 	
 	# Disable the selected button to show which is selected
-	match index:
-		0: deck1_button.disabled = true
-		1: deck2_button.disabled = true
-		2: deck3_button.disabled = true
+	var selected_button = [deck1_button, deck2_button, deck3_button][index]
+	selected_button.disabled = true
 	
 	# Enable the start button now that a deck is selected
 	start_game_button.disabled = false
