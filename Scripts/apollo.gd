@@ -14,15 +14,9 @@ var selected_deck_index: int = -1  # -1 means no deck selected
 @onready var selected_deck_description = $MainContainer/RightPanel/DeckTitleContainer/SelectedDeckDescription
 @onready var card_container = $MainContainer/RightPanel/ScrollContainer/CardContainer
 
-# Tooltip for locked decks
-var tooltip_label: Label
-
 func _ready():
 	# Load the Apollo card collection
 	apollo_collection = load("res://Resources/Collections/apollo.tres")
-	
-	# Create tooltip
-	create_tooltip()
 	
 	# Update the deck button labels and unlock states
 	if apollo_collection:
@@ -33,34 +27,6 @@ func _ready():
 	
 	# Right panel starts hidden
 	right_panel.visible = false
-
-# Create tooltip for showing unlock conditions
-func create_tooltip():
-	tooltip_label = Label.new()
-	tooltip_label.add_theme_color_override("font_color", Color.WHITE)
-	tooltip_label.add_theme_font_size_override("font_size", 12)
-	tooltip_label.z_index = 1000
-	tooltip_label.visible = false
-	
-	# Create background for tooltip
-	var tooltip_bg = PanelContainer.new()
-	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.1, 0.1, 0.1, 0.9)
-	style.border_color = Color.WHITE
-	style.border_width_left = 1
-	style.border_width_top = 1
-	style.border_width_right = 1
-	style.border_width_bottom = 1
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.corner_radius_bottom_left = 4
-	style.corner_radius_bottom_right = 4
-	tooltip_bg.add_theme_stylebox_override("panel", style)
-	
-	tooltip_bg.add_child(tooltip_label)
-	add_child(tooltip_bg)
-	tooltip_bg.visible = false
-	tooltip_bg.name = "TooltipContainer"
 
 # Set up deck buttons with unlock conditions
 func setup_deck_buttons():
@@ -78,35 +44,11 @@ func setup_deck_buttons():
 		if not is_unlocked:
 			# Gray out locked deck
 			button.modulate = Color(0.6, 0.6, 0.6)
-			button.disabled = false  # Keep enabled for tooltip
-			
-			# Connect mouse events for tooltip
-			button.mouse_entered.connect(_on_deck_button_hover_start.bind(i))
-			button.mouse_exited.connect(_on_deck_button_hover_end)
+			button.disabled = false  # Keep enabled so they can still click to see requirements
 		else:
 			# Normal appearance for unlocked decks
 			button.modulate = Color.WHITE
 			button.disabled = false
-
-# Show tooltip on locked deck hover
-func _on_deck_button_hover_start(deck_index: int):
-	var deck_def = apollo_collection.decks[deck_index]
-	
-	if not deck_def.is_unlocked("Apollo"):
-		var unlock_desc = deck_def.get_unlock_description("Apollo")
-		tooltip_label.text = unlock_desc
-		
-		var tooltip_container = get_node("TooltipContainer")
-		tooltip_container.visible = true
-		
-		# Position tooltip near mouse
-		var mouse_pos = get_global_mouse_position()
-		tooltip_container.global_position = mouse_pos + Vector2(10, -30)
-
-# Hide tooltip
-func _on_deck_button_hover_end():
-	var tooltip_container = get_node("TooltipContainer")
-	tooltip_container.visible = false
 
 # Back button
 func _on_button_pressed() -> void:
@@ -124,8 +66,13 @@ func _on_deck_3_button_pressed() -> void:
 	
 func _on_start_game_button_pressed() -> void:
 	if selected_deck_index >= 0:
-		# Initialize the experience tracker for this new run
+		# Only allow starting if deck is unlocked
 		var deck_def = apollo_collection.decks[selected_deck_index]
+		if not deck_def.is_unlocked("Apollo"):
+			print("Cannot start game - deck is locked!")
+			return
+			
+		# Initialize the experience tracker for this new run
 		get_node("/root/RunExperienceTrackerAutoload").start_new_run(deck_def.card_indices)
 		print("Initialized experience tracker for new run with deck: ", deck_def.deck_name)
 		
@@ -138,14 +85,10 @@ func _on_start_game_button_pressed() -> void:
 		# Change to the map scene instead of directly to game
 		get_tree().change_scene_to_file("res://Scenes/RunMap.tscn")
 	
-# Helper function to handle deck selection
+# Helper function to handle deck selection - now handles both locked and unlocked decks
 func select_deck(index: int) -> void:
 	var deck_def = apollo_collection.decks[index]
-	
-	# Check if deck is unlocked
-	if not deck_def.is_unlocked("Apollo"):
-		print("Deck is locked: ", deck_def.deck_name)
-		return
+	var is_unlocked = deck_def.is_unlocked("Apollo")
 	
 	selected_deck_index = index
 	
@@ -156,25 +99,171 @@ func select_deck(index: int) -> void:
 		if deck.is_unlocked("Apollo"):
 			button.disabled = false
 			button.modulate = Color.WHITE
+		else:
+			# Keep locked decks grayed out but clickable
+			button.modulate = Color(0.6, 0.6, 0.6)
+			button.disabled = false
 	
 	# Disable the selected button to show which is selected
 	var selected_button = [deck1_button, deck2_button, deck3_button][index]
 	selected_button.disabled = true
 	
-	# Enable the start button now that a deck is selected
-	start_game_button.disabled = false
+	# Enable/disable start button based on whether deck is unlocked
+	start_game_button.disabled = not is_unlocked
 	
-	# Display the deck cards and info
-	display_deck_cards(index)
+	# Display the deck info (works for both locked and unlocked)
+	if is_unlocked:
+		display_deck_cards(index)
+	else:
+		display_unlock_requirements(index)
 	
 	# Show the right panel
 	right_panel.visible = true
 	
-	# Optionally, you could display the deck description somewhere
 	print("Selected deck: ", apollo_collection.decks[index].deck_name)
-	print("Description: ", apollo_collection.decks[index].deck_description)
+	if is_unlocked:
+		print("Description: ", apollo_collection.decks[index].deck_description)
+	else:
+		print("Deck is locked - showing unlock requirements")
 
-# Display the cards for the selected deck with experience info
+# Display unlock requirements for locked decks
+func display_unlock_requirements(deck_index: int) -> void:
+	if not apollo_collection or deck_index < 0 or deck_index >= apollo_collection.decks.size():
+		return
+	
+	var deck_def = apollo_collection.decks[deck_index]
+	
+	# Update deck title and description
+	selected_deck_title.text = deck_def.deck_name + " (LOCKED)"
+	selected_deck_description.text = deck_def.deck_description
+	
+	# Clear existing content
+	for child in card_container.get_children():
+		child.queue_free()
+	
+	# Wait a frame to ensure old children are removed
+	await get_tree().process_frame
+	
+	# Create unlock requirements display
+	var requirements_panel = create_unlock_requirements_panel(deck_def)
+	card_container.add_child(requirements_panel)
+
+# Create a panel showing unlock requirements
+func create_unlock_requirements_panel(deck_def: DeckDefinition) -> Control:
+	# Main container
+	var main_container = VBoxContainer.new()
+	main_container.custom_minimum_size = Vector2(0, 150)
+	
+	# Create background panel
+	var panel = PanelContainer.new()
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color("#4A2D2D")  # Reddish background for locked
+	style.border_color = Color("#8A4A4A")
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	panel.add_theme_stylebox_override("panel", style)
+	
+	# Margin for content
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 15)
+	margin.add_theme_constant_override("margin_right", 15)
+	margin.add_theme_constant_override("margin_top", 15)
+	margin.add_theme_constant_override("margin_bottom", 15)
+	
+	var content_container = VBoxContainer.new()
+	content_container.add_theme_constant_override("separation", 12)
+	
+	# Display requirements
+	if deck_def.required_capture_exp > 0 or deck_def.required_defense_exp > 0:
+		if deck_def.required_capture_exp > 0:
+			var capture_req = create_requirement_display(
+				"⚔️ Capture Experience", 
+				deck_def.get_current_capture_exp("Apollo"), 
+				deck_def.required_capture_exp,
+				Color("#FFD700")
+			)
+			content_container.add_child(capture_req)
+		
+		if deck_def.required_defense_exp > 0:
+			var defense_req = create_requirement_display(
+				"🛡️ Defense Experience", 
+				deck_def.get_current_defense_exp("Apollo"), 
+				deck_def.required_defense_exp,
+				Color("#87CEEB")
+			)
+			content_container.add_child(defense_req)
+	else:
+		# This shouldn't happen for non-starter decks, but just in case
+		var error_label = Label.new()
+		error_label.text = "No requirements defined"
+		error_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+		content_container.add_child(error_label)
+	
+	# Assemble the structure
+	margin.add_child(content_container)
+	panel.add_child(margin)
+	main_container.add_child(panel)
+	
+	return main_container
+
+# Create a display for a single requirement (current/required)
+func create_requirement_display(title: String, current: int, required: int, color: Color) -> Control:
+	var req_container = VBoxContainer.new()
+	
+	# Title
+	var title_label = Label.new()
+	title_label.text = title
+	title_label.add_theme_font_size_override("font_size", 14)
+	title_label.add_theme_color_override("font_color", color)
+	req_container.add_child(title_label)
+	
+	# Progress container
+	var progress_container = HBoxContainer.new()
+	progress_container.add_theme_constant_override("separation", 10)
+	
+	# Progress bar
+	var progress_bar = ProgressBar.new()
+	progress_bar.min_value = 0
+	progress_bar.max_value = required
+	progress_bar.value = current
+	progress_bar.custom_minimum_size = Vector2(200, 20)
+	progress_bar.show_percentage = false
+	
+	# Style the progress bar
+	var bg_style = StyleBoxFlat.new()
+	bg_style.bg_color = Color("#333333")
+	bg_style.border_width_left = 1
+	bg_style.border_width_top = 1
+	bg_style.border_width_right = 1
+	bg_style.border_width_bottom = 1
+	bg_style.border_color = Color("#555555")
+	
+	var fill_style = StyleBoxFlat.new()
+	fill_style.bg_color = color
+	
+	progress_bar.add_theme_stylebox_override("background", bg_style)
+	progress_bar.add_theme_stylebox_override("fill", fill_style)
+	
+	progress_container.add_child(progress_bar)
+	
+	# Progress text
+	var progress_text = Label.new()
+	progress_text.text = str(current) + " / " + str(required)
+	progress_text.add_theme_font_size_override("font_size", 12)
+	progress_text.add_theme_color_override("font_color", Color("#DDDDDD"))
+	progress_container.add_child(progress_text)
+	
+	req_container.add_child(progress_container)
+	
+	return req_container
+
+# Display the cards for the selected deck with experience info (existing function, unchanged)
 func display_deck_cards(deck_index: int) -> void:
 	if not apollo_collection or deck_index < 0 or deck_index >= apollo_collection.decks.size():
 		return
@@ -200,7 +289,7 @@ func display_deck_cards(deck_index: int) -> void:
 			var card_display = create_deck_card_display(card, card_index)
 			card_container.add_child(card_display)
 
-# Create a card display panel for deck preview
+# Create a card display panel for deck preview (existing function, unchanged)
 func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	# Main container for this card
 	var card_panel = PanelContainer.new()
