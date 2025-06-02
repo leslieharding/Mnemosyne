@@ -179,7 +179,7 @@ func setup_experience_summary(capture_total_node: Label, defense_total_node: Lab
 		var before_defense = total_exp_data["defense_exp"] - run_exp_data["defense_exp"]
 		
 		# Create a container for this card
-		var card_container = create_detailed_card_exp_display(
+		var card_container = await create_detailed_card_exp_display(
 			card, 
 			before_capture, total_exp_data["capture_exp"],
 			before_defense, total_exp_data["defense_exp"],
@@ -193,13 +193,16 @@ func setup_experience_summary(capture_total_node: Label, defense_total_node: Lab
 	
 	print("\n=== Experience summary setup complete ===")
 
-# Rest of the functions remain the same...
 func create_detailed_card_exp_display(
 	card: CardResource, 
 	before_capture: int, after_capture: int,
 	before_defense: int, after_defense: int,
 	capture_gain: int, defense_gain: int
 ) -> Control:
+	print("Creating detailed display for: ", card.card_name)
+	print("  Capture: ", before_capture, " -> ", after_capture, " (gain: ", capture_gain, ")")
+	print("  Defense: ", before_defense, " -> ", after_defense, " (gain: ", defense_gain, ")")
+	
 	var container = VBoxContainer.new()
 	container.custom_minimum_size = Vector2(0, 120)
 	
@@ -209,6 +212,7 @@ func create_detailed_card_exp_display(
 	name_label.add_theme_font_size_override("font_size", 18)
 	name_label.add_theme_color_override("font_color", Color("#DDDDDD"))
 	container.add_child(name_label)
+	print("  Card name label added successfully")
 	
 	# Experience gained summary
 	var summary_container = HBoxContainer.new()
@@ -219,6 +223,7 @@ func create_detailed_card_exp_display(
 		capture_gain_label.add_theme_color_override("font_color", Color("#FFD700"))
 		capture_gain_label.add_theme_font_size_override("font_size", 14)
 		summary_container.add_child(capture_gain_label)
+		print("  Capture gain label added")
 	
 	if defense_gain > 0:
 		if capture_gain > 0:
@@ -231,15 +236,19 @@ func create_detailed_card_exp_display(
 		defense_gain_label.add_theme_color_override("font_color", Color("#87CEEB"))
 		defense_gain_label.add_theme_font_size_override("font_size", 14)
 		summary_container.add_child(defense_gain_label)
+		print("  Defense gain label added")
 	
 	container.add_child(summary_container)
+	print("  Summary container added")
 	
 	# Progress bars container
 	var progress_container = HBoxContainer.new()
 	container.add_child(progress_container)
+	print("  Progress container added")
 	
 	# Capture progress (if any experience gained)
 	if capture_gain > 0:
+		print("  Creating capture progress section...")
 		var capture_section = VBoxContainer.new()
 		capture_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		
@@ -248,12 +257,35 @@ func create_detailed_card_exp_display(
 		capture_title.add_theme_font_size_override("font_size", 12)
 		capture_title.add_theme_color_override("font_color", Color("#FFD700"))
 		capture_section.add_child(capture_title)
+		print("    Capture title added")
+		
+		# Try to load the ExpProgressBar scene
+		print("    Loading ExpProgressBar scene...")
+		var exp_bar_scene = preload("res://Scenes/ExpProgressBar.tscn")
+		if not exp_bar_scene:
+			print("    ERROR: Failed to preload ExpProgressBar scene!")
+			return container
+		print("    ExpProgressBar scene loaded successfully")
 		
 		# Before state
+		print("    Creating before capture bar...")
 		var before_capture_bar = exp_bar_scene.instantiate()
-		capture_section.add_child(before_capture_bar)  # Add to tree FIRST
-		await get_tree().process_frame  # Wait for proper initialization
-		before_capture_bar.setup_progress(before_capture, "capture", ExpProgressBar.DisplayMode.DETAILED)  # THEN setup
+		if not before_capture_bar:
+			print("    ERROR: Failed to instantiate before capture bar!")
+			return container
+		print("    Before capture bar instantiated")
+		
+		# Add to tree first, then setup
+		capture_section.add_child(before_capture_bar)
+		print("    Before capture bar added to tree")
+		
+		# Wait a frame to ensure it's properly in the tree
+		await get_tree().process_frame
+		
+		# Now setup
+		print("    Setting up before capture bar with XP: ", before_capture)
+		before_capture_bar.setup_progress(before_capture, "capture", ExpProgressBar.DisplayMode.DETAILED)
+		print("    Before capture bar setup complete")
 		
 		# Arrow
 		var arrow_label = Label.new()
@@ -261,24 +293,40 @@ func create_detailed_card_exp_display(
 		arrow_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		arrow_label.add_theme_font_size_override("font_size", 16)
 		capture_section.add_child(arrow_label)
+		print("    Arrow label added")
 		
 		# After state (will be animated)
-		var after_capture_bar = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
-		after_capture_bar.setup_progress(before_capture, "capture", ExpProgressBar.DisplayMode.DETAILED)
+		print("    Creating after capture bar...")
+		var after_capture_bar = exp_bar_scene.instantiate()
+		if not after_capture_bar:
+			print("    ERROR: Failed to instantiate after capture bar!")
+			return container
+		
 		capture_section.add_child(after_capture_bar)
+		print("    After capture bar added to tree")
+		
+		# Wait a frame
+		await get_tree().process_frame
+		
+		print("    Setting up after capture bar with XP: ", before_capture)
+		after_capture_bar.setup_progress(before_capture, "capture", ExpProgressBar.DisplayMode.DETAILED)
+		print("    After capture bar setup complete")
 		
 		# Schedule animation
 		call_deferred("animate_progress_bar", after_capture_bar, before_capture, after_capture)
 		
 		progress_container.add_child(capture_section)
+		print("    Capture section added to progress container")
 	
 	# Spacer between progress bars
 	if capture_gain > 0 and defense_gain > 0:
 		var spacer = VSeparator.new()
 		progress_container.add_child(spacer)
+		print("  Spacer added between progress bars")
 	
 	# Defense progress (if any experience gained)
 	if defense_gain > 0:
+		print("  Creating defense progress section...")
 		var defense_section = VBoxContainer.new()
 		defense_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		
@@ -287,11 +335,28 @@ func create_detailed_card_exp_display(
 		defense_title.add_theme_font_size_override("font_size", 12)
 		defense_title.add_theme_color_override("font_color", Color("#87CEEB"))
 		defense_section.add_child(defense_title)
+		print("    Defense title added")
+		
+		# Try to load the ExpProgressBar scene
+		print("    Loading ExpProgressBar scene for defense...")
+		var exp_bar_scene = preload("res://Scenes/ExpProgressBar.tscn")
+		if not exp_bar_scene:
+			print("    ERROR: Failed to preload ExpProgressBar scene for defense!")
+			return container
 		
 		# Before state
-		var before_defense_bar = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
-		before_defense_bar.setup_progress(before_defense, "defense", ExpProgressBar.DisplayMode.DETAILED)
+		print("    Creating before defense bar...")
+		var before_defense_bar = exp_bar_scene.instantiate()
+		if not before_defense_bar:
+			print("    ERROR: Failed to instantiate before defense bar!")
+			return container
+		
 		defense_section.add_child(before_defense_bar)
+		await get_tree().process_frame
+		
+		print("    Setting up before defense bar with XP: ", before_defense)
+		before_defense_bar.setup_progress(before_defense, "defense", ExpProgressBar.DisplayMode.DETAILED)
+		print("    Before defense bar setup complete")
 		
 		# Arrow
 		var arrow_label = Label.new()
@@ -301,15 +366,26 @@ func create_detailed_card_exp_display(
 		defense_section.add_child(arrow_label)
 		
 		# After state (will be animated)
-		var after_defense_bar = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
-		after_defense_bar.setup_progress(before_defense, "defense", ExpProgressBar.DisplayMode.DETAILED)
+		print("    Creating after defense bar...")
+		var after_defense_bar = exp_bar_scene.instantiate()
+		if not after_defense_bar:
+			print("    ERROR: Failed to instantiate after defense bar!")
+			return container
+		
 		defense_section.add_child(after_defense_bar)
+		await get_tree().process_frame
+		
+		print("    Setting up after defense bar with XP: ", before_defense)
+		after_defense_bar.setup_progress(before_defense, "defense", ExpProgressBar.DisplayMode.DETAILED)
+		print("    After defense bar setup complete")
 		
 		# Schedule animation
 		call_deferred("animate_progress_bar", after_defense_bar, before_defense, after_defense)
 		
 		progress_container.add_child(defense_section)
+		print("    Defense section added to progress container")
 	
+	print("Card display creation complete for: ", card.card_name)
 	return container
 
 func animate_progress_bar(progress_bar: ExpProgressBar, old_xp: int, new_xp: int):
