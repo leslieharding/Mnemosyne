@@ -206,14 +206,35 @@ func create_detailed_card_exp_display(
 	print("  Defense: ", before_defense, " -> ", after_defense, " (gain: ", defense_gain, ")")
 	
 	var container = VBoxContainer.new()
-	container.custom_minimum_size = Vector2(0, 120)
+	container.custom_minimum_size = Vector2(500, 200)  # Make it bigger and visible
+	container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	
+	# Add a background to make it visible for debugging
+	var panel = PanelContainer.new()
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color("#2A2A2A")
+	style.border_color = Color("#444444")
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	panel.add_theme_stylebox_override("panel", style)
+	
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_top", 10)
+	margin.add_theme_constant_override("margin_right", 10)
+	margin.add_theme_constant_override("margin_bottom", 10)
+	
+	var inner_container = VBoxContainer.new()
+	inner_container.custom_minimum_size = Vector2(0, 180)
 	
 	# Card name
 	var name_label = Label.new()
 	name_label.text = card.card_name
 	name_label.add_theme_font_size_override("font_size", 18)
 	name_label.add_theme_color_override("font_color", Color("#DDDDDD"))
-	container.add_child(name_label)
+	inner_container.add_child(name_label)
 	print("  Card name label added successfully")
 	
 	# Experience gained summary
@@ -240,12 +261,12 @@ func create_detailed_card_exp_display(
 		summary_container.add_child(defense_gain_label)
 		print("  Defense gain label added")
 	
-	container.add_child(summary_container)
+	inner_container.add_child(summary_container)
 	print("  Summary container added")
 	
 	# Progress bars container
 	var progress_container = HBoxContainer.new()
-	container.add_child(progress_container)
+	inner_container.add_child(progress_container)
 	print("  Progress container added")
 	
 	# Capture progress (if any experience gained)
@@ -281,8 +302,8 @@ func create_detailed_card_exp_display(
 		capture_section.add_child(before_capture_bar)
 		print("    Before capture bar added to tree")
 		
-		# Wait a frame to ensure it's properly in the tree
-		await get_tree().process_frame
+		# Wait for the node to be fully ready (this ensures @onready vars are initialized)
+		await before_capture_bar.ready
 		
 		# Now setup
 		print("    Setting up before capture bar with XP: ", before_capture)
@@ -307,8 +328,8 @@ func create_detailed_card_exp_display(
 		capture_section.add_child(after_capture_bar)
 		print("    After capture bar added to tree")
 		
-		# Wait a frame
-		await get_tree().process_frame
+		# Wait for the node to be fully ready
+		await after_capture_bar.ready
 		
 		print("    Setting up after capture bar with XP: ", before_capture)
 		after_capture_bar.setup_progress(before_capture, "capture", ExpProgressBar.DisplayMode.DETAILED)
@@ -354,7 +375,7 @@ func create_detailed_card_exp_display(
 			return container
 		
 		defense_section.add_child(before_defense_bar)
-		await get_tree().process_frame
+		await before_defense_bar.ready
 		
 		print("    Setting up before defense bar with XP: ", before_defense)
 		before_defense_bar.setup_progress(before_defense, "defense", ExpProgressBar.DisplayMode.DETAILED)
@@ -375,7 +396,7 @@ func create_detailed_card_exp_display(
 			return container
 		
 		defense_section.add_child(after_defense_bar)
-		await get_tree().process_frame
+		await after_defense_bar.ready
 		
 		print("    Setting up after defense bar with XP: ", before_defense)
 		after_defense_bar.setup_progress(before_defense, "defense", ExpProgressBar.DisplayMode.DETAILED)
@@ -386,6 +407,11 @@ func create_detailed_card_exp_display(
 		
 		progress_container.add_child(defense_section)
 		print("    Defense section added to progress container")
+	
+	# Assemble the final structure
+	margin.add_child(inner_container)
+	panel.add_child(margin)
+	container.add_child(panel)
 	
 	print("Card display creation complete for: ", card.card_name)
 	return container
