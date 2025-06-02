@@ -28,14 +28,34 @@ func _ready():
 	# Right panel starts hidden
 	right_panel.visible = false
 
+
 # Set up deck buttons with unlock conditions
 func setup_deck_buttons():
 	var deck_buttons = [deck1_button, deck2_button, deck3_button]
 	
+	# DEBUG: Check what experience data we actually have
+	if has_node("/root/GlobalProgressTrackerAutoload"):
+		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		var god_progress = progress_tracker.get_god_progress("Apollo")
+		print("=== APOLLO PROGRESS DEBUG ===")
+		print("Total god progress entries: ", god_progress.size())
+		for card_index in god_progress:
+			var card_exp = god_progress[card_index]
+			print("Card ", card_index, ": Capture=", card_exp.get("capture_exp", 0), " Defense=", card_exp.get("defense_exp", 0))
+	
 	for i in range(apollo_collection.decks.size()):
 		var deck_def = apollo_collection.decks[i]
 		var button = deck_buttons[i]
-		var is_unlocked = deck_def.is_unlocked("Apollo")
+		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		var god_progress = progress_tracker.get_god_progress("Apollo")
+		var is_unlocked = deck_def.is_unlocked("Apollo", god_progress)
+		
+		# DEBUG: Show unlock calculation details for deck 1 only
+		if i == 1:
+			print("=== DECK 1 DEBUG ===")
+			print("Required capture exp: ", deck_def.required_capture_exp)
+			print("Current capture exp: ", deck_def.get_current_capture_exp("Apollo"))
+			print("Is unlocked: ", is_unlocked)
 		
 		# Set button text
 		button.text = deck_def.deck_name
