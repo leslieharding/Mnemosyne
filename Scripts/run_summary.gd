@@ -12,11 +12,19 @@ var deck_index: int = 0
 var victory: bool = true
 
 func _ready():
+	# Wait a frame to ensure all @onready variables are properly initialized
+	await get_tree().process_frame
+	
 	# Get parameters from previous scene
 	var params = get_scene_params()
 	god_name = params.get("god", "Apollo")
 	deck_index = params.get("deck_index", 0)
 	victory = params.get("victory", true)
+	
+	# Validate that all UI references are valid before using them
+	if not validate_ui_references():
+		push_error("Some UI references are invalid in RunSummary scene")
+		return
 	
 	# Update title and result
 	title_label.text = god_name + " - Run Summary"
@@ -30,24 +38,67 @@ func _ready():
 	# Display experience summary
 	display_experience_summary()
 
+func validate_ui_references() -> bool:
+	var valid = true
+	
+	if not title_label:
+		print("ERROR: title_label is null")
+		valid = false
+	if not result_label:
+		print("ERROR: result_label is null")
+		valid = false
+	if not capture_total_label:
+		print("ERROR: capture_total_label is null")
+		valid = false
+	if not defense_total_label:
+		print("ERROR: defense_total_label is null")
+		valid = false
+	if not card_details_container:
+		print("ERROR: card_details_container is null")
+		valid = false
+	
+	return valid
+
 func display_experience_summary():
+	# Double-check that tracker exists
+	if not has_node("/root/RunExperienceTrackerAutoload"):
+		print("ERROR: RunExperienceTrackerAutoload not found")
+		return
+	
 	# Get experience data from the tracker
 	var tracker = get_node("/root/RunExperienceTrackerAutoload")
 	var all_exp = tracker.get_all_experience()
 	var totals = tracker.get_total_experience()
 	
-	# Update total labels
-	capture_total_label.text = "⚔️ Total Capture: " + str(totals["capture_exp"])
-	defense_total_label.text = "🛡️ Total Defense: " + str(totals["defense_exp"])
+	# Validate totals labels again before assignment
+	if capture_total_label:
+		capture_total_label.text = "⚔️ Total Capture: " + str(totals["capture_exp"])
+	else:
+		print("ERROR: capture_total_label is null in display_experience_summary")
+		
+	if defense_total_label:
+		defense_total_label.text = "🛡️ Total Defense: " + str(totals["defense_exp"])
+	else:
+		print("ERROR: defense_total_label is null in display_experience_summary")
 	
 	# Load the god's collection to get card names
-	var collection: GodCardCollection = load("res://Resources/Collections/" + god_name.to_lower() + ".tres")
+	var collection_path = "res://Resources/Collections/" + god_name.to_lower() + ".tres"
+	var collection: GodCardCollection = load(collection_path)
 	if not collection:
-		print("Failed to load collection for " + god_name)
+		print("Failed to load collection at: " + collection_path)
 		return
 	
 	# Get global progress for before/after comparison
+	if not has_node("/root/GlobalProgressTrackerAutoload"):
+		print("ERROR: GlobalProgressTrackerAutoload not found")
+		return
+		
 	var global_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	
+	# Validate card_details_container before using it
+	if not card_details_container:
+		print("ERROR: card_details_container is null, cannot display card details")
+		return
 	
 	# Create detailed view for each card that gained experience
 	for card_index in all_exp:
@@ -240,12 +291,10 @@ func create_card_exp_display(card: CardResource, exp_data: Dictionary) -> Contro
 	
 	return container
 
-
 func get_scene_params() -> Dictionary:
 	if get_tree().has_meta("scene_params"):
 		return get_tree().get_meta("scene_params")
 	return {}
-
 
 func _on_new_run_button_pressed() -> void:
 	# Add run experience to global tracker before clearing
@@ -255,8 +304,6 @@ func _on_new_run_button_pressed() -> void:
 	get_node("/root/RunExperienceTrackerAutoload").clear_run()
 	# Go to god selection
 	get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
-	
-
 
 func _on_main_menu_button_pressed() -> void:
 	# Add run experience to global tracker before clearing
@@ -266,8 +313,7 @@ func _on_main_menu_button_pressed() -> void:
 	get_node("/root/RunExperienceTrackerAutoload").clear_run()
 	# Go to main menu
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
-	
-	
+
 # Save the run experience to global progress
 func save_run_to_global_progress():
 	var tracker = get_node("/root/RunExperienceTrackerAutoload")
@@ -279,4 +325,4 @@ func save_run_to_global_progress():
 	# Add it to the global tracker
 	if run_exp.size() > 0:
 		global_tracker.add_run_experience(god_name, run_exp)
-		print("Saved run experience to global progress for ", god_name)	
+		print("Saved run experience to global progress for ", god_name)
