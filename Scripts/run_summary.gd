@@ -22,10 +22,10 @@ func _ready():
 	await get_tree().create_timer(0.1).timeout
 	setup_ui_safely()
 
-func print_tree_pretty(node: Node = self, indent: String = ""):
+func debug_print_tree(node: Node = self, indent: String = ""):
 	print(indent + node.name + " (" + node.get_class() + ")")
 	for child in node.get_children():
-		print_tree_pretty(child, indent + "  ")
+		debug_print_tree(child, indent + "  ")
 
 func setup_ui_safely():
 	print("\n=== Setting up UI ===")
@@ -250,9 +250,10 @@ func create_detailed_card_exp_display(
 		capture_section.add_child(capture_title)
 		
 		# Before state
-		var before_capture_bar = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
-		before_capture_bar.setup_progress(before_capture, "capture", ExpProgressBar.DisplayMode.DETAILED)
-		capture_section.add_child(before_capture_bar)
+		var before_capture_bar = exp_bar_scene.instantiate()
+		capture_section.add_child(before_capture_bar)  # Add to tree FIRST
+		await get_tree().process_frame  # Wait for proper initialization
+		before_capture_bar.setup_progress(before_capture, "capture", ExpProgressBar.DisplayMode.DETAILED)  # THEN setup
 		
 		# Arrow
 		var arrow_label = Label.new()
