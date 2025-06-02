@@ -171,18 +171,20 @@ func setup_experience_summary(capture_total_node: Label, defense_total_node: Lab
 		
 		print("Card name: " + card.card_name)
 		
-		# Get total experience (before this run was added to global)
-		var total_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
+		# Get total experience (this is the "before" state since global hasn't been updated yet)
+		var before_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
+		var before_capture = before_exp_data["capture_exp"]
+		var before_defense = before_exp_data["defense_exp"]
 		
-		# Calculate before experience (total minus this run)
-		var before_capture = total_exp_data["capture_exp"] - run_exp_data["capture_exp"]
-		var before_defense = total_exp_data["defense_exp"] - run_exp_data["defense_exp"]
+		# Calculate "after" experience (before + this run's gains)
+		var after_capture = before_capture + run_exp_data["capture_exp"]
+		var after_defense = before_defense + run_exp_data["defense_exp"]
 		
 		# Create a container for this card
 		var card_container = await create_detailed_card_exp_display(
 			card, 
-			before_capture, total_exp_data["capture_exp"],
-			before_defense, total_exp_data["defense_exp"],
+			before_capture, after_capture,
+			before_defense, after_defense,
 			run_exp_data["capture_exp"], run_exp_data["defense_exp"]
 		)
 		card_details_node.add_child(card_container)
