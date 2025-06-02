@@ -18,9 +18,10 @@ func is_unlocked(god_name: String) -> bool:
 	if is_starter_deck:
 		return true
 	
-	# Check experience requirements
-	if has_node("/root/GlobalProgressTrackerAutoload"):
-		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	# Check experience requirements through Engine singleton
+	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
+	if scene_tree and scene_tree.has_node("/root/GlobalProgressTrackerAutoload"):
+		var progress_tracker = scene_tree.get_node("/root/GlobalProgressTrackerAutoload")
 		var god_progress = progress_tracker.get_god_progress(god_name)
 		
 		# Calculate total experience across all cards for this god
@@ -64,8 +65,9 @@ func get_unlock_description(god_name: String) -> String:
 
 # Helper to get current capture experience
 func get_current_capture_exp(god_name: String) -> int:
-	if has_node("/root/GlobalProgressTrackerAutoload"):
-		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
+	if scene_tree and scene_tree.has_node("/root/GlobalProgressTrackerAutoload"):
+		var progress_tracker = scene_tree.get_node("/root/GlobalProgressTrackerAutoload")
 		var god_progress = progress_tracker.get_god_progress(god_name)
 		
 		var total = 0
@@ -77,8 +79,9 @@ func get_current_capture_exp(god_name: String) -> int:
 
 # Helper to get current defense experience
 func get_current_defense_exp(god_name: String) -> int:
-	if has_node("/root/GlobalProgressTrackerAutoload"):
-		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
+	if scene_tree and scene_tree.has_node("/root/GlobalProgressTrackerAutoload"):
+		var progress_tracker = scene_tree.get_node("/root/GlobalProgressTrackerAutoload")
 		var god_progress = progress_tracker.get_god_progress(god_name)
 		
 		var total = 0
