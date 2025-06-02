@@ -108,7 +108,9 @@ func _on_start_game_button_pressed() -> void:
 # Helper function to handle deck selection - now handles both locked and unlocked decks
 func select_deck(index: int) -> void:
 	var deck_def = apollo_collection.decks[index]
-	var is_unlocked = deck_def.is_unlocked("Apollo")
+	var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	var god_progress = progress_tracker.get_god_progress("Apollo")
+	var is_unlocked = deck_def.is_unlocked("Apollo", god_progress)
 	
 	selected_deck_index = index
 	
@@ -199,12 +201,24 @@ func create_unlock_requirements_panel(deck_def: DeckDefinition) -> Control:
 	var content_container = VBoxContainer.new()
 	content_container.add_theme_constant_override("separation", 12)
 	
-	# Display requirements
+		# Display requirements
 	if deck_def.required_capture_exp > 0 or deck_def.required_defense_exp > 0:
+		# Get current progress data
+		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		var god_progress = progress_tracker.get_god_progress("Apollo")
+		
+		# Calculate current totals
+		var current_capture_exp = 0
+		var current_defense_exp = 0
+		for card_index in god_progress:
+			var card_exp = god_progress[card_index]
+			current_capture_exp += card_exp.get("capture_exp", 0)
+			current_defense_exp += card_exp.get("defense_exp", 0)
+		
 		if deck_def.required_capture_exp > 0:
 			var capture_req = create_requirement_display(
 				"⚔️ Capture Experience", 
-				deck_def.get_current_capture_exp("Apollo"), 
+				current_capture_exp, 
 				deck_def.required_capture_exp,
 				Color("#FFD700")
 			)
@@ -213,7 +227,7 @@ func create_unlock_requirements_panel(deck_def: DeckDefinition) -> Control:
 		if deck_def.required_defense_exp > 0:
 			var defense_req = create_requirement_display(
 				"🛡️ Defense Experience", 
-				deck_def.get_current_defense_exp("Apollo"), 
+				current_defense_exp, 
 				deck_def.required_defense_exp,
 				Color("#87CEEB")
 			)
