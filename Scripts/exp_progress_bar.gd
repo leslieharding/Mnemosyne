@@ -69,3 +69,52 @@ func setup_styling():
 	# Apply styles
 	progress_bar.add_theme_stylebox_override("background", bg_style)
 	progress_bar.add_theme_stylebox_override("fill", bar_style)
+
+
+# Animate progress change (useful for summary screen)
+func animate_progress_change(old_xp: int, new_xp: int, duration: float = 1.0):
+	var old_level = ExperienceHelpers.calculate_level(old_xp)
+	var new_level = ExperienceHelpers.calculate_level(new_xp)
+	var old_progress = ExperienceHelpers.calculate_progress(old_xp)
+	var new_progress = ExperienceHelpers.calculate_progress(new_xp)
+	
+	# If level changed, we need to handle the animation differently
+	if old_level != new_level:
+		await animate_level_up(old_xp, new_xp, duration)
+	else:
+		# Simple progress animation within same level
+		var tween = create_tween()
+		tween.tween_method(update_progress_display, old_progress, new_progress, duration)
+
+# Animate level up scenario
+func animate_level_up(old_xp: int, new_xp: int, duration: float):
+	var old_level = ExperienceHelpers.calculate_level(old_xp)
+	var new_level = ExperienceHelpers.calculate_level(new_xp)
+	var old_progress = ExperienceHelpers.calculate_progress(old_xp)
+	var new_progress = ExperienceHelpers.calculate_progress(new_xp)
+	
+	# First, animate to end of current level
+	var tween = create_tween()
+	var time_per_level = duration / (new_level - old_level + 1)
+	
+	# Animate to end of current level
+	tween.tween_method(update_progress_display, old_progress, ExperienceHelpers.XP_PER_LEVEL, time_per_level * 0.5)
+	
+	# Level up effect
+	tween.tween_callback(show_level_up_effect)
+	
+	# Update to new level and animate to final progress
+	tween.tween_callback(func(): level_label.text = "Lv." + str(new_level))
+	tween.tween_method(update_progress_display, 0, new_progress, time_per_level * 0.5)
+
+# Update progress bar and label during animation
+func update_progress_display(progress_value: int):
+	progress_bar.value = progress_value
+	progress_label.text = str(progress_value) + "/" + str(ExperienceHelpers.XP_PER_LEVEL)
+
+# Visual effect for level up
+func show_level_up_effect():
+	# Flash effect
+	var tween = create_tween()
+	tween.tween_property(self, "modulate", Color(2, 2, 2), 0.1)
+	tween.tween_property(self, "modulate", Color.WHITE, 0.2)
