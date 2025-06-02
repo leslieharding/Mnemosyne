@@ -1,7 +1,10 @@
-[gd_scene format=3 uid="uid://bsaj6aconrjfm"]
+[gd_scene load_steps=2 format=3 uid="uid://bsaj6aconrjfm"]
+
+[ext_resource type="Script" uid="uid://bopwownnnnq5" path="res://Scripts/exp_progress_bar.gd" id="1_2be6h"]
 
 [node name="ExpProgressBar" type="HBoxContainer"]
 custom_minimum_size = Vector2(120, 20)
+script = ExtResource("1_2be6h")
 
 [node name="LevelLabel" type="Label" parent="."]
 layout_mode = 2

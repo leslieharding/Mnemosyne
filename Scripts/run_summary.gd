@@ -12,11 +12,6 @@ var deck_index: int = 0
 var victory: bool = true
 
 func _ready():
-	
-	# Connect button signals
-	$VBoxContainer/ButtonContainer/NewRunButton.pressed.connect(_on_new_run_button_pressed)
-	$VBoxContainer/ButtonContainer/MainMenuButton.pressed.connect(_on_main_menu_button_pressed)
-	
 	# Get parameters from previous scene
 	var params = get_scene_params()
 	god_name = params.get("god", "Apollo")

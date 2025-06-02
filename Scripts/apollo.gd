@@ -181,10 +181,10 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	var v_separator = VSeparator.new()
 	h_container.add_child(v_separator)
 	
-	# Right side - Experience info with progress bars
+	# Right side - Experience info with level display
 	var right_side = VBoxContainer.new()
 	right_side.size_flags_horizontal = Control.SIZE_SHRINK_END
-	right_side.custom_minimum_size.x = 180  # Slightly wider for progress bars
+	right_side.custom_minimum_size.x = 180  # Slightly wider for level display
 	h_container.add_child(right_side)
 	
 	# Experience title
@@ -205,7 +205,7 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 		capture_exp = exp_data.get("capture_exp", 0)
 		defense_exp = exp_data.get("defense_exp", 0)
 	
-	# Capture experience progress bar
+	# Capture experience level display
 	var capture_container = VBoxContainer.new()
 	right_side.add_child(capture_container)
 	
@@ -215,16 +215,19 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	capture_label.add_theme_color_override("font_color", Color("#FFD700"))
 	capture_container.add_child(capture_label)
 	
-	var capture_progress = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
-	capture_progress.setup_progress(capture_exp, "capture", ExpProgressBar.DisplayMode.COMPACT)
-	capture_container.add_child(capture_progress)
+	# Show level and progress for capture
+	var capture_text = Label.new()
+	capture_text.text = ExperienceHelpers.format_level_display(capture_exp)
+	capture_text.add_theme_font_size_override("font_size", 10)
+	capture_text.add_theme_color_override("font_color", Color("#FFD700"))
+	capture_container.add_child(capture_text)
 	
 	# Small spacer
 	var spacer = Control.new()
 	spacer.custom_minimum_size.y = 5
 	right_side.add_child(spacer)
 	
-	# Defense experience progress bar
+	# Defense experience level display
 	var defense_container = VBoxContainer.new()
 	right_side.add_child(defense_container)
 	
@@ -234,8 +237,11 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
 	defense_container.add_child(defense_label)
 	
-	var defense_progress = preload("res://Scenes/ExpProgressBar.tscn").instantiate()
-	defense_progress.setup_progress(defense_exp, "defense", ExpProgressBar.DisplayMode.COMPACT)
-	defense_container.add_child(defense_progress)
+	# Show level and progress for defense
+	var defense_text = Label.new()
+	defense_text.text = ExperienceHelpers.format_level_display(defense_exp)
+	defense_text.add_theme_font_size_override("font_size", 10)
+	defense_text.add_theme_color_override("font_color", Color("#87CEEB"))
+	defense_container.add_child(defense_text)
 	
 	return card_panel
