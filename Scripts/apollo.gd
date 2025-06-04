@@ -3,6 +3,7 @@ extends Node2D
 # Reference to the Apollo card collection
 var apollo_collection: GodCardCollection
 var selected_deck_index: int = -1  # -1 means no deck selected
+var journal_button: JournalButton
 
 # UI References
 @onready var deck1_button = $MainContainer/LeftPanel/Deck1Button
@@ -27,7 +28,13 @@ func _ready():
 	
 	# Right panel starts hidden
 	right_panel.visible = false
+	
+	setup_journal_button()
 
+
+func setup_journal_button():
+	journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
+	add_child(journal_button)
 
 # Set up deck buttons with unlock conditions
 func setup_deck_buttons():

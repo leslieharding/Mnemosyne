@@ -19,6 +19,10 @@ var deck_card_indices: Array[int] = []  # Original indices in Apollo's collectio
 var exp_panel: ExpPanel  # Reference to experience panel
 var grid_to_collection_index: Dictionary = {}  # grid_index -> collection_index
 
+# Journal button reference  
+var journal_button: JournalButton
+
+
 # Player types for ownership tracking
 enum Owner {
 	NONE,
@@ -56,6 +60,9 @@ func _ready():
 	# Create styles for grid selection
 	create_grid_styles()
 	
+	# Add journal button
+	setup_journal_button()
+	
 	# Get the selected deck from Apollo scene
 	var params = get_scene_params()
 	if params.has("deck_index"):
@@ -69,6 +76,11 @@ func _ready():
 	
 	# Start the game
 	start_game()
+
+func setup_journal_button():
+	journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
+	add_child(journal_button)
+
 
 # Set up the game managers
 func setup_managers():
@@ -395,17 +407,30 @@ func should_game_end() -> bool:
 	
 	return available_slots == 0 or (player_deck.is_empty() and not opponent_manager.has_cards())
 
-# End the game
 func end_game():
 	await get_tree().process_frame
 	
 	var scores = get_current_scores()
 	var winner = ""
+	var victory = false
 	
 	if scores.player > scores.opponent:
 		winner = "You win!"
+		victory = true
 	elif scores.opponent > scores.player:
 		winner = "You lose!"
+		victory = false
+	else:
+		winner = "It's a tie!"
+		victory = true  # Treat ties as victories for experience purposes
+	
+	# Record the enemy encounter in memory journal
+	record_enemy_encounter(victory)
+	
+	# Record god experience (you used this god in battle)
+	record_god_experience()
+	
+	if not victory:
 		# If player loses, show run summary before ending
 		game_status_label.text = "Defeat! " + winner
 		disable_player_input()
@@ -424,8 +449,6 @@ func end_game():
 		})
 		get_tree().change_scene_to_file("res://Scenes/RunSummary.tscn")
 		return
-	else:
-		winner = "It's a tie!"
 	
 	# Player won or tied - continue the run
 	game_status_label.text = "Victory! " + winner
@@ -969,3 +992,44 @@ func show_reward_screen():
 		"current_node": params.get("current_node")
 	})
 	get_tree().change_scene_to_file("res://Scenes/RewardScreen.tscn")
+
+
+func record_enemy_encounter(victory: bool):
+	if not has_node("/root/MemoryJournalManagerAutoload"):
+		return
+	
+	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
+	var params = get_scene_params()
+	
+	# Get enemy info from current node
+	var enemy_name = "Shadow Acolyte"  # Default
+	var enemy_difficulty = 0
+	
+	if params.has("current_node"):
+		var current_node = params["current_node"]
+		enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
+		enemy_difficulty = current_node.enemy_difficulty
+	
+	# Record the encounter
+	memory_manager.record_enemy_encounter(enemy_name, victory, enemy_difficulty)
+	print("Recorded enemy encounter: ", enemy_name, " (victory: ", victory, ")")
+
+func record_god_experience():
+	if not has_node("/root/MemoryJournalManagerAutoload"):
+		return
+	
+	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
+	var params = get_scene_params()
+	
+	var god_name = params.get("god", "Apollo")
+	var deck_index = params.get("deck_index", 0)
+	
+	# Get deck name for tracking
+	var apollo_collection = load("res://Resources/Collections/Apollo.tres")
+	var deck_name = ""
+	if apollo_collection and deck_index < apollo_collection.decks.size():
+		deck_name = apollo_collection.decks[deck_index].deck_name
+	
+	# Record the god experience
+	memory_manager.record_god_experience(god_name, 1, deck_name)
+	print("Recorded god experience: ", god_name, " with deck ", deck_name)
