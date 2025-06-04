@@ -89,9 +89,23 @@ func setup_notification_indicator():
 func _on_journal_button_pressed():
 	# Create journal if it doesn't exist
 	if not journal_instance:
+		# Create a dedicated CanvasLayer for the journal to ensure proper positioning
+		var journal_canvas = CanvasLayer.new()
+		journal_canvas.layer = 50  # Higher than button layer to be on top
+		journal_canvas.name = "JournalCanvas"
+		get_tree().current_scene.add_child(journal_canvas)
+		
+		# Create the journal and add it to the dedicated canvas layer
 		journal_instance = preload("res://Scenes/MemoryJournal.tscn").instantiate()
-		get_tree().current_scene.add_child(journal_instance)
+		journal_canvas.add_child(journal_instance)
 		journal_instance.journal_closed.connect(_on_journal_closed)
+		
+		# Force the journal to fill the entire screen
+		journal_instance.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		journal_instance.position = Vector2.ZERO
+		journal_instance.size = get_viewport().get_visible_rect().size
+		
+		print("Journal created with dedicated CanvasLayer at position: ", journal_instance.position, " size: ", journal_instance.size)
 	
 	# Show journal
 	journal_instance.show_journal()
@@ -100,8 +114,12 @@ func _on_journal_button_pressed():
 	hide_notification()
 
 func _on_journal_closed():
-	# Journal was closed, could update state here
-	pass
+	# Clean up the journal and its canvas layer when closed
+	if journal_instance:
+		var journal_canvas = journal_instance.get_parent()
+		if journal_canvas and journal_canvas.name == "JournalCanvas":
+			journal_canvas.queue_free()
+		journal_instance = null
 
 func _on_mouse_entered():
 	# Hover animation

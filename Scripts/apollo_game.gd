@@ -89,6 +89,9 @@ func setup_journal_button():
 		journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
 		canvas_layer.add_child(journal_button)
 		
+		journal_button.position = Vector2(20, get_viewport().get_visible_rect().size.y - 80)
+		journal_button.size = Vector2(60, 60)
+		
 		print("Apollo Game: Journal button added with CanvasLayer")
 
 
