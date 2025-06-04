@@ -88,7 +88,9 @@ func _on_start_game_button_pressed() -> void:
 	if selected_deck_index >= 0:
 		# Only allow starting if deck is unlocked
 		var deck_def = apollo_collection.decks[selected_deck_index]
-		if not deck_def.is_unlocked("Apollo"):
+		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		var god_progress = progress_tracker.get_god_progress("Apollo")
+		if not deck_def.is_unlocked("Apollo", god_progress):
 			print("Cannot start game - deck is locked!")
 			return
 			

@@ -93,14 +93,15 @@ func setup_managers():
 
 
 # Set up opponent based on parameters from map
+# Set up opponent based on parameters from map
 func setup_opponent_from_params():
 	var params = get_scene_params()
 	
 	# Check if we have current node data (enemy info)
 	if params.has("current_node"):
 		var current_node = params["current_node"]
-		var enemy_name = current_node.get("enemy_name", "Shadow Acolyte")
-		var enemy_difficulty = current_node.get("enemy_difficulty", 0)
+		var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
+		var enemy_difficulty = current_node.enemy_difficulty
 		
 		print("Setting up opponent: ", enemy_name, " (difficulty ", enemy_difficulty, ")")
 		opponent_manager.setup_opponent(enemy_name, enemy_difficulty)
