@@ -5,16 +5,16 @@ class_name MemoryJournalUI
 signal journal_closed()
 
 # UI References - these will be connected automatically by the scene structure
-@onready var main_panel = $MainPanel
-@onready var tab_container = $MainPanel/VBox/TabContainer
-@onready var close_button = $MainPanel/VBox/Header/CloseButton
-@onready var title_label = $MainPanel/VBox/Header/TitleLabel
-@onready var summary_label = $MainPanel/VBox/Header/SummaryLabel
+@onready var main_panel = $MainContainer
+@onready var tab_container = $MainContainer/VBox/TabContainer
+@onready var close_button = $MainContainer/VBox/Header/CloseButton
+@onready var title_label = $MainContainer/VBox/Header/TitleLabel
+@onready var summary_label = $MainContainer/VBox/Header/SummaryLabel
 
 # Tab references
-@onready var bestiary_tab = $MainPanel/VBox/TabContainer/Bestiary
-@onready var gods_tab = $MainPanel/VBox/TabContainer/Gods
-@onready var mnemosyne_tab = $MainPanel/VBox/TabContainer/Mnemosyne
+@onready var bestiary_tab = $MainContainer/VBox/TabContainer/Bestiary
+@onready var gods_tab = $MainContainer/VBox/TabContainer/Gods
+@onready var mnemosyne_tab = $MainContainer/VBox/TabContainer/Mnemosyne
 
 # Animation
 var journal_tween: Tween

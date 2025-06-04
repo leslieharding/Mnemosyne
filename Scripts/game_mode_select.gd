@@ -24,5 +24,6 @@ func _on_artemis_button_pressed() -> void:
 
 
 func setup_journal_button():
-	journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
-	add_child(journal_button)
+	if not journal_button:  # Check if it already exists
+		journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
+		add_child(journal_button)

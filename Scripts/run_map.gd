@@ -18,6 +18,9 @@ var selected_deck_index: int = 0
 # Experience panel reference
 var exp_panel: ExpPanel
 
+# Journal button reference
+var journal_button: JournalButton
+
 func _ready():
 	# Connect back button
 	back_button.pressed.connect(_on_back_button_pressed)
@@ -40,6 +43,13 @@ func _ready():
 	
 	# Update UI
 	update_ui()
+	setup_journal_button()
+
+func setup_journal_button():
+	if not journal_button:  # Check if it already exists
+		journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
+		add_child(journal_button)
+
 
 # Get parameters passed from the deck selection scene
 func get_run_parameters():

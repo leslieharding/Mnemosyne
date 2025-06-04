@@ -33,8 +33,9 @@ func _ready():
 
 
 func setup_journal_button():
-	journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
-	add_child(journal_button)
+	if not journal_button:  # Check if it already exists
+		journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
+		add_child(journal_button)
 
 # Set up deck buttons with unlock conditions
 func setup_deck_buttons():
