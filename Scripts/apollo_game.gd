@@ -78,9 +78,18 @@ func _ready():
 	start_game()
 
 func setup_journal_button():
-	if not journal_button:  # Check if it already exists
+	if not journal_button:
+		# Create a CanvasLayer to ensure it's always on top, especially for Node2D scenes
+		var canvas_layer = CanvasLayer.new()
+		canvas_layer.layer = 10  # High layer value to be on top
+		canvas_layer.name = "JournalLayer"
+		add_child(canvas_layer)
+		
+		# Create the journal button
 		journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
-		add_child(journal_button)
+		canvas_layer.add_child(journal_button)
+		
+		print("Apollo Game: Journal button added with CanvasLayer")
 
 
 # Set up the game managers

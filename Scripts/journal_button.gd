@@ -14,7 +14,7 @@ var hover_tween: Tween
 var notification_tween: Tween
 
 func _ready():
-	# Set up button appearance
+	# Set up button appearance first
 	setup_button_style()
 	
 	# Connect signals
@@ -31,12 +31,9 @@ func _ready():
 		memory_manager.new_memory_formed.connect(_on_new_memory_formed)
 		memory_manager.memory_level_increased.connect(_on_memory_level_increased)
 	
-	# Position in bottom-right corner
-	set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	offset_left = -80
-	offset_top = -80
-	offset_right = -20
-	offset_bottom = -20
+	
+	
+	print("Journal button ready - Position: ", position, " Size: ", size, " Visible: ", visible)
 
 func setup_button_style():
 	# Set button properties
