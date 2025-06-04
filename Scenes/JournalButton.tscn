@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://5tws4ffpt061"]
+
+[ext_resource type="Script" uid="uid://detfcf3l8hhh6" path="res://Scripts/journal_button.gd" id="1_58mg4"]
+
+[node name="JournalButton" type="Button"]
+custom_minimum_size = Vector2(60, 60)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -8.0
+offset_top = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "📖"
+script = ExtResource("1_58mg4")

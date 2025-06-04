@@ -1,0 +1,138 @@
+[gd_scene load_steps=2 format=3 uid="uid://tx1ipeivmntw"]
+
+[ext_resource type="Script" uid="uid://der57mv5vo48a" path="res://Scripts/memory_journal.gd" id="1_fi0jc"]
+
+[node name="MemoryJournal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_fi0jc")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.00392157)
+
+[node name="MainContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(800, 600)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -42.5
+offset_right = 20.0
+offset_bottom = 42.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="MainContainer/VBox"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Memory Journal"
+horizontal_alignment = 1
+
+[node name="SummaryLabel" type="Label" parent="MainContainer/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Growing Awareness • 0 Enemies • 0 Gods"
+horizontal_alignment = 1
+
+[node name="CloseButton" type="Button" parent="MainContainer/VBox/Header"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+text = "X"
+
+[node name="TabContainer" type="TabContainer" parent="MainContainer/VBox"]
+layout_mode = 2
+current_tab = 0
+
+[node name="Bestiary" type="HSplitContainer" parent="MainContainer/VBox/TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Bestiary/LeftPanel"]
+layout_mode = 2
+text = "Encountered Enemies"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Bestiary/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EnemyList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary/LeftPanel/ScrollContainer"]
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Bestiary/RightPanel"]
+layout_mode = 2
+text = "Select an enemy to view details"
+horizontal_alignment = 1
+
+[node name="Gods" type="HSplitContainer" parent="MainContainer/VBox/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Gods/LeftPanel"]
+layout_mode = 2
+text = "Divine Connections"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Gods/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GodList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods/LeftPanel/ScrollContainer"]
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Gods/RightPanel"]
+layout_mode = 2
+text = "Select a god to view mastery details"
+horizontal_alignment = 1
+
+[node name="Mnemosyne" type="VBoxContainer" parent="MainContainer/VBox/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Mnemosyne"]
+layout_mode = 2
+text = "Self-Reflection"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ContentVBox" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne/ScrollContainer"]
+layout_mode = 2
