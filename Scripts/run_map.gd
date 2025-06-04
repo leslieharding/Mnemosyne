@@ -162,7 +162,7 @@ func style_map_node_button(button: Button, map_node: MapNode):
 			button.text += " 👑"
 	
 	# Add enemy info to button text and tooltip
-	if map_node.has("enemy_name") and map_node.has("enemy_difficulty"):
+	if map_node.enemy_name != "" and map_node.enemy_difficulty >= 0:
 		var difficulty_text = ""
 		match map_node.enemy_difficulty:
 			0: difficulty_text = "Novice"
