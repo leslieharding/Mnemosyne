@@ -87,6 +87,28 @@ func setup_managers():
 	
 	# Connect opponent manager signals
 	opponent_manager.opponent_card_placed.connect(_on_opponent_card_placed)
+	
+	# Set up opponent based on map node data
+	setup_opponent_from_params()
+
+
+# Set up opponent based on parameters from map
+func setup_opponent_from_params():
+	var params = get_scene_params()
+	
+	# Check if we have current node data (enemy info)
+	if params.has("current_node"):
+		var current_node = params["current_node"]
+		var enemy_name = current_node.get("enemy_name", "Shadow Acolyte")
+		var enemy_difficulty = current_node.get("enemy_difficulty", 0)
+		
+		print("Setting up opponent: ", enemy_name, " (difficulty ", enemy_difficulty, ")")
+		opponent_manager.setup_opponent(enemy_name, enemy_difficulty)
+	else:
+		# Fallback for testing or if no node data available
+		print("No enemy data found, using default Shadow Acolyte")
+		opponent_manager.setup_opponent("Shadow Acolyte", 0)
+
 
 # Start the game sequence
 func start_game():

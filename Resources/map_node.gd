@@ -17,9 +17,15 @@ enum NodeType {
 @export var is_available: bool = false
 @export var node_id: int = -1
 
+# Enemy encounter data
+@export var enemy_name: String = "Shadow Acolyte"  # Which enemy type
+@export var enemy_difficulty: int = 0  # 0=easy, 1=medium, 2=hard/boss
+
 # Visual/UI properties
 @export var display_name: String = ""
 @export var description: String = ""
+
+# Replace the _init function (around lines 21-40)
 
 func _init(id: int = -1, type: NodeType = NodeType.BATTLE, pos: Vector2 = Vector2.ZERO):
 	node_id = id
@@ -27,6 +33,10 @@ func _init(id: int = -1, type: NodeType = NodeType.BATTLE, pos: Vector2 = Vector
 	position = pos
 	is_available = false
 	is_completed = false
+	
+	# Set default enemy data
+	enemy_name = "Shadow Acolyte"
+	enemy_difficulty = 0
 	
 	# Set default display info based on type
 	match node_type:

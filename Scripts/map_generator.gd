@@ -44,7 +44,7 @@ static func generate_layer_nodes(layer: int, starting_id: int) -> Array[MapNode]
 	
 	# Calculate horizontal spacing for this layer
 	var horizontal_spacing = MAP_WIDTH / (node_count + 1)
-# Invert the Y position so layer 0 is at the bottom and final layer is at top
+	# Invert the Y position so layer 0 is at the bottom and final layer is at top
 	var y_position = (LAYER_COUNT - 1 - layer) * LAYER_SPACING
 	
 	for i in range(node_count):
@@ -56,6 +56,10 @@ static func generate_layer_nodes(layer: int, starting_id: int) -> Array[MapNode]
 		
 		# Create the node
 		var node = MapNode.new(starting_id + i, node_type, position)
+		
+		# Assign enemy to this node
+		assign_enemy_to_node(node, layer, i)
+		
 		layer_nodes.append(node)
 	
 	return layer_nodes
@@ -67,6 +71,34 @@ static func determine_node_type(layer: int, index_in_layer: int) -> MapNode.Node
 		return MapNode.NodeType.BOSS
 	else:
 		return MapNode.NodeType.BATTLE
+
+# Assign enemy to a node based on its position
+static func assign_enemy_to_node(node: MapNode, layer: int, index_in_layer: int):
+	# Load enemy collection to get available enemies
+	var enemies_collection: EnemiesCollection = load("res://Resources/Collections/Enemies.tres")
+	if not enemies_collection:
+		# Fallback if enemies collection not found
+		node.enemy_name = "Shadow Acolyte"
+		node.enemy_difficulty = 0
+		return
+	
+	var enemy_names = enemies_collection.get_enemy_names()
+	
+	# Assign enemy based on layer (simple assignment for now)
+	match layer:
+		0:  # Starting layer - easy enemies
+			node.enemy_name = enemy_names[index_in_layer % enemy_names.size()]
+			node.enemy_difficulty = 0
+		1, 2:  # Middle layers - medium enemies
+			node.enemy_name = enemy_names[index_in_layer % enemy_names.size()]
+			node.enemy_difficulty = 1
+		3:  # Boss layer - hard enemies
+			node.enemy_name = enemy_names[0]  # Could be specific boss enemy
+			node.enemy_difficulty = 2
+		_:
+			# Fallback
+			node.enemy_name = "Shadow Acolyte"
+			node.enemy_difficulty = 0
 
 # Connect nodes between layers - REVERSE the connection direction
 static func connect_layers(nodes_by_layer: Array, map_data: MapData):
@@ -124,3 +156,4 @@ static func print_map_debug(map_data: MapData):
 		
 		for node in layer_nodes:
 			print("  Node ", node.node_id, " (", node.display_name, ") -> ", node.connections)
+			print("    Enemy: ", node.enemy_name, " (difficulty ", node.enemy_difficulty, ")")

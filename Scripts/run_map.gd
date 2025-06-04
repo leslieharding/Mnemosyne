@@ -111,6 +111,8 @@ func create_map_node_button(map_node: MapNode):
 	map_container.add_child(button)
 	map_node_buttons.append(button)
 
+# Replace the style_map_node_button function (around lines 150-200)
+
 # Style a map node button based on its state
 func style_map_node_button(button: Button, map_node: MapNode):
 	# Create custom style based on node state
@@ -158,6 +160,21 @@ func style_map_node_button(button: Button, map_node: MapNode):
 			style.border_width_right = 3
 			style.border_width_bottom = 3
 			button.text += " 👑"
+	
+	# Add enemy info to button text and tooltip
+	if map_node.has("enemy_name") and map_node.has("enemy_difficulty"):
+		var difficulty_text = ""
+		match map_node.enemy_difficulty:
+			0: difficulty_text = "Novice"
+			1: difficulty_text = "Adept"
+			2: difficulty_text = "Master"
+		
+		# Update button text to include enemy info
+		if not button.text.contains("✓"):
+			button.text = map_node.display_name + "\n" + map_node.enemy_name
+		
+		# Set tooltip with more detailed info
+		button.tooltip_text = map_node.enemy_name + " (" + difficulty_text + ")"
 	
 	# Apply the style
 	button.add_theme_stylebox_override("normal", style)

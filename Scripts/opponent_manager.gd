@@ -4,39 +4,66 @@ class_name OpponentManager
 
 signal opponent_card_placed(grid_index: int)
 
-# Opponent's deck - for now always the same, but structured for future variation
+# Opponent's deck and info
 var opponent_deck: Array[CardResource] = []
-var opponent_name: String = "Apollo's Shadow"
-var last_played_card: CardResource = null  # Track the last played card
+var opponent_name: String = "Unknown Enemy"
+var opponent_description: String = ""
+var last_played_card: CardResource = null
 
 # AI decision making
 var think_time_min: float = 1.0
 var think_time_max: float = 2.5
 
-func _ready():
-	setup_default_opponent()
+# Enemy collection reference
+var enemies_collection: EnemiesCollection
 
-# Set up the default opponent with a fixed deck
-func setup_default_opponent():
-	# Load Apollo collection and use the first deck as opponent's deck
+func _ready():
+	load_enemies_collection()
+
+# Load the enemies collection
+func load_enemies_collection():
+	enemies_collection = load("res://Resources/Collections/Enemies.tres")
+	if not enemies_collection:
+		push_error("Failed to load enemies collection!")
+
+# Set up opponent with specific enemy and difficulty
+func setup_opponent(enemy_name: String, difficulty: int = 0):
+	if not enemies_collection:
+		load_enemies_collection()
+		if not enemies_collection:
+			setup_fallback_opponent()
+			return
+	
+	# Get the enemy deck
+	opponent_deck = enemies_collection.get_enemy_deck(enemy_name, difficulty)
+	
+	if opponent_deck.is_empty():
+		print("Warning: No deck found for enemy '", enemy_name, "' with difficulty ", difficulty)
+		setup_fallback_opponent()
+		return
+	
+	# Get enemy info for display
+	var enemy_info = enemies_collection.get_enemy_info(enemy_name, difficulty)
+	if enemy_info.has("enemy_name"):
+		opponent_name = enemy_info["deck_name"] + " (" + enemy_info["enemy_name"] + ")"
+		opponent_description = enemy_info["deck_description"]
+	else:
+		opponent_name = enemy_name
+		opponent_description = "A mysterious opponent"
+	
+	print("Opponent loaded: ", opponent_name, " with ", opponent_deck.size(), " cards")
+	print("Deck: ", opponent_description)
+
+# Fallback to Apollo deck if enemy system fails
+func setup_fallback_opponent():
+	print("Using fallback opponent (Apollo deck)")
 	var apollo_collection: GodCardCollection = load("res://Resources/Collections/Apollo.tres")
 	if apollo_collection:
-		# For now, opponent always uses "The Sun" deck (index 0)
 		opponent_deck = apollo_collection.get_deck(0)
-		print("Opponent deck loaded: ", opponent_deck.size(), " cards")
+		opponent_name = "Apollo's Shadow"
+		opponent_description = "A reflection of divine power"
 	else:
-		push_error("Failed to load opponent deck!")
-
-# Future method for setting different opponent types
-func setup_opponent(opponent_type: String):
-	match opponent_type:
-		"basic":
-			setup_default_opponent()
-		"advanced":
-			# Future: load different deck or AI behavior
-			setup_default_opponent()
-		_:
-			setup_default_opponent()
+		push_error("Failed to load fallback opponent deck!")
 
 # Take opponent's turn
 func take_turn(available_slots: Array[int]):
@@ -83,5 +110,6 @@ func has_cards() -> bool:
 func get_opponent_info() -> Dictionary:
 	return {
 		"name": opponent_name,
+		"description": opponent_description,
 		"cards_remaining": opponent_deck.size()
 	}
