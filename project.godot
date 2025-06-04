@@ -19,6 +19,7 @@ config/features=PackedStringArray("4.4", "Mobile")
 TransitionManagerAutoload="*res://Scripts/transition_manager.gd"
 RunExperienceTrackerAutoload="*res://Scripts/run_experience_tracker.gd"
 GlobalProgressTrackerAutoload="*res://Scripts/global_progress_tracker.gd"
+MemoryJournalManagerAutoload="*res://Scripts/memory_journal_manager.gd"
 
 [input]
 
