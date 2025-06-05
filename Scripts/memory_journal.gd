@@ -125,8 +125,28 @@ func refresh_bestiary_tab():
 	for enemy_name in enemy_memories:
 		print("- ", enemy_name, ": ", enemy_memories[enemy_name])
 	
-	# Get the enemy list container
-	var enemy_list = bestiary_tab.get_node("LeftPanel/ScrollContainer/EnemyList")
+	# Get the enemy list container and fix sizing issues
+	var left_panel = bestiary_tab.get_node("LeftPanel")
+	var scroll_container = left_panel.get_node("ScrollContainer")
+	var enemy_list = scroll_container.get_node("EnemyList")
+	
+	# Force proper sizing on the containers
+	left_panel.custom_minimum_size = Vector2(250, 0)
+	left_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	
+	scroll_container.custom_minimum_size = Vector2(0, 400)  # Set minimum height
+	scroll_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	
+	enemy_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	enemy_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	
+	print("DEBUG: EnemyList found: ", enemy_list != null)
+	if enemy_list:
+		print("DEBUG: EnemyList size: ", enemy_list.size)
+		print("DEBUG: EnemyList visible: ", enemy_list.visible)
+		print("DEBUG: EnemyList modulate: ", enemy_list.modulate)
+		print("DEBUG: ScrollContainer size: ", scroll_container.size)
+		print("DEBUG: LeftPanel size: ", left_panel.size)
 	
 	# Clear existing content
 	for child in enemy_list.get_children():
@@ -143,6 +163,8 @@ func refresh_bestiary_tab():
 		no_data_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		no_data_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		no_data_label.add_theme_color_override("font_color", Color("#888888"))
+		no_data_label.custom_minimum_size = Vector2(200, 60)  # Ensure minimum size
+		no_data_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		enemy_list.add_child(no_data_label)
 		return
 	
@@ -183,11 +205,23 @@ func refresh_bestiary_tab():
 		print("Enemy list children after adding: ", enemy_list.get_children().size())
 		print("Button is visible: ", button.visible)
 		print("Button modulate: ", button.modulate)
+		print("Button position: ", button.position)
+		print("Button size after adding: ", button.size)
 		
 		# Connect to show details
 		button.pressed.connect(_on_enemy_selected.bind(enemy_name, enemy_data))
 	
+	# Force layout updates
+	await get_tree().process_frame
+	enemy_list.queue_redraw()
+	scroll_container.queue_redraw()
+	left_panel.queue_redraw()
+	
 	print("Bestiary refresh complete - added ", sorted_enemies.size(), " enemies")
+	print("Final EnemyList size: ", enemy_list.size)
+	print("Final ScrollContainer size: ", scroll_container.size)
+	print("Final LeftPanel size: ", left_panel.size)
+	print("Final EnemyList children: ", enemy_list.get_children().size())
 
 # Also add this debug function to memory_journal_manager.gd to help troubleshoot:
 
@@ -202,6 +236,7 @@ func refresh_bestiary_tab():
 func create_enemy_list_button(enemy_name: String, enemy_data: Dictionary, memory_manager: MemoryJournalManager) -> Button:
 	var button = Button.new()
 	button.custom_minimum_size = Vector2(220, 80)  # Ensure minimum size
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL  # Expand to fill container width
 	
 	# Create button text with level and experience info
 	var level_desc = memory_manager.get_bestiary_memory_description(enemy_data["memory_level"])
@@ -268,9 +303,8 @@ func create_enemy_list_button(enemy_name: String, enemy_data: Dictionary, memory
 	button.add_theme_color_override("font_color", Color("#DDDDDD"))
 	button.add_theme_font_size_override("font_size", 12)
 	
-	# Set alignment
-	button.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	button.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	# Set alignment - FIXED: Use 'alignment' instead of 'horizontal_alignment' for Button
+	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	
 	print("Button style applied for level ", enemy_data["memory_level"], " with bg color ", style.bg_color)
 	
