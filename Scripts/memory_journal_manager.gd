@@ -416,3 +416,22 @@ func count_mastered_enemies() -> int:
 		if enemy_data["memory_level"] >= 4:  # Analyzed or higher
 			count += 1
 	return count
+	
+	
+# Add this at the end of Scripts/memory_journal_manager.gd
+func debug_memory_state():
+	print("=== MEMORY MANAGER DEBUG ===")
+	print("Save path: ", save_path)
+	print("Memory data structure: ", memory_data.keys())
+	print("Bestiary entries: ", memory_data["bestiary"].size())
+	
+	for enemy_name in memory_data["bestiary"]:
+		var enemy_data = memory_data["bestiary"][enemy_name]
+		print("Enemy: ", enemy_name)
+		print("  Total Experience: ", enemy_data["total_experience"])
+		print("  Memory Level: ", enemy_data["memory_level"])
+		print("  Encounters: ", enemy_data["encounters"])
+		print("  Victories: ", enemy_data["victories"])
+		print("  Defeats: ", enemy_data["defeats"])
+	
+	print("===========================")	

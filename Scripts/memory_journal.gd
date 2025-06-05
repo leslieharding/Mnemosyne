@@ -107,13 +107,23 @@ func update_header():
 	var consciousness_desc = memory_manager.get_consciousness_description(summary["consciousness_level"])
 	summary_label.text = consciousness_desc + " • " + str(summary["enemies_encountered"]) + " Enemies • " + str(summary["gods_experienced"]) + " Gods"
 
-# Refresh bestiary tab content with enhanced enemy display
 func refresh_bestiary_tab():
+	print("=== REFRESHING BESTIARY TAB ===")
+	
 	if not has_node("/root/MemoryJournalManagerAutoload"):
+		print("ERROR: MemoryJournalManagerAutoload not found!")
 		return
 	
 	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
+	
+	# DEBUG: Call debug function
+	memory_manager.debug_memory_state()
+	
 	var enemy_memories = memory_manager.get_all_enemy_memories()
+	
+	print("Enemy memories found: ", enemy_memories.size())
+	for enemy_name in enemy_memories:
+		print("- ", enemy_name, ": ", enemy_memories[enemy_name])
 	
 	# Get the enemy list container
 	var enemy_list = bestiary_tab.get_node("LeftPanel/ScrollContainer/EnemyList")
@@ -121,6 +131,20 @@ func refresh_bestiary_tab():
 	# Clear existing content
 	for child in enemy_list.get_children():
 		child.queue_free()
+	
+	# Wait a frame to ensure children are cleared
+	await get_tree().process_frame
+	
+	# Check if we have any enemy data
+	if enemy_memories.is_empty():
+		print("No enemy memories found - adding placeholder")
+		var no_data_label = Label.new()
+		no_data_label.text = "No enemies encountered yet.\nFight some battles to populate the bestiary!"
+		no_data_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		no_data_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		no_data_label.add_theme_color_override("font_color", Color("#888888"))
+		enemy_list.add_child(no_data_label)
+		return
 	
 	# Sort enemies by memory level (highest first), then by total experience
 	var sorted_enemies = []
@@ -139,20 +163,45 @@ func refresh_bestiary_tab():
 		return a.experience > b.experience
 	)
 	
+	print("Sorted enemies: ", sorted_enemies.size())
+	
 	# Add each enemy as an enhanced button
 	for enemy_entry in sorted_enemies:
 		var enemy_name = enemy_entry.name
 		var enemy_data = enemy_entry.data
+		print("Creating button for: ", enemy_name)
+		
 		var button = create_enemy_list_button(enemy_name, enemy_data, memory_manager)
+		
+		# DEBUG: Check button properties
+		print("Button created - Text: '", button.text, "' Size: ", button.custom_minimum_size)
+		print("Button parent will be: ", enemy_list.name)
+		print("Enemy list children before adding: ", enemy_list.get_children().size())
+		
 		enemy_list.add_child(button)
+		
+		print("Enemy list children after adding: ", enemy_list.get_children().size())
+		print("Button is visible: ", button.visible)
+		print("Button modulate: ", button.modulate)
 		
 		# Connect to show details
 		button.pressed.connect(_on_enemy_selected.bind(enemy_name, enemy_data))
+	
+	print("Bestiary refresh complete - added ", sorted_enemies.size(), " enemies")
 
-# Create an enhanced enemy list button
+# Also add this debug function to memory_journal_manager.gd to help troubleshoot:
+
+# Add this debug function to Scripts/memory_journal_manager.gd at the end of the class:
+
+
+
+# Replace the create_enemy_list_button function in Scripts/memory_journal.gd (around lines 200-250)
+
+# Replace the create_enemy_list_button function in Scripts/memory_journal.gd (around lines 200-250)
+
 func create_enemy_list_button(enemy_name: String, enemy_data: Dictionary, memory_manager: MemoryJournalManager) -> Button:
 	var button = Button.new()
-	button.custom_minimum_size = Vector2(220, 70)
+	button.custom_minimum_size = Vector2(220, 80)  # Ensure minimum size
 	
 	# Create button text with level and experience info
 	var level_desc = memory_manager.get_bestiary_memory_description(enemy_data["memory_level"])
@@ -170,14 +219,17 @@ func create_enemy_list_button(enemy_name: String, enemy_data: Dictionary, memory
 	
 	button.text = enemy_name + "\n" + level_desc + " - " + exp_info + next_threshold
 	
-	# Style button based on memory level
+	print("Creating button with text: ", button.text)
+	print("Button size: ", button.custom_minimum_size)
+	
+	# Create a more visible style
 	var style = StyleBoxFlat.new()
 	style.corner_radius_top_left = 4
 	style.corner_radius_top_right = 4
 	style.corner_radius_bottom_left = 4
 	style.corner_radius_bottom_right = 4
 	
-	# Color based on memory level
+	# Make sure the button is clearly visible with distinct colors
 	match enemy_data["memory_level"]:
 		0: # Unknown - dark gray
 			style.bg_color = Color("#2A2A2A")
@@ -185,7 +237,7 @@ func create_enemy_list_button(enemy_name: String, enemy_data: Dictionary, memory
 		1: # Glimpsed - dark blue
 			style.bg_color = Color("#1A2A3A")
 			style.border_color = Color("#2A4A5A")
-		2: # Observed - blue
+		2: # Observed - blue (this is what Shadow Acolyte should be)
 			style.bg_color = Color("#2A3A4A")
 			style.border_color = Color("#4A5A6A")
 		3: # Understood - green
@@ -206,7 +258,21 @@ func create_enemy_list_button(enemy_name: String, enemy_data: Dictionary, memory
 	style.border_width_right = 2
 	style.border_width_bottom = 2
 	
+	# Apply styles to all button states
 	button.add_theme_stylebox_override("normal", style)
+	button.add_theme_stylebox_override("hover", style)
+	button.add_theme_stylebox_override("pressed", style)
+	button.add_theme_stylebox_override("focus", style)
+	
+	# Ensure text is visible
+	button.add_theme_color_override("font_color", Color("#DDDDDD"))
+	button.add_theme_font_size_override("font_size", 12)
+	
+	# Set alignment
+	button.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	
+	print("Button style applied for level ", enemy_data["memory_level"], " with bg color ", style.bg_color)
 	
 	return button
 
