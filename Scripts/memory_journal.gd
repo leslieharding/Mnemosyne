@@ -1,4 +1,4 @@
-# res://Scripts/memory_journal_ui.gd
+# res://Scripts/memory_journal.gd
 extends Control
 class_name MemoryJournalUI
 
@@ -107,7 +107,7 @@ func update_header():
 	var consciousness_desc = memory_manager.get_consciousness_description(summary["consciousness_level"])
 	summary_label.text = consciousness_desc + " • " + str(summary["enemies_encountered"]) + " Enemies • " + str(summary["gods_experienced"]) + " Gods"
 
-# Refresh bestiary tab content
+# Refresh bestiary tab content with enhanced enemy display
 func refresh_bestiary_tab():
 	if not has_node("/root/MemoryJournalManagerAutoload"):
 		return
@@ -122,18 +122,95 @@ func refresh_bestiary_tab():
 	for child in enemy_list.get_children():
 		child.queue_free()
 	
-	# Add each enemy as a simple button
+	# Sort enemies by memory level (highest first), then by total experience
+	var sorted_enemies = []
 	for enemy_name in enemy_memories:
 		var enemy_data = enemy_memories[enemy_name]
-		var button = Button.new()
-		button.text = enemy_name + "\nLevel: " + str(enemy_data["memory_level"]) + " (" + str(enemy_data["encounters"]) + " encounters)"
-		button.custom_minimum_size = Vector2(200, 60)
+		sorted_enemies.append({
+			"name": enemy_name,
+			"data": enemy_data,
+			"level": enemy_data["memory_level"],
+			"experience": enemy_data["total_experience"]
+		})
+	
+	sorted_enemies.sort_custom(func(a, b): 
+		if a.level != b.level:
+			return a.level > b.level
+		return a.experience > b.experience
+	)
+	
+	# Add each enemy as an enhanced button
+	for enemy_entry in sorted_enemies:
+		var enemy_name = enemy_entry.name
+		var enemy_data = enemy_entry.data
+		var button = create_enemy_list_button(enemy_name, enemy_data, memory_manager)
 		enemy_list.add_child(button)
 		
-		# Connect to show details (simplified for now)
+		# Connect to show details
 		button.pressed.connect(_on_enemy_selected.bind(enemy_name, enemy_data))
 
-# Handle enemy selection in bestiary
+# Create an enhanced enemy list button
+func create_enemy_list_button(enemy_name: String, enemy_data: Dictionary, memory_manager: MemoryJournalManager) -> Button:
+	var button = Button.new()
+	button.custom_minimum_size = Vector2(220, 70)
+	
+	# Create button text with level and experience info
+	var level_desc = memory_manager.get_bestiary_memory_description(enemy_data["memory_level"])
+	var exp_info = str(enemy_data["total_experience"]) + " exp"
+	
+	# Get next level threshold for progress display
+	var next_threshold = ""
+	var current_level = enemy_data["memory_level"]
+	if current_level < memory_manager.BESTIARY_EXPERIENCE_THRESHOLDS.size() - 1:
+		var next_level_exp = memory_manager.BESTIARY_EXPERIENCE_THRESHOLDS[current_level + 1]
+		var progress = enemy_data["total_experience"]
+		next_threshold = " (" + str(progress) + "/" + str(next_level_exp) + ")"
+	else:
+		next_threshold = " (MAX)"
+	
+	button.text = enemy_name + "\n" + level_desc + " - " + exp_info + next_threshold
+	
+	# Style button based on memory level
+	var style = StyleBoxFlat.new()
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	
+	# Color based on memory level
+	match enemy_data["memory_level"]:
+		0: # Unknown - dark gray
+			style.bg_color = Color("#2A2A2A")
+			style.border_color = Color("#444444")
+		1: # Glimpsed - dark blue
+			style.bg_color = Color("#1A2A3A")
+			style.border_color = Color("#2A4A5A")
+		2: # Observed - blue
+			style.bg_color = Color("#2A3A4A")
+			style.border_color = Color("#4A5A6A")
+		3: # Understood - green
+			style.bg_color = Color("#2A3A2A")
+			style.border_color = Color("#4A6A4A")
+		4: # Analyzed - yellow/gold
+			style.bg_color = Color("#3A3A1A")
+			style.border_color = Color("#6A6A2A")
+		5: # Mastered - purple
+			style.bg_color = Color("#3A2A3A")
+			style.border_color = Color("#6A4A6A")
+		_: # Transcendent - bright gold
+			style.bg_color = Color("#4A4A2A")
+			style.border_color = Color("#8A8A4A")
+	
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	
+	button.add_theme_stylebox_override("normal", style)
+	
+	return button
+
+# Handle enemy selection in bestiary with detailed information
 func _on_enemy_selected(enemy_name: String, enemy_data: Dictionary):
 	var details_panel = bestiary_tab.get_node("RightPanel")
 	
@@ -141,23 +218,151 @@ func _on_enemy_selected(enemy_name: String, enemy_data: Dictionary):
 	for child in details_panel.get_children():
 		child.queue_free()
 	
-	# Create simple details display
-	var details_label = Label.new()
+	# Get detailed enemy information based on memory level
 	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
+	var detailed_info = memory_manager.get_enemy_detailed_info(enemy_name)
 	
-	details_label.text = enemy_name + "\n\n"
-	details_label.text += "Memory Level: " + memory_manager.get_bestiary_memory_description(enemy_data["memory_level"]) + "\n"
-	details_label.text += "Encounters: " + str(enemy_data["encounters"]) + "\n"
-	details_label.text += "Victories: " + str(enemy_data["victories"]) + "\n"
-	details_label.text += "Defeats: " + str(enemy_data["defeats"]) + "\n"
-	if enemy_data["encounters"] > 0:
-		var win_rate = round(float(enemy_data["victories"]) / float(enemy_data["encounters"]) * 100)
-		details_label.text += "Win Rate: " + str(win_rate) + "%"
+	if detailed_info.is_empty():
+		var error_label = Label.new()
+		error_label.text = "No information available."
+		details_panel.add_child(error_label)
+		return
 	
-	details_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	details_panel.add_child(details_label)
+	# Create detailed display
+	create_detailed_enemy_display(details_panel, detailed_info)
 
-# Refresh gods tab content
+# Create a comprehensive enemy details display
+func create_detailed_enemy_display(container: Control, info: Dictionary):
+	var main_vbox = VBoxContainer.new()
+	main_vbox.add_theme_constant_override("separation", 10)
+	
+	# Enemy name and memory level
+	var header_container = VBoxContainer.new()
+	
+	var name_label = Label.new()
+	name_label.text = info["name"]
+	name_label.add_theme_font_size_override("font_size", 20)
+	name_label.add_theme_color_override("font_color", Color("#DDDDDD"))
+	header_container.add_child(name_label)
+	
+	var memory_label = Label.new()
+	memory_label.text = "Memory Level: " + str(info["memory_level"]) + " (" + info["memory_description"] + ")"
+	memory_label.add_theme_font_size_override("font_size", 14)
+	memory_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+	header_container.add_child(memory_label)
+	
+	var exp_label = Label.new()
+	exp_label.text = "Total Experience: " + str(info["total_experience"])
+	exp_label.add_theme_font_size_override("font_size", 12)
+	exp_label.add_theme_color_override("font_color", Color("#888888"))
+	header_container.add_child(exp_label)
+	
+	main_vbox.add_child(header_container)
+	
+	# Separator
+	var separator1 = HSeparator.new()
+	main_vbox.add_child(separator1)
+	
+	# Description
+	var desc_label = Label.new()
+	desc_label.text = info["description"]
+	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc_label.add_theme_font_size_override("font_size", 13)
+	desc_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	main_vbox.add_child(desc_label)
+	
+	# Statistics (based on memory level)
+	if "visible_stats" in info and info["visible_stats"].size() > 0:
+		var separator2 = HSeparator.new()
+		main_vbox.add_child(separator2)
+		
+		var stats_title = Label.new()
+		stats_title.text = "Combat Statistics"
+		stats_title.add_theme_font_size_override("font_size", 16)
+		stats_title.add_theme_color_override("font_color", Color("#DDDDDD"))
+		main_vbox.add_child(stats_title)
+		
+		var stats_container = VBoxContainer.new()
+		
+		for stat in info["visible_stats"]:
+			match stat:
+				"encounters":
+					var encounters_label = Label.new()
+					encounters_label.text = "Total Encounters: " + str(info["encounters"])
+					encounters_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+					stats_container.add_child(encounters_label)
+				"victories":
+					var victories_label = Label.new()
+					victories_label.text = "Victories: " + str(info["victories"])
+					victories_label.add_theme_color_override("font_color", Color("#66BB6A"))
+					stats_container.add_child(victories_label)
+				"defeats":
+					var defeats_label = Label.new()
+					defeats_label.text = "Defeats: " + str(info["defeats"])
+					defeats_label.add_theme_color_override("font_color", Color("#EF5350"))
+					stats_container.add_child(defeats_label)
+				"win_rate":
+					if "win_rate" in info:
+						var winrate_label = Label.new()
+						winrate_label.text = "Win Rate: " + str(info["win_rate"]) + "%"
+						var color = Color("#66BB6A") if info["win_rate"] >= 50 else Color("#EF5350")
+						winrate_label.add_theme_color_override("font_color", color)
+						stats_container.add_child(winrate_label)
+		
+		main_vbox.add_child(stats_container)
+	
+	# Tactical information (higher memory levels)
+	if "tactical_note" in info and info["tactical_note"] != "":
+		var separator3 = HSeparator.new()
+		main_vbox.add_child(separator3)
+		
+		var tactical_title = Label.new()
+		tactical_title.text = "Tactical Analysis"
+		tactical_title.add_theme_font_size_override("font_size", 16)
+		tactical_title.add_theme_color_override("font_color", Color("#DDDDDD"))
+		main_vbox.add_child(tactical_title)
+		
+		var tactical_label = Label.new()
+		tactical_label.text = info["tactical_note"]
+		tactical_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		tactical_label.add_theme_font_size_override("font_size", 12)
+		tactical_label.add_theme_color_override("font_color", Color("#BBBBBB"))
+		main_vbox.add_child(tactical_label)
+	
+	# Weakness hints (level 4+)
+	if "weakness_hint" in info and info["weakness_hint"] != "":
+		var weakness_title = Label.new()
+		weakness_title.text = "Identified Weaknesses"
+		weakness_title.add_theme_font_size_override("font_size", 14)
+		weakness_title.add_theme_color_override("font_color", Color("#FFB74D"))
+		main_vbox.add_child(weakness_title)
+		
+		var weakness_label = Label.new()
+		weakness_label.text = info["weakness_hint"]
+		weakness_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		weakness_label.add_theme_font_size_override("font_size", 12)
+		weakness_label.add_theme_color_override("font_color", Color("#FFB74D"))
+		main_vbox.add_child(weakness_label)
+	
+	# Optimal strategy (level 5)
+	if "optimal_strategy" in info and info["optimal_strategy"] != "":
+		var strategy_title = Label.new()
+		strategy_title.text = "Optimal Strategy"
+		strategy_title.add_theme_font_size_override("font_size", 14)
+		strategy_title.add_theme_color_override("font_color", Color("#AB47BC"))
+		main_vbox.add_child(strategy_title)
+		
+		var strategy_label = Label.new()
+		strategy_label.text = info["optimal_strategy"]
+		strategy_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		strategy_label.add_theme_font_size_override("font_size", 12)
+		strategy_label.add_theme_color_override("font_color", Color("#AB47BC"))
+		main_vbox.add_child(strategy_label)
+	
+	# Add main container to the details panel
+	container.add_child(main_vbox)
+
+# Refresh gods tab content (unchanged from original)
 func refresh_gods_tab():
 	if not has_node("/root/MemoryJournalManagerAutoload"):
 		return
@@ -205,7 +410,7 @@ func _on_god_selected(god_name: String, god_data: Dictionary):
 	details_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	details_panel.add_child(details_label)
 
-# Refresh Mnemosyne tab content
+# Refresh Mnemosyne tab content (unchanged from original)
 func refresh_mnemosyne_tab():
 	if not has_node("/root/MemoryJournalManagerAutoload"):
 		return

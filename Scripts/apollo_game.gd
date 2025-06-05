@@ -1007,6 +1007,8 @@ func show_reward_screen():
 	get_tree().change_scene_to_file("res://Scenes/RewardScreen.tscn")
 
 
+# Lines 650-680 of apollo_game.gd - Updated memory recording functions
+
 func record_enemy_encounter(victory: bool):
 	if not has_node("/root/MemoryJournalManagerAutoload"):
 		return
@@ -1023,9 +1025,9 @@ func record_enemy_encounter(victory: bool):
 		enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
 		enemy_difficulty = current_node.enemy_difficulty
 	
-	# Record the encounter
+	# Record the encounter with the simplified experience system
 	memory_manager.record_enemy_encounter(enemy_name, victory, enemy_difficulty)
-	print("Recorded enemy encounter: ", enemy_name, " (victory: ", victory, ")")
+	print("Recorded enemy encounter: ", enemy_name, " (victory: ", victory, ", difficulty: ", enemy_difficulty, ")")
 
 func record_god_experience():
 	if not has_node("/root/MemoryJournalManagerAutoload"):

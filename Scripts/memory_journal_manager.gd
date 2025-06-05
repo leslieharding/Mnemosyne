@@ -24,10 +24,14 @@ var memory_data: Dictionary = {
 
 var save_path: String = "user://memory_journal.save"
 
-# Memory level thresholds
-const BESTIARY_LEVEL_THRESHOLDS = [1, 3, 6, 10, 15]  # encounters needed for each level
+# Updated memory level thresholds - experience needed for each level
+const BESTIARY_EXPERIENCE_THRESHOLDS = [0, 3, 8, 15, 25, 40]  # Level 0 through 5
 const GOD_LEVEL_THRESHOLDS = [1, 5, 15, 30, 50]      # battles with god needed for each level
 const MNEMOSYNE_LEVEL_THRESHOLDS = [10, 25, 50, 100, 200]  # total battles for consciousness levels
+
+# Experience values
+const WIN_EXPERIENCE = 2
+const LOSS_EXPERIENCE = 1
 
 func _ready():
 	load_memory_data()
@@ -39,25 +43,27 @@ func _ready():
 
 # === BESTIARY FUNCTIONS ===
 
-# Record an enemy encounter
+# Record an enemy encounter with simplified experience system
 func record_enemy_encounter(enemy_name: String, victory: bool, enemy_difficulty: int = 0):
+	# Calculate experience gained
+	var exp_gained = WIN_EXPERIENCE if victory else LOSS_EXPERIENCE
+	
 	if not enemy_name in memory_data["bestiary"]:
 		memory_data["bestiary"][enemy_name] = {
+			"total_experience": 0,
 			"encounters": 0,
 			"victories": 0,
 			"defeats": 0,
 			"memory_level": 0,
 			"first_encountered": Time.get_datetime_string_from_system(),
 			"last_encountered": "",
-			"highest_difficulty": 0,
-			"discovered_abilities": [],
-			"combat_notes": [],
-			"deck_cards_seen": [],
-			"weaknesses_discovered": []
+			"highest_difficulty": 0
 		}
 		emit_signal("new_memory_formed", "bestiary", enemy_name)
 	
 	var enemy_data = memory_data["bestiary"][enemy_name]
+	
+	# Update basic stats
 	enemy_data["encounters"] += 1
 	enemy_data["last_encountered"] = Time.get_datetime_string_from_system()
 	enemy_data["highest_difficulty"] = max(enemy_data["highest_difficulty"], enemy_difficulty)
@@ -67,26 +73,31 @@ func record_enemy_encounter(enemy_name: String, victory: bool, enemy_difficulty:
 	else:
 		enemy_data["defeats"] += 1
 	
-	# Check for memory level increase
+	# Add experience and check for level up
 	var old_level = enemy_data["memory_level"]
-	var new_level = calculate_bestiary_memory_level(enemy_data["encounters"])
+	enemy_data["total_experience"] += exp_gained
+	var new_level = calculate_bestiary_memory_level(enemy_data["total_experience"])
+	
 	if new_level > old_level:
 		enemy_data["memory_level"] = new_level
 		emit_signal("memory_level_increased", "bestiary", enemy_name, new_level)
+		print("Enemy memory level increased! ", enemy_name, " is now level ", new_level)
+	
+	print("Enemy encounter recorded: ", enemy_name, " (+", exp_gained, " exp, total: ", enemy_data["total_experience"], ", level: ", enemy_data["memory_level"], ")")
 	
 	# Update Mnemosyne's general stats
 	update_mnemosyne_battle_stats(victory)
 	
 	save_memory_data()
 
-# Calculate memory level based on encounters
-func calculate_bestiary_memory_level(encounters: int) -> int:
-	for i in range(BESTIARY_LEVEL_THRESHOLDS.size()):
-		if encounters < BESTIARY_LEVEL_THRESHOLDS[i]:
+# Calculate memory level based on total experience
+func calculate_bestiary_memory_level(total_experience: int) -> int:
+	for i in range(BESTIARY_EXPERIENCE_THRESHOLDS.size() - 1, -1, -1):
+		if total_experience >= BESTIARY_EXPERIENCE_THRESHOLDS[i]:
 			return i
-	return BESTIARY_LEVEL_THRESHOLDS.size()
+	return 0
 
-# Get memory level description for bestiary
+# Get memory level description for bestiary with experience info
 func get_bestiary_memory_description(level: int) -> String:
 	match level:
 		0: return "Unknown"
@@ -96,6 +107,107 @@ func get_bestiary_memory_description(level: int) -> String:
 		4: return "Analyzed"
 		5: return "Mastered"
 		_: return "Transcendent"
+
+# Get detailed enemy information based on memory level
+func get_enemy_detailed_info(enemy_name: String) -> Dictionary:
+	if not enemy_name in memory_data["bestiary"]:
+		return {}
+	
+	var enemy_data = memory_data["bestiary"][enemy_name]
+	var level = enemy_data["memory_level"]
+	var result = {
+		"name": enemy_name,
+		"memory_level": level,
+		"memory_description": get_bestiary_memory_description(level),
+		"total_experience": enemy_data["total_experience"],
+		"encounters": enemy_data["encounters"],
+		"victories": enemy_data["victories"],
+		"defeats": enemy_data["defeats"]
+	}
+	
+	# Add information based on memory level
+	match level:
+		0:
+			result["description"] = "A mysterious adversary shrouded in uncertainty."
+			result["visible_stats"] = []
+		1:
+			result["description"] = "You've caught glimpses of this foe in battle."
+			result["visible_stats"] = ["encounters"]
+		2:
+			result["description"] = "Combat patterns begin to emerge from observation."
+			result["visible_stats"] = ["encounters", "victories", "defeats"]
+			if enemy_data["encounters"] > 0:
+				var win_rate = round(float(enemy_data["victories"]) / float(enemy_data["encounters"]) * 100)
+				result["win_rate"] = win_rate
+		3:
+			result["description"] = "You understand this enemy's basic tactics and tendencies."
+			result["visible_stats"] = ["encounters", "victories", "defeats", "win_rate", "difficulty"]
+			result["tactical_note"] = get_tactical_note_for_level(enemy_data, 3)
+		4:
+			result["description"] = "Deep analysis reveals this opponent's strengths and weaknesses."
+			result["visible_stats"] = ["encounters", "victories", "defeats", "win_rate", "difficulty", "weaknesses"]
+			result["tactical_note"] = get_tactical_note_for_level(enemy_data, 4)
+			result["weakness_hint"] = get_weakness_hint(enemy_data)
+		5:
+			result["description"] = "Complete mastery: every aspect of this enemy is known to you."
+			result["visible_stats"] = ["encounters", "victories", "defeats", "win_rate", "difficulty", "weaknesses", "strategy"]
+			result["tactical_note"] = get_tactical_note_for_level(enemy_data, 5)
+			result["weakness_hint"] = get_weakness_hint(enemy_data)
+			result["optimal_strategy"] = get_optimal_strategy(enemy_data)
+	
+	return result
+
+# Generate tactical notes based on memory level and win rate
+func get_tactical_note_for_level(enemy_data: Dictionary, level: int) -> String:
+	if enemy_data["encounters"] == 0:
+		return ""
+	
+	var win_rate = float(enemy_data["victories"]) / float(enemy_data["encounters"])
+	
+	match level:
+		3:
+			if win_rate > 0.7:
+				return "This enemy poses little threat when approached correctly."
+			elif win_rate > 0.4:
+				return "A balanced opponent requiring careful consideration."
+			else:
+				return "This foe has proven challenging - caution advised."
+		4:
+			if win_rate > 0.7:
+				return "Weaknesses identified: exploit defensive gaps with strong directional attacks."
+			elif win_rate > 0.4:
+				return "Mixed results suggest this enemy adapts to different strategies."
+			else:
+				return "Strong defensive patterns observed - breakthrough strategies needed."
+		5:
+			if win_rate > 0.7:
+				return "Completely understood: predictable patterns make victory assured."
+			elif win_rate > 0.4:
+				return "Mastered tactical analysis allows for consistent strategic victories."
+			else:
+				return "Even with complete knowledge, this remains a formidable opponent."
+	
+	return ""
+
+# Generate weakness hints for higher memory levels
+func get_weakness_hint(enemy_data: Dictionary) -> String:
+	var difficulty = enemy_data.get("highest_difficulty", 0)
+	match difficulty:
+		0: return "Novice-level defenses can be overwhelmed with coordinated attacks."
+		1: return "Moderate defensive patterns show gaps in corner positioning."
+		2: return "Advanced tactics required: exploit timing windows in their card placement."
+		_: return "Weakness patterns detected through extensive observation."
+
+# Generate optimal strategy for mastery level
+func get_optimal_strategy(enemy_data: Dictionary) -> String:
+	var win_rate = float(enemy_data["victories"]) / float(enemy_data["encounters"]) if enemy_data["encounters"] > 0 else 0
+	
+	if win_rate > 0.7:
+		return "Maintain aggressive positioning and exploit their predictable defensive responses."
+	elif win_rate > 0.4:
+		return "Balanced approach: adapt strategy based on their opening moves and card placement."
+	else:
+		return "Defensive strategy recommended: weather their initial assault, then counter-attack systematically."
 
 # Get enemy memory data
 func get_enemy_memory(enemy_name: String) -> Dictionary:
@@ -107,7 +219,7 @@ func get_enemy_memory(enemy_name: String) -> Dictionary:
 func get_all_enemy_memories() -> Dictionary:
 	return memory_data["bestiary"]
 
-# === GOD FUNCTIONS ===
+# === GOD FUNCTIONS === (unchanged from original)
 
 # Record experience with a god
 func record_god_experience(god_name: String, battles_fought: int = 1, deck_used: String = ""):
@@ -175,7 +287,7 @@ func get_god_memory(god_name: String) -> Dictionary:
 func get_all_god_memories() -> Dictionary:
 	return memory_data["gods"]
 
-# === MNEMOSYNE FUNCTIONS ===
+# === MNEMOSYNE FUNCTIONS === (unchanged from original)
 
 # Update Mnemosyne's battle statistics
 func update_mnemosyne_battle_stats(victory: bool):
@@ -235,7 +347,7 @@ func get_consciousness_description(level: int) -> String:
 		6: return "Transcendent Knowledge"
 		_: return "Omniscient Memory"
 
-# === SAVE/LOAD FUNCTIONS ===
+# === SAVE/LOAD FUNCTIONS === (unchanged from original)
 
 # Save memory data to disk
 func save_memory_data():
