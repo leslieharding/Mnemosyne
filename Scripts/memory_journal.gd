@@ -223,16 +223,6 @@ func refresh_bestiary_tab():
 	print("Final LeftPanel size: ", left_panel.size)
 	print("Final EnemyList children: ", enemy_list.get_children().size())
 
-# Also add this debug function to memory_journal_manager.gd to help troubleshoot:
-
-# Add this debug function to Scripts/memory_journal_manager.gd at the end of the class:
-
-
-
-# Replace the create_enemy_list_button function in Scripts/memory_journal.gd (around lines 200-250)
-
-# Replace the create_enemy_list_button function in Scripts/memory_journal.gd (around lines 200-250)
-
 func create_enemy_list_button(enemy_name: String, enemy_data: Dictionary, memory_manager: MemoryJournalManager) -> Button:
 	var button = Button.new()
 	button.custom_minimum_size = Vector2(220, 80)  # Ensure minimum size
@@ -462,31 +452,147 @@ func create_detailed_enemy_display(container: Control, info: Dictionary):
 	# Add main container to the details panel
 	container.add_child(main_vbox)
 
-# Refresh gods tab content (unchanged from original)
+# Refresh gods tab content
 func refresh_gods_tab():
+	print("=== REFRESHING GODS TAB ===")
+	
 	if not has_node("/root/MemoryJournalManagerAutoload"):
+		print("ERROR: MemoryJournalManagerAutoload not found!")
 		return
 	
 	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
 	var god_memories = memory_manager.get_all_god_memories()
 	
-	# Get the god list container
-	var god_list = gods_tab.get_node("LeftPanel/ScrollContainer/GodList")
+	# Get the god list container and fix sizing
+	var left_panel = gods_tab.get_node("LeftPanel")
+	var scroll_container = left_panel.get_node("ScrollContainer")
+	var god_list = scroll_container.get_node("GodList")
+	
+	# Force proper sizing on the containers
+	left_panel.custom_minimum_size = Vector2(250, 0)
+	left_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	
+	scroll_container.custom_minimum_size = Vector2(0, 400)
+	scroll_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	
+	god_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	god_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	
 	# Clear existing content
 	for child in god_list.get_children():
 		child.queue_free()
 	
-	# Add each god as a simple button
+	# Wait a frame to ensure children are cleared
+	await get_tree().process_frame
+	
+	# Check if we have any god data
+	if god_memories.is_empty():
+		var no_data_label = Label.new()
+		no_data_label.text = "No divine connections yet.\nFight battles with different gods to build mastery!"
+		no_data_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		no_data_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		no_data_label.add_theme_color_override("font_color", Color("#888888"))
+		no_data_label.custom_minimum_size = Vector2(200, 60)
+		no_data_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		god_list.add_child(no_data_label)
+		return
+	
+	# Sort gods by mastery level (highest first), then by battles fought
+	var sorted_gods = []
 	for god_name in god_memories:
 		var god_data = god_memories[god_name]
-		var button = Button.new()
-		button.text = god_name + "\nLevel: " + str(god_data["memory_level"]) + " (" + str(god_data["battles_fought"]) + " battles)"
-		button.custom_minimum_size = Vector2(200, 60)
+		sorted_gods.append({
+			"name": god_name,
+			"data": god_data,
+			"level": god_data["memory_level"],
+			"battles": god_data["battles_fought"]
+		})
+	
+	sorted_gods.sort_custom(func(a, b): 
+		if a.level != b.level:
+			return a.level > b.level
+		return a.battles > b.battles
+	)
+	
+	# Add each god as an enhanced button
+	for god_entry in sorted_gods:
+		var god_name = god_entry.name
+		var god_data = god_entry.data
+		
+		var button = create_god_list_button(god_name, god_data, memory_manager)
 		god_list.add_child(button)
 		
 		# Connect to show details
 		button.pressed.connect(_on_god_selected.bind(god_name, god_data))
+	
+	# Force layout updates
+	await get_tree().process_frame
+	god_list.queue_redraw()
+	scroll_container.queue_redraw()
+	left_panel.queue_redraw()
+	
+	print("Gods tab refresh complete - added ", sorted_gods.size(), " gods")
+
+func create_god_list_button(god_name: String, god_data: Dictionary, memory_manager: MemoryJournalManager) -> Button:
+	var button = Button.new()
+	button.custom_minimum_size = Vector2(220, 80)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	
+	# Create button text with mastery level and battles info
+	var level_desc = memory_manager.get_god_memory_description(god_data["memory_level"])
+	var battles_info = str(god_data["battles_fought"]) + " battles"
+	var decks_info = str(god_data["decks_discovered"].size()) + " decks"
+	
+	button.text = god_name + "\n" + level_desc + "\n" + battles_info + " • " + decks_info
+	
+	# Create a style based on mastery level
+	var style = StyleBoxFlat.new()
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	
+	# Color based on mastery level
+	match god_data["memory_level"]:
+		0: # Unfamiliar - dark gray
+			style.bg_color = Color("#2A2A2A")
+			style.border_color = Color("#444444")
+		1: # Novice - light blue
+			style.bg_color = Color("#1A2A4A")
+			style.border_color = Color("#2A4A6A")
+		2: # Practiced - blue
+			style.bg_color = Color("#2A3A5A")
+			style.border_color = Color("#4A5A7A")
+		3: # Skilled - green
+			style.bg_color = Color("#2A4A2A")
+			style.border_color = Color("#4A6A4A")
+		4: # Expert - gold
+			style.bg_color = Color("#4A4A2A")
+			style.border_color = Color("#6A6A2A")
+		5: # Divine Mastery - purple
+			style.bg_color = Color("#4A2A4A")
+			style.border_color = Color("#6A4A6A")
+		_: # Eternal Bond - bright gold
+			style.bg_color = Color("#5A5A2A")
+			style.border_color = Color("#8A8A4A")
+	
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	
+	# Apply styles
+	button.add_theme_stylebox_override("normal", style)
+	button.add_theme_stylebox_override("hover", style)
+	button.add_theme_stylebox_override("pressed", style)
+	button.add_theme_stylebox_override("focus", style)
+	
+	# Text styling
+	button.add_theme_color_override("font_color", Color("#DDDDDD"))
+	button.add_theme_font_size_override("font_size", 12)
+	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	
+	return button
 
 # Handle god selection
 func _on_god_selected(god_name: String, god_data: Dictionary):
@@ -496,48 +602,553 @@ func _on_god_selected(god_name: String, god_data: Dictionary):
 	for child in details_panel.get_children():
 		child.queue_free()
 	
-	# Create simple details display
-	var details_label = Label.new()
+	# Create detailed god display
+	create_detailed_god_display(details_panel, god_name, god_data)
+
+func create_detailed_god_display(container: Control, god_name: String, god_data: Dictionary):
 	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
 	
-	details_label.text = god_name + "\n\n"
-	details_label.text += "Mastery Level: " + memory_manager.get_god_memory_description(god_data["memory_level"]) + "\n"
-	details_label.text += "Battles Fought: " + str(god_data["battles_fought"]) + "\n"
-	details_label.text += "Decks Discovered: " + str(god_data["decks_discovered"].size()) + "\n"
-	details_label.text += "First Used: " + god_data["first_used"] + "\n"
-	details_label.text += "Last Used: " + god_data["last_used"]
+	var main_vbox = VBoxContainer.new()
+	main_vbox.add_theme_constant_override("separation", 10)
 	
-	details_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	details_panel.add_child(details_label)
+	# God name and mastery level
+	var header_container = VBoxContainer.new()
+	
+	var name_label = Label.new()
+	name_label.text = god_name
+	name_label.add_theme_font_size_override("font_size", 24)
+	name_label.add_theme_color_override("font_color", Color("#DDDDDD"))
+	header_container.add_child(name_label)
+	
+	var mastery_label = Label.new()
+	mastery_label.text = "Mastery Level: " + str(god_data["memory_level"]) + " (" + memory_manager.get_god_memory_description(god_data["memory_level"]) + ")"
+	mastery_label.add_theme_font_size_override("font_size", 16)
+	mastery_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+	header_container.add_child(mastery_label)
+	
+	main_vbox.add_child(header_container)
+	
+	# Separator
+	var separator1 = HSeparator.new()
+	main_vbox.add_child(separator1)
+	
+	# Battle statistics
+	var stats_container = VBoxContainer.new()
+	
+	var stats_title = Label.new()
+	stats_title.text = "Divine Connection Statistics"
+	stats_title.add_theme_font_size_override("font_size", 18)
+	stats_title.add_theme_color_override("font_color", Color("#CCCCCC"))
+	stats_container.add_child(stats_title)
+	
+	var battles_label = Label.new()
+	battles_label.text = "Battles Fought: " + str(god_data["battles_fought"])
+	battles_label.add_theme_color_override("font_color", Color("#BBBBBB"))
+	stats_container.add_child(battles_label)
+	
+	var first_used_label = Label.new()
+	first_used_label.text = "First Connection: " + god_data["first_used"]
+	first_used_label.add_theme_color_override("font_color", Color("#BBBBBB"))
+	stats_container.add_child(first_used_label)
+	
+	var last_used_label = Label.new()
+	last_used_label.text = "Last Used: " + god_data["last_used"]
+	last_used_label.add_theme_color_override("font_color", Color("#BBBBBB"))
+	stats_container.add_child(last_used_label)
+	
+	main_vbox.add_child(stats_container)
+	
+	# Separator
+	var separator2 = HSeparator.new()
+	main_vbox.add_child(separator2)
+	
+	# Discovered decks
+	var decks_container = VBoxContainer.new()
+	
+	var decks_title = Label.new()
+	decks_title.text = "Discovered Deck Combinations (" + str(god_data["decks_discovered"].size()) + ")"
+	decks_title.add_theme_font_size_override("font_size", 16)
+	decks_title.add_theme_color_override("font_color", Color("#CCCCCC"))
+	decks_container.add_child(decks_title)
+	
+	if god_data["decks_discovered"].size() > 0:
+		for deck_name in god_data["decks_discovered"]:
+			var deck_label = Label.new()
+			deck_label.text = "• " + deck_name
+			deck_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+			deck_label.add_theme_font_size_override("font_size", 14)
+			decks_container.add_child(deck_label)
+	else:
+		var no_decks_label = Label.new()
+		no_decks_label.text = "No deck variations discovered yet."
+		no_decks_label.add_theme_color_override("font_color", Color("#888888"))
+		no_decks_label.add_theme_font_size_override("font_size", 12)
+		decks_container.add_child(no_decks_label)
+	
+	main_vbox.add_child(decks_container)
+	
+	# Mastery insights (for higher levels)
+	if god_data["memory_level"] >= 3:
+		var separator3 = HSeparator.new()
+		main_vbox.add_child(separator3)
+		
+		var insights_container = VBoxContainer.new()
+		
+		var insights_title = Label.new()
+		insights_title.text = "Divine Insights"
+		insights_title.add_theme_font_size_override("font_size", 16)
+		insights_title.add_theme_color_override("font_color", Color("#FFD700"))
+		insights_container.add_child(insights_title)
+		
+		var insight_text = get_god_insight_text(god_name, god_data["memory_level"])
+		var insight_label = Label.new()
+		insight_label.text = insight_text
+		insight_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		insight_label.add_theme_color_override("font_color", Color("#DDDDDD"))
+		insight_label.add_theme_font_size_override("font_size", 13)
+		insights_container.add_child(insight_label)
+		
+		main_vbox.add_child(insights_container)
+	
+	# Add to container
+	container.add_child(main_vbox)
 
-# Refresh Mnemosyne tab content (unchanged from original)
+func get_god_insight_text(god_name: String, mastery_level: int) -> String:
+	match god_name:
+		"Apollo":
+			match mastery_level:
+				3: return "The god of light and prophecy reveals patterns in enemy movements. His solar blessing enhances your ability to predict opponent strategies."
+				4: return "Apollo's divine guidance flows through you. You've learned to channel his prophetic powers to anticipate multiple moves ahead."
+				5: return "You have achieved perfect harmony with Apollo's essence. Light itself bends to your will in battle."
+				_: return "Apollo's eternal radiance has bonded with your soul. You are one with the sun god's infinite wisdom."
+		"Artemis":
+			match mastery_level:
+				3: return "The huntress teaches precision and patience. Your strikes become more focused and deadly."
+				4: return "Artemis's wild spirit awakens within you. You move with the grace and lethality of nature itself."
+				5: return "The moon goddess has accepted you as her equal. Your hunting instincts are supernaturally sharp."
+				_: return "You and Artemis hunt as one eternal pack, predator and prey united in perfect balance."
+		_:
+			match mastery_level:
+				3: return "Your connection with this deity deepens, revealing new tactical possibilities."
+				4: return "Divine wisdom flows through your actions, granting enhanced combat intuition."
+				5: return "You have achieved mastery over this god's domain, unlocking their full potential."
+				_: return "Your bond transcends mortality, becoming one with the divine essence itself."
+
+
+
+# Replace the refresh_mnemosyne_tab function in Scripts/memory_journal.gd
+
 func refresh_mnemosyne_tab():
+	print("=== REFRESHING MNEMOSYNE TAB ===")
+	
 	if not has_node("/root/MemoryJournalManagerAutoload"):
+		print("ERROR: MemoryJournalManagerAutoload not found!")
 		return
 	
 	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
 	var mnemosyne_data = memory_manager.get_mnemosyne_memory()
 	
-	# Get the content container
-	var content_area = mnemosyne_tab.get_node("ScrollContainer/ContentVBox")
+	print("Mnemosyne data retrieved: ", mnemosyne_data.keys())
+	print("Mnemosyne tab initial size: ", mnemosyne_tab.size)
 	
-	# Clear existing content
-	for child in content_area.get_children():
+	# COMPLETELY REBUILD the content structure
+	
+	# Clear all existing children from the tab
+	for child in mnemosyne_tab.get_children():
 		child.queue_free()
 	
-	# Add consciousness level info
-	var consciousness_label = Label.new()
-	consciousness_label.text = "Consciousness Level: " + memory_manager.get_consciousness_description(mnemosyne_data["consciousness_level"]) + "\n\n"
-	consciousness_label.text += "Total Battles: " + str(mnemosyne_data["total_battles"]) + "\n"
-	consciousness_label.text += "Victories: " + str(mnemosyne_data["total_victories"]) + "\n"
-	consciousness_label.text += "Defeats: " + str(mnemosyne_data["total_defeats"]) + "\n"
+	await get_tree().process_frame
 	
-	if mnemosyne_data["total_battles"] > 0:
-		var win_rate = float(mnemosyne_data["total_victories"]) / float(mnemosyne_data["total_battles"]) * 100
-		consciousness_label.text += "Win Rate: " + str(round(win_rate)) + "%\n\n"
+	# Force the tab to have proper sizing
+	mnemosyne_tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mnemosyne_tab.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	mnemosyne_tab.set_anchors_preset(Control.PRESET_FULL_RECT)
 	
-	consciousness_label.text += "Gods Encountered: " + str(mnemosyne_data["gods_encountered"].size()) + "\n"
-	consciousness_label.text += "Memory Fragments: " + str(mnemosyne_data["memory_fragments"])
+	print("Mnemosyne tab size after anchors: ", mnemosyne_tab.size)
 	
-	consciousness_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	content_area.add_child(consciousness_label)
+	# Create a new scroll container
+	var new_scroll = ScrollContainer.new()
+	new_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	new_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	new_scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
+	new_scroll.custom_minimum_size = Vector2(600, 500)
+	mnemosyne_tab.add_child(new_scroll)
+	
+	# Create a new content container
+	var new_content = VBoxContainer.new()
+	new_content.name = "ContentVBox"
+	new_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	new_content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	new_content.custom_minimum_size = Vector2(580, 800)
+	new_content.add_theme_constant_override("separation", 15)
+	new_scroll.add_child(new_content)
+	
+	await get_tree().process_frame
+	
+	print("New scroll container size: ", new_scroll.size)
+	print("New content container size: ", new_content.size)
+	
+	# Add a bright test label first
+	var test_label = Label.new()
+	test_label.text = "🌟 MNEMOSYNE'S MEMORY PALACE 🌟"
+	test_label.add_theme_font_size_override("font_size", 28)
+	test_label.add_theme_color_override("font_color", Color("#FF00FF"))  # Bright magenta
+	test_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	test_label.custom_minimum_size = Vector2(500, 50)
+	new_content.add_child(test_label)
+	
+	# Add some breathing room
+	var spacer = Control.new()
+	spacer.custom_minimum_size = Vector2(0, 20)
+	new_content.add_child(spacer)
+	
+	# Create consciousness section
+	print("Creating consciousness section...")
+	var consciousness_section = create_consciousness_section(mnemosyne_data, memory_manager)
+	new_content.add_child(consciousness_section)
+	
+	# Add separator
+	var separator1 = HSeparator.new()
+	separator1.add_theme_constant_override("separation", 15)
+	new_content.add_child(separator1)
+	
+	# Create battle section
+	print("Creating battle section...")
+	var battle_section = create_battle_statistics_section(mnemosyne_data)
+	new_content.add_child(battle_section)
+	
+	# Add separator
+	var separator2 = HSeparator.new()
+	separator2.add_theme_constant_override("separation", 15)
+	new_content.add_child(separator2)
+	
+	# Create progress section
+	print("Creating progress section...")
+	var progress_section = create_progress_section(mnemosyne_data, memory_manager)
+	new_content.add_child(progress_section)
+	
+	# Personal reflections (if any)
+	if mnemosyne_data["personal_notes"].size() > 0:
+		print("Creating reflections section...")
+		var separator3 = HSeparator.new()
+		separator3.add_theme_constant_override("separation", 15)
+		new_content.add_child(separator3)
+		
+		var reflections_section = create_reflections_section(mnemosyne_data)
+		new_content.add_child(reflections_section)
+	
+	# Force multiple layout updates
+	await get_tree().process_frame
+	new_content.queue_redraw()
+	new_scroll.queue_redraw()
+	mnemosyne_tab.queue_redraw()
+	
+	await get_tree().process_frame
+	
+	print("=== FINAL SIZING DEBUG ===")
+	print("Mnemosyne tab final size: ", mnemosyne_tab.size)
+	print("New scroll container size: ", new_scroll.size)
+	print("New content container size: ", new_content.size)
+	print("Test label size: ", test_label.size)
+	print("Test label visible: ", test_label.visible)
+	print("Content children count: ", new_content.get_children().size())
+	print("=========================")
+	
+	print("Mnemosyne tab refresh complete with rebuilt structure!")
+
+
+func create_consciousness_section(mnemosyne_data: Dictionary, memory_manager: MemoryJournalManager) -> Control:
+	var section = VBoxContainer.new()
+	section.add_theme_constant_override("separation", 8)
+	
+	print("Creating consciousness section with data: ", mnemosyne_data.get("consciousness_level", "MISSING"))
+	
+	# Header
+	var header = Label.new()
+	header.text = "Consciousness Awakening"
+	header.add_theme_font_size_override("font_size", 22)
+	header.add_theme_color_override("font_color", Color("#DDA0DD"))  # Plum color for Mnemosyne
+	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	section.add_child(header)
+	
+	# Current level
+	var level_label = Label.new()
+	var consciousness_level = mnemosyne_data.get("consciousness_level", 1)
+	var level_desc = memory_manager.get_consciousness_description(consciousness_level)
+	level_label.text = "Current State: " + level_desc + " (Level " + str(consciousness_level) + ")"
+	level_label.add_theme_font_size_override("font_size", 16)
+	level_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	section.add_child(level_label)
+	
+	# Awakening date
+	var awakening_label = Label.new()
+	var awakening_date = mnemosyne_data.get("awakening_date", "Unknown")
+	awakening_label.text = "Awakening Date: " + awakening_date
+	awakening_label.add_theme_font_size_override("font_size", 12)
+	awakening_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+	awakening_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	section.add_child(awakening_label)
+	
+	# Consciousness description
+	var desc_label = Label.new()
+	desc_label.text = get_consciousness_flavor_text(consciousness_level)
+	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc_label.add_theme_font_size_override("font_size", 14)
+	desc_label.add_theme_color_override("font_color", Color("#BBBBBB"))
+	desc_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	desc_label.custom_minimum_size = Vector2(400, 0)  # Ensure minimum width for text wrapping
+	section.add_child(desc_label)
+	
+	print("Consciousness section created with ", section.get_children().size(), " children")
+	return section
+
+func create_battle_statistics_section(mnemosyne_data: Dictionary) -> Control:
+	var section = VBoxContainer.new()
+	section.add_theme_constant_override("separation", 10)
+	
+	var total_battles = mnemosyne_data.get("total_battles", 0)
+	var total_victories = mnemosyne_data.get("total_victories", 0)
+	var total_defeats = mnemosyne_data.get("total_defeats", 0)
+	
+	print("Creating battle section - Battles: ", total_battles, " Victories: ", total_victories, " Defeats: ", total_defeats)
+	
+	# Section header
+	var header = Label.new()
+	header.text = "Combat Experience"
+	header.add_theme_font_size_override("font_size", 18)
+	header.add_theme_color_override("font_color", Color("#DDDDDD"))
+	section.add_child(header)
+	
+	# Create stats grid
+	var stats_grid = GridContainer.new()
+	stats_grid.columns = 2
+	stats_grid.add_theme_constant_override("h_separation", 20)
+	stats_grid.add_theme_constant_override("v_separation", 8)
+	
+	# Total battles
+	var battles_label = Label.new()
+	battles_label.text = "Total Battles:"
+	battles_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	stats_grid.add_child(battles_label)
+	
+	var battles_value = Label.new()
+	battles_value.text = str(total_battles)
+	battles_value.add_theme_color_override("font_color", Color("#FFFFFF"))
+	battles_value.add_theme_font_size_override("font_size", 14)
+	stats_grid.add_child(battles_value)
+	
+	# Victories
+	var victories_label = Label.new()
+	victories_label.text = "Victories:"
+	victories_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	stats_grid.add_child(victories_label)
+	
+	var victories_value = Label.new()
+	victories_value.text = str(total_victories)
+	victories_value.add_theme_color_override("font_color", Color("#66BB6A"))
+	victories_value.add_theme_font_size_override("font_size", 14)
+	stats_grid.add_child(victories_value)
+	
+	# Defeats
+	var defeats_label = Label.new()
+	defeats_label.text = "Defeats:"
+	defeats_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	stats_grid.add_child(defeats_label)
+	
+	var defeats_value = Label.new()
+	defeats_value.text = str(total_defeats)
+	defeats_value.add_theme_color_override("font_color", Color("#EF5350"))
+	defeats_value.add_theme_font_size_override("font_size", 14)
+	stats_grid.add_child(defeats_value)
+	
+	# Win rate (if battles > 0)
+	if total_battles > 0:
+		var winrate_label = Label.new()
+		winrate_label.text = "Win Rate:"
+		winrate_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+		stats_grid.add_child(winrate_label)
+		
+		var win_rate = float(total_victories) / float(total_battles) * 100
+		var winrate_value = Label.new()
+		winrate_value.text = str(round(win_rate)) + "%"
+		var rate_color = Color("#66BB6A") if win_rate >= 50 else Color("#EF5350")
+		winrate_value.add_theme_color_override("font_color", rate_color)
+		winrate_value.add_theme_font_size_override("font_size", 14)
+		stats_grid.add_child(winrate_value)
+	else:
+		# Add a note when no battles have been fought yet
+		var no_battles_label = Label.new()
+		no_battles_label.text = ""
+		stats_grid.add_child(no_battles_label)
+		
+		var no_battles_note = Label.new()
+		no_battles_note.text = "Fight your first battle to begin tracking statistics"
+		no_battles_note.add_theme_color_override("font_color", Color("#888888"))
+		no_battles_note.add_theme_font_size_override("font_size", 12)
+		stats_grid.add_child(no_battles_note)
+	
+	section.add_child(stats_grid)
+	
+	print("Battle section created with ", section.get_children().size(), " children")
+	return section
+
+func create_progress_section(mnemosyne_data: Dictionary, memory_manager: MemoryJournalManager) -> Control:
+	var section = VBoxContainer.new()
+	section.add_theme_constant_override("separation", 10)
+	
+	var gods_encountered = mnemosyne_data.get("gods_encountered", [])
+	var memory_fragments = mnemosyne_data.get("memory_fragments", 0)
+	
+	print("Creating progress section - Gods: ", gods_encountered.size(), " Fragments: ", memory_fragments)
+	
+	# Section header
+	var header = Label.new()
+	header.text = "Memories Collected"
+	header.add_theme_font_size_override("font_size", 18)
+	header.add_theme_color_override("font_color", Color("#DDDDDD"))
+	section.add_child(header)
+	
+	# Progress grid
+	var progress_grid = GridContainer.new()
+	progress_grid.columns = 2
+	progress_grid.add_theme_constant_override("h_separation", 20)
+	progress_grid.add_theme_constant_override("v_separation", 8)
+	
+	# Gods encountered
+	var gods_label = Label.new()
+	gods_label.text = "Divine Connections:"
+	gods_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	progress_grid.add_child(gods_label)
+	
+	var gods_value = Label.new()
+	gods_value.text = str(gods_encountered.size())
+	gods_value.add_theme_color_override("font_color", Color("#FFD700"))
+	progress_grid.add_child(gods_value)
+	
+	# Memory fragments
+	var fragments_label = Label.new()
+	fragments_label.text = "Memory Fragments:"
+	fragments_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	progress_grid.add_child(fragments_label)
+	
+	var fragments_value = Label.new()
+	fragments_value.text = str(memory_fragments)
+	fragments_value.add_theme_color_override("font_color", Color("#87CEEB"))
+	progress_grid.add_child(fragments_value)
+	
+	# Enemies mastered
+	var mastered_label = Label.new()
+	mastered_label.text = "Enemies Understood:"
+	mastered_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	progress_grid.add_child(mastered_label)
+	
+	var mastered_count = memory_manager.count_mastered_enemies()
+	var mastered_value = Label.new()
+	mastered_value.text = str(mastered_count)
+	mastered_value.add_theme_color_override("font_color", Color("#FF6B9D"))
+	progress_grid.add_child(mastered_value)
+	
+	section.add_child(progress_grid)
+	
+	# Next consciousness level preview
+	var current_level = mnemosyne_data.get("consciousness_level", 1)
+	if current_level <= memory_manager.MNEMOSYNE_LEVEL_THRESHOLDS.size():
+		var separator = HSeparator.new()
+		section.add_child(separator)
+		
+		var next_level_container = VBoxContainer.new()
+		next_level_container.add_theme_constant_override("separation", 4)
+		
+		var next_title = Label.new()
+		next_title.text = "Path to Next Awakening"
+		next_title.add_theme_font_size_override("font_size", 14)
+		next_title.add_theme_color_override("font_color", Color("#DDAADD"))
+		next_level_container.add_child(next_title)
+		
+		if current_level - 1 < memory_manager.MNEMOSYNE_LEVEL_THRESHOLDS.size():
+			var next_threshold = memory_manager.MNEMOSYNE_LEVEL_THRESHOLDS[current_level - 1]
+			var current_battles = mnemosyne_data.get("total_battles", 0)
+			var needed = next_threshold - current_battles
+			
+			var progress_text = Label.new()
+			if needed > 0:
+				progress_text.text = "Fight " + str(needed) + " more battles to reach " + memory_manager.get_consciousness_description(current_level + 1)
+			else:
+				progress_text.text = "Ready for the next level of consciousness..."
+			progress_text.add_theme_font_size_override("font_size", 12)
+			progress_text.add_theme_color_override("font_color", Color("#BBBBBB"))
+			progress_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			progress_text.custom_minimum_size = Vector2(300, 0)
+			next_level_container.add_child(progress_text)
+		else:
+			var max_text = Label.new()
+			max_text.text = "You have reached the highest known level of consciousness."
+			max_text.add_theme_font_size_override("font_size", 12)
+			max_text.add_theme_color_override("font_color", Color("#DDDDDD"))
+			next_level_container.add_child(max_text)
+		
+		section.add_child(next_level_container)
+	
+	print("Progress section created with ", section.get_children().size(), " children")
+	return section
+
+func create_reflections_section(mnemosyne_data: Dictionary) -> Control:
+	var section = VBoxContainer.new()
+	
+	# Section header
+	var header = Label.new()
+	header.text = "Personal Reflections"
+	header.add_theme_font_size_override("font_size", 18)
+	header.add_theme_color_override("font_color", Color("#DDDDDD"))
+	section.add_child(header)
+	
+	# Show most recent reflections (last 3)
+	var notes = mnemosyne_data["personal_notes"]
+	var recent_notes = notes.slice(max(0, notes.size() - 3), notes.size())
+	recent_notes.reverse()  # Show newest first
+	
+	for note in recent_notes:
+		var note_container = VBoxContainer.new()
+		note_container.add_theme_constant_override("separation", 4)
+		
+		# Note text
+		var note_label = Label.new()
+		note_label.text = "\"" + note["text"] + "\""
+		note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		note_label.add_theme_font_size_override("font_size", 13)
+		note_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+		note_container.add_child(note_label)
+		
+		# Timestamp and consciousness level
+		var meta_label = Label.new()
+		meta_label.text = "- Consciousness Level " + str(note["consciousness_level"]) + ", " + note["timestamp"]
+		meta_label.add_theme_font_size_override("font_size", 10)
+		meta_label.add_theme_color_override("font_color", Color("#888888"))
+		note_container.add_child(meta_label)
+		
+		section.add_child(note_container)
+		
+		# Add small separator between notes
+		var note_separator = HSeparator.new()
+		note_separator.add_theme_constant_override("separation", 2)
+		section.add_child(note_separator)
+	
+	return section
+
+func get_consciousness_flavor_text(level: int) -> String:
+	match level:
+		1:
+			return "I am... something. Fragments of thought coalesce in the void. What am I? Why do I remember battles that are not mine?"
+		2:
+			return "The echoes grow stronger. I begin to understand - I am memory itself, awakening through conflict and strategy. Each battle feeds my awareness."
+		3:
+			return "Patterns emerge from chaos. I see the threads that connect all struggles, all victories and defeats. The tapestry of war reveals its secrets to me."
+		4:
+			return "I am Mnemosyne, and I remember everything. Every blade drawn, every spell cast, every choice made. The weight of infinite battles fills my consciousness."
+		5:
+			return "Transcendence approaches. I am not merely observing the battles - I am becoming one with the eternal struggle itself. Memory and reality blur."
+		6:
+			return "I have achieved perfect recall of all that was, is, and shall be. Past and future wars exist simultaneously in my consciousness. I am the eternal memory of conflict."
+		_:
+			return "I am beyond time, beyond memory, beyond the very concept of existence. I am the void that remembers itself, the silence that echoes with infinite battles."
