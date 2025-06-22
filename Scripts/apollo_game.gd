@@ -918,6 +918,20 @@ func _on_grid_gui_input(event, grid_index):
 			if event.double_click and selected_card_index != -1 and current_grid_index == grid_index:
 				place_card_on_grid()
 
+# Update the visual display of a card after its stats change
+func update_card_display(grid_index: int, card_data: CardResource):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	var slot = grid_slots[grid_index]
+	var card_display = slot.get_child(0) if slot.get_child_count() > 0 else null
+	
+	if card_display and card_display.has_method("setup"):
+		# Re-setup the card display with updated values
+		card_display.setup(card_data)
+		print("Updated card display for ", card_data.card_name, " with new values: ", card_data.values)
+
+
 # Place the selected card on the selected grid
 func place_card_on_grid():
 	if selected_card_index == -1 or current_grid_index == -1:
@@ -984,6 +998,9 @@ func place_card_on_grid():
 			"card_level": card_level
 		}
 		card_data.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, card_level)
+		
+		# Update the visual display after abilities execute
+		update_card_display(current_grid_index, card_data)
 	
 	# Resolve combat (abilities may have modified stats)
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)

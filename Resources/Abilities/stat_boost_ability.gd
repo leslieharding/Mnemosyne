@@ -16,6 +16,8 @@ func execute(context: Dictionary) -> bool:
 	var grid_position = context.get("grid_position", -1)
 	var game_manager = context.get("game_manager")
 	
+	print("StatBoostAbility: Starting execution for card at position ", grid_position)
+	
 	if not placed_card or grid_position == -1 or not game_manager:
 		print("StatBoostAbility: Missing required context data")
 		return false
@@ -25,16 +27,24 @@ func execute(context: Dictionary) -> bool:
 	
 	for direction in range(4):  # 0=North, 1=East, 2=South, 3=West
 		var enemy_position = get_adjacent_position(grid_position, direction, game_manager)
+		print("StatBoostAbility: Checking direction ", direction, " (", get_direction_name(direction), ") -> position ", enemy_position)
+		
 		if enemy_position == -1:
+			print("  No adjacent position in this direction")
 			continue
 		
 		var enemy_card = game_manager.get_card_at_position(enemy_position)
 		var enemy_owner = game_manager.get_owner_at_position(enemy_position)
 		
+		print("  Found card: ", enemy_card.card_name if enemy_card else "none", " owned by: ", enemy_owner)
+		
 		# If there's an enemy card in this direction, boost our stat for that direction
-		if enemy_card and enemy_owner != game_manager.Owner.NONE and enemy_owner != game_manager.Owner.PLAYER:
+		if enemy_card and enemy_owner == game_manager.Owner.OPPONENT:
+			print("  BOOSTING direction ", direction, " from ", placed_card.values[direction], " to ", placed_card.values[direction] + boost_amount)
 			placed_card.values[direction] += boost_amount
 			boosted_directions.append(get_direction_name(direction))
+		else:
+			print("  Not an enemy card - skipping")
 	
 	# Print results
 	if boosted_directions.size() > 0:
