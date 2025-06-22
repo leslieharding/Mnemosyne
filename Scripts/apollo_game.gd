@@ -780,7 +780,29 @@ func setup_experience_panel():
 	# Set up with current deck
 	exp_panel.setup_deck(player_deck, deck_card_indices)
 
-# Display player's hand of cards using manual positioning
+
+# Helper method to get card at a specific grid position
+func get_card_at_position(position: int) -> CardResource:
+	if position >= 0 and position < grid_card_data.size():
+		return grid_card_data[position]
+	return null
+
+# Helper method to get owner at a specific grid position  
+func get_owner_at_position(position: int) -> Owner:
+	if position >= 0 and position < grid_ownership.size():
+		return grid_ownership[position]
+	return Owner.NONE
+
+# Helper method to get card level from experience system
+func get_card_level(card_index: int) -> int:
+	if has_node("/root/GlobalProgressTrackerAutoload"):
+		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		var exp_data = progress_tracker.get_card_total_experience("Apollo", card_index)
+		var total_exp = exp_data.get("capture_exp", 0) + exp_data.get("defense_exp", 0)
+		return ExperienceHelpers.calculate_level(total_exp)
+	return 0
+
+
 # Display player's hand of cards using manual positioning
 func display_player_hand():
 	# First, clear existing cards
@@ -822,6 +844,7 @@ func display_player_hand():
 		
 		# Connect to detect clicks on the card (only when it's player's turn)
 		card_display.panel.gui_input.connect(_on_card_gui_input.bind(card_display, i))
+
 
 # Handle card input events
 func _on_card_gui_input(event, card_display, card_index):
@@ -912,6 +935,10 @@ func place_card_on_grid():
 	
 	# Store a reference to the card data before removing it
 	var card_data = player_deck[selected_card_index]
+	var card_collection_index = deck_card_indices[selected_card_index]
+	
+	# Get card level for ability checks
+	var card_level = get_card_level(card_collection_index)
 	
 	# Mark the slot as occupied and set ownership
 	grid_occupied[current_grid_index] = true
@@ -919,7 +946,7 @@ func place_card_on_grid():
 	grid_card_data[current_grid_index] = card_data
 	
 	# Track which collection index this card is from
-	grid_to_collection_index[current_grid_index] = deck_card_indices[selected_card_index]
+	grid_to_collection_index[current_grid_index] = card_collection_index
 	
 	# Get the current slot
 	var slot = grid_slots[current_grid_index]
@@ -928,7 +955,6 @@ func place_card_on_grid():
 	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 	
 	# Add the card as a child of the slot panel
-	# This ensures proper positioning within the grid
 	slot.add_child(card_display)
 	
 	# Center the card within the slot
@@ -940,7 +966,7 @@ func place_card_on_grid():
 	# Set higher z-index so the card appears on top
 	card_display.z_index = 1
 	
-	# Setup the card with the card resource data (using our stored reference)
+	# Setup the card display with the card resource data
 	card_display.setup(card_data)
 	
 	# Apply player styling initially
@@ -948,7 +974,18 @@ func place_card_on_grid():
 	
 	print("Card placed on grid at position", current_grid_index)
 	
-	# Resolve combat
+	# EXECUTE ON-PLAY ABILITIES BEFORE COMBAT
+	if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
+		print("Executing on-play abilities for ", card_data.card_name)
+		var ability_context = {
+			"placed_card": card_data,
+			"grid_position": current_grid_index,
+			"game_manager": self,
+			"card_level": card_level
+		}
+		card_data.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, card_level)
+	
+	# Resolve combat (abilities may have modified stats)
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 	if captures > 0:
 		print("Player captured ", captures, " cards!")
