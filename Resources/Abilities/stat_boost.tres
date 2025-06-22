@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StatBoostAbility" load_steps=2 format=3 uid="uid://ou2ysm46mrde"]
+
+[ext_resource type="Script" uid="uid://bqbrhjegh1g6e" path="res://Resources/Abilities/stat_boost_ability.gd" id="1_rgi02"]
+
+[resource]
+script = ExtResource("1_rgi02")
+boost_amount = 1
+ability_name = "Stat Boost"
+description = "When placed adjacent to enemy cards, gain +1 power in directions facing those enemies"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://bqbrhjegh1g6e"

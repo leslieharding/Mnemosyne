@@ -1,14 +1,26 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=22 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=25 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
+[ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_cm1c1"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_w7xgs"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_cm1c1"]
+[ext_resource type="Script" uid="uid://bqbrhjegh1g6e" path="res://Resources/Abilities/stat_boost_ability.gd" id="3_dwe15"]
+
+[sub_resource type="Resource" id="Resource_sfw3d"]
+script = ExtResource("3_dwe15")
+boost_amount = 1
+ability_name = ""
+description = ""
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
 
 [sub_resource type="Resource" id="Resource_vqrrp"]
 script = ExtResource("1_vqrrp")
 card_name = "Helios"
 values = Array[int]([5, 5, 5, 5])
 description = "Sometimes you just gotta whack something very hard"
+abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_sfw3d")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_w7xgs"]
@@ -16,6 +28,7 @@ script = ExtResource("1_vqrrp")
 card_name = "The Sun Chariot"
 values = Array[int]([5, 4, 6, 3])
 description = "Helios graces us with his presence"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cm1c1"]
@@ -23,6 +36,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Phaetons Boast"
 values = Array[int]([3, 9, 8, 1])
 description = "You just cant give Epiphus the satisfaction"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_dwe15"]
@@ -30,6 +44,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Eos, the dawn"
 values = Array[int]([4, 4, 7, 7])
 description = "Welcome to a new day"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ooqpa"]
@@ -37,6 +52,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Phelgon"
 values = Array[int]([8, 8, 2, 2])
 description = "Look at my horse"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_e1acv"]
@@ -44,6 +60,7 @@ script = ExtResource("1_vqrrp")
 card_name = "The Lyre"
 values = Array[int]([5, 5, 5, 5])
 description = "Heavenly music "
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ej0q7"]
@@ -51,6 +68,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Orpheus"
 values = Array[int]([6, 7, 6, 7])
 description = "The sweetest voice yet alive"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_gowu1"]
@@ -58,6 +76,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Marceius "
 values = Array[int]([8, 2, 8, 2])
 description = "Sometimes you think you got this, reality is often cruel"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_p7jhq"]
@@ -65,6 +84,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Euridyce"
 values = Array[int]([6, 4, 4, 8])
 description = "Love you would go all the way to hell for"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2h7tk"]
@@ -72,6 +92,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Calliope"
 values = Array[int]([7, 7, 8, 8])
 description = "From when all lovely voices spring"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bufwg"]
@@ -79,6 +100,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Delphic Oracle"
 values = Array[int]([3, 3, 3, 3])
 description = "The power and curse of knowing"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ca26u"]
@@ -86,6 +108,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Cassandra"
 values = Array[int]([5, 5, 5, 5])
 description = "You wont listen"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qbbw0"]
@@ -93,6 +116,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Tiresias"
 values = Array[int]([4, 8, 8, 4])
 description = "He may be blind but it is you who cannot see"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xjxyc"]
@@ -100,6 +124,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Calchas"
 values = Array[int]([2, 6, 8, 4])
 description = "Let the man speak his mind, even if its not what you want to hear"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_b0n1o"]
@@ -107,6 +132,7 @@ script = ExtResource("1_vqrrp")
 card_name = "The Fates"
 values = Array[int]([8, 9, 8, 6])
 description = "Lets no pretend you have any control over what they are doing"
+abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tn03x"]
