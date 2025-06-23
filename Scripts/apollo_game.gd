@@ -255,7 +255,13 @@ func opponent_take_turn():
 	# Let opponent make their move
 	opponent_manager.take_turn(available_slots)
 
-# Resolve combat when a card is placed
+# Add this helper method to apollo_game.gd to set card ownership
+func set_card_ownership(grid_index: int, new_owner: Owner):
+	if grid_index >= 0 and grid_index < grid_ownership.size():
+		grid_ownership[grid_index] = new_owner
+		print("Card at slot ", grid_index, " ownership changed to ", "Player" if new_owner == Owner.PLAYER else "Opponent")
+
+# Replace the resolve_combat function in apollo_game.gd (lines ~380-450)
 func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource):
 	print("Resolving combat for card at slot ", grid_index)
 	
@@ -290,22 +296,43 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 					
 					print("Combat ", direction.name, ": My ", my_value, " vs Their ", their_value)
 					
-					# If my value is greater, I capture their card
+					# Check for capture or successful defense
 					if my_value > their_value:
 						print("Captured card at slot ", adj_index, "!")
 						captures.append(adj_index)
 						
-						# Award capture experience if it's a player card
+						# Award capture experience if it's a player card attacking
 						if attacking_owner == Owner.PLAYER:
 							var card_collection_index = get_card_collection_index(grid_index)
 							if card_collection_index != -1:
 								get_node("/root/RunExperienceTrackerAutoload").add_capture_exp(card_collection_index, 10)
 					else:
-						# Defense successful - award defense exp if defending card is player's
+						# Defense successful - check for ON_DEFEND abilities
+						print("Defense successful at slot ", adj_index, "!")
+						
+						# Award defense experience if defending card is player's
 						if attacking_owner == Owner.OPPONENT and grid_ownership[adj_index] == Owner.PLAYER:
 							var defending_card_index = get_card_collection_index(adj_index)
 							if defending_card_index != -1:
 								get_node("/root/RunExperienceTrackerAutoload").add_defense_exp(defending_card_index, 5)
+						
+						# Check for ON_DEFEND abilities on the defending card
+						var defending_card_level = get_card_level(get_card_collection_index(adj_index))
+						if adjacent_card.has_ability_type(CardAbility.TriggerType.ON_DEFEND, defending_card_level):
+							print("Executing ON_DEFEND abilities for defending card: ", adjacent_card.card_name)
+							
+							var defend_context = {
+								"defending_card": adjacent_card,
+								"defending_position": adj_index,
+								"attacking_card": attacking_card,
+								"attacking_position": grid_index,
+								"game_manager": self,
+								"direction": direction.name,
+								"card_level": defending_card_level
+							}
+							
+							# Execute all ON_DEFEND abilities
+							adjacent_card.execute_abilities(CardAbility.TriggerType.ON_DEFEND, defend_context, defending_card_level)
 	
 	# Apply all captures
 	for captured_index in captures:

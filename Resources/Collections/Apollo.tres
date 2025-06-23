@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=25 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=27 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_cm1c1"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_w7xgs"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_cm1c1"]
 [ext_resource type="Script" uid="uid://bqbrhjegh1g6e" path="res://Resources/Abilities/stat_boost_ability.gd" id="3_dwe15"]
+[ext_resource type="Script" uid="uid://b72irnrav5w53" path="res://Resources/Abilities/defensive_counter_ability.gd" id="4_dwe15"]
 
 [sub_resource type="Resource" id="Resource_sfw3d"]
 script = ExtResource("3_dwe15")
@@ -31,12 +32,20 @@ description = "Helios graces us with his presence"
 abilities = Array[ExtResource("2_cm1c1")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_l7o3e"]
+script = ExtResource("4_dwe15")
+ability_name = ""
+description = ""
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://b72irnrav5w53"
+
 [sub_resource type="Resource" id="Resource_cm1c1"]
 script = ExtResource("1_vqrrp")
 card_name = "Phaetons Boast"
 values = Array[int]([3, 9, 8, 1])
 description = "You just cant give Epiphus the satisfaction"
-abilities = Array[ExtResource("2_cm1c1")]([])
+abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_l7o3e")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_dwe15"]

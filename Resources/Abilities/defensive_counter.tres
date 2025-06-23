@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DefensiveCounterAbility" load_steps=2 format=3 uid="uid://blcdsg0lygrr7"]
+
+[ext_resource type="Script" uid="uid://b72irnrav5w53" path="res://Resources/Abilities/defensive_counter_ability.gd" id="1_psnu6"]
+
+[resource]
+script = ExtResource("1_psnu6")
+ability_name = "Defensive Counter"
+description = "When this card successfully defends against an enemy attack, capture the attacking card"
+unlock_level = 0
+trigger_condition = 0
