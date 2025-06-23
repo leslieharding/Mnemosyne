@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PassiveBoostAbility" load_steps=2 format=3 uid="uid://c7cypeqi3nxf0"]
+
+[ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="1_erull"]
+
+[resource]
+script = ExtResource("1_erull")
+boost_amount = 1
+ability_name = "Divine Inspiration"
+description = "While under your control, all other friendly cards gain +1 to all stats"
+unlock_level = 0
+trigger_condition = 3

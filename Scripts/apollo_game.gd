@@ -50,6 +50,10 @@ var opponent_is_thinking: bool = false
 @onready var game_status_label = $VBoxContainer/Title
 @onready var deck_name_label = $VBoxContainer/DeckName
 
+var active_passive_abilities: Dictionary = {}  # position -> array of passive abilities
+
+
+
 func _ready():
 	# Initialize game managers
 	setup_managers()
@@ -261,6 +265,8 @@ func set_card_ownership(grid_index: int, new_owner: Owner):
 		grid_ownership[grid_index] = new_owner
 		print("Card at slot ", grid_index, " ownership changed to ", "Player" if new_owner == Owner.PLAYER else "Opponent")
 
+# This replaces the existing resolve_combat function in apollo_game.gd (around lines 210-280)
+
 func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource):
 	print("Resolving combat for card at slot ", grid_index)
 	
@@ -372,10 +378,21 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 						else:
 							print("DEBUG: No ON_DEFEND abilities found or level requirement not met")
 	
-	# Apply all captures
+	# Apply all captures and handle passive abilities
 	for captured_index in captures:
+		# Store the card data before changing ownership (for passive ability removal)
+		var captured_card_data = grid_card_data[captured_index]
+		
+		# Remove passive abilities of the captured card BEFORE changing ownership
+		handle_passive_abilities_on_capture(captured_index, captured_card_data)
+		
+		# Change ownership
 		grid_ownership[captured_index] = attacking_owner
 		print("Card at slot ", captured_index, " is now owned by ", "Player" if attacking_owner == Owner.PLAYER else "Opponent")
+	
+	# Refresh all passive abilities to account for ownership changes
+	if captures.size() > 0:
+		refresh_all_passive_abilities()
 	
 	# Update visuals for all affected cards
 	update_board_visuals()
@@ -997,6 +1014,8 @@ func update_card_display(grid_index: int, card_data: CardResource):
 		print("Updated card display for ", card_data.card_name, " with new values: ", card_data.values)
 
 
+# This replaces the existing place_card_on_grid function in apollo_game.gd (around lines 580-650)
+
 # Place the selected card on the selected grid
 func place_card_on_grid():
 	if selected_card_index == -1 or current_grid_index == -1:
@@ -1067,6 +1086,9 @@ func place_card_on_grid():
 		# Update the visual display after abilities execute
 		update_card_display(current_grid_index, card_data)
 	
+	# HANDLE PASSIVE ABILITIES
+	handle_passive_abilities_on_place(current_grid_index, card_data, card_level)
+	
 	# Resolve combat (abilities may have modified stats)
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 	if captures > 0:
@@ -1090,6 +1112,91 @@ func place_card_on_grid():
 
 	# Switch turns
 	turn_manager.next_turn()
+
+
+# Handle passive abilities when a card is placed
+func handle_passive_abilities_on_place(grid_position: int, card_data: CardResource, card_level: int):
+	# Check if this card has passive abilities
+	if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+		print("Handling passive abilities for ", card_data.card_name, " at position ", grid_position)
+		
+		# Store reference to this card's passive abilities
+		if not grid_position in active_passive_abilities:
+			active_passive_abilities[grid_position] = []
+		
+		var available_abilities = card_data.get_available_abilities(card_level)
+		for ability in available_abilities:
+			if ability.trigger_condition == CardAbility.TriggerType.PASSIVE:
+				active_passive_abilities[grid_position].append(ability)
+				
+				# Execute the passive ability with "apply" action
+				var passive_context = {
+					"passive_action": "apply",
+					"boosting_card": card_data,
+					"boosting_position": grid_position,
+					"game_manager": self,
+					"card_level": card_level
+				}
+				
+				ability.execute(passive_context)
+	
+	# Also trigger passive abilities of existing cards (in case they need to affect the new card)
+	refresh_all_passive_abilities()
+
+# Handle passive abilities when a card is captured/removed
+func handle_passive_abilities_on_capture(grid_position: int, card_data: CardResource):
+	if grid_position in active_passive_abilities:
+		print("Removing passive abilities for captured card at position ", grid_position)
+		
+		# Execute each passive ability with "remove" action
+		for ability in active_passive_abilities[grid_position]:
+			var passive_context = {
+				"passive_action": "remove",
+				"boosting_card": card_data,
+				"boosting_position": grid_position,
+				"game_manager": self
+			}
+			
+			ability.execute(passive_context)
+		
+		# Remove from tracking
+		active_passive_abilities.erase(grid_position)
+	
+	# Refresh remaining passive abilities
+	refresh_all_passive_abilities()
+
+# Refresh all passive abilities (useful when ownership changes)
+func refresh_all_passive_abilities():
+	print("Refreshing all passive abilities")
+	
+	# First remove all existing boosts
+	for position in active_passive_abilities:
+		var card_data = get_card_at_position(position)
+		if card_data:
+			for ability in active_passive_abilities[position]:
+				var passive_context = {
+					"passive_action": "remove",
+					"boosting_card": card_data,
+					"boosting_position": position,
+					"game_manager": self
+				}
+				ability.execute(passive_context)
+	
+	# Then re-apply all boosts
+	for position in active_passive_abilities:
+		var card_data = get_card_at_position(position)
+		if card_data:
+			for ability in active_passive_abilities[position]:
+				var passive_context = {
+					"passive_action": "apply",
+					"boosting_card": card_data,
+					"boosting_position": position,
+					"game_manager": self
+				}
+				ability.execute(passive_context)
+
+
+
 
 # Remove a card from the player's hand after it's played
 func remove_card_from_hand(card_index: int):
