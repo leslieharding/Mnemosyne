@@ -261,7 +261,6 @@ func set_card_ownership(grid_index: int, new_owner: Owner):
 		grid_ownership[grid_index] = new_owner
 		print("Card at slot ", grid_index, " ownership changed to ", "Player" if new_owner == Owner.PLAYER else "Opponent")
 
-# Replace the resolve_combat function in apollo_game.gd (lines ~380-450)
 func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource):
 	print("Resolving combat for card at slot ", grid_index)
 	
@@ -291,6 +290,11 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 				if adjacent_owner != Owner.NONE and adjacent_owner != attacking_owner:
 					var adjacent_card = grid_card_data[adj_index]
 					
+					# Safety check - ensure both cards exist
+					if not attacking_card or not adjacent_card:
+						print("Warning: Missing card data in combat resolution")
+						continue
+					
 					var my_value = attacking_card.values[direction.my_value_index]
 					var their_value = adjacent_card.values[direction.their_value_index]
 					
@@ -316,9 +320,24 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 							if defending_card_index != -1:
 								get_node("/root/RunExperienceTrackerAutoload").add_defense_exp(defending_card_index, 5)
 						
-						# Check for ON_DEFEND abilities on the defending card
-						var defending_card_level = get_card_level(get_card_collection_index(adj_index))
-						if adjacent_card.has_ability_type(CardAbility.TriggerType.ON_DEFEND, defending_card_level):
+						# DEBUG: Check for ON_DEFEND abilities on the defending card
+						print("DEBUG: Checking ON_DEFEND abilities for card: ", adjacent_card.card_name)
+						print("DEBUG: Card abilities count: ", adjacent_card.abilities.size())
+						for i in range(adjacent_card.abilities.size()):
+							var ability = adjacent_card.abilities[i]
+							print("DEBUG: Ability ", i, ": ", ability.ability_name, " trigger: ", ability.trigger_condition)
+						
+						var defending_card_collection_index = get_card_collection_index(adj_index)
+						print("DEBUG: Defending card collection index: ", defending_card_collection_index)
+						
+						var defending_card_level = get_card_level(defending_card_collection_index)
+						print("DEBUG: Defending card level: ", defending_card_level)
+						
+						var has_on_defend = adjacent_card.has_ability_type(CardAbility.TriggerType.ON_DEFEND, defending_card_level)
+						print("DEBUG: Has ON_DEFEND ability: ", has_on_defend)
+						print("DEBUG: TriggerType.ON_DEFEND value: ", CardAbility.TriggerType.ON_DEFEND)
+						
+						if has_on_defend:
 							print("Executing ON_DEFEND abilities for defending card: ", adjacent_card.card_name)
 							
 							var defend_context = {
@@ -333,6 +352,8 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 							
 							# Execute all ON_DEFEND abilities
 							adjacent_card.execute_abilities(CardAbility.TriggerType.ON_DEFEND, defend_context, defending_card_level)
+						else:
+							print("DEBUG: No ON_DEFEND abilities found or level requirement not met")
 	
 	# Apply all captures
 	for captured_index in captures:

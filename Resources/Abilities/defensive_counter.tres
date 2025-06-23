@@ -7,4 +7,4 @@ script = ExtResource("1_psnu6")
 ability_name = "Defensive Counter"
 description = "When this card successfully defends against an enemy attack, capture the attacking card"
 unlock_level = 0
-trigger_condition = 0
+trigger_condition = 1

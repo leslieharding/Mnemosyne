@@ -3,7 +3,10 @@ class_name DefensiveCounterAbility
 extends CardAbility
 
 func _init():
+	ability_name = "Defensive Counter"
+	description = "When this card successfully defends against an enemy attack, capture the attacking card"
 	trigger_condition = TriggerType.ON_DEFEND
+	print("DefensiveCounterAbility _init called - trigger_condition set to: ", trigger_condition)
 
 func execute(context: Dictionary) -> bool:
 	if not can_execute(context):
@@ -17,10 +20,27 @@ func execute(context: Dictionary) -> bool:
 	var game_manager = context.get("game_manager")
 	var direction = context.get("direction", -1)  # Direction of the attack
 	
-	print("DefensiveCounterAbility: Starting execution for ", defending_card.card_name, " at position ", defending_position)
+	print("DefensiveCounterAbility: Starting execution for ", defending_card.card_name if defending_card else "unknown card", " at position ", defending_position)
 	
-	if not defending_card or defending_position == -1 or not attacking_card or attacking_position == -1 or not game_manager:
-		print("DefensiveCounterAbility: Missing required context data")
+	# Safety checks - ensure all required data is present
+	if not defending_card:
+		print("DefensiveCounterAbility: No defending card provided")
+		return false
+	
+	if defending_position == -1:
+		print("DefensiveCounterAbility: Invalid defending position")
+		return false
+	
+	if not attacking_card:
+		print("DefensiveCounterAbility: No attacking card provided")
+		return false
+	
+	if attacking_position == -1:
+		print("DefensiveCounterAbility: Invalid attacking position")
+		return false
+	
+	if not game_manager:
+		print("DefensiveCounterAbility: No game manager provided")
 		return false
 	
 	# The defense was successful if we're here, so capture the attacking card
