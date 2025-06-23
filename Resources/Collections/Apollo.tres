@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=27 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=29 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_cm1c1"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_cm1c1"]
 [ext_resource type="Script" uid="uid://bqbrhjegh1g6e" path="res://Resources/Abilities/stat_boost_ability.gd" id="3_dwe15"]
 [ext_resource type="Script" uid="uid://b72irnrav5w53" path="res://Resources/Abilities/defensive_counter_ability.gd" id="4_dwe15"]
+[ext_resource type="Script" uid="uid://dgsvwgjhs2vju" path="res://Resources/Abilities/stat_nullify_ability.gd" id="4_ooqpa"]
 
 [sub_resource type="Resource" id="Resource_sfw3d"]
 script = ExtResource("3_dwe15")
@@ -24,18 +25,26 @@ description = "Sometimes you just gotta whack something very hard"
 abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_sfw3d")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_bj61k"]
+script = ExtResource("4_ooqpa")
+ability_name = "Stat Nullify"
+description = "When this card is captured its stats are reduced to 1."
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dgsvwgjhs2vju"
+
 [sub_resource type="Resource" id="Resource_w7xgs"]
 script = ExtResource("1_vqrrp")
 card_name = "The Sun Chariot"
-values = Array[int]([5, 4, 6, 3])
+values = Array[int]([2, 2, 2, 2])
 description = "Helios graces us with his presence"
-abilities = Array[ExtResource("2_cm1c1")]([])
+abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_bj61k")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_l7o3e"]
 script = ExtResource("4_dwe15")
 ability_name = "Defensive Counter"
-description = "hen this card successfully defends against an enemy attack, capture the attacking card"
+description = "When this card successfully defends against an enemy attack, capture the attacking card"
 unlock_level = 0
 trigger_condition = 1
 metadata/_custom_type_script = "uid://b72irnrav5w53"

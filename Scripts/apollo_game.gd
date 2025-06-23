@@ -310,6 +310,23 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 							var card_collection_index = get_card_collection_index(grid_index)
 							if card_collection_index != -1:
 								get_node("/root/RunExperienceTrackerAutoload").add_capture_exp(card_collection_index, 10)
+						
+						# Execute ON_CAPTURE abilities on the card that was just captured
+						var captured_card_level = get_card_level(get_card_collection_index(adj_index))
+						if adjacent_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, captured_card_level):
+							print("Executing ON_CAPTURE abilities for captured card: ", adjacent_card.card_name)
+							
+							var capture_context = {
+								"capturing_card": attacking_card,
+								"capturing_position": grid_index,
+								"captured_card": adjacent_card,
+								"captured_position": adj_index,
+								"game_manager": self,
+								"direction": direction.name,
+								"card_level": captured_card_level
+							}
+							
+							adjacent_card.execute_abilities(CardAbility.TriggerType.ON_CAPTURE, capture_context, captured_card_level)
 					else:
 						# Defense successful - check for ON_DEFEND abilities
 						print("Defense successful at slot ", adj_index, "!")

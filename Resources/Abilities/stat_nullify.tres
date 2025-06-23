@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StatNullifyAbility" load_steps=2 format=3 uid="uid://bvhx0fm5n8dyo"]
+
+[ext_resource type="Script" uid="uid://dgsvwgjhs2vju" path="res://Resources/Abilities/stat_nullify_ability.gd" id="1_2v441"]
+
+[resource]
+script = ExtResource("1_2v441")
+ability_name = "Stat Nullify"
+description = "When this card is captured its stats are reduced to 1."
+unlock_level = 0
+trigger_condition = 2
