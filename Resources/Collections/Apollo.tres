@@ -34,10 +34,10 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_l7o3e"]
 script = ExtResource("4_dwe15")
-ability_name = ""
-description = ""
+ability_name = "Defensive Counter"
+description = "hen this card successfully defends against an enemy attack, capture the attacking card"
 unlock_level = 0
-trigger_condition = 0
+trigger_condition = 1
 metadata/_custom_type_script = "uid://b72irnrav5w53"
 
 [sub_resource type="Resource" id="Resource_cm1c1"]
