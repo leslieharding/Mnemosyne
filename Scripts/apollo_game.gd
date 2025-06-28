@@ -62,13 +62,18 @@ var opponent_is_thinking: bool = false
 
 var active_passive_abilities: Dictionary = {}  # position -> array of passive abilities
 
-
+# Boss prediction system
+var is_boss_battle: bool = false
+var current_boss_prediction: Dictionary = {}
 
 
 
 func _ready():
 	# Initialize game managers
 	setup_managers()
+	
+	# Initialize boss prediction tracker
+	setup_boss_prediction_tracker()
 	
 	# Initialize game board
 	setup_empty_board()
@@ -92,6 +97,18 @@ func _ready():
 	
 	# Start the game
 	start_game()
+
+# Set up the boss prediction tracker
+func setup_boss_prediction_tracker():
+	# Check if this is a boss battle
+	var params = get_scene_params()
+	if params.has("current_node"):
+		var current_node = params["current_node"]
+		is_boss_battle = (current_node.enemy_name == "?????")
+		print("Boss battle detected: ", is_boss_battle)
+	
+	print("Boss prediction tracker initialized")
+
 
 func setup_journal_button():
 	if not journal_button:
@@ -195,8 +212,16 @@ func start_game():
 func _on_coin_flip_result(player_goes_first: bool):
 	if player_goes_first:
 		game_status_label.text = "You won the coin flip! You go first."
+		# Add this new section:
+		if not is_boss_battle:
+			get_node("/root/BossPredictionTrackerAutoload").start_recording_battle()
 	else:
 		game_status_label.text = "Opponent won the coin flip! They go first."
+		# Add this new section:
+		if is_boss_battle:
+			game_status_label.text = "The boss allows you to go first... 'I know what you will do.'"
+			turn_manager.current_player = TurnManager.Player.HUMAN
+			player_goes_first = true
 	
 	# Brief pause to show result
 	await get_tree().create_timer(2.0).timeout
@@ -218,6 +243,8 @@ func _on_turn_changed(is_player_turn: bool):
 	
 	if is_player_turn:
 		enable_player_input()
+		if is_boss_battle:
+			make_boss_prediction()
 	else:
 		disable_player_input()
 		# Only start opponent turn if they're not already thinking
@@ -226,6 +253,46 @@ func _on_turn_changed(is_player_turn: bool):
 			call_deferred("opponent_take_turn")  # Use call_deferred to avoid async issues
 		else:
 			print("Opponent already thinking, skipping turn start")
+
+
+# Make boss prediction for the current turn
+func make_boss_prediction():
+	if not is_boss_battle:
+		return
+	
+	var tracker = get_node("/root/BossPredictionTrackerAutoload")
+	if not tracker:
+		return
+	
+	# Calculate current turn number (1-based)
+	var cards_played = 5 - player_deck.size()
+	var current_turn = cards_played + 1
+	
+	if current_turn > 5:
+		return  # All cards played
+	
+	# Get available cards (indices of remaining cards in hand)
+	var available_cards: Array[int] = []
+	for i in range(player_deck.size()):
+		var card_collection_index = deck_card_indices[i]
+		available_cards.append(card_collection_index)
+	
+	# Get available positions (unoccupied grid slots)
+	var available_positions: Array[int] = []
+	for i in range(grid_occupied.size()):
+		if not grid_occupied[i]:
+			available_positions.append(i)
+	
+	# Get boss prediction
+	current_boss_prediction = tracker.get_boss_prediction(
+		current_turn, 
+		available_cards, 
+		available_positions
+	)
+	
+	print("Boss prediction for turn ", current_turn, ": Card ", current_boss_prediction.get("card", -1), " at position ", current_boss_prediction.get("position", -1))
+
+
 
 # Calculate and return current scores (Triple Triad style)
 func get_current_scores() -> Dictionary:
@@ -579,6 +646,11 @@ func should_game_end() -> bool:
 	return available_slots == 0 or (player_deck.is_empty() and not opponent_manager.has_cards())
 
 func end_game():
+	
+	var tracker = get_node("/root/BossPredictionTrackerAutoload")
+	if tracker:
+		tracker.stop_recording()
+	
 	await get_tree().process_frame
 	
 	var scores = get_current_scores()
@@ -1094,7 +1166,6 @@ func update_card_display(grid_index: int, card_data: CardResource):
 		print("Updated card display for ", card_data.card_name, " with new values: ", card_data.values)
 
 
-# This replaces the existing place_card_on_grid function in apollo_game.gd (around lines 580-650)
 
 # Place the selected card on the selected grid
 func place_card_on_grid():
@@ -1115,10 +1186,31 @@ func place_card_on_grid():
 	var card_data = player_deck[selected_card_index]
 	var card_collection_index = deck_card_indices[selected_card_index]
 	
+	# Record this play for pattern tracking (if not boss battle)
+	if not is_boss_battle:
+		var tracker = get_node("/root/BossPredictionTrackerAutoload")
+		if tracker:
+			tracker.record_card_play(card_collection_index, current_grid_index)
+	
+	# Check boss prediction if this is a boss battle
+	var boss_prediction_hit = false
+	if is_boss_battle and current_boss_prediction.has("card") and current_boss_prediction.has("position"):
+		if current_boss_prediction["card"] == card_collection_index and current_boss_prediction["position"] == current_grid_index:
+			boss_prediction_hit = true
+			print("BOSS PREDICTION HIT! The boss anticipated your move!")
+			# Apply the stat reduction - weakens the card but doesn't change ownership
+			card_data.values[0] = 1  # North
+			card_data.values[1] = 1  # East
+			card_data.values[2] = 1  # South
+			card_data.values[3] = 1  # West
+			
+			# Show feedback to player
+			game_status_label.text = "The boss anticipated your move! Your card's power is weakened!"
+	
 	# Get card level for ability checks
 	var card_level = get_card_level(card_collection_index)
 	
-	# Mark the slot as occupied and set ownership
+	# Mark the slot as occupied and set ownership (always PLAYER - prediction hits don't change ownership)
 	grid_occupied[current_grid_index] = true
 	grid_ownership[current_grid_index] = Owner.PLAYER
 	grid_card_data[current_grid_index] = card_data
@@ -1144,11 +1236,21 @@ func place_card_on_grid():
 	# Set higher z-index so the card appears on top
 	card_display.z_index = 1
 	
-	# Setup the card display with the card resource data
+	# Setup the card display with the card resource data (including potentially weakened stats)
 	card_display.setup(card_data)
 	
-	# Apply player styling initially
-	card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+	# Apply player styling initially, but make prediction hits more visible
+	if boss_prediction_hit:
+		# Create a special style for predicted cards
+		var prediction_hit_style = player_card_style.duplicate()
+		prediction_hit_style.border_color = Color("#FF6B6B")  # Red border for prediction hits
+		prediction_hit_style.border_width_left = 4
+		prediction_hit_style.border_width_top = 4
+		prediction_hit_style.border_width_right = 4
+		prediction_hit_style.border_width_bottom = 4
+		card_display.panel.add_theme_stylebox_override("panel", prediction_hit_style)
+	else:
+		card_display.panel.add_theme_stylebox_override("panel", player_card_style)
 	
 	# Connect hover signals for grid cards too
 	card_display.card_hovered.connect(_on_card_hovered)
@@ -1156,7 +1258,7 @@ func place_card_on_grid():
 	
 	print("Card placed on grid at position", current_grid_index)
 	
-	# EXECUTE ON-PLAY ABILITIES BEFORE COMBAT
+	# EXECUTE ON-PLAY ABILITIES BEFORE COMBAT (but after potential stat reduction)
 	if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
 		print("Executing on-play abilities for ", card_data.card_name)
 		var ability_context = {
@@ -1173,7 +1275,7 @@ func place_card_on_grid():
 	# HANDLE PASSIVE ABILITIES
 	handle_passive_abilities_on_place(current_grid_index, card_data, card_level)
 	
-	# Resolve combat (abilities may have modified stats)
+	# Resolve combat (abilities may have modified stats, and boss prediction may have weakened the card)
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 	if captures > 0:
 		print("Player captured ", captures, " cards!")

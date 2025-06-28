@@ -20,6 +20,7 @@ TransitionManagerAutoload="*res://Scripts/transition_manager.gd"
 RunExperienceTrackerAutoload="*res://Scripts/run_experience_tracker.gd"
 GlobalProgressTrackerAutoload="*res://Scripts/global_progress_tracker.gd"
 MemoryJournalManagerAutoload="*res://Scripts/memory_journal_manager.gd"
+BossPredictionTrackerAutoload="*res://Scripts/boss_prediction_tracker.gd"
 
 [input]
 
