@@ -486,8 +486,8 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_gr0xj"]
 script = ExtResource("5_m5w2u")
 boost_amount = 1
-ability_name = ""
-description = ""
+ability_name = "Stat Boost"
+description = "Boosts stats duh"
 unlock_level = 0
 trigger_condition = 0
 metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
@@ -510,8 +510,8 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_s4ywq"]
 script = ExtResource("6_mxtxa")
-ability_name = ""
-description = ""
+ability_name = "Defensive Counter"
+description = "Counters defensively duh"
 unlock_level = 0
 trigger_condition = 0
 metadata/_custom_type_script = "uid://b72irnrav5w53"
