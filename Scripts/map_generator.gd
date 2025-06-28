@@ -72,9 +72,7 @@ static func determine_node_type(layer: int, index_in_layer: int) -> MapNode.Node
 	else:
 		return MapNode.NodeType.BATTLE
 
-# Assign enemy to a node based on its position
 static func assign_enemy_to_node(node: MapNode, layer: int, index_in_layer: int):
-	# Load enemy collection to get available enemies
 	var enemies_collection: EnemiesCollection = load("res://Resources/Collections/Enemies.tres")
 	if not enemies_collection:
 		# Fallback if enemies collection not found
@@ -84,21 +82,42 @@ static func assign_enemy_to_node(node: MapNode, layer: int, index_in_layer: int)
 	
 	var enemy_names = enemies_collection.get_enemy_names()
 	
-	# Assign enemy based on layer (simple assignment for now)
-	match layer:
-		0:  # Starting layer - easy enemies
-			node.enemy_name = enemy_names[index_in_layer % enemy_names.size()]
-			node.enemy_difficulty = 0
-		1, 2:  # Middle layers - medium enemies
-			node.enemy_name = enemy_names[index_in_layer % enemy_names.size()]
-			node.enemy_difficulty = 1
-		3:  # Boss layer - hard enemies
-			node.enemy_name = enemy_names[0]  # Could be specific boss enemy
-			node.enemy_difficulty = 2
-		_:
-			# Fallback
-			node.enemy_name = "Shadow Acolyte"
-			node.enemy_difficulty = 0
+	# Assign enemy based on node type first, then layer
+	if node.node_type == MapNode.NodeType.BOSS:
+		# Always assign the boss to boss nodes
+		node.enemy_name = "?????"
+		node.enemy_difficulty = 2  # Master difficulty for boss
+		print("Assigned boss: ????? to boss node")
+	else:
+		# Regular enemy assignment based on layer
+		match layer:
+			0:  # Starting layer - easy enemies
+				# Use the first few enemies, excluding the boss
+				var regular_enemies = []
+				for enemy_name in enemy_names:
+					if enemy_name != "?????":
+						regular_enemies.append(enemy_name)
+				
+				if regular_enemies.size() > 0:
+					node.enemy_name = regular_enemies[index_in_layer % regular_enemies.size()]
+				else:
+					node.enemy_name = "Shadow Acolyte"  # Fallback
+				node.enemy_difficulty = 0
+			1, 2:  # Middle layers - medium enemies
+				var regular_enemies = []
+				for enemy_name in enemy_names:
+					if enemy_name != "?????":
+						regular_enemies.append(enemy_name)
+				
+				if regular_enemies.size() > 0:
+					node.enemy_name = regular_enemies[index_in_layer % regular_enemies.size()]
+				else:
+					node.enemy_name = "Shadow Acolyte"  # Fallback
+				node.enemy_difficulty = 1
+			_:
+				# Fallback for any other layers
+				node.enemy_name = "Shadow Acolyte"
+				node.enemy_difficulty = 0
 
 # Connect nodes between layers - REVERSE the connection direction
 static func connect_layers(nodes_by_layer: Array, map_data: MapData):
