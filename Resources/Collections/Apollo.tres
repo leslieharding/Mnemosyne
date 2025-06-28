@@ -22,7 +22,7 @@ metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
 script = ExtResource("1_vqrrp")
 card_name = "Helios"
 values = Array[int]([5, 5, 5, 5])
-description = "Sometimes you just gotta whack something very hard"
+description = "The sun titan arrives"
 abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_sfw3d")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 

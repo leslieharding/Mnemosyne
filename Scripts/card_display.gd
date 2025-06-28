@@ -10,6 +10,9 @@ class_name CardDisplay
 @onready var south_value = $Panel/MarginContainer/VBoxContainer/South
 @onready var west_value = $Panel/MarginContainer/VBoxContainer/HBoxContainer/West
 
+signal card_hovered(card_data: CardResource)
+signal card_unhovered()
+
 # Style properties
 var default_style: StyleBoxFlat
 var selected_style: StyleBoxFlat
@@ -22,6 +25,10 @@ func _ready():
 	# Connect the panel's gui_input signal to our method
 	panel.gui_input.connect(_on_panel_gui_input)
 	
+	# Connect hover signals
+	panel.mouse_entered.connect(_on_mouse_entered)
+	panel.mouse_exited.connect(_on_mouse_exited)
+	
 	# Store the default style
 	default_style = panel.get_theme_stylebox("panel").duplicate()
 	
@@ -32,6 +39,13 @@ func _ready():
 	selected_style.border_width_right = 4
 	selected_style.border_width_bottom = 4
 	selected_style.border_width_left = 4
+
+func _on_mouse_entered():
+	if card_data:
+		emit_signal("card_hovered", card_data)
+
+func _on_mouse_exited():
+	emit_signal("card_unhovered")
 
 # Configure the card with data
 func setup(card: CardResource):

@@ -49,8 +49,13 @@ var opponent_is_thinking: bool = false
 @onready var board_container = $VBoxContainer/GameGrid
 @onready var game_status_label = $VBoxContainer/Title
 @onready var deck_name_label = $VBoxContainer/DeckName
+@onready var card_info_panel = $CardInfoPanel
+@onready var card_name_display = $CardInfoPanel/MarginContainer/VBoxContainer/CardNameLabel
+@onready var card_description_display = $CardInfoPanel/MarginContainer/VBoxContainer/CardDescriptionLabel
 
 var active_passive_abilities: Dictionary = {}  # position -> array of passive abilities
+
+
 
 
 
@@ -139,6 +144,15 @@ func setup_opponent_from_params():
 		print("No enemy data found, using default Shadow Acolyte")
 		opponent_manager.setup_opponent("Shadow Acolyte", 0)
 
+
+func _on_card_hovered(card_data: CardResource):
+	if card_data:
+		card_name_display.text = card_data.card_name
+		card_description_display.text = card_data.description
+		card_info_panel.visible = true
+
+func _on_card_unhovered():
+	card_info_panel.visible = false
 
 # Start the game sequence
 func start_game():
@@ -467,6 +481,10 @@ func _on_opponent_card_placed(grid_index: int):
 	
 	# Apply opponent styling
 	card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+	
+	# Connect hover signals for opponent cards too
+	card_display.card_hovered.connect(_on_card_hovered)
+	card_display.card_unhovered.connect(_on_card_unhovered)
 	
 	print("Opponent placed card: ", opponent_card_data.card_name, " at slot ", grid_index)
 	
@@ -926,6 +944,10 @@ func display_player_hand():
 		
 		# Connect to detect clicks on the card (only when it's player's turn)
 		card_display.panel.gui_input.connect(_on_card_gui_input.bind(card_display, i))
+		
+		# Connect hover signals for info panel
+		card_display.card_hovered.connect(_on_card_hovered)
+		card_display.card_unhovered.connect(_on_card_unhovered)
 
 
 # Handle card input events
@@ -1069,6 +1091,10 @@ func place_card_on_grid():
 	
 	# Apply player styling initially
 	card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+	
+	# Connect hover signals for grid cards too
+	card_display.card_hovered.connect(_on_card_hovered)
+	card_display.card_unhovered.connect(_on_card_unhovered)
 	
 	print("Card placed on grid at position", current_grid_index)
 	
