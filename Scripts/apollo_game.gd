@@ -484,6 +484,16 @@ func _on_opponent_card_placed(grid_index: int):
 		opponent_is_thinking = false
 		return
 	
+	# DEBUG: Check the opponent card data
+	print("=== OPPONENT CARD DEBUG ===")
+	print("Card name: ", opponent_card_data.card_name)
+	print("Card abilities count: ", opponent_card_data.abilities.size())
+	if opponent_card_data.abilities.size() > 0:
+		for i in range(opponent_card_data.abilities.size()):
+			var ability = opponent_card_data.abilities[i]
+			print("  Ability ", i, ": ", ability.ability_name, " - ", ability.description)
+	print("===========================")
+	
 	# Mark the slot as occupied and set ownership
 	grid_occupied[grid_index] = true
 	grid_ownership[grid_index] = Owner.OPPONENT
@@ -495,8 +505,23 @@ func _on_opponent_card_placed(grid_index: int):
 	# Create a card display for the opponent's card
 	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 	
-	# Add the card as a child of the slot panel
+	# Add the card as a child of the slot panel FIRST
 	slot.add_child(card_display)
+	
+	# Wait one frame to ensure _ready() is called and @onready variables are initialized
+	await get_tree().process_frame
+	
+	# NOW setup the card display with the actual card data
+	card_display.setup(opponent_card_data)
+	
+	# DEBUG: Verify the card display has the data
+	print("=== CARD DISPLAY DEBUG ===")
+	print("Card display card_data: ", card_display.card_data)
+	if card_display.card_data:
+		print("Card display abilities: ", card_display.card_data.abilities.size())
+	else:
+		print("ERROR: Card display card_data is null!")
+	print("===========================")
 	
 	# Center the card within the slot (same as player cards)
 	card_display.position = Vector2(
@@ -507,14 +532,11 @@ func _on_opponent_card_placed(grid_index: int):
 	# Set higher z-index so the card appears on top
 	card_display.z_index = 1
 	
-	# Setup the card display with the actual card data
-	card_display.setup(opponent_card_data)
-	
 	# Apply opponent styling
 	card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
 	
-	# Connect hover signals for opponent cards too - THIS IS THE KEY CHANGE
-	# This ensures enemy cards also show their abilities on hover
+	# Connect hover signals AFTER setup - THIS IS THE KEY FIX
+	# This ensures the card_data is properly set before hover events can fire
 	card_display.card_hovered.connect(_on_card_hovered)
 	card_display.card_unhovered.connect(_on_card_unhovered)
 	
