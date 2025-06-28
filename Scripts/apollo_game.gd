@@ -513,11 +513,16 @@ func _on_opponent_card_placed(grid_index: int):
 	# Apply opponent styling
 	card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
 	
-	# Connect hover signals for opponent cards too
+	# Connect hover signals for opponent cards too - THIS IS THE KEY CHANGE
+	# This ensures enemy cards also show their abilities on hover
 	card_display.card_hovered.connect(_on_card_hovered)
 	card_display.card_unhovered.connect(_on_card_unhovered)
 	
 	print("Opponent placed card: ", opponent_card_data.card_name, " at slot ", grid_index)
+	print("Card abilities: ", opponent_card_data.abilities.size())
+	for i in range(opponent_card_data.abilities.size()):
+		var ability = opponent_card_data.abilities[i]
+		print("  Ability ", i, ": ", ability.ability_name, " - ", ability.description)
 	
 	# Resolve combat
 	var captures = resolve_combat(grid_index, Owner.OPPONENT, opponent_card_data)
