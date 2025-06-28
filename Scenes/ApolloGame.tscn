@@ -38,10 +38,12 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 
 [node name="CardInfoPanel" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(300, 200)
 offset_left = 20.0
-offset_top = 400.0
-offset_right = 60.0
-offset_bottom = 440.0
+offset_top = 285.0
+offset_right = 320.0
+offset_bottom = 485.0
 
 [node name="MarginContainer" type="MarginContainer" parent="CardInfoPanel"]
 layout_mode = 2
@@ -53,11 +55,85 @@ theme_override_constants/margin_bottom = 10
 [node name="VBoxContainer" type="VBoxContainer" parent="CardInfoPanel/MarginContainer"]
 layout_mode = 2
 
-[node name="CardNameLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LeftSection" type="VBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardNameLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 16
 
-[node name="CardDescriptionLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer"]
+[node name="CardDescriptionLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="HSeparator" type="HSeparator" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="AbilityNameLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.843137, 0, 1)
+theme_override_font_sizes/font_size = 14
+text = "Ability Name"
+autowrap_mode = 3
+
+[node name="AbilityDescriptionLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 11
+text = "Ability Description goes here"
+autowrap_mode = 3
+
+[node name="RightSection" type="VBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_horizontal = 8
+alignment = 1
+
+[node name="PowerGrid" type="VBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+alignment = 1
+
+[node name="TopRow" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid"]
+layout_mode = 2
+
+[node name="NorthPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/TopRow"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "5"
+horizontal_alignment = 1
+
+[node name="MiddleRow" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid"]
+layout_mode = 2
+
+[node name="WestPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "5"
+horizontal_alignment = 1
+
+[node name="EastPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "5"
+horizontal_alignment = 1
+
+[node name="BottomRow" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid"]
+layout_mode = 2
+
+[node name="SouthPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/BottomRow"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "5"
+horizontal_alignment = 1

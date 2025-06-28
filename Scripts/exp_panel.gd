@@ -6,7 +6,7 @@ class_name ExpPanel
 @onready var collapse_button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CollapseButton
 @onready var title_label = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/TitleLabel
 
-var is_collapsed: bool = false
+var is_collapsed: bool = true  
 var card_displays: Dictionary = {}  # card_index -> mini card display
 
 func _ready():
@@ -16,6 +16,15 @@ func _ready():
 	
 	# Connect collapse button
 	collapse_button.pressed.connect(_on_collapse_toggled)
+	
+	# Start in collapsed state with proper title format
+	card_container.visible = false
+	collapse_button.text = "▶"
+	is_collapsed = true
+	
+	# Set the initial title to match the collapsed format
+	var totals = get_node("/root/RunExperienceTrackerAutoload").get_total_experience()
+	title_label.text = "Experience (⚔️ " + str(totals["capture_exp"]) + " | 🛡️ " + str(totals["defense_exp"]) + ")"
 
 
 # Set up the panel with the current deck

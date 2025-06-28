@@ -45,13 +45,20 @@ var opponent_manager: OpponentManager
 var opponent_is_thinking: bool = false
 
 # UI References
+
 @onready var hand_container = $VBoxContainer/HBoxContainer
 @onready var board_container = $VBoxContainer/GameGrid
 @onready var game_status_label = $VBoxContainer/Title
 @onready var deck_name_label = $VBoxContainer/DeckName
 @onready var card_info_panel = $CardInfoPanel
-@onready var card_name_display = $CardInfoPanel/MarginContainer/VBoxContainer/CardNameLabel
-@onready var card_description_display = $CardInfoPanel/MarginContainer/VBoxContainer/CardDescriptionLabel
+@onready var card_name_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection/CardNameLabel
+@onready var card_description_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection/CardDescriptionLabel
+@onready var ability_name_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection/AbilityNameLabel
+@onready var ability_description_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection/AbilityDescriptionLabel
+@onready var north_power_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/TopRow/NorthPower
+@onready var east_power_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow/EastPower
+@onready var south_power_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/BottomRow/SouthPower
+@onready var west_power_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow/WestPower
 
 var active_passive_abilities: Dictionary = {}  # position -> array of passive abilities
 
@@ -145,13 +152,37 @@ func setup_opponent_from_params():
 		opponent_manager.setup_opponent("Shadow Acolyte", 0)
 
 
+# Handle card hover for info panel
 func _on_card_hovered(card_data: CardResource):
 	if card_data:
 		card_name_display.text = card_data.card_name
 		card_description_display.text = card_data.description
+		
+		# Update power numbers in D-pad layout
+		# card.values array is [North, East, South, West]
+		north_power_display.text = str(card_data.values[0])
+		east_power_display.text = str(card_data.values[1])
+		south_power_display.text = str(card_data.values[2])
+		west_power_display.text = str(card_data.values[3])
+		
+		# Handle ability information
+		if card_data.abilities.size() > 0:
+			# Show the first ability (cards typically have one main ability)
+			var ability = card_data.abilities[0]
+			ability_name_display.text = ability.ability_name
+			ability_description_display.text = ability.description
+			ability_name_display.visible = true
+			ability_description_display.visible = true
+		else:
+			# Hide ability labels if no abilities
+			ability_name_display.visible = false
+			ability_description_display.visible = false
+		
+		# Show the panel now that it's populated with real data
 		card_info_panel.visible = true
 
 func _on_card_unhovered():
+	# Hide the panel when no card is being hovered
 	card_info_panel.visible = false
 
 # Start the game sequence

@@ -12,8 +12,8 @@
 [sub_resource type="Resource" id="Resource_sfw3d"]
 script = ExtResource("3_dwe15")
 boost_amount = 1
-ability_name = ""
-description = ""
+ability_name = "Stat Boost"
+description = "When attacking, increase your power value by 1"
 unlock_level = 0
 trigger_condition = 0
 metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
