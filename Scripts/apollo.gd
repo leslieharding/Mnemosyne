@@ -119,7 +119,7 @@ func _on_start_game_button_pressed() -> void:
 		print("Initialized experience tracker for new run with deck: ", deck_def.deck_name)
 		
 		# Add this line after initializing the experience tracker:
-		get_node("/root/BossPredictionTrackerAutoload").start_new_run()
+		get_node("/root/BossPredictionTrackerAutoload").clear_patterns()
 		print("Initialized boss prediction tracker for new run")
 		
 		# Pass the selected god and deck index to the map scene
