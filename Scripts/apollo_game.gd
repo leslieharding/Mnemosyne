@@ -40,6 +40,7 @@ var opponent_card_style: StyleBoxFlat
 # Game managers
 var turn_manager: TurnManager
 var opponent_manager: OpponentManager
+var visual_effects_manager: VisualEffectsManager
 
 # State management to prevent multiple opponent turns
 var opponent_is_thinking: bool = false
@@ -142,6 +143,10 @@ func setup_managers():
 	# Create opponent manager
 	opponent_manager = OpponentManager.new()
 	add_child(opponent_manager)
+	
+	# Create visual effects manager
+	visual_effects_manager = VisualEffectsManager.new()
+	add_child(visual_effects_manager)
 	
 	# Connect opponent manager signals
 	opponent_manager.opponent_card_placed.connect(_on_opponent_card_placed)
@@ -254,6 +259,17 @@ func _on_turn_changed(is_player_turn: bool):
 		else:
 			print("Opponent already thinking, skipping turn start")
 
+func get_card_display_at_position(grid_index: int) -> CardDisplay:
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return null
+	
+	var slot = grid_slots[grid_index]
+	if slot.get_child_count() > 0:
+		var child = slot.get_child(0)
+		if child is CardDisplay:
+			return child
+	
+	return null
 
 # Make boss prediction for the current turn
 func make_boss_prediction():
@@ -378,6 +394,7 @@ func set_card_ownership(grid_index: int, new_owner: Owner):
 		print("Card at slot ", grid_index, " ownership changed to ", "Player" if new_owner == Owner.PLAYER else "Opponent")
 
 # This replaces the existing resolve_combat function in apollo_game.gd (around lines 210-280)
+# This replaces the existing resolve_combat function in apollo_game.gd (around lines 210-280)
 
 func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource):
 	print("Resolving combat for card at slot ", grid_index)
@@ -422,6 +439,12 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 					if my_value > their_value:
 						print("Captured card at slot ", adj_index, "!")
 						captures.append(adj_index)
+						
+						# VISUAL EFFECT: Flash the attacking card's edge
+						var attacking_card_display = get_card_display_at_position(grid_index)
+						if attacking_card_display:
+							var is_player_attack = (attacking_owner == Owner.PLAYER)
+							visual_effects_manager.show_capture_flash(attacking_card_display, direction.my_value_index, is_player_attack)
 						
 						# Award capture experience if it's a player card attacking
 						if attacking_owner == Owner.PLAYER:
