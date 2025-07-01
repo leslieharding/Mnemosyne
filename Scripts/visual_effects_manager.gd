@@ -3,7 +3,7 @@ extends Node
 class_name VisualEffectsManager
 
 # Flash configuration
-const FLASH_DURATION: float = 0.4
+const FLASH_DURATION: float = 0.8
 const FLASH_COLOR: Color = Color.WHITE
 const PLAYER_FLASH_COLOR: Color = Color("#4499FF")  # Blue for player
 const OPPONENT_FLASH_COLOR: Color = Color("#FF4444")  # Red for opponent
@@ -31,10 +31,10 @@ func show_capture_flash(attacking_card_display: CardDisplay, attack_direction: i
 # Convert attack direction to the edge that should flash
 func get_flash_edge_from_direction(direction: int) -> String:
 	match direction:
-		0: return "south"  # Attacking north, so flash south edge of attacker
-		1: return "west"   # Attacking east, so flash west edge of attacker  
-		2: return "north"  # Attacking south, so flash north edge of attacker
-		3: return "east"   # Attacking west, so flash east edge of attacker
+		0: return "north"  # Attacking north, so flash north edge of attacker
+		1: return "east"   # Attacking east, so flash east edge of attacker  
+		2: return "south"  # Attacking south, so flash south edge of attacker
+		3: return "west"   # Attacking west, so flash west edge of attacker
 		_: return "north"  # Default fallback
 
 # Create and animate the flash effect on a specific edge
