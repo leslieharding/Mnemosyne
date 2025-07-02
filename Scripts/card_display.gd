@@ -2,9 +2,9 @@
 extends Node2D
 class_name CardDisplay
 
-# References to child nodes
+# References to child nodes - FIXED to match actual scene structure
 @onready var panel = $Panel
-@onready var card_name_label = $Panel/MarginContainer/VBoxContainer/HBoxContainer/Name
+@onready var card_name_label = $Panel/MarginContainer/CardNameLabel
 @onready var north_value = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/NorthPower
 @onready var east_value = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/EastPower
 @onready var south_value = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/SouthPower
@@ -54,7 +54,7 @@ func _on_mouse_exited():
 func setup(card: CardResource):
 	card_data = card
 	
-	# Set the card information
+	# Set the card name
 	card_name_label.text = card.card_name
 	
 	# Set the directional values [Up, Right, Down, Left]
