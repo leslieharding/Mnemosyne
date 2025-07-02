@@ -524,6 +524,25 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 		# Change ownership
 		grid_ownership[captured_index] = attacking_owner
 		print("Card at slot ", captured_index, " is now owned by ", "Player" if attacking_owner == Owner.PLAYER else "Opponent")
+		
+		# Check if the newly captured card has passive abilities and restart pulse effect
+		var card_level = get_card_level(get_card_collection_index(captured_index))
+		if captured_card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			print("Restarting passive abilities for captured card at position ", captured_index)
+			
+			# Re-add to passive abilities tracking
+			if not captured_index in active_passive_abilities:
+				active_passive_abilities[captured_index] = []
+			
+			var available_abilities = captured_card_data.get_available_abilities(card_level)
+			for ability in available_abilities:
+				if ability.trigger_condition == CardAbility.TriggerType.PASSIVE:
+					active_passive_abilities[captured_index].append(ability)
+			
+			# Restart visual pulse effect for the captured card
+			var card_display = get_card_display_at_position(captured_index)
+			if card_display and visual_effects_manager:
+				visual_effects_manager.start_passive_pulse(card_display)
 	
 	# Refresh all passive abilities to account for ownership changes
 	if captures.size() > 0:
@@ -629,6 +648,23 @@ func _on_opponent_card_placed(grid_index: int):
 	# This ensures the card_data is properly set before hover events can fire
 	card_display.card_hovered.connect(_on_card_hovered)
 	card_display.card_unhovered.connect(_on_card_unhovered)
+	
+	# Check for passive abilities on opponent cards and start pulse effect
+	var opponent_card_level = get_card_level(0)  # Opponent cards use level 0 for now
+	if opponent_card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, opponent_card_level):
+		print("Opponent card has passive abilities - starting pulse effect")
+		
+		# Store passive abilities for opponent card
+		if not grid_index in active_passive_abilities:
+			active_passive_abilities[grid_index] = []
+		
+		var available_abilities = opponent_card_data.get_available_abilities(opponent_card_level)
+		for ability in available_abilities:
+			if ability.trigger_condition == CardAbility.TriggerType.PASSIVE:
+				active_passive_abilities[grid_index].append(ability)
+		
+		# Start visual pulse effect
+		visual_effects_manager.start_passive_pulse(card_display)
 	
 	print("Opponent placed card: ", opponent_card_data.card_name, " at slot ", grid_index)
 	print("Card abilities: ", opponent_card_data.abilities.size())
@@ -1348,6 +1384,11 @@ func handle_passive_abilities_on_place(grid_position: int, card_data: CardResour
 				}
 				
 				ability.execute(passive_context)
+		
+		# Start visual pulse effect for passive abilities
+		var card_display = get_card_display_at_position(grid_position)
+		if card_display and visual_effects_manager:
+			visual_effects_manager.start_passive_pulse(card_display)
 	
 	# Also trigger passive abilities of existing cards (in case they need to affect the new card)
 	refresh_all_passive_abilities()
@@ -1356,6 +1397,11 @@ func handle_passive_abilities_on_place(grid_position: int, card_data: CardResour
 func handle_passive_abilities_on_capture(grid_position: int, card_data: CardResource):
 	if grid_position in active_passive_abilities:
 		print("Removing passive abilities for captured card at position ", grid_position)
+		
+		# Stop visual pulse effect first
+		var card_display = get_card_display_at_position(grid_position)
+		if card_display and visual_effects_manager:
+			visual_effects_manager.stop_passive_pulse(card_display)
 		
 		# Execute each passive ability with "remove" action
 		for ability in active_passive_abilities[grid_position]:

@@ -8,6 +8,16 @@ const FLASH_COLOR: Color = Color.WHITE
 const PLAYER_FLASH_COLOR: Color = Color("#4499FF")  # Blue for player
 const OPPONENT_FLASH_COLOR: Color = Color("#FF4444")  # Red for opponent
 
+# Passive pulse configuration
+const PASSIVE_PULSE_DURATION: float = 2.0  # Full pulse cycle duration
+const PASSIVE_PULSE_COLOR: Color = Color("#9966FF")  # Purple for passive abilities
+const PASSIVE_PULSE_MIN_ALPHA: float = 0.2  # Minimum opacity
+const PASSIVE_PULSE_MAX_ALPHA: float = 0.6  # Maximum opacity
+
+# Track active passive pulses to avoid duplicates
+var active_passive_pulses: Dictionary = {}  # card_display -> pulse_effect
+
+
 func _ready():
 	pass
 
@@ -160,3 +170,91 @@ func get_direction_name(direction: int) -> String:
 		2: return "South"
 		3: return "West"
 		_: return "Unknown"
+
+# Start passive ability pulse effect on a card
+func start_passive_pulse(card_display: CardDisplay):
+	if not card_display or not card_display.panel:
+		print("VisualEffectsManager: Invalid card display for passive pulse")
+		return
+	
+	# Check if this card already has a passive pulse active
+	if card_display in active_passive_pulses:
+		return
+	
+	# Wait one frame to ensure the card is fully rendered
+	await get_tree().process_frame
+	
+	# Create the pulse overlay that covers all edges
+	var pulse_container = Control.new()
+	pulse_container.name = "PassivePulseEffect"
+	pulse_container.set_anchors_preset(Control.PRESET_FULL_RECT)
+	pulse_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	# Create individual edge overlays
+	var edges = create_all_edge_overlays(card_display.panel.size)
+	for edge in edges:
+		pulse_container.add_child(edge)
+	
+	# Add to the card panel
+	card_display.panel.add_child(pulse_container)
+	pulse_container.z_index = 50
+	
+	# Store reference to track active pulse
+	active_passive_pulses[card_display] = pulse_container
+	
+	# Start the pulsing animation
+	start_pulse_animation(pulse_container)
+
+# Stop passive ability pulse effect on a card
+func stop_passive_pulse(card_display: CardDisplay):
+	if not card_display in active_passive_pulses:
+		return
+	
+	var pulse_container = active_passive_pulses[card_display]
+	
+	# Fade out before removing
+	if is_instance_valid(pulse_container):
+		var fade_tween = create_tween()
+		fade_tween.tween_property(pulse_container, "modulate:a", 0.0, 0.3)
+		fade_tween.tween_callback(func():
+			if is_instance_valid(pulse_container):
+				pulse_container.queue_free()
+		)
+	
+	# Remove from tracking
+	active_passive_pulses.erase(card_display)
+
+# Create overlay rectangles for all four edges
+func create_all_edge_overlays(card_size: Vector2) -> Array[ColorRect]:
+	var edges: Array[ColorRect] = []
+	var thickness = 3
+	
+	# Create all four edges
+	var positions_and_sizes = [
+		[Vector2(0, 0), Vector2(card_size.x, thickness)],  # North
+		[Vector2(0, card_size.y - thickness), Vector2(card_size.x, thickness)],  # South
+		[Vector2(0, 0), Vector2(thickness, card_size.y)],  # West
+		[Vector2(card_size.x - thickness, 0), Vector2(thickness, card_size.y)]  # East
+	]
+	
+	for pos_size in positions_and_sizes:
+		var edge = ColorRect.new()
+		edge.color = PASSIVE_PULSE_COLOR
+		edge.position = pos_size[0]
+		edge.size = pos_size[1]
+		edges.append(edge)
+	
+	return edges
+
+# Start the continuous pulsing animation
+func start_pulse_animation(pulse_container: Control):
+	if not is_instance_valid(pulse_container):
+		return
+	
+	pulse_container.modulate.a = PASSIVE_PULSE_MIN_ALPHA
+	
+	var pulse_tween = create_tween()
+	pulse_tween.set_loops()
+	
+	pulse_tween.tween_property(pulse_container, "modulate:a", PASSIVE_PULSE_MAX_ALPHA, PASSIVE_PULSE_DURATION * 0.5).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	pulse_tween.tween_property(pulse_container, "modulate:a", PASSIVE_PULSE_MIN_ALPHA, PASSIVE_PULSE_DURATION * 0.5).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
