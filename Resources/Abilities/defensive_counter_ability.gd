@@ -46,8 +46,16 @@ func execute(context: Dictionary) -> bool:
 	# The defense was successful if we're here, so capture the attacking card
 	print("DefensiveCounterAbility: Successful defense! Capturing attacking card at position ", attacking_position)
 	
-	# Change ownership of the attacking card to the defending player
+	# Get defending owner and determine if it's a player defending
 	var defending_owner = game_manager.get_owner_at_position(defending_position)
+	var is_player_defending = (defending_owner == game_manager.Owner.PLAYER)
+	
+	# VISUAL EFFECT: Show defensive counter flash on the defending card
+	var defending_card_display = game_manager.get_card_display_at_position(defending_position)
+	if defending_card_display and game_manager.visual_effects_manager:
+		game_manager.visual_effects_manager.show_defensive_counter_flash(defending_card_display, direction, is_player_defending)
+	
+	# Change ownership of the attacking card to the defending player
 	game_manager.set_card_ownership(attacking_position, defending_owner)
 	
 	print(ability_name, " activated! ", defending_card.card_name, " captured the attacking ", attacking_card.card_name, "!")
