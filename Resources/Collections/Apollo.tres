@@ -36,9 +36,9 @@ metadata/_custom_type_script = "uid://dgsvwgjhs2vju"
 
 [sub_resource type="Resource" id="Resource_w7xgs"]
 script = ExtResource("1_vqrrp")
-card_name = "Cygnus"
+card_name = "The Sun Chariot"
 values = Array[int]([2, 2, 2, 2])
-description = "Oh dont listen to him Phaeton"
+description = "Helios graces us with his presence"
 abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_bj61k")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
