@@ -36,7 +36,7 @@ theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
 [node name="PowerDisplayContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
-custom_minimum_size = Vector2(50, 50)
+custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
