@@ -47,6 +47,7 @@ var opponent_is_thinking: bool = false
 
 # UI References
 
+# UI References
 @onready var hand_container = $VBoxContainer/HBoxContainer
 @onready var board_container = $VBoxContainer/GameGrid
 @onready var game_status_label = $VBoxContainer/Title
