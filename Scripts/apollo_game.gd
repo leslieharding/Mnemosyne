@@ -68,7 +68,23 @@ var active_passive_abilities: Dictionary = {}  # position -> array of passive ab
 var is_boss_battle: bool = false
 var current_boss_prediction: Dictionary = {}
 
+# Card info panel state management
+enum PanelState {
+	HIDDEN,
+	FADING_IN,
+	VISIBLE,
+	GRACE_PERIOD,
+	FADING_OUT
+}
 
+var panel_state: PanelState = PanelState.HIDDEN
+var panel_fade_tween: Tween
+var panel_grace_timer: Timer
+
+# Panel timing configuration
+const FADE_IN_DURATION: float = 0.2
+const FADE_OUT_DURATION: float = 0.4
+const GRACE_PERIOD_DURATION: float = 0.7
 
 func _ready():
 	# Initialize game managers
@@ -85,6 +101,9 @@ func _ready():
 	
 	# Add journal button
 	setup_journal_button()
+	
+	# Set up card info panel for smooth fading
+	setup_card_info_panel()
 	
 	# Get the selected deck from Apollo scene
 	var params = get_scene_params()
@@ -111,6 +130,20 @@ func setup_boss_prediction_tracker():
 	
 	print("Boss prediction tracker initialized")
 
+func setup_card_info_panel():
+	if card_info_panel:
+		# Keep panel visible but transparent initially
+		card_info_panel.visible = true
+		card_info_panel.modulate.a = 0.0
+		
+		# Create grace period timer
+		panel_grace_timer = Timer.new()
+		panel_grace_timer.wait_time = GRACE_PERIOD_DURATION
+		panel_grace_timer.one_shot = true
+		panel_grace_timer.timeout.connect(_on_grace_period_expired)
+		add_child(panel_grace_timer)
+		
+		print("Card info panel fade system initialized")
 
 func setup_journal_button():
 	if not journal_button:
@@ -175,38 +208,123 @@ func setup_opponent_from_params():
 		opponent_manager.setup_opponent("Shadow Acolyte", 0)
 
 
-# Handle card hover for info panel
 func _on_card_hovered(card_data: CardResource):
-	if card_data:
-		card_name_display.text = card_data.card_name
-		card_description_display.text = card_data.description
-		
-		# Update power numbers in D-pad layout
-		# card.values array is [North, East, South, West]
-		north_power_display.text = str(card_data.values[0])
-		east_power_display.text = str(card_data.values[1])
-		south_power_display.text = str(card_data.values[2])
-		west_power_display.text = str(card_data.values[3])
-		
-		# Handle ability information
-		if card_data.abilities.size() > 0:
-			# Show the first ability (cards typically have one main ability)
-			var ability = card_data.abilities[0]
-			ability_name_display.text = ability.ability_name
-			ability_description_display.text = ability.description
-			ability_name_display.visible = true
-			ability_description_display.visible = true
-		else:
-			# Hide ability labels if no abilities
-			ability_name_display.visible = false
-			ability_description_display.visible = false
-		
-		# Show the panel now that it's populated with real data
-		card_info_panel.visible = true
+	if not card_data:
+		return
+	
+	# Cancel grace period timer if it's running
+	if panel_grace_timer.time_left > 0:
+		panel_grace_timer.stop()
+	
+	# Update panel content
+	update_panel_content(card_data)
+	
+	# Handle fade in based on current state
+	match panel_state:
+		PanelState.HIDDEN, PanelState.FADING_OUT:
+			start_fade_in()
+		PanelState.FADING_IN, PanelState.VISIBLE, PanelState.GRACE_PERIOD:
+			# Panel is already visible or becoming visible, just ensure it's in visible state
+			panel_state = PanelState.VISIBLE
+			# Content is already updated above
 
 func _on_card_unhovered():
-	# Hide the panel when no card is being hovered
-	card_info_panel.visible = false
+	# Start grace period unless we're already fading out or hidden
+	match panel_state:
+		PanelState.VISIBLE, PanelState.FADING_IN:
+			start_grace_period()
+		PanelState.GRACE_PERIOD:
+			# Restart grace period timer
+			start_grace_period()
+		PanelState.FADING_OUT, PanelState.HIDDEN:
+			# Do nothing, already handling or hidden
+			pass
+
+func update_panel_content(card_data: CardResource):
+	"""Update the panel content without affecting visibility"""
+	card_name_display.text = card_data.card_name
+	card_description_display.text = card_data.description
+	
+	# Update power numbers in D-pad layout
+	north_power_display.text = str(card_data.values[0])
+	east_power_display.text = str(card_data.values[1])
+	south_power_display.text = str(card_data.values[2])
+	west_power_display.text = str(card_data.values[3])
+	
+	# Handle ability information
+	if card_data.abilities.size() > 0:
+		var ability = card_data.abilities[0]
+		ability_name_display.text = ability.ability_name
+		ability_description_display.text = ability.description
+		ability_name_display.visible = true
+		ability_description_display.visible = true
+	else:
+		ability_name_display.visible = false
+		ability_description_display.visible = false
+
+func start_fade_in():
+	"""Begin fading the panel in"""
+	# Kill any existing fade tween
+	if panel_fade_tween:
+		panel_fade_tween.kill()
+	
+	panel_state = PanelState.FADING_IN
+	
+	# Create and configure fade in tween
+	panel_fade_tween = create_tween()
+	panel_fade_tween.tween_property(
+		card_info_panel, 
+		"modulate:a", 
+		1.0, 
+		FADE_IN_DURATION
+	).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	
+	# Set state to visible when fade completes
+	panel_fade_tween.tween_callback(func(): panel_state = PanelState.VISIBLE)
+
+func start_grace_period():
+	"""Start the grace period timer"""
+	panel_state = PanelState.GRACE_PERIOD
+	
+	# Start or restart the grace timer
+	panel_grace_timer.start()
+
+func start_fade_out():
+	"""Begin fading the panel out"""
+	# Kill any existing fade tween
+	if panel_fade_tween:
+		panel_fade_tween.kill()
+	
+	panel_state = PanelState.FADING_OUT
+	
+	# Create and configure fade out tween
+	panel_fade_tween = create_tween()
+	panel_fade_tween.tween_property(
+		card_info_panel, 
+		"modulate:a", 
+		0.0, 
+		FADE_OUT_DURATION
+	).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+	
+	# Set state to hidden when fade completes
+	panel_fade_tween.tween_callback(func(): panel_state = PanelState.HIDDEN)
+
+func _on_grace_period_expired():
+	"""Called when the grace period timer expires"""
+	if panel_state == PanelState.GRACE_PERIOD:
+		start_fade_out()
+
+# Optional: Add debug function to monitor panel state
+func get_panel_state_name() -> String:
+	match panel_state:
+		PanelState.HIDDEN: return "HIDDEN"
+		PanelState.FADING_IN: return "FADING_IN"
+		PanelState.VISIBLE: return "VISIBLE"
+		PanelState.GRACE_PERIOD: return "GRACE_PERIOD"
+		PanelState.FADING_OUT: return "FADING_OUT"
+		_: return "UNKNOWN"
+
+
 
 # Start the game sequence
 func start_game():
