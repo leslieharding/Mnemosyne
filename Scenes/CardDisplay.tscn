@@ -97,4 +97,5 @@ layout_mode = 2
 
 [node name="CardNameLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 10
 text = "Card Name"

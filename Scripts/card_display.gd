@@ -4,11 +4,11 @@ class_name CardDisplay
 
 # References to child nodes - FIXED to match actual scene structure
 @onready var panel = $Panel
-@onready var card_name_label = $Panel/MarginContainer/CardNameLabel
-@onready var north_value = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/NorthPower
-@onready var east_value = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/EastPower
-@onready var south_value = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/SouthPower
-@onready var west_value = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/WestPower
+@onready var card_name_label = $Panel/MarginContainer/VBoxContainer/CardNameLabel
+@onready var north_value = $Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer/NorthPower
+@onready var east_value = $Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer/EastPower
+@onready var south_value = $Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer/SouthPower
+@onready var west_value = $Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer/WestPower
 
 signal card_hovered(card_data: CardResource)
 signal card_unhovered()
