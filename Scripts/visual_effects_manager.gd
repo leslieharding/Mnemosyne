@@ -14,6 +14,11 @@ const PASSIVE_PULSE_COLOR: Color = Color("#9966FF")  # Purple for passive abilit
 const PASSIVE_PULSE_MIN_ALPHA: float = 0.2  # Minimum opacity
 const PASSIVE_PULSE_MAX_ALPHA: float = 0.6  # Maximum opacity
 
+# Stat nullify arrow configuration
+const STAT_NULLIFY_DURATION: float = 1.5  # Total effect duration
+const STAT_NULLIFY_COLOR: Color = Color("#CC0000")  # Red color for the arrow
+const ARROW_SIZE: float = 20.0  # Size of the arrow
+
 # Track active passive pulses to avoid duplicates
 var active_passive_pulses: Dictionary = {}  # card_display -> pulse_effect
 
@@ -170,6 +175,64 @@ func get_direction_name(direction: int) -> String:
 		2: return "South"
 		3: return "West"
 		_: return "Unknown"
+
+# Show stat nullify arrow effect
+func show_stat_nullify_arrow(affected_card_display: CardDisplay):
+	if not affected_card_display:
+		print("VisualEffectsManager: No card display provided for stat nullify arrow")
+		return
+	
+	if not affected_card_display.panel:
+		print("VisualEffectsManager: Card display has no panel")
+		return
+	
+	print("VisualEffectsManager: Showing stat nullify arrow on card")
+	
+	# Wait one frame to ensure the card is fully rendered
+	await get_tree().process_frame
+	
+	# Create the arrow label
+	var arrow_label = Label.new()
+	arrow_label.text = "↓"  # Downward arrow unicode
+	arrow_label.add_theme_font_size_override("font_size", int(ARROW_SIZE))
+	arrow_label.add_theme_color_override("font_color", STAT_NULLIFY_COLOR)
+	arrow_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	arrow_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	arrow_label.name = "StatNullifyArrow"
+	
+	# Position in top-right corner of the card
+	var card_size = affected_card_display.panel.size
+	arrow_label.position = Vector2(card_size.x - 25, 5)  # 25px from right edge, 5px from top
+	arrow_label.size = Vector2(20, 20)  # Small square area for the arrow
+	
+	# Start invisible
+	arrow_label.modulate.a = 0.0
+	
+	print("VisualEffectsManager: Creating stat nullify arrow at ", arrow_label.position, " with size ", arrow_label.size)
+	
+	# Add to the card panel
+	affected_card_display.panel.add_child(arrow_label)
+	arrow_label.z_index = 110  # Higher than flash effects
+	
+	# Force an immediate redraw
+	arrow_label.queue_redraw()
+	
+	# Animate the arrow: fade in, hold, fade out
+	var tween = create_tween()
+	
+	# Fade in quickly
+	tween.tween_property(arrow_label, "modulate:a", 1.0, STAT_NULLIFY_DURATION * 0.2)
+	# Hold visible
+	tween.tween_property(arrow_label, "modulate:a", 1.0, STAT_NULLIFY_DURATION * 0.6)
+	# Fade out
+	tween.tween_property(arrow_label, "modulate:a", 0.0, STAT_NULLIFY_DURATION * 0.2)
+	
+	# Clean up when done
+	tween.tween_callback(func(): 
+		print("VisualEffectsManager: Cleaning up stat nullify arrow")
+		if is_instance_valid(arrow_label):
+			arrow_label.queue_free()
+	)
 
 # Start passive ability pulse effect on a card
 func start_passive_pulse(card_display: CardDisplay):

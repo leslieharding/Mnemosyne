@@ -48,6 +48,11 @@ func execute(context: Dictionary) -> bool:
 	if game_manager.has_method("update_card_display"):
 		game_manager.update_card_display(captured_position, captured_card)
 	
+	# VISUAL EFFECT: Show stat nullify arrow
+	var card_display = game_manager.get_card_display_at_position(captured_position)
+	if card_display and game_manager.visual_effects_manager:
+		game_manager.visual_effects_manager.show_stat_nullify_arrow(card_display)
+	
 	return true
 
 func can_execute(context: Dictionary) -> bool:
