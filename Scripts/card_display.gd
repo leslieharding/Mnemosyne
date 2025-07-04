@@ -66,7 +66,6 @@ func setup(card: CardResource):
 	# Check for defensive counter ability and show visual cue
 	setup_defensive_counter_visual_cue()
 
-# New function to handle defensive counter visual cue
 func setup_defensive_counter_visual_cue():
 	# Remove existing overlay if it exists
 	if defensive_counter_overlay:
@@ -85,59 +84,35 @@ func setup_defensive_counter_visual_cue():
 	
 	# Add visual cue if card has defensive counter
 	if has_defensive_counter:
-		create_defensive_counter_overlay()
+		create_defensive_counter_shield()
 
-# Create the grey inner border overlay for defensive counter cards
-func create_defensive_counter_overlay():
-	# Create a container that matches the panel size
-	defensive_counter_overlay = Control.new()
-	defensive_counter_overlay.name = "DefensiveCounterOverlay"
-	defensive_counter_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	defensive_counter_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+# Create the shield icon for defensive counter cards
+func create_defensive_counter_shield():
+	# Create a label for the shield icon
+	var shield_label = Label.new()
+	shield_label.text = "🛡️"  # Shield emoji (same as defense experience icon)
+	shield_label.name = "DefensiveCounterShield"
+	shield_label.add_theme_font_size_override("font_size", 16)
+	shield_label.add_theme_color_override("font_color", Color("#87CEEB"))  # Sky blue like defense exp
+	shield_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	shield_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	shield_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
-	# Create the grey inner border rectangles
-	var border_thickness = 3
-	var border_color = Color("#666666", 0.8)  # Semi-transparent grey
-	
-	# Get panel size for positioning
+	# Get panel size for positioning (same positioning logic as stat nullify arrow)
 	var panel_size = panel.size if panel.size != Vector2.ZERO else panel.custom_minimum_size
 	
-	# Create four border rectangles (inner border, so inset by existing border width)
-	var inset = 4  # Inset from the existing colored border
+	# Position in top-right corner of the card (same as stat nullify arrow)
+	shield_label.position = Vector2(panel_size.x - 25, 5)  # 25px from right edge, 5px from top
+	shield_label.size = Vector2(20, 20)  # Small square area for the shield
 	
-	# Top border
-	var top_border = ColorRect.new()
-	top_border.color = border_color
-	top_border.position = Vector2(inset, inset)
-	top_border.size = Vector2(panel_size.x - (inset * 2), border_thickness)
-	defensive_counter_overlay.add_child(top_border)
+	# Add to the panel with high z-index so it appears on top
+	panel.add_child(shield_label)
+	shield_label.z_index = 10
 	
-	# Bottom border
-	var bottom_border = ColorRect.new()
-	bottom_border.color = border_color
-	bottom_border.position = Vector2(inset, panel_size.y - inset - border_thickness)
-	bottom_border.size = Vector2(panel_size.x - (inset * 2), border_thickness)
-	defensive_counter_overlay.add_child(bottom_border)
+	# Store reference for cleanup
+	defensive_counter_overlay = shield_label
 	
-	# Left border
-	var left_border = ColorRect.new()
-	left_border.color = border_color
-	left_border.position = Vector2(inset, inset)
-	left_border.size = Vector2(border_thickness, panel_size.y - (inset * 2))
-	defensive_counter_overlay.add_child(left_border)
-	
-	# Right border
-	var right_border = ColorRect.new()
-	right_border.color = border_color
-	right_border.position = Vector2(panel_size.x - inset - border_thickness, inset)
-	right_border.size = Vector2(border_thickness, panel_size.y - (inset * 2))
-	defensive_counter_overlay.add_child(right_border)
-	
-	# Add overlay to the panel with high z-index so it appears on top
-	panel.add_child(defensive_counter_overlay)
-	defensive_counter_overlay.z_index = 10
-	
-	print("Added defensive counter visual cue to ", card_data.card_name)
+	print("Added defensive counter shield icon to ", card_data.card_name)
 
 # Selection methods
 func select():
