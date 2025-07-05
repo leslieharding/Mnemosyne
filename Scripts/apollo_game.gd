@@ -45,7 +45,8 @@ var visual_effects_manager: VisualEffectsManager
 # State management to prevent multiple opponent turns
 var opponent_is_thinking: bool = false
 
-# UI References
+# Notification system
+var notification_manager: NotificationManager
 
 # UI References
 @onready var hand_container = $VBoxContainer/HBoxContainer
@@ -105,6 +106,9 @@ func _ready():
 	# Set up card info panel for smooth fading
 	setup_card_info_panel()
 	
+	# Set up notification system
+	setup_notification_manager()
+	
 	# Get the selected deck from Apollo scene
 	var params = get_scene_params()
 	if params.has("deck_index"):
@@ -118,6 +122,13 @@ func _ready():
 	
 	# Start the game
 	start_game()
+
+func setup_notification_manager():
+	if not notification_manager:
+		notification_manager = preload("res://Scenes/NotificationManager.tscn").instantiate()
+		add_child(notification_manager)
+		print("NotificationManager added to apollo_game")
+
 
 # Set up the boss prediction tracker
 func setup_boss_prediction_tracker():
@@ -339,6 +350,9 @@ func _on_coin_flip_result(player_goes_first: bool):
 		# Add this new section:
 		if not is_boss_battle:
 			get_node("/root/BossPredictionTrackerAutoload").start_recording_battle()
+			# Show atmospheric notification
+			if notification_manager:
+				notification_manager.show_notification("You get the feeling you are being watched")
 	else:
 		game_status_label.text = "Opponent won the coin flip! They go first."
 		# Add this new section:
@@ -1384,6 +1398,10 @@ func place_card_on_grid():
 			
 			# Show feedback to player
 			game_status_label.text = "The boss anticipated your move! Your card's power is weakened!"
+			
+			# Show notification
+			if notification_manager:
+				notification_manager.show_notification("I knew you would go there")
 	
 	# Get card level for ability checks
 	var card_level = get_card_level(card_collection_index)
