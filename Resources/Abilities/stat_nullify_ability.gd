@@ -32,6 +32,17 @@ func execute(context: Dictionary) -> bool:
 		print("StatNullifyAbility: No game manager provided")
 		return false
 	
+	# Check if stats are already at minimum (1,1,1,1) - no need to nullify
+	var already_nullified = true
+	for value in captured_card.values:
+		if value > 1:
+			already_nullified = false
+			break
+	
+	if already_nullified:
+		print("StatNullifyAbility: Card stats are already at minimum (1,1,1,1), no nullification needed")
+		return false  # Return false to indicate no effect occurred
+	
 	# Store original values for logging
 	var original_values = captured_card.values.duplicate()
 	
@@ -48,7 +59,7 @@ func execute(context: Dictionary) -> bool:
 	if game_manager.has_method("update_card_display"):
 		game_manager.update_card_display(captured_position, captured_card)
 	
-	# VISUAL EFFECT: Show stat nullify arrow
+	# VISUAL EFFECT: Show stat nullify arrow (only when stats actually changed)
 	var card_display = game_manager.get_card_display_at_position(captured_position)
 	if card_display and game_manager.visual_effects_manager:
 		game_manager.visual_effects_manager.show_stat_nullify_arrow(card_display)
