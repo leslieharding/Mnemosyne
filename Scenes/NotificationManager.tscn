@@ -33,11 +33,9 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 10
 
-[node name="MessageLabel" type="Label" parent="Panel/MarginContainer"]
+[node name="MessageLabel" type="RichTextLabel" parent="Panel/MarginContainer"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.901961, 0.901961, 0.901961, 1)
-theme_override_font_sizes/font_size = 14
+bbcode_enabled = true
 text = "Notification message goes here"
 horizontal_alignment = 1
 vertical_alignment = 1
-autowrap_mode = 3
