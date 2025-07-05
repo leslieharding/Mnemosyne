@@ -16,9 +16,9 @@ var is_showing: bool = false
 var current_tween: Tween
 
 func _ready():
-	# Start hidden off-screen to the right
-	position.x = get_viewport().get_visible_rect().size.x
-	visible = true  # Keep visible but positioned off-screen
+	# Start hidden with zero alpha
+	modulate.a = 0.0
+	visible = true
 
 # Show a notification message
 func show_notification(message: String):

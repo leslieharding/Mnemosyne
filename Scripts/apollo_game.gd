@@ -125,9 +125,22 @@ func _ready():
 
 func setup_notification_manager():
 	if not notification_manager:
+		# Create a CanvasLayer to ensure proper positioning
+		var notification_canvas = CanvasLayer.new()
+		notification_canvas.layer = 99  # High layer to be on top
+		notification_canvas.name = "NotificationCanvas"
+		add_child(notification_canvas)
+		
 		notification_manager = preload("res://Scenes/NotificationManager.tscn").instantiate()
-		add_child(notification_manager)
-		print("NotificationManager added to apollo_game")
+		notification_canvas.add_child(notification_manager)
+		
+		# Position it properly on screen
+		notification_manager.position = Vector2(
+			get_viewport().get_visible_rect().size.x - 320,  # 20px from right edge (300 width + 20)
+			get_viewport().get_visible_rect().size.y / 2 - 40  # Centered vertically
+		)
+		
+		print("NotificationManager created and positioned at: ", notification_manager.position)
 
 
 # Set up the boss prediction tracker
