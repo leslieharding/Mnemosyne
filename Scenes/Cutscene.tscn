@@ -1,0 +1,135 @@
+[gd_scene load_steps=2 format=3 uid="uid://cjckm0orglar0"]
+
+[ext_resource type="Script" uid="uid://h556kvhhwuup" path="res://Scripts/cutscene.gd" id="1_1srds"]
+
+[node name="Cutscene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1srds")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.101961, 0.101961, 0.101961, 1)
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SpeakerArea" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="LeftSpeaker" type="PanelContainer" parent="MainContainer/SpeakerArea"]
+custom_minimum_size = Vector2(300, 400)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MainContainer/SpeakerArea/LeftSpeaker"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/SpeakerArea/LeftSpeaker/MarginContainer"]
+layout_mode = 2
+
+[node name="PortraitArea" type="Control" parent="MainContainer/SpeakerArea/LeftSpeaker/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="MainContainer/SpeakerArea/LeftSpeaker/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Character Name"
+horizontal_alignment = 1
+
+[node name="CenterSpace" type="Control" parent="MainContainer/SpeakerArea"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="RightSpeaker" type="PanelContainer" parent="MainContainer/SpeakerArea"]
+custom_minimum_size = Vector2(300, 400)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MainContainer/SpeakerArea/RightSpeaker"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/SpeakerArea/RightSpeaker/MarginContainer"]
+layout_mode = 2
+
+[node name="PortraitArea" type="Control" parent="MainContainer/SpeakerArea/RightSpeaker/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="MainContainer/SpeakerArea/RightSpeaker/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Character Name"
+horizontal_alignment = 1
+
+[node name="DialogueArea" type="PanelContainer" parent="MainContainer"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MainContainer/DialogueArea"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/DialogueArea/MarginContainer"]
+layout_mode = 2
+
+[node name="SpeakerNameLabel" type="Label" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Speaker Name"
+
+[node name="DialogueText" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "This is where the dialogue would appear, click to continue....."
+fit_content = true
+
+[node name="ContinueIndicator" type="Label" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "click to continue"
+horizontal_alignment = 2
+
+[node name="Controls" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="SkipButton" type="Button" parent="MainContainer/Controls"]
+layout_mode = 2
+text = "Skip"
+
+[node name="Spacer" type="Control" parent="MainContainer/Controls"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AdvanceButton" type="Button" parent="MainContainer/Controls"]
+layout_mode = 2
+text = "Continue"
