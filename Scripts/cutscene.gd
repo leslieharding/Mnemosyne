@@ -1,12 +1,12 @@
 # res://Scripts/cutscene.gd
 extends Control
 
-# UI References
+# UI References - corrected to match actual scene structure
 @onready var background = $Background
 @onready var left_speaker_panel = $MainContainer/SpeakerArea/LeftSpeaker
 @onready var right_speaker_panel = $MainContainer/SpeakerArea/RightSpeaker
-@onready var left_name_label = $MainContainer/SpeakerArea/LeftSpeaker/MarginContainer/VBoxContainer/NameLabel
-@onready var right_name_label = $MainContainer/SpeakerArea/RightSpeaker/MarginContainer/VBoxContainer/NameLabel
+@onready var left_name_label = $MainContainer/SpeakerArea/LeftSpeaker/MarginContainer/VBoxContainer/Label
+@onready var right_name_label = $MainContainer/SpeakerArea/RightSpeaker/MarginContainer/VBoxContainer/Label
 @onready var left_portrait_area = $MainContainer/SpeakerArea/LeftSpeaker/MarginContainer/VBoxContainer/PortraitArea
 @onready var right_portrait_area = $MainContainer/SpeakerArea/RightSpeaker/MarginContainer/VBoxContainer/PortraitArea
 @onready var dialogue_area = $MainContainer/DialogueArea
@@ -34,6 +34,9 @@ func _ready():
 		print("No cutscene data found, returning to previous scene")
 		return_to_previous_scene()
 		return
+	
+	# Wait one frame to ensure all @onready variables are initialized
+	await get_tree().process_frame
 	
 	# Set up the cutscene
 	setup_cutscene()
