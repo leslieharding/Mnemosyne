@@ -26,19 +26,22 @@ func create_sample_cutscenes():
 	var mnemosyne = Character.new("Mnemosyne", Color("#DDA0DD"), null, "left")
 	
 	# Create Apollo character  
+	var chiron = Character.new("Chiron", Color("#FFD700"), null, "right")
+	
+	# Create Apollo character  
 	var apollo = Character.new("Apollo", Color("#FFD700"), null, "right")
 	
 	# NEW: Opening awakening cutscene
 	var opening_lines: Array[DialogueLine] = []
-	opening_lines.append(DialogueLine.new("Mnemosyne", "Darkness... yet not empty. Something stirs within the void."))
-	opening_lines.append(DialogueLine.new("Mnemosyne", "Fragments. Echoes. Memories that are not my own."))
-	opening_lines.append(DialogueLine.new("Apollo", "She awakens at last. The titaness of memory begins to stir."))
-	opening_lines.append(DialogueLine.new("Mnemosyne", "Who... speaks? Your voice carries light I do not understand."))
-	opening_lines.append(DialogueLine.new("Apollo", "I am Apollo, god of prophecy and light. Through divine conflict, you shall remember your purpose."))
-	opening_lines.append(DialogueLine.new("Mnemosyne", "My purpose? I feel... the weight of infinite battles calling to me."))
-	opening_lines.append(DialogueLine.new("Apollo", "Choose your patron, awakening one. Through their power, you shall forge new memories and reclaim what was lost."))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "Wow this sure is the opening cutscene and some sample text"))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "And this is the second line of it."))
+	opening_lines.append(DialogueLine.new("Chiron", "Im the other character in this scene LMAO"))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "Hey thats pretty cool."))
+	opening_lines.append(DialogueLine.new("Chiron", "We really are just reusing the same code"))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "Yeah but its the first time I've got it to work you know"))
+	opening_lines.append(DialogueLine.new("Chiron", "Good for you I guess"))
 	
-	var opening_cutscene = CutsceneData.new("opening_awakening", [mnemosyne, apollo], opening_lines)
+	var opening_cutscene = CutsceneData.new("opening_awakening", [mnemosyne, chiron], opening_lines)
 	cutscenes["opening_awakening"] = opening_cutscene
 	
 	# Sample awakening cutscene (existing)
@@ -49,7 +52,7 @@ func create_sample_cutscenes():
 	awakening_lines.append(DialogueLine.new("Apollo", "They are mine, and those of countless others. You are becoming the keeper of all memory."))
 	awakening_lines.append(DialogueLine.new("Mnemosyne", "The weight of infinite battles... I begin to understand my purpose."))
 	
-	var awakening_cutscene = CutsceneData.new("mnemosyne_awakening", [mnemosyne, apollo], awakening_lines)
+	var awakening_cutscene = CutsceneData.new("mnemosyne_awakening", [mnemosyne, chiron], awakening_lines)
 	cutscenes["mnemosyne_awakening"] = awakening_cutscene
 	
 	# Sample boss encounter cutscene (existing)
@@ -58,7 +61,7 @@ func create_sample_cutscenes():
 	boss_lines.append(DialogueLine.new("Apollo", "The final guardian has been watching, learning your patterns."))
 	boss_lines.append(DialogueLine.new("Mnemosyne", "Then I must transcend prediction itself. Memory is more than pattern."))
 	
-	var boss_cutscene = CutsceneData.new("boss_encounter", [mnemosyne, apollo], boss_lines)
+	var boss_cutscene = CutsceneData.new("boss_encounter", [mnemosyne, chiron], boss_lines)
 	cutscenes["boss_encounter"] = boss_cutscene
 	
 	print("Loaded ", cutscenes.size(), " cutscenes")
