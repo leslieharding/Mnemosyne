@@ -115,6 +115,12 @@ func _on_new_game_confirmed():
 		run_tracker.clear_run()
 		print("Current run data cleared")
 	
+	# Clear memory journal data
+	if has_node("/root/MemoryJournalManagerAutoload"):
+		var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
+		memory_manager.clear_all_memories()
+		print("Memory journal data cleared")
+	
 	# Trigger the opening cutscene instead of going directly to god select
 	if has_node("/root/CutsceneManagerAutoload"):
 		get_node("/root/CutsceneManagerAutoload").play_cutscene("opening_awakening")
