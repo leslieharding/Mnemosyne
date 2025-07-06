@@ -84,7 +84,12 @@ func setup_confirmation_dialog():
 
 # Direct new game for first-time players
 func _on_new_game_button_pressed_direct():
-	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+	# Trigger the opening cutscene for first-time players too
+	if has_node("/root/CutsceneManagerAutoload"):
+		get_node("/root/CutsceneManagerAutoload").play_cutscene("opening_awakening")
+	else:
+		# Fallback if cutscene manager isn't available
+		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 # New game with confirmation for returning players
 func _on_new_game_button_pressed_with_confirmation():
@@ -110,8 +115,15 @@ func _on_new_game_confirmed():
 		run_tracker.clear_run()
 		print("Current run data cleared")
 	
-	# Start fresh game
-	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+	# Trigger the opening cutscene instead of going directly to god select
+	if has_node("/root/CutsceneManagerAutoload"):
+		get_node("/root/CutsceneManagerAutoload").play_cutscene("opening_awakening")
+	else:
+		# Fallback if cutscene manager isn't available
+		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+
+
+
 
 func _on_quit_button_pressed() -> void:
 	get_tree().quit()

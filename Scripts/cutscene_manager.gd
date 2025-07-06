@@ -28,7 +28,20 @@ func create_sample_cutscenes():
 	# Create Apollo character  
 	var apollo = Character.new("Apollo", Color("#FFD700"), null, "right")
 	
-	# Sample awakening cutscene
+	# NEW: Opening awakening cutscene
+	var opening_lines: Array[DialogueLine] = []
+	opening_lines.append(DialogueLine.new("Mnemosyne", "Darkness... yet not empty. Something stirs within the void."))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "Fragments. Echoes. Memories that are not my own."))
+	opening_lines.append(DialogueLine.new("Apollo", "She awakens at last. The titaness of memory begins to stir."))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "Who... speaks? Your voice carries light I do not understand."))
+	opening_lines.append(DialogueLine.new("Apollo", "I am Apollo, god of prophecy and light. Through divine conflict, you shall remember your purpose."))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "My purpose? I feel... the weight of infinite battles calling to me."))
+	opening_lines.append(DialogueLine.new("Apollo", "Choose your patron, awakening one. Through their power, you shall forge new memories and reclaim what was lost."))
+	
+	var opening_cutscene = CutsceneData.new("opening_awakening", [mnemosyne, apollo], opening_lines)
+	cutscenes["opening_awakening"] = opening_cutscene
+	
+	# Sample awakening cutscene (existing)
 	var awakening_lines: Array[DialogueLine] = []
 	awakening_lines.append(DialogueLine.new("Mnemosyne", "I... what is this sensation? Fragments of thought coalescing..."))
 	awakening_lines.append(DialogueLine.new("Apollo", "Ah, the titaness stirs. Your awareness grows with each battle witnessed."))
@@ -39,7 +52,7 @@ func create_sample_cutscenes():
 	var awakening_cutscene = CutsceneData.new("mnemosyne_awakening", [mnemosyne, apollo], awakening_lines)
 	cutscenes["mnemosyne_awakening"] = awakening_cutscene
 	
-	# Sample boss encounter cutscene
+	# Sample boss encounter cutscene (existing)
 	var boss_lines: Array[DialogueLine] = []
 	boss_lines.append(DialogueLine.new("Mnemosyne", "This presence... it knows my thoughts before I think them."))
 	boss_lines.append(DialogueLine.new("Apollo", "The final guardian has been watching, learning your patterns."))
@@ -77,8 +90,14 @@ func play_cutscene(cutscene_id: String):
 	# Switch to cutscene scene
 	get_tree().change_scene_to_file("res://Scenes/Cutscene.tscn")
 
-# Return to the previous scene
 func return_to_previous_scene():
+	# Special handling for opening cutscene - always go to god select
+	var last_played = viewed_cutscenes[-1] if viewed_cutscenes.size() > 0 else ""
+	if last_played == "opening_awakening":
+		print("Completed opening cutscene, going to god select")
+		get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+		return
+	
 	if return_scene_path != "":
 		# Restore scene parameters if they existed
 		if not return_scene_params.is_empty():

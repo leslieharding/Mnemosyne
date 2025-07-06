@@ -21,6 +21,7 @@ RunExperienceTrackerAutoload="*res://Scripts/run_experience_tracker.gd"
 GlobalProgressTrackerAutoload="*res://Scripts/global_progress_tracker.gd"
 MemoryJournalManagerAutoload="*res://Scripts/memory_journal_manager.gd"
 BossPredictionTrackerAutoload="*res://Scripts/boss_prediction_tracker.gd"
+CutsceneManagerAutoload="*res://Scripts/cutscene_manager.gd"
 
 [input]
 
