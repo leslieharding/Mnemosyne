@@ -28,19 +28,30 @@ func load_enemies_collection():
 
 # Set up opponent with specific enemy and difficulty
 func setup_opponent(enemy_name: String, difficulty: int = 0):
+	print("OpponentManager: Setting up opponent: ", enemy_name, " with difficulty ", difficulty)
+	
 	if not enemies_collection:
 		load_enemies_collection()
 		if not enemies_collection:
+			print("OpponentManager: Failed to load enemies collection")
 			setup_fallback_opponent()
 			return
 	
+	print("OpponentManager: Enemies collection loaded, available enemies: ", enemies_collection.get_enemy_names())
+	
 	# Get the enemy deck
 	opponent_deck = enemies_collection.get_enemy_deck(enemy_name, difficulty)
+	
+	print("OpponentManager: Got deck with ", opponent_deck.size(), " cards")
 	
 	if opponent_deck.is_empty():
 		print("Warning: No deck found for enemy '", enemy_name, "' with difficulty ", difficulty)
 		setup_fallback_opponent()
 		return
+	
+	# Debug: Print all cards in the deck
+	for i in range(opponent_deck.size()):
+		print("OpponentManager: Deck card ", i, ": ", opponent_deck[i].card_name if opponent_deck[i] else "NULL")
 	
 	# Get enemy info for display
 	var enemy_info = enemies_collection.get_enemy_info(enemy_name, difficulty)
@@ -51,8 +62,7 @@ func setup_opponent(enemy_name: String, difficulty: int = 0):
 		opponent_name = enemy_name
 		opponent_description = "A mysterious opponent"
 	
-	print("Opponent loaded: ", opponent_name, " with ", opponent_deck.size(), " cards")
-	print("Deck: ", opponent_description)
+	print("OpponentManager: Opponent loaded: ", opponent_name, " with ", opponent_deck.size(), " cards")
 
 # Fallback to Apollo deck if enemy system fails
 func setup_fallback_opponent():
