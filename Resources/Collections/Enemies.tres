@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=78 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=84 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -565,6 +565,54 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_vawst"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_8p8y8")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_wi1xk"]
+script = ExtResource("2_xcqsp")
+card_name = "Rhea"
+values = Array[int]([6, 6, 6, 6])
+description = ""
+abilities = Array[ExtResource("3_lm3ty")]([])
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_fxeb3"]
+script = ExtResource("2_xcqsp")
+card_name = "Hyperion"
+values = Array[int]([7, 7, 6, 6])
+description = ""
+abilities = Array[ExtResource("3_lm3ty")]([])
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_sfnpw"]
+script = ExtResource("2_xcqsp")
+card_name = "Atlas"
+values = Array[int]([8, 7, 8, 7])
+description = ""
+abilities = Array[ExtResource("3_lm3ty")]([])
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_68lbv"]
+script = ExtResource("2_xcqsp")
+card_name = "Oceanus"
+values = Array[int]([7, 6, 6, 7])
+description = ""
+abilities = Array[ExtResource("3_lm3ty")]([])
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_8eb4r"]
+script = ExtResource("2_xcqsp")
+card_name = "Tethys"
+values = Array[int]([5, 6, 5, 6])
+description = ""
+abilities = Array[ExtResource("3_lm3ty")]([])
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_25nh6"]
+script = ExtResource("1_e7ref")
+enemy_name = "Chronos"
+enemy_description = "Have you got the time to hang out?"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_wi1xk"), SubResource("Resource_fxeb3"), SubResource("Resource_sfnpw"), SubResource("Resource_68lbv"), SubResource("Resource_8eb4r")])
+decks = Array[ExtResource("3_601pn")]([])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
 [resource]
 script = ExtResource("4_a5nvj")
-enemies = Array[ExtResource("1_e7ref")]([SubResource("Resource_efy6x"), SubResource("Resource_y0w8m"), SubResource("Resource_bdmj8"), SubResource("Resource_i1x7r")])
+enemies = Array[ExtResource("1_e7ref")]([SubResource("Resource_efy6x"), SubResource("Resource_y0w8m"), SubResource("Resource_bdmj8"), SubResource("Resource_i1x7r"), SubResource("Resource_25nh6")])

@@ -84,9 +84,9 @@ func setup_confirmation_dialog():
 
 # Direct new game for first-time players
 func _on_new_game_button_pressed_direct():
-	# Trigger the opening cutscene for first-time players too
+	# Trigger the tutorial sequence for first-time players
 	if has_node("/root/CutsceneManagerAutoload"):
-		get_node("/root/CutsceneManagerAutoload").play_cutscene("opening_awakening")
+		get_node("/root/CutsceneManagerAutoload").play_cutscene("tutorial_intro")
 	else:
 		# Fallback if cutscene manager isn't available
 		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")

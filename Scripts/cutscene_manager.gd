@@ -25,11 +25,28 @@ func create_sample_cutscenes():
 	# Create Mnemosyne character
 	var mnemosyne = Character.new("Mnemosyne", Color("#DDA0DD"), null, "left")
 	
-	# Create Apollo character  
+	# Create Chrion character  
 	var chiron = Character.new("Chiron", Color("#FFD700"), null, "right")
 	
 	# Create Apollo character  
 	var apollo = Character.new("Apollo", Color("#FFD700"), null, "right")
+	
+	# Create Chronos character  
+	var chronos = Character.new("Chronos", Color("#8B4513"), null, "right")
+	
+	
+	# Tutorial introduction cutscene
+	var tutorial_lines: Array[DialogueLine] = []
+	tutorial_lines.append(DialogueLine.new("Chronos", "This is intro dialogue"))
+	tutorial_lines.append(DialogueLine.new("Mnemosyne", "It sure is"))
+	tutorial_lines.append(DialogueLine.new("Chronos", "well shall we have the tutorial fight or what?"))
+	tutorial_lines.append(DialogueLine.new("Mnemosyne", "Yeah I guess so"))
+	tutorial_lines.append(DialogueLine.new("Chronos", "Alright have at you!"))
+	
+
+	var tutorial_cutscene = CutsceneData.new("tutorial_intro", [mnemosyne, chronos], tutorial_lines)
+	cutscenes["tutorial_intro"] = tutorial_cutscene
+	
 	
 	# NEW: Opening awakening cutscene
 	var opening_lines: Array[DialogueLine] = []
@@ -94,10 +111,21 @@ func play_cutscene(cutscene_id: String):
 	get_tree().change_scene_to_file("res://Scenes/Cutscene.tscn")
 
 func return_to_previous_scene():
-	# Special handling for opening cutscene - always go to god select
+	# Special handling for tutorial flow
 	var last_played = viewed_cutscenes[-1] if viewed_cutscenes.size() > 0 else ""
-	if last_played == "opening_awakening":
-		print("Completed opening cutscene, going to god select")
+	
+	if last_played == "tutorial_intro":
+		print("Completed tutorial intro cutscene, starting tutorial battle")
+		# Set up tutorial battle parameters
+		get_tree().set_meta("scene_params", {
+			"is_tutorial": true,
+			"god": "Mnemosyne",
+			"opponent": "Chronos"
+		})
+		get_tree().change_scene_to_file("res://Scenes/ApolloGame.tscn")
+		return
+	elif last_played == "opening_awakening":
+		print("Completed post-tutorial cutscene, going to god select")
 		get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
 		return
 	

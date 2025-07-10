@@ -87,6 +87,16 @@ const FADE_IN_DURATION: float = 0.2
 const FADE_OUT_DURATION: float = 0.4
 const GRACE_PERIOD_DURATION: float = 0.7
 
+
+# Tutorial mode variables
+var is_tutorial_mode: bool = false
+var tutorial_god: String = ""
+var tutorial_step: int = 0
+var tutorial_overlay: Control
+var tutorial_modal: AcceptDialog
+
+
+
 func _ready():
 	# Initialize game managers
 	setup_managers()
@@ -100,9 +110,6 @@ func _ready():
 	# Create styles for grid selection
 	create_grid_styles()
 	
-	# Add journal button
-	setup_journal_button()
-	
 	# Set up card info panel for smooth fading
 	setup_card_info_panel()
 	
@@ -111,6 +118,18 @@ func _ready():
 	
 	# Get the selected deck from Apollo scene
 	var params = get_scene_params()
+	
+	# Check for tutorial mode
+	is_tutorial_mode = params.get("is_tutorial", false)
+	tutorial_god = params.get("god", "Apollo") if is_tutorial_mode else "Apollo"
+	
+	if is_tutorial_mode:
+		print("Starting tutorial mode with god: ", tutorial_god, " vs opponent: ", params.get("opponent", "Chronos"))
+		setup_tutorial_ui()
+	
+	# Add journal button (unless tutorial mode)
+	setup_journal_button()
+	
 	if params.has("deck_index"):
 		selected_deck_index = params.deck_index
 		load_player_deck(selected_deck_index)
@@ -122,6 +141,30 @@ func _ready():
 	
 	# Start the game
 	start_game()
+
+
+func setup_tutorial_ui():
+	# Create tutorial overlay container
+	var tutorial_canvas = CanvasLayer.new()
+	tutorial_canvas.layer = 200  # Very high layer to be on top of everything
+	tutorial_canvas.name = "TutorialCanvas"
+	add_child(tutorial_canvas)
+	
+	tutorial_overlay = Control.new()
+	tutorial_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	tutorial_overlay.name = "TutorialOverlay"
+	tutorial_canvas.add_child(tutorial_overlay)
+	
+	# Create modal dialog for tutorial messages
+	tutorial_modal = AcceptDialog.new()
+	tutorial_modal.title = "Tutorial"
+	tutorial_modal.size = Vector2(400, 200)
+	tutorial_modal.position = Vector2(400, 200)
+	tutorial_modal.ok_button_text = "Continue"
+	tutorial_overlay.add_child(tutorial_modal)
+	
+	print("Tutorial UI setup complete")
+
 
 func setup_notification_manager():
 	if not notification_manager:
@@ -170,6 +213,12 @@ func setup_card_info_panel():
 		print("Card info panel fade system initialized")
 
 func setup_journal_button():
+	
+	if is_tutorial_mode:
+		# Don't show journal button in tutorial
+		print("Tutorial mode: Skipping journal button setup")
+		return
+	
 	if not journal_button:
 		# Create a CanvasLayer to ensure it's always on top, especially for Node2D scenes
 		var canvas_layer = CanvasLayer.new()
@@ -218,18 +267,27 @@ func setup_managers():
 func setup_opponent_from_params():
 	var params = get_scene_params()
 	
-	# Check if we have current node data (enemy info)
-	if params.has("current_node"):
-		var current_node = params["current_node"]
-		var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
-		var enemy_difficulty = current_node.enemy_difficulty
-		
-		print("Setting up opponent: ", enemy_name, " (difficulty ", enemy_difficulty, ")")
-		opponent_manager.setup_opponent(enemy_name, enemy_difficulty)
+	if is_tutorial_mode:
+		# Tutorial mode - use specified opponent
+		var opponent_name = params.get("opponent", "Chronos")
+		print("Setting up tutorial opponent: ", opponent_name)
+		opponent_manager.setup_opponent(opponent_name, 0)  # Difficulty 0 for tutorial
 	else:
-		# Fallback for testing or if no node data available
-		print("No enemy data found, using default Shadow Acolyte")
-		opponent_manager.setup_opponent("Shadow Acolyte", 0)
+			# Check if we have current node data (enemy info)
+		if params.has("current_node"):
+			var current_node = params["current_node"]
+			var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
+			var enemy_difficulty = current_node.enemy_difficulty
+			
+			print("Setting up opponent: ", enemy_name, " (difficulty ", enemy_difficulty, ")")
+			opponent_manager.setup_opponent(enemy_name, enemy_difficulty)
+		else:
+			# Fallback for testing or if no node data available
+			print("No enemy data found, using default Shadow Acolyte")
+			opponent_manager.setup_opponent("Shadow Acolyte", 0)
+	
+	
+	
 
 
 func _on_card_hovered(card_data: CardResource):
@@ -350,11 +408,59 @@ func get_panel_state_name() -> String:
 
 
 
-# Start the game sequence
 func start_game():
-	game_status_label.text = "Flipping coin to determine who goes first..."
-	disable_player_input()
-	turn_manager.start_game()
+	if is_tutorial_mode:
+		game_status_label.text = "Tutorial: Learning the Basics"
+		# Skip coin flip in tutorial - let player go first
+		turn_manager.current_player = TurnManager.Player.HUMAN
+		print("Tutorial started - player goes first")
+		_on_game_started()
+		show_tutorial_step(0)  # Start tutorial
+	else:
+		game_status_label.text = "Flipping coin to determine who goes first..."
+		disable_player_input()
+		turn_manager.start_game()
+
+
+func show_tutorial_step(step: int):
+	tutorial_step = step
+	var message = ""
+	
+	match step:
+		0:
+			message = "Welcome to the world of card battles! This is your hand of cards at the bottom. Each card has numbers on four sides representing its power in each direction."
+		1:
+			message = "Click on a card in your hand to select it. Try clicking on any card now."
+		2:
+			message = "Great! Now you'll see a grid in the center. Click on any empty space to place your card there."
+		3:
+			message = "Excellent! When cards are placed next to each other, they battle. The higher number wins and captures the opponent's card. Continue playing cards to learn more."
+		4:
+			message = "Cards battle using the sides that face each other. A card with 3 pointing North will battle a card with 2 pointing South - the 3 wins!"
+		5:
+			message = "Continue placing your remaining cards. Don't worry about losing - this is about learning the rules."
+		_:
+			return  # No more tutorial steps
+	
+	tutorial_modal.dialog_text = message
+	tutorial_modal.popup_centered()
+	
+	if step <= 1:
+		# Pause input until they acknowledge the tutorial
+		disable_player_input()
+		tutorial_modal.confirmed.connect(_on_tutorial_continue.bind(step), CONNECT_ONE_SHOT)
+
+func _on_tutorial_continue(step: int):
+	match step:
+		0:
+			enable_player_input()
+			show_tutorial_step(1)
+		1:
+			# They need to select a card before we continue
+			pass
+		_:
+			pass
+
 
 # Handle coin flip result
 func _on_coin_flip_result(player_goes_first: bool):
@@ -1175,31 +1281,45 @@ func setup_empty_board():
 		# Apply default style
 		slot.add_theme_stylebox_override("panel", default_grid_style)
 
-# Load player's selected deck
-# Load player's selected deck
 func load_player_deck(deck_index: int):
-	# Load Apollo collection
-	var apollo_collection: GodCardCollection = load("res://Resources/Collections/Apollo.tres")
-	if apollo_collection:
+	var collection_path: String
+	var collection: GodCardCollection
+	
+	if is_tutorial_mode:
+		# Load tutorial collections
+		if tutorial_god == "Mnemosyne":
+			collection_path = "res://Resources/Collections/Mnemosyne.tres"
+		else:
+			collection_path = "res://Resources/Collections/Apollo.tres"  # Fallback
+	else:
+		# Normal mode - load Apollo collection
+		collection_path = "res://Resources/Collections/Apollo.tres"
+	
+	collection = load(collection_path)
+	if collection:
 		# Get the deck definition
-		var deck_def = apollo_collection.decks[deck_index]
+		var deck_def = collection.decks[deck_index]
 		
 		# Store the original indices
 		deck_card_indices = deck_def.card_indices.duplicate()
 		
 		# Get the deck based on index
-		player_deck = apollo_collection.get_deck(deck_index)
+		player_deck = collection.get_deck(deck_index)
 		
-		# The experience tracker should already be initialized from the god selection screen
-		print("Loading deck for battle - experience tracker should already be initialized")
-		
-		# Set up experience panel
-		setup_experience_panel()
+		if is_tutorial_mode:
+			print("Loaded tutorial deck for ", tutorial_god, " with ", player_deck.size(), " cards")
+			# Don't set up experience panel in tutorial mode
+		else:
+			# The experience tracker should already be initialized from the god selection screen
+			print("Loading deck for battle - experience tracker should already be initialized")
+			
+			# Set up experience panel
+			setup_experience_panel()
 		
 		# Display cards in hand
 		display_player_hand()
 	else:
-		push_error("Failed to load Apollo collection!")
+		push_error("Failed to load collection: " + collection_path)
 
 # Add new function to set up experience panel
 func setup_experience_panel():

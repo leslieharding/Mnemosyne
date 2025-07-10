@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=10 format=3 uid="uid://ba4obktkm1t7a"]
+
+[ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_lnd8j"]
+[ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_fw0bv"]
+[ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="3_njtec"]
+[ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="4_04wac"]
+
+[sub_resource type="Resource" id="Resource_0cb82"]
+script = ExtResource("1_lnd8j")
+card_name = "Clio"
+values = Array[int]([1, 1, 1, 1])
+description = "Is there ever anything more ignorable than a lesson from history?"
+abilities = Array[ExtResource("2_fw0bv")]([])
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_qjfog"]
+script = ExtResource("1_lnd8j")
+card_name = "Euterpe"
+values = Array[int]([1, 1, 1, 1])
+description = "Witty music related comment goes here"
+abilities = Array[ExtResource("2_fw0bv")]([])
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_vcysh"]
+script = ExtResource("1_lnd8j")
+card_name = "Terpsichore"
+values = Array[int]([1, 1, 1, 1])
+description = "Witty dance related comment goes here"
+abilities = Array[ExtResource("2_fw0bv")]([])
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_0lbui"]
+script = ExtResource("1_lnd8j")
+card_name = "Thalia"
+values = Array[int]([1, 1, 1, 1])
+description = "witty joke goes here"
+abilities = Array[ExtResource("2_fw0bv")]([])
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_tn1am"]
+script = ExtResource("1_lnd8j")
+card_name = "Melpomene"
+values = Array[int]([1, 1, 1, 1])
+description = "Witty tradgey/drama comment goes here"
+abilities = Array[ExtResource("2_fw0bv")]([])
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[resource]
+script = ExtResource("4_04wac")
+god_name = "Mnemosyne"
+cards = Array[ExtResource("1_lnd8j")]([SubResource("Resource_0cb82"), SubResource("Resource_qjfog"), SubResource("Resource_vcysh"), SubResource("Resource_0lbui"), SubResource("Resource_tn1am")])
+decks = Array[ExtResource("3_njtec")]([])
