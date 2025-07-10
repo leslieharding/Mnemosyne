@@ -958,6 +958,19 @@ func should_game_end() -> bool:
 
 func end_game():
 	
+	# Tutorial ending - different flow
+	if is_tutorial_mode:
+		game_status_label.text = "Tutorial Complete!"
+		disable_player_input()
+		opponent_is_thinking = false
+		turn_manager.end_game()
+		
+		# Show tutorial completion message
+		tutorial_modal.dialog_text = "Lesson learned! Through defeat comes wisdom. You now understand the basic rules of card combat. Your real journey begins now..."
+		tutorial_modal.popup_centered()
+		tutorial_modal.confirmed.connect(_on_tutorial_finished, CONNECT_ONE_SHOT)
+		return
+	
 	var tracker = get_node("/root/BossPredictionTrackerAutoload")
 	if tracker:
 		tracker.stop_recording()
@@ -1017,6 +1030,20 @@ func end_game():
 	
 	# Return to map with updated progress
 	show_reward_screen()
+
+func _on_tutorial_finished():
+	print("Tutorial battle completed, transitioning to post-battle cutscene")
+	
+	# Trigger the post-battle cutscene (which is the existing "opening_awakening")
+	if has_node("/root/CutsceneManagerAutoload"):
+		get_node("/root/CutsceneManagerAutoload").play_cutscene("opening_awakening")
+	else:
+		# Fallback if cutscene manager isn't available
+		get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+
+
+
+
 # Return to the map after completing an encounter
 func return_to_map():
 	# Get the current map data and node info
@@ -1430,6 +1457,10 @@ func _on_card_gui_input(event, card_display, card_index):
 			selected_card_index = card_index
 			print("Selected card: ", player_deck[card_index].card_name)
 			
+			# Tutorial advancement - they selected a card
+			if is_tutorial_mode and tutorial_step == 1:
+				show_tutorial_step(2)
+			
 			# Initialize grid selection if not already set
 			if current_grid_index == -1:
 				# Find the first unoccupied grid slot
@@ -1627,6 +1658,24 @@ func place_card_on_grid():
 
 	# Switch turns
 	turn_manager.next_turn()
+
+	# Add tutorial advancement at the very end
+	if is_tutorial_mode:
+		match tutorial_step:
+			1:
+				# They selected a card, now show grid selection tutorial
+				show_tutorial_step(2)
+			2:
+				# They placed their first card
+				show_tutorial_step(3)
+			3:
+				# After a few cards, explain combat
+				if player_deck.size() <= 3:  # When they have 2 cards left
+					show_tutorial_step(4)
+			4:
+				# Continue with general advice
+				if player_deck.size() <= 2:  # When they have 1 card left
+					show_tutorial_step(5)
 
 
 # Handle passive abilities when a card is placed
