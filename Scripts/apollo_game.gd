@@ -263,7 +263,6 @@ func setup_managers():
 
 
 # Set up opponent based on parameters from map
-# Set up opponent based on parameters from map
 func setup_opponent_from_params():
 	var params = get_scene_params()
 	
@@ -271,9 +270,14 @@ func setup_opponent_from_params():
 		# Tutorial mode - use specified opponent
 		var opponent_name = params.get("opponent", "Chronos")
 		print("Setting up tutorial opponent: ", opponent_name)
-		opponent_manager.setup_opponent(opponent_name, 0)  # Difficulty 0 for tutorial
+		
+		# For tutorial, we'll manually set up Chronos since it might not be in the enemies collection properly
+		if opponent_name == "Chronos":
+			setup_chronos_opponent()
+		else:
+			opponent_manager.setup_opponent(opponent_name, 0)  # Difficulty 0 for tutorial
 	else:
-			# Check if we have current node data (enemy info)
+		# Check if we have current node data (enemy info)
 		if params.has("current_node"):
 			var current_node = params["current_node"]
 			var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
@@ -287,7 +291,37 @@ func setup_opponent_from_params():
 			opponent_manager.setup_opponent("Shadow Acolyte", 0)
 	
 	
+func setup_chronos_opponent():
+	print("Setting up Chronos as tutorial opponent")
 	
+	# Try to get Chronos from the enemies collection first
+	var enemies_collection: EnemiesCollection = load("res://Resources/Collections/Enemies.tres")
+	if enemies_collection:
+		var chronos_enemy = enemies_collection.get_enemy("Chronos")
+		if chronos_enemy and chronos_enemy.cards.size() > 0:
+			print("Found Chronos in enemies collection with ", chronos_enemy.cards.size(), " cards")
+			opponent_manager.setup_opponent("Chronos", 0)
+			return
+	
+	# Fallback: manually create a Chronos deck from the enemies collection or use a substitute
+	print("Chronos not found in enemies collection, creating fallback deck")
+	
+	# For tutorial purposes, we can use some cards from the enemies collection or create a simple deck
+	if enemies_collection and enemies_collection.enemies.size() > 0:
+		# Use the first available enemy as a substitute
+		var substitute_enemy = enemies_collection.enemies[0]
+		print("Using ", substitute_enemy.enemy_name, " as Chronos substitute")
+		opponent_manager.opponent_deck = substitute_enemy.cards.slice(0, 5)  # Take first 5 cards
+		opponent_manager.opponent_name = "Chronos (Tutorial)"
+		opponent_manager.opponent_description = "The Titan of Time teaches you the ways of battle"
+	else:
+		# Last resort: use Apollo cards as opponent
+		print("No enemies available, using Apollo cards as Chronos substitute")
+		var apollo_collection: GodCardCollection = load("res://Resources/Collections/Apollo.tres")
+		if apollo_collection:
+			opponent_manager.opponent_deck = apollo_collection.get_deck(0)
+			opponent_manager.opponent_name = "Chronos (Tutorial)"
+			opponent_manager.opponent_description = "The Titan of Time teaches you the ways of battle"
 
 
 func _on_card_hovered(card_data: CardResource):
@@ -1316,6 +1350,21 @@ func load_player_deck(deck_index: int):
 		# Load tutorial collections
 		if tutorial_god == "Mnemosyne":
 			collection_path = "res://Resources/Collections/Mnemosyne.tres"
+			collection = load(collection_path)
+			if collection:
+				# Mnemosyne doesn't have deck definitions, so use all available cards
+				player_deck = collection.cards.duplicate()  # Use all 5 cards
+				
+				# Create deck indices for the cards we're using
+				deck_card_indices = []
+				for i in range(player_deck.size()):
+					deck_card_indices.append(i)
+				
+				print("Loaded tutorial deck for Mnemosyne with ", player_deck.size(), " cards")
+				
+				# Display cards in hand
+				display_player_hand()
+				return
 		else:
 			collection_path = "res://Resources/Collections/Apollo.tres"  # Fallback
 	else:
@@ -1350,6 +1399,11 @@ func load_player_deck(deck_index: int):
 
 # Add new function to set up experience panel
 func setup_experience_panel():
+	# Don't create experience panel in tutorial mode
+	if is_tutorial_mode:
+		print("Tutorial mode: Skipping experience panel setup")
+		return
+		
 	# Create and add the experience panel
 	exp_panel = preload("res://Scenes/ExpPanel.tscn").instantiate()
 	
