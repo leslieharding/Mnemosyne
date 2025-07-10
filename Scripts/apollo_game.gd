@@ -1362,7 +1362,7 @@ func load_player_deck(deck_index: int):
 				
 				print("Loaded tutorial deck for Mnemosyne with ", player_deck.size(), " cards")
 				
-				# Display cards in hand
+				# IMPORTANT: Display cards in hand for tutorial
 				display_player_hand()
 				return
 		else:
