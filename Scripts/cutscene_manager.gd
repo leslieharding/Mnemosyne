@@ -122,7 +122,7 @@ func return_to_previous_scene():
 			"god": "Mnemosyne",
 			"opponent": "Chronos"
 		})
-		get_tree().change_scene_to_file("res://Scenes/ApolloGame.tscn")
+		get_tree().change_scene_to_file("res://Scenes/CardBattle.tscn")
 		return
 	elif last_played == "opening_awakening":
 		print("Completed post-tutorial cutscene, going to god select")

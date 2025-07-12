@@ -1,4 +1,4 @@
-# res://Scripts/apollo_game.gd
+# res://Scripts/card_battle_manager.gd
 extends Node2D
 
 # Player's deck (received from deck selection)
@@ -15,13 +15,15 @@ var grid_ownership: Array = []  # Track who owns each card (can change via comba
 var grid_card_data: Array = []  # Track the actual card data for each slot
 
 # Experience tracking
-var deck_card_indices: Array[int] = []  # Original indices in Apollo's collection
+var deck_card_indices: Array[int] = []  # Original indices in god's collection
 var exp_panel: ExpPanel  # Reference to experience panel
 var grid_to_collection_index: Dictionary = {}  # grid_index -> collection_index
 
 # Journal button reference  
 var journal_button: JournalButton
 
+# Current god and game state
+var current_god: String = "Apollo"  # Default fallback
 
 # Player types for ownership tracking
 enum Owner {
@@ -87,7 +89,6 @@ const FADE_IN_DURATION: float = 0.2
 const FADE_OUT_DURATION: float = 0.4
 const GRACE_PERIOD_DURATION: float = 0.7
 
-
 # Tutorial mode variables
 var is_tutorial_mode: bool = false
 var tutorial_god: String = ""
@@ -95,9 +96,15 @@ var tutorial_step: int = 0
 var tutorial_overlay: Control
 var tutorial_modal: AcceptDialog
 
-
-
 func _ready():
+	# Get the current god from scene parameters first
+	var params = get_scene_params()
+	current_god = params.get("god", "Apollo")
+	is_tutorial_mode = params.get("is_tutorial", false)
+	tutorial_god = params.get("god", "Apollo") if is_tutorial_mode else current_god
+	
+	print("Battle scene starting with god: ", current_god, " (tutorial mode: ", is_tutorial_mode, ")")
+	
 	# Initialize game managers
 	setup_managers()
 	
@@ -115,13 +122,6 @@ func _ready():
 	
 	# Set up notification system
 	setup_notification_manager()
-	
-	# Get the selected deck from Apollo scene
-	var params = get_scene_params()
-	
-	# Check for tutorial mode
-	is_tutorial_mode = params.get("is_tutorial", false)
-	tutorial_god = params.get("god", "Apollo") if is_tutorial_mode else "Apollo"
 	
 	if is_tutorial_mode:
 		print("Starting tutorial mode with god: ", tutorial_god, " vs opponent: ", params.get("opponent", "Chronos"))
@@ -141,7 +141,6 @@ func _ready():
 	
 	# Start the game
 	start_game()
-
 
 func setup_tutorial_ui():
 	# Create tutorial overlay container
@@ -165,7 +164,6 @@ func setup_tutorial_ui():
 	
 	print("Tutorial UI setup complete")
 
-
 func setup_notification_manager():
 	if not notification_manager:
 		# Create a CanvasLayer to ensure proper positioning
@@ -184,7 +182,6 @@ func setup_notification_manager():
 		)
 		
 		print("NotificationManager created and positioned at: ", notification_manager.position)
-
 
 # Set up the boss prediction tracker
 func setup_boss_prediction_tracker():
@@ -213,7 +210,6 @@ func setup_card_info_panel():
 		print("Card info panel fade system initialized")
 
 func setup_journal_button():
-	
 	if is_tutorial_mode:
 		# Don't show journal button in tutorial
 		print("Tutorial mode: Skipping journal button setup")
@@ -233,8 +229,7 @@ func setup_journal_button():
 		journal_button.position = Vector2(20, get_viewport().get_visible_rect().size.y - 80)
 		journal_button.size = Vector2(60, 60)
 		
-		print("Apollo Game: Journal button added with CanvasLayer")
-
+		print("Battle Scene: Journal button added with CanvasLayer")
 
 # Set up the game managers
 func setup_managers():
@@ -260,7 +255,6 @@ func setup_managers():
 	
 	# Set up opponent based on map node data
 	setup_opponent_from_params()
-
 
 # Set up opponent based on parameters from map
 func setup_opponent_from_params():
@@ -293,8 +287,7 @@ func setup_opponent_from_params():
 		else:
 			print("No enemy data found, using default Shadow Acolyte")
 			opponent_manager.setup_opponent("Shadow Acolyte", 0)
-	
-	
+
 func setup_chronos_opponent():
 	print("Setting up Chronos as tutorial opponent")
 	
@@ -333,7 +326,6 @@ func setup_chronos_opponent():
 			print("Using fallback deck with ", fallback_deck.size(), " cards")
 		else:
 			print("ERROR: Even fallback enemy has no cards!")
-
 
 func _on_card_hovered(card_data: CardResource):
 	if not card_data:
@@ -451,8 +443,6 @@ func get_panel_state_name() -> String:
 		PanelState.FADING_OUT: return "FADING_OUT"
 		_: return "UNKNOWN"
 
-
-
 func start_game():
 	if is_tutorial_mode:
 		game_status_label.text = "Tutorial: Learning the Basics"
@@ -465,7 +455,6 @@ func start_game():
 		game_status_label.text = "Flipping coin to determine who goes first..."
 		disable_player_input()
 		turn_manager.start_game()
-
 
 func show_tutorial_step(step: int):
 	tutorial_step = step
@@ -505,7 +494,6 @@ func _on_tutorial_continue(step: int):
 			pass
 		_:
 			pass
-
 
 # Handle coin flip result
 func _on_coin_flip_result(player_goes_first: bool):
@@ -611,8 +599,6 @@ func make_boss_prediction():
 	
 	print("Boss prediction for turn ", current_turn, ": Card ", current_boss_prediction.get("card", -1), " at position ", current_boss_prediction.get("position", -1))
 
-
-
 # Calculate and return current scores (Triple Triad style)
 func get_current_scores() -> Dictionary:
 	# Count cards owned on the board
@@ -690,15 +676,13 @@ func opponent_take_turn():
 	# Let opponent make their move
 	opponent_manager.take_turn(available_slots)
 
-# Add this helper method to apollo_game.gd to set card ownership
+# Add this helper method to set card ownership
 func set_card_ownership(grid_index: int, new_owner: Owner):
 	if grid_index >= 0 and grid_index < grid_ownership.size():
 		grid_ownership[grid_index] = new_owner
 		print("Card at slot ", grid_index, " ownership changed to ", "Player" if new_owner == Owner.PLAYER else "Opponent")
 
-# This replaces the existing resolve_combat function in apollo_game.gd (around lines 210-280)
-# This replaces the existing resolve_combat function in apollo_game.gd (around lines 210-280)
-
+# This replaces the existing resolve_combat function
 func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource):
 	print("Resolving combat for card at slot ", grid_index)
 	
@@ -1008,7 +992,6 @@ func should_game_end() -> bool:
 	return available_slots == 0 or (player_deck.is_empty() and not opponent_manager.has_cards())
 
 func end_game():
-	
 	# Tutorial ending - different flow
 	if is_tutorial_mode:
 		game_status_label.text = "Tutorial Complete!"
@@ -1061,7 +1044,7 @@ func end_game():
 		# Pass data to summary screen
 		var params = get_scene_params()
 		get_tree().set_meta("scene_params", {
-			"god": params.get("god", "Apollo"),
+			"god": params.get("god", current_god),
 			"deck_index": params.get("deck_index", 0),
 			"victory": false
 		})
@@ -1092,9 +1075,6 @@ func _on_tutorial_finished():
 		# Fallback if cutscene manager isn't available
 		get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
 
-
-
-
 # Return to the map after completing an encounter
 func return_to_map():
 	# Get the current map data and node info
@@ -1102,7 +1082,7 @@ func return_to_map():
 	if params.has("map_data"):
 		# Pass the updated map data back to the map scene
 		get_tree().set_meta("scene_params", {
-			"god": params.get("god", "Apollo"),
+			"god": params.get("god", current_god),
 			"deck_index": params.get("deck_index", 0),
 			"map_data": params.get("map_data"),
 			"returning_from_battle": true
@@ -1363,56 +1343,53 @@ func load_player_deck(deck_index: int):
 	print("=== LOADING PLAYER DECK ===")
 	print("Tutorial mode: ", is_tutorial_mode)
 	print("Tutorial god: ", tutorial_god)
+	print("Current god: ", current_god)
 	print("Deck index: ", deck_index)
 	
 	var collection_path: String
 	var collection: GodCardCollection
 	
 	if is_tutorial_mode:
-		# Tutorial mode - use specified opponent
-		if tutorial_god == "Mnemosyne":
-			collection_path = "res://Resources/Collections/Mnemosyne.tres"
-			collection = load(collection_path)
-			if collection:
-				print("Mnemosyne collection loaded successfully")
-				print("Mnemosyne has ", collection.cards.size(), " cards")
-				print("Mnemosyne has ", collection.decks.size(), " deck definitions")
-				
-				# Check if Mnemosyne has deck definitions
-				if collection.decks.size() > 0:
-					# Use the first deck definition
-					var deck_def = collection.decks[0]
-					player_deck = collection.get_deck(0)
-					deck_card_indices = deck_def.card_indices.duplicate()
-					print("Using deck definition: ", deck_def.deck_name)
-					print("Card indices: ", deck_card_indices)
-				else:
-					# Fallback: use all available cards
-					player_deck = collection.cards.duplicate()
-					deck_card_indices = []
-					for i in range(player_deck.size()):
-						deck_card_indices.append(i)
-					print("No deck definitions found, using all cards")
-				
-				print("Final player deck size: ", player_deck.size())
-				
-				# Debug: Print card names
-				for i in range(player_deck.size()):
-					if player_deck[i]:
-						print("Player card ", i, ": ", player_deck[i].card_name)
-					else:
-						print("Player card ", i, ": NULL")
-				
-				display_player_hand()
-				return
+		# Tutorial mode - use tutorial god
+		collection_path = "res://Resources/Collections/" + tutorial_god + ".tres"
+		collection = load(collection_path)
+		if collection:
+			print(tutorial_god, " collection loaded successfully")
+			print(tutorial_god, " has ", collection.cards.size(), " cards")
+			print(tutorial_god, " has ", collection.decks.size(), " deck definitions")
+			
+			# Check if the god has deck definitions
+			if collection.decks.size() > 0:
+				# Use the first deck definition for tutorial
+				var deck_def = collection.decks[0]
+				player_deck = collection.get_deck(0)
+				deck_card_indices = deck_def.card_indices.duplicate()
+				print("Using deck definition: ", deck_def.deck_name)
+				print("Card indices: ", deck_card_indices)
 			else:
-				print("ERROR: Failed to load Mnemosyne collection from ", collection_path)
+				# Fallback: use all available cards
+				player_deck = collection.cards.duplicate()
+				deck_card_indices = []
+				for i in range(player_deck.size()):
+					deck_card_indices.append(i)
+				print("No deck definitions found, using all cards")
+			
+			print("Final player deck size: ", player_deck.size())
+			
+			# Debug: Print card names
+			for i in range(player_deck.size()):
+				if player_deck[i]:
+					print("Player card ", i, ": ", player_deck[i].card_name)
+				else:
+					print("Player card ", i, ": NULL")
+			
+			display_player_hand()
+			return
 		else:
-			collection_path = "res://Resources/Collections/Apollo.tres"  # Fallback
-			print("Using Apollo fallback for tutorial god: ", tutorial_god)
+			print("ERROR: Failed to load ", tutorial_god, " collection from ", collection_path)
 	else:
-		# Normal mode - load Apollo collection
-		collection_path = "res://Resources/Collections/Apollo.tres"
+		# Normal mode - load the specified god collection
+		collection_path = "res://Resources/Collections/" + current_god + ".tres"
 	
 	print("Loading collection from: ", collection_path)
 	collection = load(collection_path)
@@ -1424,7 +1401,7 @@ func load_player_deck(deck_index: int):
 		player_deck = collection.get_deck(deck_index)
 		
 		if is_tutorial_mode:
-			print("Loaded tutorial deck for ", tutorial_god, " with ", player_deck.size(), " cards")
+			print("Loaded tutorial deck for ", current_god, " with ", player_deck.size(), " cards")
 		else:
 			setup_experience_panel()
 		
@@ -1451,7 +1428,6 @@ func setup_experience_panel():
 	# Set up with current deck
 	exp_panel.setup_deck(player_deck, deck_card_indices)
 
-
 # Helper method to get card at a specific grid position
 func get_card_at_position(position: int) -> CardResource:
 	if position >= 0 and position < grid_card_data.size():
@@ -1468,11 +1444,10 @@ func get_owner_at_position(position: int) -> Owner:
 func get_card_level(card_index: int) -> int:
 	if has_node("/root/GlobalProgressTrackerAutoload"):
 		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-		var exp_data = progress_tracker.get_card_total_experience("Apollo", card_index)
+		var exp_data = progress_tracker.get_card_total_experience(current_god, card_index)
 		var total_exp = exp_data.get("capture_exp", 0) + exp_data.get("defense_exp", 0)
 		return ExperienceHelpers.calculate_level(total_exp)
 	return 0
-
 
 # Display player's hand of cards using manual positioning
 func display_player_hand():
@@ -1519,7 +1494,6 @@ func display_player_hand():
 		# Connect hover signals for info panel
 		card_display.card_hovered.connect(_on_card_hovered)
 		card_display.card_unhovered.connect(_on_card_unhovered)
-
 
 # Handle card input events
 func _on_card_gui_input(event, card_display, card_index):
@@ -1609,8 +1583,6 @@ func update_card_display(grid_index: int, card_data: CardResource):
 		# Re-setup the card display with updated values
 		card_display.setup(card_data)
 		print("Updated card display for ", card_data.card_name, " with new values: ", card_data.values)
-
-
 
 # Place the selected card on the selected grid
 func place_card_on_grid():
@@ -1766,7 +1738,6 @@ func place_card_on_grid():
 				if player_deck.size() <= 2:  # When they have 1 card left
 					show_tutorial_step(5)
 
-
 # Handle passive abilities when a card is placed
 func handle_passive_abilities_on_place(grid_position: int, card_data: CardResource, card_level: int):
 	# Check if this card has passive abilities
@@ -1858,9 +1829,6 @@ func refresh_all_passive_abilities():
 				}
 				ability.execute(passive_context)
 
-
-
-
 # Remove a card from the player's hand after it's played
 func remove_card_from_hand(card_index: int):
 	# Check if the index is valid
@@ -1888,16 +1856,14 @@ func show_reward_screen():
 	var params = get_scene_params()
 	
 	get_tree().set_meta("scene_params", {
-		"god": params.get("god", "Apollo"),
+		"god": params.get("god", current_god),
 		"deck_index": params.get("deck_index", 0),
 		"map_data": params.get("map_data"),
 		"current_node": params.get("current_node")
 	})
 	get_tree().change_scene_to_file("res://Scenes/RewardScreen.tscn")
 
-
-# Lines 650-680 of apollo_game.gd - Updated memory recording functions
-
+# Record memory functions - updated to use current god
 func record_enemy_encounter(victory: bool):
 	if not has_node("/root/MemoryJournalManagerAutoload"):
 		return
@@ -1925,14 +1891,14 @@ func record_god_experience():
 	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
 	var params = get_scene_params()
 	
-	var god_name = params.get("god", "Apollo")
+	var god_name = params.get("god", current_god)
 	var deck_index = params.get("deck_index", 0)
 	
 	# Get deck name for tracking
-	var apollo_collection = load("res://Resources/Collections/Apollo.tres")
+	var god_collection = load("res://Resources/Collections/" + god_name + ".tres")
 	var deck_name = ""
-	if apollo_collection and deck_index < apollo_collection.decks.size():
-		deck_name = apollo_collection.decks[deck_index].deck_name
+	if god_collection and deck_index < god_collection.decks.size():
+		deck_name = god_collection.decks[deck_index].deck_name
 	
 	# Record the god experience
 	memory_manager.record_god_experience(god_name, 1, deck_name)

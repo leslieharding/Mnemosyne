@@ -226,10 +226,10 @@ func _on_map_node_pressed(map_node: MapNode):
 	# For now, all nodes lead to battle - later we'll check node type
 	match map_node.node_type:
 		MapNode.NodeType.BATTLE, MapNode.NodeType.BOSS:
-			get_tree().change_scene_to_file("res://Scenes/ApolloGame.tscn")
+			get_tree().change_scene_to_file("res://Scenes/CardBattle.tscn")
 		_:
 			# Future: handle other node types
-			get_tree().change_scene_to_file("res://Scenes/ApolloGame.tscn")
+			get_tree().change_scene_to_file("res://Scenes/CardBattle.tscn")
 
 # Update the UI labels
 func update_ui():

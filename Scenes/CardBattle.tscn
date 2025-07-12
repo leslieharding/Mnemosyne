@@ -1,9 +1,9 @@
 [gd_scene load_steps=2 format=3 uid="uid://cynrsrhislb68"]
 
-[ext_resource type="Script" uid="uid://bu3s8gjaukbo6" path="res://Scripts/apollo_game.gd" id="1_qnpwp"]
+[ext_resource type="Script" uid="uid://bu3s8gjaukbo6" path="res://Scripts/card_battle_manager.gd" id="1_xcrvx"]
 
 [node name="ApolloGame" type="Node2D"]
-script = ExtResource("1_qnpwp")
+script = ExtResource("1_xcrvx")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchors_preset = 15
