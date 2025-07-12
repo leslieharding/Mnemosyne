@@ -58,7 +58,7 @@ func setup_reward_interface():
 	# Create card selection area with explicit sizing
 	var card_section = VBoxContainer.new()
 	card_section.name = "CardSection"
-	card_section.custom_minimum_size = Vector2(600, 200)  # Give it a minimum size
+	card_section.custom_minimum_size = Vector2(900, 200)  # Wider for card+exp layout
 	card_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
 	var card_label = Label.new()
@@ -67,12 +67,12 @@ func setup_reward_interface():
 	card_label.add_theme_color_override("font_color", Color.WHITE)  # Make sure it's visible
 	card_section.add_child(card_label)
 	
-	# Container for card displays with explicit sizing
+	# Container for card displays with explicit sizing (wider for card+exp layout)
 	cards_container = HBoxContainer.new()
 	cards_container.name = "CardsContainer"
 	cards_container.alignment = BoxContainer.ALIGNMENT_CENTER
-	cards_container.add_theme_constant_override("separation", 15)  # More separation
-	cards_container.custom_minimum_size = Vector2(600, 160)  # Wider minimum size
+	cards_container.add_theme_constant_override("separation", 20)  # More separation between card groups
+	cards_container.custom_minimum_size = Vector2(900, 160)  # Much wider to accommodate card+exp layout
 	cards_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cards_container.size_flags_vertical = Control.SIZE_SHRINK_CENTER  # Don't expand vertically
 	card_section.add_child(cards_container)
@@ -250,19 +250,26 @@ func create_card_displays_safe():
 		
 		print("Creating display for card: ", card.card_name)
 		
+		# Create a horizontal container for card + exp info
+		var card_with_exp_container = HBoxContainer.new()
+		card_with_exp_container.name = "CardWithExpContainer" + str(i)
+		card_with_exp_container.custom_minimum_size = Vector2(180, 150)  # Wider to accommodate exp info
+		card_with_exp_container.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		card_with_exp_container.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		card_with_exp_container.add_theme_constant_override("separation", 15)  # Gap between card and exp
+		
 		# Create a Control wrapper for the Node2D card display
 		var card_wrapper = Control.new()
 		card_wrapper.name = "CardWrapper" + str(i)
-		card_wrapper.custom_minimum_size = Vector2(110, 150)  # Slightly larger than card
+		card_wrapper.custom_minimum_size = Vector2(110, 150)  # Original card size
 		card_wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		card_wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		
 		# Create card display
 		var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 		
-		# Add card to wrapper, then wrapper to container
+		# Add card to wrapper
 		card_wrapper.add_child(card_display)
-		cards_container.add_child(card_wrapper)
 		
 		# Wait for ready
 		await get_tree().process_frame
@@ -273,9 +280,15 @@ func create_card_displays_safe():
 		# Center the card within its wrapper
 		card_display.position = Vector2(5, 5)  # Small offset for centering
 		
-		# Add experience info overlay (only if tracker exists)
-		if tracker:
-			add_experience_overlay_safe(card_display, card_index, tracker)
+		# Create experience info display (only if tracker exists)
+		var exp_info_container = create_experience_info_display(card_index, tracker)
+		
+		# Add card wrapper and exp info to the horizontal container
+		card_with_exp_container.add_child(card_wrapper)
+		card_with_exp_container.add_child(exp_info_container)
+		
+		# Add the complete container to the cards container
+		cards_container.add_child(card_with_exp_container)
 		
 		# Connect selection safely - connect to both wrapper and card panel
 		card_wrapper.gui_input.connect(_on_card_wrapper_input.bind(i))
@@ -287,49 +300,71 @@ func create_card_displays_safe():
 		# Store reference
 		card_displays.append(card_display)
 		
-		print("Card ", i, " added to container with wrapper")
+		print("Card ", i, " added to container with separate exp info")
 	
-	print("Created ", card_displays.size(), " card displays")
+	print("Created ", card_displays.size(), " card displays with separate exp info")
 	
 	# Force layout update
 	cards_container.queue_redraw()
 	await get_tree().process_frame
 
-func add_experience_overlay_safe(card_display: CardDisplay, card_index: int, tracker):
-	# Verify tracker is still valid
-	if not is_instance_valid(tracker):
-		print("Tracker is no longer valid, skipping overlay")
-		return
+func create_experience_info_display(card_index: int, tracker) -> Control:
+	# Create container for experience info
+	var exp_container = VBoxContainer.new()
+	exp_container.name = "ExperienceInfo"
+	exp_container.custom_minimum_size = Vector2(60, 150)  # Match card height
+	exp_container.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	exp_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	exp_container.add_theme_constant_override("separation", 8)
 	
-	# Get current run experience for this card
-	var exp_data = tracker.get_card_experience(card_index)
+	# Add title
+	var title_label = Label.new()
+	title_label.text = "This Run:"
+	title_label.add_theme_font_size_override("font_size", 11)
+	title_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	exp_container.add_child(title_label)
 	
-	# Create overlay container
-	var overlay = VBoxContainer.new()
-	overlay.name = "ExperienceOverlay"
-	overlay.position = Vector2(5, 5)
-	overlay.add_theme_constant_override("separation", 2)
-	
-	# Capture experience label
-	var capture_label = Label.new()
-	capture_label.text = "⚔️+" + str(exp_data["capture_exp"])
-	capture_label.add_theme_font_size_override("font_size", 10)
-	capture_label.add_theme_color_override("font_color", Color("#FFD700"))
-	overlay.add_child(capture_label)
-	
-	# Defense experience label  
-	var defense_label = Label.new()
-	defense_label.text = "🛡️+" + str(exp_data["defense_exp"])
-	defense_label.add_theme_font_size_override("font_size", 10)
-	defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
-	overlay.add_child(defense_label)
-	
-	# Add to card panel safely
-	if card_display.panel:
-		card_display.panel.add_child(overlay)
-		overlay.z_index = 10
+	# Get experience data if tracker exists
+	if tracker and is_instance_valid(tracker):
+		var exp_data = tracker.get_card_experience(card_index)
+		
+		# Capture experience label
+		var capture_label = Label.new()
+		capture_label.text = "⚔️ +" + str(exp_data["capture_exp"])
+		capture_label.add_theme_font_size_override("font_size", 12)
+		capture_label.add_theme_color_override("font_color", Color("#FFD700"))
+		capture_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		exp_container.add_child(capture_label)
+		
+		# Defense experience label  
+		var defense_label = Label.new()
+		defense_label.text = "🛡️ +" + str(exp_data["defense_exp"])
+		defense_label.add_theme_font_size_override("font_size", 12)
+		defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
+		defense_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		exp_container.add_child(defense_label)
+		
+		# Add total for this run
+		var total_run_exp = exp_data["capture_exp"] + exp_data["defense_exp"]
+		if total_run_exp > 0:
+			var total_label = Label.new()
+			total_label.text = "Total: +" + str(total_run_exp)
+			total_label.add_theme_font_size_override("font_size", 10)
+			total_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+			total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			exp_container.add_child(total_label)
 	else:
-		print("Warning: Card display panel is null, cannot add overlay")
+		# No tracker available
+		var no_data_label = Label.new()
+		no_data_label.text = "No data\navailable"
+		no_data_label.add_theme_font_size_override("font_size", 10)
+		no_data_label.add_theme_color_override("font_color", Color("#888888"))
+		no_data_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		no_data_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		exp_container.add_child(no_data_label)
+	
+	return exp_container
 
 func update_mnemosyne_button_text():
 	# Safety check
