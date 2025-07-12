@@ -2,9 +2,9 @@
 extends Control
 
 # UI References
-@onready var main_container = $VBoxContainer
-@onready var title_label = $VBoxContainer/Title
-@onready var continue_button = $VBoxContainer/ContinueButton
+@onready var main_container = $ScrollContainer/VBoxContainer
+@onready var title_label = $ScrollContainer/VBoxContainer/Title
+@onready var continue_button = $ScrollContainer/VBoxContainer/ContinueButton
 
 # Card selection
 var current_deck: Array[CardResource] = []
@@ -22,123 +22,187 @@ var mnemosyne_button: Button
 var reward_info_label: Label
 
 func _ready():
-	# Safety check - ensure we're in the tree
-	if not get_tree():
-		print("Error: Node not in scene tree!")
-		return
-	
-	# Wait a frame to ensure autoloads are ready
-	await get_tree().process_frame
-	
-	# Double check we still have a tree after awaiting
-	if not get_tree():
-		print("Error: Lost scene tree connection!")
-		return
-	
-	setup_reward_interface()
-	await load_deck_data()
-	
-	# Connect the continue button (only enabled after reward selection)
+	# Connect the continue button first
 	if continue_button:
 		continue_button.pressed.connect(_on_continue_pressed)
 		continue_button.disabled = true
 		continue_button.text = "Choose a Reward"
 	else:
 		print("Error: Continue button not found!")
+		return
+	
+	# Wait a frame to ensure all @onready variables are initialized
+	await get_tree().process_frame
+	
+	# Setup the interface
+	setup_reward_interface()
+	
+	# Load deck data
+	await safe_load_deck_data()
+
+func safe_load_deck_data():
+	# Double-check we're still in the tree
+	if not get_tree():
+		print("Error: Node not in scene tree during safe_load_deck_data!")
+		return
+	
+	await load_deck_data()
+
+
 
 func setup_reward_interface():
+	print("Setting up reward interface...")
+	print("Main container children before setup: ", main_container.get_child_count())
+	
 	# Update title
 	title_label.text = "Choose Your Reward"
 	
-	# Create card selection area
+	# Create a test label to see if anything shows up
+	var test_label = Label.new()
+	test_label.text = "TEST LABEL - IF YOU SEE THIS, DYNAMIC UI IS WORKING"
+	test_label.add_theme_font_size_override("font_size", 20)
+	test_label.add_theme_color_override("font_color", Color.RED)
+	main_container.add_child(test_label)
+	
+	print("Test label added - check if visible on screen")
+	
+	# Create card selection area with explicit sizing
 	var card_section = VBoxContainer.new()
 	card_section.name = "CardSection"
+	card_section.custom_minimum_size = Vector2(600, 200)  # Give it a minimum size
+	card_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
 	var card_label = Label.new()
 	card_label.text = "Select a card to enhance:"
 	card_label.add_theme_font_size_override("font_size", 16)
+	card_label.add_theme_color_override("font_color", Color.WHITE)  # Make sure it's visible
 	card_section.add_child(card_label)
 	
-	# Container for card displays
+	# Container for card displays with explicit sizing
 	cards_container = HBoxContainer.new()
 	cards_container.name = "CardsContainer"
 	cards_container.alignment = BoxContainer.ALIGNMENT_CENTER
 	cards_container.add_theme_constant_override("separation", 10)
+	cards_container.custom_minimum_size = Vector2(500, 150)  # Give it a minimum size
+	cards_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card_section.add_child(cards_container)
 	
-	# Experience type selection
+	# Experience type selection with explicit sizing
 	var exp_section = VBoxContainer.new()
 	exp_section.name = "ExperienceSection"
+	exp_section.custom_minimum_size = Vector2(400, 100)
+	exp_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
 	var exp_label = Label.new()
 	exp_label.text = "Choose experience type:"
 	exp_label.add_theme_font_size_override("font_size", 16)
+	exp_label.add_theme_color_override("font_color", Color.WHITE)
 	exp_section.add_child(exp_label)
 	
 	var exp_buttons = HBoxContainer.new()
 	exp_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	exp_buttons.add_theme_constant_override("separation", 20)
+	exp_buttons.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
 	capture_button = Button.new()
 	capture_button.text = "⚔️ +15 Capture XP"
 	capture_button.disabled = true
+	capture_button.custom_minimum_size = Vector2(150, 40)
 	capture_button.pressed.connect(_on_capture_button_pressed)
 	exp_buttons.add_child(capture_button)
 	
 	defense_button = Button.new()
 	defense_button.text = "🛡️ +15 Defense XP"
 	defense_button.disabled = true
+	defense_button.custom_minimum_size = Vector2(150, 40)
 	defense_button.pressed.connect(_on_defense_button_pressed)
 	exp_buttons.add_child(defense_button)
 	
 	exp_section.add_child(exp_buttons)
 	
-	# Separator
-	var separator1 = HSeparator.new()
-	
-	# Mnemosyne section
+	# Mnemosyne section with explicit sizing
 	var mnemosyne_section = VBoxContainer.new()
 	mnemosyne_section.name = "MnemosyneSection"
+	mnemosyne_section.custom_minimum_size = Vector2(400, 80)
+	mnemosyne_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
 	var mnemosyne_label = Label.new()
 	mnemosyne_label.text = "Or enhance Mnemosyne's consciousness:"
 	mnemosyne_label.add_theme_font_size_override("font_size", 16)
+	mnemosyne_label.add_theme_color_override("font_color", Color.WHITE)
 	mnemosyne_section.add_child(mnemosyne_label)
 	
 	mnemosyne_button = Button.new()
 	mnemosyne_button.text = "🧠 Consciousness Boost"
+	mnemosyne_button.custom_minimum_size = Vector2(200, 40)
 	mnemosyne_button.pressed.connect(_on_mnemosyne_button_pressed)
 	mnemosyne_section.add_child(mnemosyne_button)
 	
 	# Info label for showing current selection
 	reward_info_label = Label.new()
-	reward_info_label.text = ""
+	reward_info_label.text = "Loading deck..."  # Give it initial text
 	reward_info_label.add_theme_font_size_override("font_size", 12)
 	reward_info_label.add_theme_color_override("font_color", Color("#AAAAAA"))
 	reward_info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	reward_info_label.custom_minimum_size = Vector2(400, 30)
 	
-	# Add everything to main container (insert before continue button)
-	var continue_index = main_container.get_child_count() - 1
-	main_container.add_child(card_section)
-	main_container.move_child(card_section, continue_index)
+	# Simple approach: just add everything to the end, before continue button
+	var continue_button_index = main_container.get_children().find(continue_button)
+	print("Continue button found at index: ", continue_button_index)
 	
-	main_container.add_child(HSeparator.new())
-	main_container.move_child(main_container.get_child(-1), continue_index + 1)
+	# Use a simpler approach - just insert before the continue button
+	if continue_button_index != -1:
+		main_container.add_child(card_section)
+		main_container.move_child(card_section, continue_button_index)
+		continue_button_index += 1
+		
+		var separator1 = HSeparator.new()
+		main_container.add_child(separator1)
+		main_container.move_child(separator1, continue_button_index)
+		continue_button_index += 1
+		
+		main_container.add_child(exp_section)
+		main_container.move_child(exp_section, continue_button_index)
+		continue_button_index += 1
+		
+		var separator2 = HSeparator.new()
+		main_container.add_child(separator2)
+		main_container.move_child(separator2, continue_button_index)
+		continue_button_index += 1
+		
+		main_container.add_child(mnemosyne_section)
+		main_container.move_child(mnemosyne_section, continue_button_index)
+		continue_button_index += 1
+		
+		var separator3 = HSeparator.new()
+		main_container.add_child(separator3)
+		main_container.move_child(separator3, continue_button_index)
+		continue_button_index += 1
+		
+		main_container.add_child(reward_info_label)
+		main_container.move_child(reward_info_label, continue_button_index)
+		
+		print("Successfully added all sections")
+	else:
+		print("ERROR: Could not find continue button, adding at end")
+		main_container.add_child(card_section)
+		main_container.add_child(HSeparator.new())
+		main_container.add_child(exp_section)
+		main_container.add_child(HSeparator.new())
+		main_container.add_child(mnemosyne_section)
+		main_container.add_child(HSeparator.new())
+		main_container.add_child(reward_info_label)
 	
-	main_container.add_child(exp_section)
-	main_container.move_child(exp_section, continue_index + 2)
+	print("Main container children after setup: ", main_container.get_child_count())
+	print("Reward interface setup complete!")
 	
-	main_container.add_child(separator1)
-	main_container.move_child(separator1, continue_index + 3)
+	# Force a layout update
+	main_container.queue_redraw()
 	
-	main_container.add_child(mnemosyne_section)
-	main_container.move_child(mnemosyne_section, continue_index + 4)
-	
-	main_container.add_child(HSeparator.new())
-	main_container.move_child(main_container.get_child(-1), continue_index + 5)
-	
-	main_container.add_child(reward_info_label)
-	main_container.move_child(reward_info_label, continue_index + 6)
+	# Debug: print all children
+	for i in range(main_container.get_child_count()):
+		var child = main_container.get_child(i)
+		print("Child ", i, ": ", child.name, " (", child.get_class(), ") - visible: ", child.visible, " - size: ", child.size)
 
 func load_deck_data():
 	var params = get_scene_params()
@@ -165,16 +229,16 @@ func load_deck_data():
 	
 	print("Loaded deck with ", current_deck.size(), " cards")
 	
-	# Create card displays
-	await create_card_displays()
+	# Create card displays with safer autoload access
+	await create_card_displays_safe()
 	
 	# Update Mnemosyne button with current level info
 	update_mnemosyne_button_text()
 
-func create_card_displays():
+func create_card_displays_safe():
 	# Safety check
 	if not get_tree():
-		print("Error: No scene tree in create_card_displays")
+		print("Error: No scene tree in create_card_displays_safe")
 		return
 	
 	# Clear existing displays
@@ -183,9 +247,9 @@ func create_card_displays():
 			display.queue_free()
 	card_displays.clear()
 	
-	# Check if tracker exists - use a more defensive approach
+	# Get tracker safely
 	var tracker = null
-	if get_tree() and get_tree().has_node("/root/RunExperienceTrackerAutoload"):
+	if get_tree().has_node("/root/RunExperienceTrackerAutoload"):
 		tracker = get_tree().get_node("/root/RunExperienceTrackerAutoload")
 	
 	if not tracker:
@@ -210,9 +274,9 @@ func create_card_displays():
 		
 		# Add experience info overlay (only if tracker exists)
 		if tracker:
-			add_experience_overlay(card_display, card_index, tracker)
+			add_experience_overlay_safe(card_display, card_index, tracker)
 		
-		# Connect selection
+		# Connect selection safely
 		if card_display.panel:
 			card_display.panel.gui_input.connect(_on_card_selected.bind(i))
 		else:
@@ -223,7 +287,12 @@ func create_card_displays():
 	
 	print("Created ", card_displays.size(), " card displays")
 
-func add_experience_overlay(card_display: CardDisplay, card_index: int, tracker):
+func add_experience_overlay_safe(card_display: CardDisplay, card_index: int, tracker):
+	# Verify tracker is still valid
+	if not is_instance_valid(tracker):
+		print("Tracker is no longer valid, skipping overlay")
+		return
+	
 	# Get current run experience for this card
 	var exp_data = tracker.get_card_experience(card_index)
 	
@@ -247,9 +316,12 @@ func add_experience_overlay(card_display: CardDisplay, card_index: int, tracker)
 	defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
 	overlay.add_child(defense_label)
 	
-	# Add to card panel
-	card_display.panel.add_child(overlay)
-	overlay.z_index = 10
+	# Add to card panel safely
+	if card_display.panel:
+		card_display.panel.add_child(overlay)
+		overlay.z_index = 10
+	else:
+		print("Warning: Card display panel is null, cannot add overlay")
 
 func update_mnemosyne_button_text():
 	# Safety check
