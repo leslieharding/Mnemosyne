@@ -1515,12 +1515,14 @@ func _on_card_input_event(viewport, event, shape_idx, card_display, card_index):
 
 # Extract the card selection logic into a separate function
 
+# Replace the handle_card_selection function in Scripts/card_battle_manager.gd (around lines 275-315)
+
 func handle_card_selection(card_display, card_index):
 	print("=== HANDLING CARD SELECTION ===")
 	print("Card index: ", card_index)
 	print("Tutorial mode: ", is_tutorial_mode)
 	print("Is player turn: ", turn_manager.is_player_turn())
-	print("Tutorial step: ", tutorial_step)
+	print("Current selected_card_index: ", selected_card_index)
 	
 	# In tutorial mode, FORCE allow card selection regardless of turn state
 	if is_tutorial_mode:
@@ -1533,20 +1535,21 @@ func handle_card_selection(card_display, card_index):
 	if card_index >= player_deck.size():
 		print("Invalid card index: ", card_index)
 		return
-		
-	# Deselect previous card if any
+	
+	# FIRST: Deselect ALL cards before selecting the new one
 	var cards_container = hand_container.get_node_or_null("CardsContainer")
 	if cards_container:
+		print("Deselecting all cards in hand...")
 		for child in cards_container.get_children():
-			if child is CardDisplay and child.is_selected:
-				child.deselect()
+			if child is CardDisplay:
+				if child.is_selected:
+					print("  Deselecting card: ", child.get_card_data().card_name if child.get_card_data() else "Unknown")
+					child.deselect()
 	
-	# Select this card
+	# SECOND: Select the new card
+	print("Selecting new card: ", player_deck[card_index].card_name)
 	card_display.select()
 	selected_card_index = card_index
-	print("Successfully selected card: ", player_deck[card_index].card_name)
-	
-	
 	
 	# Initialize grid selection if not already set
 	if current_grid_index == -1:
@@ -1557,6 +1560,8 @@ func handle_card_selection(card_display, card_index):
 				grid_slots[i].add_theme_stylebox_override("panel", selected_grid_style)
 				print("Auto-selected grid slot ", i)
 				break
+	
+	print("Card selection complete - selected_card_index is now: ", selected_card_index)
 
 # Handle card input events
 func _on_card_gui_input(event, card_display, card_index):
@@ -1567,7 +1572,6 @@ func _on_card_gui_input(event, card_display, card_index):
 	print("Tutorial mode: ", is_tutorial_mode)
 	print("Turn manager active: ", turn_manager.is_game_active)
 	print("Is player turn: ", turn_manager.is_player_turn())
-	print("Tutorial step: ", tutorial_step)
 	
 	# In tutorial mode, FORCE allow card selection regardless of turn state
 	if is_tutorial_mode:
@@ -1585,30 +1589,9 @@ func _on_card_gui_input(event, card_display, card_index):
 			if card_index >= player_deck.size():
 				print("Invalid card index: ", card_index)
 				return
-				
-			# Deselect previous card if any
-			var cards_container = hand_container.get_node_or_null("CardsContainer")
-			if cards_container:
-				for child in cards_container.get_children():
-					if child is CardDisplay and child.is_selected:
-						child.deselect()
 			
-			# Select this card
-			card_display.select()
-			selected_card_index = card_index
-			print("Successfully selected card: ", player_deck[card_index].card_name)
-			
-			
-			
-			# Initialize grid selection if not already set
-			if current_grid_index == -1:
-				# Find the first unoccupied grid slot
-				for i in range(grid_slots.size()):
-					if not grid_occupied[i]:
-						current_grid_index = i
-						grid_slots[i].add_theme_stylebox_override("panel", selected_grid_style)
-						print("Auto-selected grid slot ", i)
-						break
+			# Use the improved handle_card_selection function
+			handle_card_selection(card_display, card_index)
 	else:
 		print("Non-mouse event received: ", event.get_class())
 
