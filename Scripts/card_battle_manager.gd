@@ -1568,26 +1568,15 @@ func display_player_hand():
 		
 		# Connect to detect clicks on the card - try multiple approaches
 		
-		# Approach 1: Connect to panel gui_input (original method)
+		
 		card_display.panel.gui_input.connect(_on_card_gui_input.bind(card_display, i))
 		print("Tutorial: Connected panel gui_input for card ", i)
-		
-		# Approach 2: Also connect to mouse button signals directly
-		card_display.panel.button_down.connect(_on_card_button_down.bind(card_display, i))
-		print("Tutorial: Connected panel button_down for card ", i)
 		
 		# Approach 3: Test if the CardDisplay itself has input handling
 		if card_display.has_signal("input_event"):
 			card_display.input_event.connect(_on_card_input_event.bind(card_display, i))
 			print("Tutorial: Connected CardDisplay input_event for card ", i)
 
-func _on_card_button_down(card_display, card_index):
-	print("=== CARD BUTTON DOWN ===")
-	print("Card index: ", card_index)
-	print("Card name: ", player_deck[card_index].card_name if card_index < player_deck.size() else "Invalid")
-	
-	# Call the same logic as the gui_input handler
-	handle_card_selection(card_display, card_index)
 
 func _on_card_input_event(viewport, event, shape_idx, card_display, card_index):
 	print("=== CARD INPUT EVENT ===")
