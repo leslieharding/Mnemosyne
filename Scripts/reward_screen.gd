@@ -48,23 +48,12 @@ func safe_load_deck_data():
 	
 	await load_deck_data()
 
-
-
 func setup_reward_interface():
 	print("Setting up reward interface...")
 	print("Main container children before setup: ", main_container.get_child_count())
 	
 	# Update title
 	title_label.text = "Choose Your Reward"
-	
-	# Create a test label to see if anything shows up
-	var test_label = Label.new()
-	test_label.text = "TEST LABEL - IF YOU SEE THIS, DYNAMIC UI IS WORKING"
-	test_label.add_theme_font_size_override("font_size", 20)
-	test_label.add_theme_color_override("font_color", Color.RED)
-	main_container.add_child(test_label)
-	
-	print("Test label added - check if visible on screen")
 	
 	# Create card selection area with explicit sizing
 	var card_section = VBoxContainer.new()
@@ -82,9 +71,10 @@ func setup_reward_interface():
 	cards_container = HBoxContainer.new()
 	cards_container.name = "CardsContainer"
 	cards_container.alignment = BoxContainer.ALIGNMENT_CENTER
-	cards_container.add_theme_constant_override("separation", 10)
-	cards_container.custom_minimum_size = Vector2(500, 150)  # Give it a minimum size
+	cards_container.add_theme_constant_override("separation", 15)  # More separation
+	cards_container.custom_minimum_size = Vector2(600, 160)  # Wider minimum size
 	cards_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cards_container.size_flags_vertical = Control.SIZE_SHRINK_CENTER  # Don't expand vertically
 	card_section.add_child(cards_container)
 	
 	# Experience type selection with explicit sizing
@@ -247,10 +237,8 @@ func create_card_displays_safe():
 			display.queue_free()
 	card_displays.clear()
 	
-	# Get tracker safely
-	var tracker = null
-	if get_tree().has_node("/root/RunExperienceTrackerAutoload"):
-		tracker = get_tree().get_node("/root/RunExperienceTrackerAutoload")
+	# Get tracker safely - use get_node_or_null instead
+	var tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
 	
 	if not tracker:
 		print("RunExperienceTrackerAutoload not found! Creating cards without experience data.")
@@ -262,9 +250,19 @@ func create_card_displays_safe():
 		
 		print("Creating display for card: ", card.card_name)
 		
+		# Create a Control wrapper for the Node2D card display
+		var card_wrapper = Control.new()
+		card_wrapper.name = "CardWrapper" + str(i)
+		card_wrapper.custom_minimum_size = Vector2(110, 150)  # Slightly larger than card
+		card_wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		card_wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		
 		# Create card display
 		var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
-		cards_container.add_child(card_display)
+		
+		# Add card to wrapper, then wrapper to container
+		card_wrapper.add_child(card_display)
+		cards_container.add_child(card_wrapper)
 		
 		# Wait for ready
 		await get_tree().process_frame
@@ -272,20 +270,30 @@ func create_card_displays_safe():
 		# Setup the card
 		card_display.setup(card)
 		
+		# Center the card within its wrapper
+		card_display.position = Vector2(5, 5)  # Small offset for centering
+		
 		# Add experience info overlay (only if tracker exists)
 		if tracker:
 			add_experience_overlay_safe(card_display, card_index, tracker)
 		
-		# Connect selection safely
+		# Connect selection safely - connect to both wrapper and card panel
+		card_wrapper.gui_input.connect(_on_card_wrapper_input.bind(i))
 		if card_display.panel:
-			card_display.panel.gui_input.connect(_on_card_selected.bind(i))
+			card_display.panel.gui_input.connect(_on_card_panel_input.bind(i))
 		else:
 			print("Warning: Card display panel is null for card ", i)
 		
 		# Store reference
 		card_displays.append(card_display)
+		
+		print("Card ", i, " added to container with wrapper")
 	
 	print("Created ", card_displays.size(), " card displays")
+	
+	# Force layout update
+	cards_container.queue_redraw()
+	await get_tree().process_frame
 
 func add_experience_overlay_safe(card_display: CardDisplay, card_index: int, tracker):
 	# Verify tracker is still valid
@@ -329,12 +337,13 @@ func update_mnemosyne_button_text():
 		print("Error: No scene tree in update_mnemosyne_button_text")
 		return
 	
-	if not get_tree().has_node("/root/MemoryJournalManagerAutoload"):
+	# Use get_node_or_null instead of has_node check
+	var memory_manager = get_node_or_null("/root/MemoryJournalManagerAutoload")
+	if not memory_manager:
 		print("MemoryJournalManagerAutoload not found for Mnemosyne button update")
 		mnemosyne_button.text = "🧠 Consciousness Boost\n(Memory Manager Unavailable)"
 		return
 	
-	var memory_manager = get_tree().get_node("/root/MemoryJournalManagerAutoload")
 	var mnemosyne_data = memory_manager.get_mnemosyne_memory()
 	var current_level = mnemosyne_data.get("consciousness_level", 1)
 	var current_desc = memory_manager.get_consciousness_description(current_level)
@@ -342,41 +351,94 @@ func update_mnemosyne_button_text():
 	
 	mnemosyne_button.text = "🧠 Consciousness Boost\n" + current_desc + " → " + next_desc
 
+# Separate input handlers for wrapper and panel
+func _on_card_wrapper_input(event: InputEvent, card_index: int):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		print("Wrapper input detected for card ", card_index)
+		_on_card_selected(card_index)
+
+func _on_card_panel_input(event: InputEvent, card_index: int):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		print("Panel input detected for card ", card_index)
+		_on_card_selected(card_index)
+
 func _on_card_selected(card_index: int):
 	if reward_claimed:
+		print("Reward already claimed, ignoring selection")
 		return
 	
+	print("=== CARD SELECTION DEBUG ===")
+	print("Card selection attempted - index: ", card_index, ", current selected: ", selected_card_index)
+	print("Card displays array size: ", card_displays.size())
+	print("Reward claimed: ", reward_claimed)
+	
 	# Deselect all cards
+	print("Deselecting all cards...")
 	for i in range(card_displays.size()):
 		if is_instance_valid(card_displays[i]):
-			card_displays[i].deselect()
+			print("  Checking card ", i, " - has deselect method: ", card_displays[i].has_method("deselect"))
+			if card_displays[i].has_method("deselect"):
+				card_displays[i].deselect()
+				print("    Deselected card ", i)
+			else:
+				print("    Card ", i, " has no deselect method!")
+		else:
+			print("  Card ", i, " is not valid")
 	
 	# Select this card
 	if card_index < card_displays.size() and is_instance_valid(card_displays[card_index]):
-		card_displays[card_index].select()
+		print("Selecting card ", card_index)
+		if card_displays[card_index].has_method("select"):
+			card_displays[card_index].select()  # Fixed: was using 'i' instead of 'card_index'
+			print("  Successfully called select() on card ", card_index)
+		else:
+			print("  Card ", card_index, " has no select method!")
+		
 		selected_card_index = card_index
+		print("Set selected_card_index to: ", selected_card_index)
 		
 		# Enable experience buttons
+		print("Enabling experience buttons...")
+		print("  Capture button before: disabled = ", capture_button.disabled)
+		print("  Defense button before: disabled = ", defense_button.disabled)
+		
 		capture_button.disabled = false
 		defense_button.disabled = false
+		
+		print("  Capture button after: disabled = ", capture_button.disabled)
+		print("  Defense button after: disabled = ", defense_button.disabled)
 		
 		# Update info
 		var card_name = current_deck[card_index].card_name
 		reward_info_label.text = "Selected: " + card_name
+		print("Updated info label to: ", reward_info_label.text)
 		
 		# Disable Mnemosyne button when card is selected
 		mnemosyne_button.disabled = true
+		print("Disabled Mnemosyne button")
 		
-		print("Selected card: ", card_name)
+		print("Selected card: ", card_name, " at index: ", card_index)
+	else:
+		print("Failed to select card - invalid index or card display")
+		print("  card_index: ", card_index, " < card_displays.size(): ", card_displays.size())
+		if card_index < card_displays.size():
+			print("  is_instance_valid: ", is_instance_valid(card_displays[card_index]))
+	
+	print("=== END CARD SELECTION DEBUG ===")
+	print("")  # Empty line for readability
 
 func _on_capture_button_pressed():
+	print("Capture button pressed - selected_card_index: ", selected_card_index, ", reward_claimed: ", reward_claimed)
 	if selected_card_index == -1 or reward_claimed:
+		print("Cannot apply capture reward - no card selected or reward already claimed")
 		return
 	
 	apply_experience_reward("capture")
 
 func _on_defense_button_pressed():
+	print("Defense button pressed - selected_card_index: ", selected_card_index, ", reward_claimed: ", reward_claimed)
 	if selected_card_index == -1 or reward_claimed:
+		print("Cannot apply defense reward - no card selected or reward already claimed")
 		return
 	
 	apply_experience_reward("defense")
@@ -392,13 +454,13 @@ func apply_experience_reward(exp_type: String):
 	var card_name = current_deck[selected_card_index].card_name
 	var bonus_amount = 15
 	
-	# Check if tracker exists
-	if not has_node("/root/RunExperienceTrackerAutoload"):
+	# Check if tracker exists - use get_node_or_null
+	var tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+	if not tracker:
 		print("RunExperienceTrackerAutoload not found!")
 		return
 	
 	# Apply to run tracker
-	var tracker = get_node("/root/RunExperienceTrackerAutoload")
 	if exp_type == "capture":
 		tracker.add_capture_exp(card_index, bonus_amount)
 	else:
@@ -423,13 +485,13 @@ func apply_experience_reward(exp_type: String):
 	print("Applied ", bonus_amount, " ", exp_type, " experience to ", card_name)
 
 func apply_mnemosyne_reward():
-	# Check if memory manager exists
-	if not has_node("/root/MemoryJournalManagerAutoload"):
+	# Check if memory manager exists - use get_node_or_null
+	var memory_manager = get_node_or_null("/root/MemoryJournalManagerAutoload")
+	if not memory_manager:
 		print("MemoryJournalManagerAutoload not found!")
 		return
 	
 	# Apply consciousness boost
-	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
 	var boost_amount = 3  # Equivalent to 3 battles worth of progress
 	memory_manager.add_memory_fragments(boost_amount)
 	
