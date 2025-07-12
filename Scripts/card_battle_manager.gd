@@ -446,11 +446,20 @@ func get_panel_state_name() -> String:
 func start_game():
 	if is_tutorial_mode:
 		game_status_label.text = "Tutorial: Learning the Basics"
-		# In tutorial, player always goes first - set this BEFORE calling _on_game_started
-		turn_manager.current_player = TurnManager.Player.HUMAN
-		print("Tutorial started - player goes first")
-		_on_game_started()
-		show_tutorial_step(0)  # Start tutorial
+		# CRITICAL: Properly initialize turn manager for tutorial
+		turn_manager.is_game_active = true  # Make sure game is active
+		turn_manager.current_player = TurnManager.Player.HUMAN  # Set to human player
+		print("Tutorial started - turn manager set: active=", turn_manager.is_game_active, " current_player=", turn_manager.current_player)
+		print("Tutorial - is_player_turn check: ", turn_manager.is_player_turn())
+		
+		# Debug the turn manager state
+		turn_manager.debug_state()
+		
+		# Update status immediately to show it's player's turn
+		update_game_status()
+		
+		# Start tutorial flow
+		show_tutorial_step(0)
 	else:
 		game_status_label.text = "Flipping coin to determine who goes first..."
 		disable_player_input()
@@ -479,19 +488,31 @@ func show_tutorial_step(step: int):
 	tutorial_modal.dialog_text = message
 	tutorial_modal.popup_centered()
 	
-	if step <= 1:
-		# Pause input until they acknowledge the tutorial
-		disable_player_input()
-		tutorial_modal.confirmed.connect(_on_tutorial_continue.bind(step), CONNECT_ONE_SHOT)
+	# Handle input enabling logic - ONLY disable for step 0 and 1
+	match step:
+		0:
+			# Step 0: Disable input while showing the welcome message
+			disable_player_input()
+			tutorial_modal.confirmed.connect(_on_tutorial_continue.bind(step), CONNECT_ONE_SHOT)
+		1:
+			# Step 1: Disable input while showing the "click a card" message, but enable after they close it
+			disable_player_input()
+			tutorial_modal.confirmed.connect(_on_tutorial_continue.bind(step), CONNECT_ONE_SHOT)
+		_:
+			# For steps 2+, don't disable input - just show the message and let them continue playing
+			pass
 
 func _on_tutorial_continue(step: int):
 	match step:
 		0:
 			enable_player_input()
+			print("Tutorial: Player input enabled after step 0")
 			show_tutorial_step(1)
 		1:
-			# They need to select a card before we continue
-			pass
+			enable_player_input()
+			print("Tutorial: Player input enabled after step 1 - cards should now be clickable")
+			# Don't show step 2 yet - wait for them to actually select a card
+			# When they select a card, _on_card_gui_input will call show_tutorial_step(2)
 		_:
 			pass
 
@@ -523,8 +544,8 @@ func _on_game_started():
 	
 	# Special handling for tutorial mode
 	if is_tutorial_mode:
-		print("Tutorial mode: Enabling player input immediately")
-		enable_player_input()
+		print("Tutorial mode: Game started, waiting for tutorial flow")
+		# Don't enable input here - let tutorial flow handle it
 		return
 	
 	# Normal game mode: If it's opponent's turn, let them play
@@ -621,7 +642,22 @@ func get_current_scores() -> Dictionary:
 func update_game_status():
 	var scores = get_current_scores()
 	
-	if turn_manager.is_player_turn():
+	# Debug output for tutorial
+	if is_tutorial_mode:
+		print("UPDATE_GAME_STATUS - Tutorial mode:")
+		print("  is_game_active: ", turn_manager.is_game_active)
+		print("  current_player: ", turn_manager.current_player)
+		print("  is_player_turn(): ", turn_manager.is_player_turn())
+		print("  tutorial_step: ", tutorial_step)
+	
+	if is_tutorial_mode:
+		# Special tutorial status messages
+		if turn_manager.is_player_turn():
+			game_status_label.text = "Tutorial: Your Turn - " + get_tutorial_status_message()
+		else:
+			game_status_label.text = "Tutorial: Chronos is thinking..."
+			print("ERROR: Tutorial thinks it's opponent's turn!")
+	elif turn_manager.is_player_turn():
 		game_status_label.text = "Your Turn - Select a card and place it"
 	else:
 		var opponent_info = opponent_manager.get_opponent_info()
@@ -630,13 +666,23 @@ func update_game_status():
 	# Update to show scores instead of card counts
 	deck_name_label.text = "Score - Player: " + str(scores.player) + " | Opponent: " + str(scores.opponent)
 
-# Enable player input controls
+func get_tutorial_status_message() -> String:
+	match tutorial_step:
+		0, 1:
+			return "Click on a card to select it"
+		2:
+			return "Click on the grid to place your selected card"
+		_:
+			return "Continue playing cards"
+
+
 func enable_player_input():
 	set_process_input(true)
+	print("Tutorial: Player input ENABLED")
 
-# Disable player input controls
 func disable_player_input():
 	set_process_input(false)
+	print("Tutorial: Player input DISABLED")
 	
 	# Clear any current selection
 	if current_grid_index != -1:
@@ -1351,7 +1397,8 @@ func load_player_deck(deck_index: int):
 	
 	if is_tutorial_mode:
 		# Tutorial mode - use tutorial god
-		collection_path = "res://Resources/Collections/" + tutorial_god + ".tres"
+		collection_path = "res://Resources/Collections/" + tutorial_god.to_lower() + ".tres"
+		print("Loading tutorial collection from: ", collection_path)
 		collection = load(collection_path)
 		if collection:
 			print(tutorial_god, " collection loaded successfully")
@@ -1367,12 +1414,14 @@ func load_player_deck(deck_index: int):
 				print("Using deck definition: ", deck_def.deck_name)
 				print("Card indices: ", deck_card_indices)
 			else:
-				# Fallback: use all available cards
-				player_deck = collection.cards.duplicate()
+				# Fallback: use first 5 cards if no deck definitions
+				player_deck = []
 				deck_card_indices = []
-				for i in range(player_deck.size()):
+				var cards_to_use = min(5, collection.cards.size())
+				for i in range(cards_to_use):
+					player_deck.append(collection.cards[i])
 					deck_card_indices.append(i)
-				print("No deck definitions found, using all cards")
+				print("No deck definitions found, using first ", cards_to_use, " cards")
 			
 			print("Final player deck size: ", player_deck.size())
 			
@@ -1387,6 +1436,19 @@ func load_player_deck(deck_index: int):
 			return
 		else:
 			print("ERROR: Failed to load ", tutorial_god, " collection from ", collection_path)
+			# Fallback to a working collection
+			print("Trying fallback to Apollo collection...")
+			collection_path = "res://Resources/Collections/Apollo.tres"
+			collection = load(collection_path)
+			if collection:
+				player_deck = collection.get_deck(0)
+				deck_card_indices = collection.decks[0].card_indices.duplicate()
+				print("Fallback successful - using Apollo deck")
+				display_player_hand()
+				return
+			else:
+				print("CRITICAL ERROR: Even Apollo fallback failed!")
+				return
 	else:
 		# Normal mode - load the specified god collection
 		collection_path = "res://Resources/Collections/" + current_god + ".tres"
@@ -1400,11 +1462,7 @@ func load_player_deck(deck_index: int):
 		deck_card_indices = deck_def.card_indices.duplicate()
 		player_deck = collection.get_deck(deck_index)
 		
-		if is_tutorial_mode:
-			print("Loaded tutorial deck for ", current_god, " with ", player_deck.size(), " cards")
-		else:
-			setup_experience_panel()
-		
+		setup_experience_panel()
 		display_player_hand()
 	else:
 		push_error("Failed to load collection: " + collection_path)
@@ -1482,27 +1540,134 @@ func display_player_hand():
 		var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 		cards_container.add_child(card_display)
 		
+		# Wait one frame to ensure the card display is fully ready
+		await get_tree().process_frame
+		
 		# Position the card explicitly with the new spacing
 		card_display.position.x = start_x + i * total_spacing
 		
 		# Setup the card with its data
 		card_display.setup(card)
 		
-		# Connect to detect clicks on the card (only when it's player's turn)
-		card_display.panel.gui_input.connect(_on_card_gui_input.bind(card_display, i))
-		
-		# Connect hover signals for info panel
+		# ALWAYS connect hover signals for info panel (regardless of tutorial mode)
 		card_display.card_hovered.connect(_on_card_hovered)
 		card_display.card_unhovered.connect(_on_card_unhovered)
+		print("Tutorial: Connected hover signals for card ", i, ": ", card.card_name)
+		
+		# DEBUG: Check if panel exists and is ready
+		if not card_display.panel:
+			print("ERROR: Card display panel is null for card ", i)
+			continue
+		
+		print("Card ", i, " panel mouse filter: ", card_display.panel.mouse_filter)
+		print("Card ", i, " panel size: ", card_display.panel.size)
+		print("Card ", i, " panel position: ", card_display.panel.position)
+		
+		# Make sure the panel can receive input
+		card_display.panel.mouse_filter = Control.MOUSE_FILTER_PASS
+		
+		# Connect to detect clicks on the card - try multiple approaches
+		
+		# Approach 1: Connect to panel gui_input (original method)
+		card_display.panel.gui_input.connect(_on_card_gui_input.bind(card_display, i))
+		print("Tutorial: Connected panel gui_input for card ", i)
+		
+		# Approach 2: Also connect to mouse button signals directly
+		card_display.panel.button_down.connect(_on_card_button_down.bind(card_display, i))
+		print("Tutorial: Connected panel button_down for card ", i)
+		
+		# Approach 3: Test if the CardDisplay itself has input handling
+		if card_display.has_signal("input_event"):
+			card_display.input_event.connect(_on_card_input_event.bind(card_display, i))
+			print("Tutorial: Connected CardDisplay input_event for card ", i)
+
+func _on_card_button_down(card_display, card_index):
+	print("=== CARD BUTTON DOWN ===")
+	print("Card index: ", card_index)
+	print("Card name: ", player_deck[card_index].card_name if card_index < player_deck.size() else "Invalid")
+	
+	# Call the same logic as the gui_input handler
+	handle_card_selection(card_display, card_index)
+
+func _on_card_input_event(viewport, event, shape_idx, card_display, card_index):
+	print("=== CARD INPUT EVENT ===")
+	print("Event: ", event)
+	print("Card index: ", card_index)
+	
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		handle_card_selection(card_display, card_index)
+
+# Extract the card selection logic into a separate function
+
+func handle_card_selection(card_display, card_index):
+	print("=== HANDLING CARD SELECTION ===")
+	print("Card index: ", card_index)
+	print("Tutorial mode: ", is_tutorial_mode)
+	print("Is player turn: ", turn_manager.is_player_turn())
+	print("Tutorial step: ", tutorial_step)
+	
+	# In tutorial mode, FORCE allow card selection regardless of turn state
+	if is_tutorial_mode:
+		print("Tutorial mode: Allowing card selection")
+	elif not turn_manager.is_player_turn():
+		print("Not tutorial and not player turn - blocking selection")
+		return
+	
+	# Validate that we have a valid card index
+	if card_index >= player_deck.size():
+		print("Invalid card index: ", card_index)
+		return
+		
+	# Deselect previous card if any
+	var cards_container = hand_container.get_node_or_null("CardsContainer")
+	if cards_container:
+		for child in cards_container.get_children():
+			if child is CardDisplay and child.is_selected:
+				child.deselect()
+	
+	# Select this card
+	card_display.select()
+	selected_card_index = card_index
+	print("Successfully selected card: ", player_deck[card_index].card_name)
+	
+	# Tutorial advancement - they selected a card
+	if is_tutorial_mode and tutorial_step == 1:
+		print("Tutorial: Player selected card during step 1, advancing to step 2")
+		show_tutorial_step(2)
+	
+	# Initialize grid selection if not already set
+	if current_grid_index == -1:
+		# Find the first unoccupied grid slot
+		for i in range(grid_slots.size()):
+			if not grid_occupied[i]:
+				current_grid_index = i
+				grid_slots[i].add_theme_stylebox_override("panel", selected_grid_style)
+				print("Auto-selected grid slot ", i)
+				break
 
 # Handle card input events
 func _on_card_gui_input(event, card_display, card_index):
-	# Only allow card selection during player's turn
-	if not turn_manager.is_player_turn():
+	print("=== CARD INPUT RECEIVED ===")
+	print("Event: ", event)
+	print("Card index: ", card_index)
+	print("Input processing enabled: ", is_processing_input())
+	print("Tutorial mode: ", is_tutorial_mode)
+	print("Turn manager active: ", turn_manager.is_game_active)
+	print("Is player turn: ", turn_manager.is_player_turn())
+	print("Tutorial step: ", tutorial_step)
+	
+	# In tutorial mode, FORCE allow card selection regardless of turn state
+	if is_tutorial_mode:
+		print("Tutorial mode: Allowing card input")
+	elif not turn_manager.is_player_turn():
+		print("Not tutorial and not player turn - blocking input")
 		return
 		
 	if event is InputEventMouseButton:
+		print("Mouse button event - button:", event.button_index, " pressed:", event.pressed)
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			print("Left click confirmed on card ", card_index)
+			
 			# Validate that we have a valid card index
 			if card_index >= player_deck.size():
 				print("Invalid card index: ", card_index)
@@ -1518,10 +1683,11 @@ func _on_card_gui_input(event, card_display, card_index):
 			# Select this card
 			card_display.select()
 			selected_card_index = card_index
-			print("Selected card: ", player_deck[card_index].card_name)
+			print("Successfully selected card: ", player_deck[card_index].card_name)
 			
 			# Tutorial advancement - they selected a card
 			if is_tutorial_mode and tutorial_step == 1:
+				print("Tutorial: Player selected card during step 1, advancing to step 2")
 				show_tutorial_step(2)
 			
 			# Initialize grid selection if not already set
@@ -1531,7 +1697,10 @@ func _on_card_gui_input(event, card_display, card_index):
 					if not grid_occupied[i]:
 						current_grid_index = i
 						grid_slots[i].add_theme_stylebox_override("panel", selected_grid_style)
+						print("Auto-selected grid slot ", i)
 						break
+	else:
+		print("Non-mouse event received: ", event.get_class())
 
 # Grid hover handlers (only during player's turn)
 func _on_grid_mouse_entered(grid_index):

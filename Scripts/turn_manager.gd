@@ -22,6 +22,17 @@ func start_game():
 	is_game_active = false
 	perform_coin_flip()
 
+func debug_state():
+	print("=== TURN MANAGER DEBUG ===")
+	print("is_game_active: ", is_game_active)
+	print("current_player: ", current_player)
+	print("Player.HUMAN: ", Player.HUMAN)
+	print("Player.OPPONENT: ", Player.OPPONENT)
+	print("is_player_turn(): ", is_player_turn())
+	print("is_opponent_turn(): ", is_opponent_turn())
+	print("==========================")
+
+
 # Simulate coin flip to determine who goes first
 func perform_coin_flip():
 	# Add a small delay for dramatic effect
@@ -62,7 +73,10 @@ func next_turn():
 
 # Check if it's the player's turn
 func is_player_turn() -> bool:
-	return is_game_active and current_player == Player.HUMAN
+	var result = is_game_active and current_player == Player.HUMAN
+	if not result:
+		print("is_player_turn() = false because: is_game_active=", is_game_active, " current_player=", current_player, " Player.HUMAN=", Player.HUMAN)
+	return result
 
 # Check if it's the opponent's turn
 func is_opponent_turn() -> bool:

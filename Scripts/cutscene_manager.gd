@@ -119,7 +119,8 @@ func return_to_previous_scene():
 		# Set up tutorial battle parameters
 		get_tree().set_meta("scene_params", {
 			"is_tutorial": true,
-			"god": "Mnemosyne",
+			"god": "Mnemosyne",  # This should be the player's god
+			"deck_index": 0,     # Add deck index for consistency
 			"opponent": "Chronos"
 		})
 		get_tree().change_scene_to_file("res://Scenes/CardBattle.tscn")
