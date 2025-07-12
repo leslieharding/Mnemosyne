@@ -125,7 +125,7 @@ func _ready():
 	
 	if is_tutorial_mode:
 		print("Starting tutorial mode with god: ", tutorial_god, " vs opponent: ", params.get("opponent", "Chronos"))
-		setup_tutorial_ui()
+		# No special UI setup needed - just play normally
 	
 	# Add journal button (unless tutorial mode)
 	setup_journal_button()
@@ -143,26 +143,8 @@ func _ready():
 	start_game()
 
 func setup_tutorial_ui():
-	# Create tutorial overlay container
-	var tutorial_canvas = CanvasLayer.new()
-	tutorial_canvas.layer = 200  # Very high layer to be on top of everything
-	tutorial_canvas.name = "TutorialCanvas"
-	add_child(tutorial_canvas)
-	
-	tutorial_overlay = Control.new()
-	tutorial_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	tutorial_overlay.name = "TutorialOverlay"
-	tutorial_canvas.add_child(tutorial_overlay)
-	
-	# Create modal dialog for tutorial messages
-	tutorial_modal = AcceptDialog.new()
-	tutorial_modal.title = "Tutorial"
-	tutorial_modal.size = Vector2(400, 200)
-	tutorial_modal.position = Vector2(400, 200)
-	tutorial_modal.ok_button_text = "Continue"
-	tutorial_overlay.add_child(tutorial_modal)
-	
-	print("Tutorial UI setup complete")
+	# Simplified - no modal dialogs, just play normally
+	print("Tutorial mode: Simplified setup complete")
 
 func setup_notification_manager():
 	if not notification_manager:
@@ -446,75 +428,25 @@ func get_panel_state_name() -> String:
 func start_game():
 	if is_tutorial_mode:
 		game_status_label.text = "Tutorial: Learning the Basics"
-		# CRITICAL: Properly initialize turn manager for tutorial
-		turn_manager.is_game_active = true  # Make sure game is active
-		turn_manager.current_player = TurnManager.Player.HUMAN  # Set to human player
-		print("Tutorial started - turn manager set: active=", turn_manager.is_game_active, " current_player=", turn_manager.current_player)
-		print("Tutorial - is_player_turn check: ", turn_manager.is_player_turn())
-		
-		# Debug the turn manager state
-		turn_manager.debug_state()
-		
-		# Update status immediately to show it's player's turn
+		# Simple tutorial setup - just start the game normally
+		turn_manager.is_game_active = true
+		turn_manager.current_player = TurnManager.Player.HUMAN
+		enable_player_input()
 		update_game_status()
-		
-		# Start tutorial flow
-		show_tutorial_step(0)
+		print("Tutorial started as normal game - player can immediately play cards")
 	else:
 		game_status_label.text = "Flipping coin to determine who goes first..."
 		disable_player_input()
 		turn_manager.start_game()
 
-func show_tutorial_step(step: int):
-	tutorial_step = step
-	var message = ""
-	
-	match step:
-		0:
-			message = "Welcome to the world of card battles! This is your hand of cards at the bottom. Each card has numbers on four sides representing its power in each direction."
-		1:
-			message = "Click on a card in your hand to select it. Try clicking on any card now."
-		2:
-			message = "Great! Now you'll see a grid in the center. Click on any empty space to place your card there."
-		3:
-			message = "Excellent! When cards are placed next to each other, they battle. The higher number wins and captures the opponent's card. Continue playing cards to learn more."
-		4:
-			message = "Cards battle using the sides that face each other. A card with 3 pointing North will battle a card with 2 pointing South - the 3 wins!"
-		5:
-			message = "Continue placing your remaining cards. Don't worry about losing - this is about learning the rules."
-		_:
-			return  # No more tutorial steps
-	
-	tutorial_modal.dialog_text = message
-	tutorial_modal.popup_centered()
-	
-	# Handle input enabling logic - ONLY disable for step 0 and 1
-	match step:
-		0:
-			# Step 0: Disable input while showing the welcome message
-			disable_player_input()
-			tutorial_modal.confirmed.connect(_on_tutorial_continue.bind(step), CONNECT_ONE_SHOT)
-		1:
-			# Step 1: Disable input while showing the "click a card" message, but enable after they close it
-			disable_player_input()
-			tutorial_modal.confirmed.connect(_on_tutorial_continue.bind(step), CONNECT_ONE_SHOT)
-		_:
-			# For steps 2+, don't disable input - just show the message and let them continue playing
-			pass
+# Remove all the tutorial step functions and replace with simple status messages
+func get_tutorial_status_message() -> String:
+	return "Select a card and place it on the grid"
 
-func _on_tutorial_continue(step: int):
-	match step:
-		0:
-			enable_player_input()
-			print("Tutorial: Player input enabled after step 0")
-			show_tutorial_step(1)
-		1:
-			enable_player_input()
-			print("Tutorial: Player input enabled after step 1 - cards should now be clickable")
-			# Don't show step 2 yet - wait for them to actually select a card
-			# When they select a card, _on_card_gui_input will call show_tutorial_step(2)
-		_:
-			pass
+
+
+
+
 
 # Handle coin flip result
 func _on_coin_flip_result(player_goes_first: bool):
@@ -666,14 +598,6 @@ func update_game_status():
 	# Update to show scores instead of card counts
 	deck_name_label.text = "Score - Player: " + str(scores.player) + " | Opponent: " + str(scores.opponent)
 
-func get_tutorial_status_message() -> String:
-	match tutorial_step:
-		0, 1:
-			return "Click on a card to select it"
-		2:
-			return "Click on the grid to place your selected card"
-		_:
-			return "Continue playing cards"
 
 
 func enable_player_input():
@@ -1619,10 +1543,7 @@ func handle_card_selection(card_display, card_index):
 	selected_card_index = card_index
 	print("Successfully selected card: ", player_deck[card_index].card_name)
 	
-	# Tutorial advancement - they selected a card
-	if is_tutorial_mode and tutorial_step == 1:
-		print("Tutorial: Player selected card during step 1, advancing to step 2")
-		show_tutorial_step(2)
+	
 	
 	# Initialize grid selection if not already set
 	if current_grid_index == -1:
@@ -1674,10 +1595,7 @@ func _on_card_gui_input(event, card_display, card_index):
 			selected_card_index = card_index
 			print("Successfully selected card: ", player_deck[card_index].card_name)
 			
-			# Tutorial advancement - they selected a card
-			if is_tutorial_mode and tutorial_step == 1:
-				print("Tutorial: Player selected card during step 1, advancing to step 2")
-				show_tutorial_step(2)
+			
 			
 			# Initialize grid selection if not already set
 			if current_grid_index == -1:
@@ -1878,23 +1796,7 @@ func place_card_on_grid():
 	# Switch turns
 	turn_manager.next_turn()
 
-	# Add tutorial advancement at the very end
-	if is_tutorial_mode:
-		match tutorial_step:
-			1:
-				# They selected a card, now show grid selection tutorial
-				show_tutorial_step(2)
-			2:
-				# They placed their first card
-				show_tutorial_step(3)
-			3:
-				# After a few cards, explain combat
-				if player_deck.size() <= 3:  # When they have 2 cards left
-					show_tutorial_step(4)
-			4:
-				# Continue with general advice
-				if player_deck.size() <= 2:  # When they have 1 card left
-					show_tutorial_step(5)
+	
 
 # Handle passive abilities when a card is placed
 func handle_passive_abilities_on_place(grid_position: int, card_data: CardResource, card_level: int):
