@@ -33,7 +33,7 @@ func _ready():
 func create_selection_styles():
 	# Default style (from scene)
 	default_style = StyleBoxFlat.new()
-	default_style.bg_color = Color("#581033", 1.0)
+	
 	default_style.border_width_left = 4
 	default_style.border_width_top = 4
 	default_style.border_width_right = 4
@@ -44,13 +44,15 @@ func create_selection_styles():
 	default_style.corner_radius_bottom_right = 4
 	default_style.corner_radius_bottom_left = 4
 	
-	# Selected style (brighter border)
+	# Selected style (same background, only border changes)
 	selected_style = default_style.duplicate()
-	selected_style.border_color = Color("#44AAFF")  # Bright blue
+	selected_style.border_color = Color("#44AAFF")  # Bright blue border
 	selected_style.border_width_left = 6
 	selected_style.border_width_top = 6
 	selected_style.border_width_right = 6
 	selected_style.border_width_bottom = 6
+	
+
 
 # Set up the card display with card data
 func setup(card: CardResource):
