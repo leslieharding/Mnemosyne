@@ -312,10 +312,10 @@ func create_experience_info_display(card_index: int, tracker) -> Control:
 	# Create container for experience info
 	var exp_container = VBoxContainer.new()
 	exp_container.name = "ExperienceInfo"
-	exp_container.custom_minimum_size = Vector2(60, 150)  # Match card height
+	exp_container.custom_minimum_size = Vector2(80, 150)  # Slightly wider for total exp
 	exp_container.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	exp_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	exp_container.add_theme_constant_override("separation", 8)
+	exp_container.add_theme_constant_override("separation", 6)  # Tighter spacing for more content
 	
 	# Add title
 	var title_label = Label.new()
@@ -345,15 +345,64 @@ func create_experience_info_display(card_index: int, tracker) -> Control:
 		defense_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		exp_container.add_child(defense_label)
 		
-		# Add total for this run
-		var total_run_exp = exp_data["capture_exp"] + exp_data["defense_exp"]
-		if total_run_exp > 0:
-			var total_label = Label.new()
-			total_label.text = "Total: +" + str(total_run_exp)
-			total_label.add_theme_font_size_override("font_size", 10)
-			total_label.add_theme_color_override("font_color", Color("#AAAAAA"))
-			total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			exp_container.add_child(total_label)
+		# Add small separator
+		var separator = HSeparator.new()
+		separator.add_theme_constant_override("separation", 4)
+		exp_container.add_child(separator)
+		
+		# Total experience section
+		var total_title = Label.new()
+		total_title.text = "Total:"
+		total_title.add_theme_font_size_override("font_size", 10)
+		total_title.add_theme_color_override("font_color", Color("#AAAAAA"))
+		total_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		exp_container.add_child(total_title)
+		
+		# Get total experience from global tracker
+		var params = get_scene_params()
+		var god_name = params.get("god", "Apollo")
+		
+		var global_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
+		if global_tracker and is_instance_valid(global_tracker):
+			var total_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
+			var total_capture = total_exp_data.get("capture_exp", 0)
+			var total_defense = total_exp_data.get("defense_exp", 0)
+			
+			# Total capture experience
+			var total_capture_label = Label.new()
+			total_capture_label.text = "⚔️ " + str(total_capture)
+			total_capture_label.add_theme_font_size_override("font_size", 10)
+			total_capture_label.add_theme_color_override("font_color", Color("#B8860B"))  # Darker gold
+			total_capture_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			exp_container.add_child(total_capture_label)
+			
+			# Total defense experience
+			var total_defense_label = Label.new()
+			total_defense_label.text = "🛡️ " + str(total_defense)
+			total_defense_label.add_theme_font_size_override("font_size", 10)
+			total_defense_label.add_theme_color_override("font_color", Color("#4682B4"))  # Darker blue
+			total_defense_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			exp_container.add_child(total_defense_label)
+			
+			# Add level display for quick reference
+			var combined_total = total_capture + total_defense
+			if combined_total > 0:
+				var level = ExperienceHelpers.calculate_level(combined_total)
+				var level_label = Label.new()
+				level_label.text = "Lv." + str(level)
+				level_label.add_theme_font_size_override("font_size", 9)
+				level_label.add_theme_color_override("font_color", Color("#888888"))
+				level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				exp_container.add_child(level_label)
+		else:
+			# No global tracker - show notice
+			var no_total_label = Label.new()
+			no_total_label.text = "Total:\nN/A"
+			no_total_label.add_theme_font_size_override("font_size", 9)
+			no_total_label.add_theme_color_override("font_color", Color("#666666"))
+			no_total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			no_total_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			exp_container.add_child(no_total_label)
 	else:
 		# No tracker available
 		var no_data_label = Label.new()
