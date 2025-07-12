@@ -1,18 +1,405 @@
+# res://Scripts/reward_screen.gd
 extends Control
 
+# UI References
+@onready var main_container = $VBoxContainer
+@onready var title_label = $VBoxContainer/Title
+@onready var continue_button = $VBoxContainer/ContinueButton
+
+# Card selection
+var current_deck: Array[CardResource] = []
+var deck_indices: Array[int] = []
+var selected_card_index: int = -1
+var selected_experience_type: String = ""  # "capture" or "defense"
+var reward_claimed: bool = false
+
+# UI components we'll create
+var cards_container: HBoxContainer
+var card_displays: Array[CardDisplay] = []
+var capture_button: Button
+var defense_button: Button
+var mnemosyne_button: Button
+var reward_info_label: Label
+
 func _ready():
-	# Connect the continue button
-	$VBoxContainer/ContinueButton.pressed.connect(_on_continue_pressed)
+	# Safety check - ensure we're in the tree
+	if not get_tree():
+		print("Error: Node not in scene tree!")
+		return
 	
-	# Simple victory message
-	$VBoxContainer/Title.text = "Victory!"
-	$VBoxContainer/RewardText.text = "You gained 1 gold!"
+	# Wait a frame to ensure autoloads are ready
+	await get_tree().process_frame
+	
+	# Double check we still have a tree after awaiting
+	if not get_tree():
+		print("Error: Lost scene tree connection!")
+		return
+	
+	setup_reward_interface()
+	await load_deck_data()
+	
+	# Connect the continue button (only enabled after reward selection)
+	if continue_button:
+		continue_button.pressed.connect(_on_continue_pressed)
+		continue_button.disabled = true
+		continue_button.text = "Choose a Reward"
+	else:
+		print("Error: Continue button not found!")
+
+func setup_reward_interface():
+	# Update title
+	title_label.text = "Choose Your Reward"
+	
+	# Create card selection area
+	var card_section = VBoxContainer.new()
+	card_section.name = "CardSection"
+	
+	var card_label = Label.new()
+	card_label.text = "Select a card to enhance:"
+	card_label.add_theme_font_size_override("font_size", 16)
+	card_section.add_child(card_label)
+	
+	# Container for card displays
+	cards_container = HBoxContainer.new()
+	cards_container.name = "CardsContainer"
+	cards_container.alignment = BoxContainer.ALIGNMENT_CENTER
+	cards_container.add_theme_constant_override("separation", 10)
+	card_section.add_child(cards_container)
+	
+	# Experience type selection
+	var exp_section = VBoxContainer.new()
+	exp_section.name = "ExperienceSection"
+	
+	var exp_label = Label.new()
+	exp_label.text = "Choose experience type:"
+	exp_label.add_theme_font_size_override("font_size", 16)
+	exp_section.add_child(exp_label)
+	
+	var exp_buttons = HBoxContainer.new()
+	exp_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
+	exp_buttons.add_theme_constant_override("separation", 20)
+	
+	capture_button = Button.new()
+	capture_button.text = "⚔️ +15 Capture XP"
+	capture_button.disabled = true
+	capture_button.pressed.connect(_on_capture_button_pressed)
+	exp_buttons.add_child(capture_button)
+	
+	defense_button = Button.new()
+	defense_button.text = "🛡️ +15 Defense XP"
+	defense_button.disabled = true
+	defense_button.pressed.connect(_on_defense_button_pressed)
+	exp_buttons.add_child(defense_button)
+	
+	exp_section.add_child(exp_buttons)
+	
+	# Separator
+	var separator1 = HSeparator.new()
+	
+	# Mnemosyne section
+	var mnemosyne_section = VBoxContainer.new()
+	mnemosyne_section.name = "MnemosyneSection"
+	
+	var mnemosyne_label = Label.new()
+	mnemosyne_label.text = "Or enhance Mnemosyne's consciousness:"
+	mnemosyne_label.add_theme_font_size_override("font_size", 16)
+	mnemosyne_section.add_child(mnemosyne_label)
+	
+	mnemosyne_button = Button.new()
+	mnemosyne_button.text = "🧠 Consciousness Boost"
+	mnemosyne_button.pressed.connect(_on_mnemosyne_button_pressed)
+	mnemosyne_section.add_child(mnemosyne_button)
+	
+	# Info label for showing current selection
+	reward_info_label = Label.new()
+	reward_info_label.text = ""
+	reward_info_label.add_theme_font_size_override("font_size", 12)
+	reward_info_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+	reward_info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	
+	# Add everything to main container (insert before continue button)
+	var continue_index = main_container.get_child_count() - 1
+	main_container.add_child(card_section)
+	main_container.move_child(card_section, continue_index)
+	
+	main_container.add_child(HSeparator.new())
+	main_container.move_child(main_container.get_child(-1), continue_index + 1)
+	
+	main_container.add_child(exp_section)
+	main_container.move_child(exp_section, continue_index + 2)
+	
+	main_container.add_child(separator1)
+	main_container.move_child(separator1, continue_index + 3)
+	
+	main_container.add_child(mnemosyne_section)
+	main_container.move_child(mnemosyne_section, continue_index + 4)
+	
+	main_container.add_child(HSeparator.new())
+	main_container.move_child(main_container.get_child(-1), continue_index + 5)
+	
+	main_container.add_child(reward_info_label)
+	main_container.move_child(reward_info_label, continue_index + 6)
+
+func load_deck_data():
+	var params = get_scene_params()
+	var god_name = params.get("god", "Apollo")
+	var deck_index = params.get("deck_index", 0)
+	
+	print("Loading deck data for: ", god_name, " deck ", deck_index)
+	
+	# Load the god's collection
+	var collection_path = "res://Resources/Collections/" + god_name.to_lower() + ".tres"
+	var collection: GodCardCollection = load(collection_path)
+	
+	if not collection:
+		print("Failed to load collection for rewards: ", collection_path)
+		return
+	
+	if deck_index >= collection.decks.size():
+		print("Invalid deck index: ", deck_index)
+		return
+	
+	# Get the deck and indices
+	current_deck = collection.get_deck(deck_index)
+	deck_indices = collection.decks[deck_index].card_indices.duplicate()
+	
+	print("Loaded deck with ", current_deck.size(), " cards")
+	
+	# Create card displays
+	await create_card_displays()
+	
+	# Update Mnemosyne button with current level info
+	update_mnemosyne_button_text()
+
+func create_card_displays():
+	# Safety check
+	if not get_tree():
+		print("Error: No scene tree in create_card_displays")
+		return
+	
+	# Clear existing displays
+	for display in card_displays:
+		if is_instance_valid(display):
+			display.queue_free()
+	card_displays.clear()
+	
+	# Check if tracker exists - use a more defensive approach
+	var tracker = null
+	if get_tree() and get_tree().has_node("/root/RunExperienceTrackerAutoload"):
+		tracker = get_tree().get_node("/root/RunExperienceTrackerAutoload")
+	
+	if not tracker:
+		print("RunExperienceTrackerAutoload not found! Creating cards without experience data.")
+	
+	# Create display for each card
+	for i in range(current_deck.size()):
+		var card = current_deck[i]
+		var card_index = deck_indices[i]
+		
+		print("Creating display for card: ", card.card_name)
+		
+		# Create card display
+		var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
+		cards_container.add_child(card_display)
+		
+		# Wait for ready
+		await get_tree().process_frame
+		
+		# Setup the card
+		card_display.setup(card)
+		
+		# Add experience info overlay (only if tracker exists)
+		if tracker:
+			add_experience_overlay(card_display, card_index, tracker)
+		
+		# Connect selection
+		if card_display.panel:
+			card_display.panel.gui_input.connect(_on_card_selected.bind(i))
+		else:
+			print("Warning: Card display panel is null for card ", i)
+		
+		# Store reference
+		card_displays.append(card_display)
+	
+	print("Created ", card_displays.size(), " card displays")
+
+func add_experience_overlay(card_display: CardDisplay, card_index: int, tracker):
+	# Get current run experience for this card
+	var exp_data = tracker.get_card_experience(card_index)
+	
+	# Create overlay container
+	var overlay = VBoxContainer.new()
+	overlay.name = "ExperienceOverlay"
+	overlay.position = Vector2(5, 5)
+	overlay.add_theme_constant_override("separation", 2)
+	
+	# Capture experience label
+	var capture_label = Label.new()
+	capture_label.text = "⚔️+" + str(exp_data["capture_exp"])
+	capture_label.add_theme_font_size_override("font_size", 10)
+	capture_label.add_theme_color_override("font_color", Color("#FFD700"))
+	overlay.add_child(capture_label)
+	
+	# Defense experience label  
+	var defense_label = Label.new()
+	defense_label.text = "🛡️+" + str(exp_data["defense_exp"])
+	defense_label.add_theme_font_size_override("font_size", 10)
+	defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
+	overlay.add_child(defense_label)
+	
+	# Add to card panel
+	card_display.panel.add_child(overlay)
+	overlay.z_index = 10
+
+func update_mnemosyne_button_text():
+	# Safety check
+	if not get_tree():
+		print("Error: No scene tree in update_mnemosyne_button_text")
+		return
+	
+	if not get_tree().has_node("/root/MemoryJournalManagerAutoload"):
+		print("MemoryJournalManagerAutoload not found for Mnemosyne button update")
+		mnemosyne_button.text = "🧠 Consciousness Boost\n(Memory Manager Unavailable)"
+		return
+	
+	var memory_manager = get_tree().get_node("/root/MemoryJournalManagerAutoload")
+	var mnemosyne_data = memory_manager.get_mnemosyne_memory()
+	var current_level = mnemosyne_data.get("consciousness_level", 1)
+	var current_desc = memory_manager.get_consciousness_description(current_level)
+	var next_desc = memory_manager.get_consciousness_description(current_level + 1)
+	
+	mnemosyne_button.text = "🧠 Consciousness Boost\n" + current_desc + " → " + next_desc
+
+func _on_card_selected(card_index: int):
+	if reward_claimed:
+		return
+	
+	# Deselect all cards
+	for i in range(card_displays.size()):
+		if is_instance_valid(card_displays[i]):
+			card_displays[i].deselect()
+	
+	# Select this card
+	if card_index < card_displays.size() and is_instance_valid(card_displays[card_index]):
+		card_displays[card_index].select()
+		selected_card_index = card_index
+		
+		# Enable experience buttons
+		capture_button.disabled = false
+		defense_button.disabled = false
+		
+		# Update info
+		var card_name = current_deck[card_index].card_name
+		reward_info_label.text = "Selected: " + card_name
+		
+		# Disable Mnemosyne button when card is selected
+		mnemosyne_button.disabled = true
+		
+		print("Selected card: ", card_name)
+
+func _on_capture_button_pressed():
+	if selected_card_index == -1 or reward_claimed:
+		return
+	
+	apply_experience_reward("capture")
+
+func _on_defense_button_pressed():
+	if selected_card_index == -1 or reward_claimed:
+		return
+	
+	apply_experience_reward("defense")
+
+func _on_mnemosyne_button_pressed():
+	if reward_claimed:
+		return
+	
+	apply_mnemosyne_reward()
+
+func apply_experience_reward(exp_type: String):
+	var card_index = deck_indices[selected_card_index]
+	var card_name = current_deck[selected_card_index].card_name
+	var bonus_amount = 15
+	
+	# Check if tracker exists
+	if not has_node("/root/RunExperienceTrackerAutoload"):
+		print("RunExperienceTrackerAutoload not found!")
+		return
+	
+	# Apply to run tracker
+	var tracker = get_node("/root/RunExperienceTrackerAutoload")
+	if exp_type == "capture":
+		tracker.add_capture_exp(card_index, bonus_amount)
+	else:
+		tracker.add_defense_exp(card_index, bonus_amount)
+	
+	# Update UI
+	reward_claimed = true
+	continue_button.disabled = false
+	continue_button.text = "Continue"
+	
+	# Disable all reward options
+	capture_button.disabled = true
+	defense_button.disabled = true
+	mnemosyne_button.disabled = true
+	
+	# Update info label
+	var exp_icon = "⚔️" if exp_type == "capture" else "🛡️"
+	var exp_name = exp_type.capitalize()
+	reward_info_label.text = "Reward Applied: " + card_name + " gained " + str(bonus_amount) + " " + exp_name + " XP!"
+	reward_info_label.add_theme_color_override("font_color", Color("#66BB6A"))
+	
+	print("Applied ", bonus_amount, " ", exp_type, " experience to ", card_name)
+
+func apply_mnemosyne_reward():
+	# Check if memory manager exists
+	if not has_node("/root/MemoryJournalManagerAutoload"):
+		print("MemoryJournalManagerAutoload not found!")
+		return
+	
+	# Apply consciousness boost
+	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
+	var boost_amount = 3  # Equivalent to 3 battles worth of progress
+	memory_manager.add_memory_fragments(boost_amount)
+	
+	# Force consciousness level recalculation by adding battles
+	var current_battles = memory_manager.get_mnemosyne_memory()["total_battles"]
+	# Temporarily boost battle count to trigger level up, then restore
+	memory_manager.memory_data["mnemosyne"]["total_battles"] += boost_amount
+	var new_level = memory_manager.calculate_mnemosyne_consciousness_level()
+	memory_manager.memory_data["mnemosyne"]["consciousness_level"] = new_level
+	memory_manager.memory_data["mnemosyne"]["total_battles"] = current_battles  # Restore original
+	
+	memory_manager.save_memory_data()
+	
+	# Update UI
+	reward_claimed = true
+	continue_button.disabled = false
+	continue_button.text = "Continue"
+	
+	# Disable all reward options
+	capture_button.disabled = true
+	defense_button.disabled = true
+	mnemosyne_button.disabled = true
+	
+	# Deselect any card
+	for display in card_displays:
+		if is_instance_valid(display):
+			display.deselect()
+	
+	# Update info label
+	reward_info_label.text = "Reward Applied: Mnemosyne's consciousness has expanded!"
+	reward_info_label.add_theme_color_override("font_color", Color("#DDA0DD"))
+	
+	print("Applied consciousness boost to Mnemosyne")
 
 func _on_continue_pressed():
+	if not reward_claimed:
+		return
+	
 	# Get the map data and return to map
 	var params = get_scene_params()
 	
-	# Pass everything back to the map (unchanged for now)
+	# Pass everything back to the map
 	get_tree().set_meta("scene_params", {
 		"god": params.get("god", "Apollo"),
 		"deck_index": params.get("deck_index", 0),
