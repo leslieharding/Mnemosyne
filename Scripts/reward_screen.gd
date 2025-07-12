@@ -413,9 +413,7 @@ func _on_card_selected(card_index: int):
 		reward_info_label.text = "Selected: " + card_name
 		print("Updated info label to: ", reward_info_label.text)
 		
-		# Disable Mnemosyne button when card is selected
-		mnemosyne_button.disabled = true
-		print("Disabled Mnemosyne button")
+		
 		
 		print("Selected card: ", card_name, " at index: ", card_index)
 	else:
