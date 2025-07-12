@@ -969,10 +969,13 @@ func end_game():
 		opponent_is_thinking = false
 		turn_manager.end_game()
 		
-		# Show tutorial completion message
-		tutorial_modal.dialog_text = "Lesson learned! Through defeat comes wisdom. You now understand the basic rules of card combat. Your real journey begins now..."
-		tutorial_modal.popup_centered()
-		tutorial_modal.confirmed.connect(_on_tutorial_finished, CONNECT_ONE_SHOT)
+		# Create and show tutorial completion dialog
+		var tutorial_dialog = AcceptDialog.new()
+		tutorial_dialog.dialog_text = "Lesson learned! Through defeat comes wisdom. You now understand the basic rules of card combat. Your real journey begins now..."
+		tutorial_dialog.title = "Tutorial Complete"
+		add_child(tutorial_dialog)
+		tutorial_dialog.popup_centered()
+		tutorial_dialog.confirmed.connect(_on_tutorial_finished, CONNECT_ONE_SHOT)
 		return
 	
 	var tracker = get_node("/root/BossPredictionTrackerAutoload")
