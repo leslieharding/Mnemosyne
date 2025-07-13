@@ -99,7 +99,8 @@ func _on_new_game_button_pressed_with_confirmation():
 func _on_continue_button_pressed():
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
-# Confirmed new game - erase progress and start fresh
+# Replace this entire function in Scripts/main_menu.gd (around lines 95-125)
+
 func _on_new_game_confirmed():
 	print("Player confirmed new game - erasing all progress")
 	
@@ -120,6 +121,12 @@ func _on_new_game_confirmed():
 		var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
 		memory_manager.clear_all_memories()
 		print("Memory journal data cleared")
+	
+	# Clear conversation data
+	if has_node("/root/ConversationManagerAutoload"):
+		var conv_manager = get_node("/root/ConversationManagerAutoload")
+		conv_manager.clear_all_conversations()
+		print("Conversation data cleared")
 	
 	# Trigger the opening cutscene instead of going directly to god select
 	if has_node("/root/CutsceneManagerAutoload"):

@@ -22,6 +22,7 @@ GlobalProgressTrackerAutoload="*res://Scripts/global_progress_tracker.gd"
 MemoryJournalManagerAutoload="*res://Scripts/memory_journal_manager.gd"
 BossPredictionTrackerAutoload="*res://Scripts/boss_prediction_tracker.gd"
 CutsceneManagerAutoload="*res://Scripts/cutscene_manager.gd"
+ConversationManagerAutoload="*res://Scripts/conversation_manager.gd"
 
 [input]
 

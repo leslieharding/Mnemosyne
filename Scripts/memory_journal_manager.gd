@@ -43,7 +43,6 @@ func _ready():
 
 # === BESTIARY FUNCTIONS ===
 
-# Record an enemy encounter with simplified experience system
 func record_enemy_encounter(enemy_name: String, victory: bool, enemy_difficulty: int = 0):
 	# Calculate experience gained
 	var exp_gained = WIN_EXPERIENCE if victory else LOSS_EXPERIENCE
@@ -82,6 +81,12 @@ func record_enemy_encounter(enemy_name: String, victory: bool, enemy_difficulty:
 		enemy_data["memory_level"] = new_level
 		emit_signal("memory_level_increased", "bestiary", enemy_name, new_level)
 		print("Enemy memory level increased! ", enemy_name, " is now level ", new_level)
+		
+		# Check for conversation trigger when enemy reaches mastery level
+		if new_level >= 4 and has_node("/root/ConversationManagerAutoload"):  # "Analyzed" level or higher
+			var conv_manager = get_node("/root/ConversationManagerAutoload")
+			print("Triggering first_enemy_mastered conversation")
+			conv_manager.trigger_conversation("first_enemy_mastered")
 	
 	print("Enemy encounter recorded: ", enemy_name, " (+", exp_gained, " exp, total: ", enemy_data["total_experience"], ", level: ", enemy_data["memory_level"], ")")
 	
@@ -289,7 +294,6 @@ func get_all_god_memories() -> Dictionary:
 
 # === MNEMOSYNE FUNCTIONS === (unchanged from original)
 
-# Update Mnemosyne's battle statistics
 func update_mnemosyne_battle_stats(victory: bool):
 	memory_data["mnemosyne"]["total_battles"] += 1
 	if victory:
@@ -303,6 +307,12 @@ func update_mnemosyne_battle_stats(victory: bool):
 	if new_level > old_level:
 		memory_data["mnemosyne"]["consciousness_level"] = new_level
 		emit_signal("memory_level_increased", "mnemosyne", "consciousness", new_level)
+		
+		# Trigger conversation for consciousness breakthrough at level 3 or higher
+		if new_level >= 3 and has_node("/root/ConversationManagerAutoload"):
+			var conv_manager = get_node("/root/ConversationManagerAutoload")
+			print("Triggering consciousness_breakthrough conversation")
+			conv_manager.trigger_conversation("consciousness_breakthrough")
 		
 		# Add insight when leveling up
 		add_mnemosyne_insight("My understanding deepens... I can feel my awareness expanding beyond mortal comprehension.")

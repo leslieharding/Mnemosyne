@@ -136,6 +136,13 @@ func _ready():
 	else:
 		push_error("No deck was selected!")
 	
+		# Start a new run for conversation tracking (if not tutorial)
+	if not is_tutorial_mode and has_node("/root/ConversationManagerAutoload"):
+		var conv_manager = get_node("/root/ConversationManagerAutoload")
+		conv_manager.start_new_run()
+		print("CardBattle: Started new run for conversations")
+	
+	
 	# Set up input handling (only when it's player's turn)
 	set_process_input(false)  # Start disabled
 	
@@ -961,6 +968,8 @@ func should_game_end() -> bool:
 	
 	return available_slots == 0 or (player_deck.is_empty() and not opponent_manager.has_cards())
 
+# Replace this entire function in Scripts/card_battle_manager.gd (around lines 880-960)
+
 func end_game():
 	# Tutorial ending - different flow
 	if is_tutorial_mode:
@@ -1003,6 +1012,19 @@ func end_game():
 	
 	# Record god experience (you used this god in battle)
 	record_god_experience()
+	
+	# Trigger conversation flags based on battle outcome
+	if has_node("/root/ConversationManagerAutoload"):
+		var conv_manager = get_node("/root/ConversationManagerAutoload")
+		
+		if not victory:
+			# Check if this was a boss battle
+			if is_boss_battle:
+				print("Triggering first_boss_loss conversation")
+				conv_manager.trigger_conversation("first_boss_loss")
+			else:
+				print("Triggering first_run_defeat conversation")
+				conv_manager.trigger_conversation("first_run_defeat")
 	
 	if not victory:
 		# If player loses, show run summary before ending
