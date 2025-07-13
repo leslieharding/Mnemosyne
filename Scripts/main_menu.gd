@@ -128,9 +128,9 @@ func _on_new_game_confirmed():
 		conv_manager.clear_all_conversations()
 		print("Conversation data cleared")
 	
-	# Trigger the opening cutscene instead of going directly to god select
+	# FIXED: Always trigger the tutorial cutscene for new games, regardless of previous data
 	if has_node("/root/CutsceneManagerAutoload"):
-		get_node("/root/CutsceneManagerAutoload").play_cutscene("opening_awakening")
+		get_node("/root/CutsceneManagerAutoload").play_cutscene("tutorial_intro")
 	else:
 		# Fallback if cutscene manager isn't available
 		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
