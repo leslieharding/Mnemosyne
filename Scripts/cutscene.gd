@@ -45,9 +45,6 @@ func _ready():
 	advance_button.pressed.connect(_on_advance_pressed)
 	skip_button.pressed.connect(_on_skip_pressed)
 	
-	# Allow clicking on dialogue area to advance
-	dialogue_area.gui_input.connect(_on_dialogue_area_input)
-	
 	# Set up input handling for keyboard
 	set_process_input(true)
 	
@@ -152,8 +149,7 @@ func show_current_line():
 	# Update speaker panel highlighting
 	update_speaker_highlighting(current_line, speaker_character)
 	
-	# Show continue indicator
-	continue_indicator.visible = true
+	
 
 func update_speaker_highlighting(line: DialogueLine, speaker: Character):
 	# Reset both panels to inactive
@@ -223,8 +219,3 @@ func _on_skip_confirmed(dialog: AcceptDialog):
 
 func _on_skip_canceled(dialog: AcceptDialog):
 	dialog.queue_free()
-
-func _on_dialogue_area_input(event):
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			advance_dialogue()

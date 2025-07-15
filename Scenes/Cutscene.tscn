@@ -112,12 +112,6 @@ bbcode_enabled = true
 text = "This is where the dialogue would appear, click to continue....."
 fit_content = true
 
-[node name="ContinueIndicator" type="Label" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "click to continue"
-horizontal_alignment = 2
-
 [node name="Controls" type="HBoxContainer" parent="MainContainer"]
 layout_mode = 2
 size_flags_vertical = 4
