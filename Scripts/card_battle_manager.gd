@@ -95,6 +95,7 @@ var tutorial_god: String = ""
 var tutorial_step: int = 0
 var tutorial_overlay: Control
 var tutorial_modal: AcceptDialog
+var tutorial_panel: PanelContainer
 
 func _ready():
 	# Get the current god from scene parameters first
@@ -122,6 +123,8 @@ func _ready():
 	
 	# Set up notification system
 	setup_notification_manager()
+	
+	setup_tutorial_panel()
 	
 	if is_tutorial_mode:
 		print("Starting tutorial mode with god: ", tutorial_god, " vs opponent: ", params.get("opponent", "Chronos"))
@@ -171,6 +174,81 @@ func setup_notification_manager():
 		)
 		
 		print("NotificationManager created and positioned at: ", notification_manager.position)
+
+func setup_tutorial_panel():
+	if not is_tutorial_mode:
+		return  # Only show in tutorial mode
+	
+	# Create the tutorial panel
+	tutorial_panel = PanelContainer.new()
+	tutorial_panel.name = "TutorialPanel"
+	
+	# Position in top-left corner with some margin
+	tutorial_panel.position = Vector2(20, 20)
+	tutorial_panel.custom_minimum_size = Vector2(300, 120)  # Same width as card info panel
+	
+	# Create panel style similar to card info panel
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color("#2A2A2A")
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	style.border_color = Color("#555555")
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	tutorial_panel.add_theme_stylebox_override("panel", style)
+	
+	# Create margin container for padding
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_top", 10)
+	margin.add_theme_constant_override("margin_right", 10)
+	margin.add_theme_constant_override("margin_bottom", 10)
+	tutorial_panel.add_child(margin)
+	
+	# Create content container
+	var content = VBoxContainer.new()
+	margin.add_child(content)
+	
+	# Tutorial title
+	var title_label = Label.new()
+	title_label.text = "Tutorial"
+	title_label.add_theme_font_size_override("font_size", 16)
+	title_label.add_theme_color_override("font_color", Color("#FFD700"))  # Gold color
+	content.add_child(title_label)
+	
+	# Tutorial text
+	var text_label = Label.new()
+	text_label.text = "Welcome to your first battle! Click on a card from your hand, then click on an empty grid space to place it."
+	text_label.add_theme_font_size_override("font_size", 12)
+	text_label.add_theme_color_override("font_color", Color("#DDDDDD"))
+	text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content.add_child(text_label)
+	
+	# Add to the main scene
+	add_child(tutorial_panel)
+	
+	print("Tutorial panel created and positioned")
+
+# Add this call in _ready() function after setup_notification_manager():
+# setup_tutorial_panel()
+
+# Function to update tutorial text (you can call this to change the text)
+func update_tutorial_text(new_text: String):
+	if not tutorial_panel:
+		return
+	
+	# Find the text label (it's the second child in the VBoxContainer)
+	var margin = tutorial_panel.get_child(0)
+	var content = margin.get_child(0)
+	var text_label = content.get_child(1)  # Second child is the text label
+	
+	if text_label is Label:
+		text_label.text = new_text
+
 
 # Set up the boss prediction tracker
 func setup_boss_prediction_tracker():
