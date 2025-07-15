@@ -1321,7 +1321,7 @@ func find_slot_in_direction_vertical(start_col: int, col_step: int, preferred_y:
 func create_grid_styles():
 	# Default style (empty slot)
 	default_grid_style = StyleBoxFlat.new()
-	default_grid_style.bg_color = Color("#444444")
+	default_grid_style.bg_color = Color("#444444")  # Keep this background color always
 	default_grid_style.border_width_left = 1
 	default_grid_style.border_width_top = 1
 	default_grid_style.border_width_right = 1
@@ -1330,21 +1330,14 @@ func create_grid_styles():
 	
 	# Selected style (currently highlighted slot)
 	selected_grid_style = StyleBoxFlat.new()
-	selected_grid_style.bg_color = Color("#444444")
+	selected_grid_style.bg_color = Color("#444444")  # Same background as default
 	selected_grid_style.border_width_left = 2
 	selected_grid_style.border_width_top = 2
 	selected_grid_style.border_width_right = 2
 	selected_grid_style.border_width_bottom = 2
 	selected_grid_style.border_color = Color("#44AAFF")  # Bright blue highlight
 	
-	# Hover style
-	hover_grid_style = StyleBoxFlat.new()
-	hover_grid_style.bg_color = Color("#555555")
-	hover_grid_style.border_width_left = 1
-	hover_grid_style.border_width_top = 1
-	hover_grid_style.border_width_right = 1
-	hover_grid_style.border_width_bottom = 1
-	hover_grid_style.border_color = Color("#888888")
+	
 	
 	# Player card style (blue border)
 	player_card_style = StyleBoxFlat.new()
@@ -1695,21 +1688,27 @@ func _on_card_gui_input(event, card_display, card_index):
 	else:
 		print("Non-mouse event received: ", event.get_class())
 
-# Grid hover handlers (only during player's turn)
 func _on_grid_mouse_entered(grid_index):
 	if not turn_manager.is_player_turn():
 		return
+	
+	# Only apply selection highlight if a card is selected and slot is not occupied
+	if selected_card_index != -1 and not grid_occupied[grid_index]:
+		# Clear the previous selection highlight
+		if current_grid_index != -1:
+			grid_slots[current_grid_index].add_theme_stylebox_override("panel", default_grid_style)
 		
-	# Only apply hover effect if not selected and not occupied
-	if grid_index != current_grid_index and not grid_occupied[grid_index]:
-		grid_slots[grid_index].add_theme_stylebox_override("panel", hover_grid_style)
+		# Update the current selection to the hovered slot
+		current_grid_index = grid_index
+		grid_slots[grid_index].add_theme_stylebox_override("panel", selected_grid_style)
+	
 
 func _on_grid_mouse_exited(grid_index):
 	if not turn_manager.is_player_turn():
 		return
-		
-	# Restore default style if not the currently selected one
-	if grid_index != current_grid_index and not grid_occupied[grid_index]:
+	
+	# If this slot is not the currently selected one, make sure it has default style
+	if current_grid_index != grid_index and not grid_occupied[grid_index]:
 		grid_slots[grid_index].add_theme_stylebox_override("panel", default_grid_style)
 
 # Grid click handler (only during player's turn)
@@ -1719,18 +1718,10 @@ func _on_grid_gui_input(event, grid_index):
 		
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			# Only select if a card is selected and grid is not occupied
+			# Only place card if a card is selected and grid is not occupied
 			if selected_card_index != -1 and not grid_occupied[grid_index]:
-				# Deselect current selection
-				if current_grid_index != -1:
-					grid_slots[current_grid_index].add_theme_stylebox_override("panel", default_grid_style)
-				
-				# Select new grid
-				current_grid_index = grid_index
-				grid_slots[grid_index].add_theme_stylebox_override("panel", selected_grid_style)
-			
-			# Double-click to place
-			if event.double_click and selected_card_index != -1 and current_grid_index == grid_index:
+				# The grid selection is already handled by mouse_entered
+				# Just place the card
 				place_card_on_grid()
 
 # Update the visual display of a card after its stats change
