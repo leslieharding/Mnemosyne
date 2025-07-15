@@ -1317,11 +1317,10 @@ func find_slot_in_direction_vertical(start_col: int, col_step: int, preferred_y:
 	
 	return -1  # No free slot found
 
-# Create the different styles for grid slots
 func create_grid_styles():
 	# Default style (empty slot)
 	default_grid_style = StyleBoxFlat.new()
-	default_grid_style.bg_color = Color("#444444")  # Keep this background color always
+	default_grid_style.bg_color = Color("#444444")
 	default_grid_style.border_width_left = 1
 	default_grid_style.border_width_top = 1
 	default_grid_style.border_width_right = 1
@@ -1330,14 +1329,12 @@ func create_grid_styles():
 	
 	# Selected style (currently highlighted slot)
 	selected_grid_style = StyleBoxFlat.new()
-	selected_grid_style.bg_color = Color("#444444")  # Same background as default
+	selected_grid_style.bg_color = Color("#444444")  # Same background
 	selected_grid_style.border_width_left = 2
 	selected_grid_style.border_width_top = 2
 	selected_grid_style.border_width_right = 2
 	selected_grid_style.border_width_bottom = 2
 	selected_grid_style.border_color = Color("#44AAFF")  # Bright blue highlight
-	
-	
 	
 	# Player card style (blue border)
 	player_card_style = StyleBoxFlat.new()
