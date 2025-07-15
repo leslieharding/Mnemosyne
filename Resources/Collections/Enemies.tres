@@ -569,7 +569,7 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 script = ExtResource("2_xcqsp")
 card_name = "Rhea"
 values = Array[int]([6, 6, 6, 6])
-description = ""
+description = "The Olympian Mother"
 abilities = Array[ExtResource("3_lm3ty")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -577,7 +577,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 script = ExtResource("2_xcqsp")
 card_name = "Hyperion"
 values = Array[int]([7, 7, 6, 6])
-description = ""
+description = "He that walks on high"
 abilities = Array[ExtResource("3_lm3ty")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -585,7 +585,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 script = ExtResource("2_xcqsp")
 card_name = "Atlas"
 values = Array[int]([8, 7, 8, 7])
-description = ""
+description = "The world upon thine shoulders"
 abilities = Array[ExtResource("3_lm3ty")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -593,15 +593,15 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 script = ExtResource("2_xcqsp")
 card_name = "Oceanus"
 values = Array[int]([7, 6, 6, 7])
-description = ""
+description = "Most of the surface is named after me"
 abilities = Array[ExtResource("3_lm3ty")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8eb4r"]
 script = ExtResource("2_xcqsp")
-card_name = "Tethys"
+card_name = "Phoebe"
 values = Array[int]([5, 6, 5, 6])
-description = ""
+description = "The shining one"
 abilities = Array[ExtResource("3_lm3ty")]([])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 

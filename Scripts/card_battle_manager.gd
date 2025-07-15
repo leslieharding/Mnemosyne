@@ -980,7 +980,7 @@ func end_game():
 		
 		# Create and show tutorial completion dialog
 		var tutorial_dialog = AcceptDialog.new()
-		tutorial_dialog.dialog_text = "Lesson learned! Through defeat comes wisdom. You now understand the basic rules of card combat. Your real journey begins now..."
+		tutorial_dialog.dialog_text = "Chronos crushes you"
 		tutorial_dialog.title = "Tutorial Complete"
 		add_child(tutorial_dialog)
 		tutorial_dialog.popup_centered()
