@@ -97,6 +97,8 @@ var tutorial_overlay: Control
 var tutorial_modal: AcceptDialog
 var tutorial_panel: PanelContainer
 
+var consecutive_draws: int = 0
+
 func _ready():
 	# Get the current god from scene parameters first
 	var params = get_scene_params()
@@ -222,7 +224,11 @@ func setup_tutorial_panel():
 	
 	# Tutorial text
 	var text_label = Label.new()
-	text_label.text = "Welcome to your first battle! Click on a card from your hand, then click on an empty grid space to place it."
+	text_label.text = "Click a card to select it
+	Click to place the card on the grid 
+	Adjacent cards will fight each other
+	Hover over cards to see more details
+	"
 	text_label.add_theme_font_size_override("font_size", 12)
 	text_label.add_theme_color_override("font_color", Color("#DDDDDD"))
 	text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -1046,7 +1052,7 @@ func should_game_end() -> bool:
 	
 	return available_slots == 0 or (player_deck.is_empty() and not opponent_manager.has_cards())
 
-# Replace this entire function in Scripts/card_battle_manager.gd (around lines 880-960)
+
 
 func end_game():
 	# Tutorial ending - different flow
@@ -1078,12 +1084,65 @@ func end_game():
 	if scores.player > scores.opponent:
 		winner = "You win!"
 		victory = true
+		consecutive_draws = 0  # Reset draw counter on victory
 	elif scores.opponent > scores.player:
 		winner = "You lose!"
 		victory = false
+		consecutive_draws = 0  # Reset draw counter on loss
 	else:
-		winner = "It's a tie!"
-		victory = true  # Treat ties as victories for experience purposes
+		# Handle draw
+		consecutive_draws += 1
+		
+		if consecutive_draws >= 2:
+			# Second consecutive draw counts as a loss
+			winner = "Second draw in a row - You lose!"
+			victory = false
+			consecutive_draws = 0  # Reset for next encounter
+			
+			# Record the enemy encounter as a loss
+			record_enemy_encounter(false)
+			
+			# Record god experience (you used this god in battle)
+			record_god_experience()
+			
+			# Trigger conversation flags based on battle outcome
+			if has_node("/root/ConversationManagerAutoload"):
+				var conv_manager = get_node("/root/ConversationManagerAutoload")
+				
+				# Check if this was a boss battle
+				if is_boss_battle:
+					print("Triggering first_boss_loss conversation")
+					conv_manager.trigger_conversation("first_boss_loss")
+				else:
+					print("Triggering first_run_defeat conversation")
+					conv_manager.trigger_conversation("first_run_defeat")
+			
+			# Show defeat message and go to summary
+			game_status_label.text = "Defeat! " + winner
+			disable_player_input()
+			opponent_is_thinking = false
+			turn_manager.end_game()
+			
+			# Add a delay then go to run summary
+			await get_tree().create_timer(3.0).timeout
+			
+			# Pass data to summary screen
+			var params = get_scene_params()
+			get_tree().set_meta("scene_params", {
+				"god": params.get("god", current_god),
+				"deck_index": params.get("deck_index", 0),
+				"victory": false
+			})
+			get_tree().change_scene_to_file("res://Scenes/RunSummary.tscn")
+			return
+		else:
+			# First draw - restart the round
+			winner = "It's a draw! Restarting round... (Warning: Second draw will count as defeat)"
+			game_status_label.text = winner
+			
+			# Reset the game state for a new round
+			restart_round()
+			return  # Exit early, don't proceed with normal end game logic
 	
 	# Record the enemy encounter in memory journal
 	record_enemy_encounter(victory)
@@ -1137,6 +1196,70 @@ func end_game():
 	
 	# Return to map with updated progress
 	show_reward_screen()
+
+
+# Add this new function to Scripts/card_battle_manager.gd
+func restart_round():
+	print("Restarting round due to draw")
+	
+	# Clear the grid
+	for i in range(grid_slots.size()):
+		if grid_occupied[i]:
+			var slot = grid_slots[i]  # Get the slot reference
+			# Remove card display if present
+			for child in slot.get_children():
+				child.queue_free()
+		
+		# Reset grid state
+		grid_occupied[i] = false
+		grid_ownership[i] = Owner.NONE
+		grid_card_data[i] = null
+		
+		# Reset slot styling - get slot reference again
+		var slot = grid_slots[i]
+		slot.add_theme_stylebox_override("panel", default_grid_style)
+	
+	# Clear grid to collection index mapping
+	grid_to_collection_index.clear()
+	
+	# Reset passive abilities tracking
+	active_passive_abilities.clear()
+	
+	# Reset card selection
+	selected_card_index = -1
+	current_grid_index = -1
+	
+	# Reset opponent thinking state
+	opponent_is_thinking = false
+	
+	# Restore original decks (you'll need to reload them)
+	restore_original_decks()
+	
+	# Redisplay player hand
+	display_player_hand()
+	
+	# Start a new coin flip
+	await get_tree().create_timer(2.0).timeout  # Brief pause
+	turn_manager.start_game()
+
+func restore_original_decks():
+	# Reload player deck
+	var params = get_scene_params()
+	var god_name = params.get("god", current_god)
+	var deck_index = params.get("deck_index", 0)
+	
+	var collection_path = "res://Resources/Collections/" + god_name.to_lower() + ".tres"
+	var collection: GodCardCollection = load(collection_path)
+	if collection:
+		var deck_def = collection.decks[deck_index]
+		deck_card_indices = deck_def.card_indices.duplicate()
+		player_deck = collection.get_deck(deck_index)
+	
+	# Reload opponent deck
+	setup_opponent_from_params()  # This will reload their deck
+
+
+
 
 func _on_tutorial_finished():
 	print("Tutorial battle completed, transitioning to post-battle cutscene")

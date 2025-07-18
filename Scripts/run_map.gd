@@ -233,11 +233,9 @@ func _on_map_node_pressed(map_node: MapNode):
 
 # Update the UI labels
 func update_ui():
-	title_label.text = "Choose Your Path - " + selected_god
 	
 	var completed_count = current_map.completed_nodes.size()
 	var total_count = current_map.nodes.size()
-	progress_label.text = "Progress: " + str(completed_count) + "/" + str(total_count) + " nodes completed"
 	
 	# Check if run is complete
 	check_run_completion()

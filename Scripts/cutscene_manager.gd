@@ -70,12 +70,12 @@ func create_sample_cutscenes():
 	opening_lines.append(DialogueLine.new("Chiron", "It feels a little ridiculous me telling you of all people how to learn"))
 	opening_lines.append(DialogueLine.new("Chiron", "But when I learn something new, I usually find someone I trust and ask them to teach me."))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "So will you then? Teach me?"))
-	opening_lines.append(DialogueLine.new("Chiron", "Of course I will. What do you want to learn?"))
+	opening_lines.append(DialogueLine.new("Chiron", "Of course I will. Who would be foolish enough to pass up such an opportunity. Where should we start?"))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "I want to be able to stand up for myself"))
 	opening_lines.append(DialogueLine.new("Chiron", "My advice, start with relying on the power of others, until you have built up your own strength"))
 	opening_lines.append(DialogueLine.new("Chiron", "Go and visit Apollo, he owes me one for Asclepius."))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "Thank you Chiron. "))
-	opening_lines.append(DialogueLine.new("Chiron", "I’ll be here when you need me."))
+	
 
 	
 	var opening_cutscene = CutsceneData.new("opening_awakening", [mnemosyne, chiron], opening_lines)
