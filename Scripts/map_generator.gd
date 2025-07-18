@@ -3,8 +3,8 @@ class_name MapGenerator
 extends RefCounted
 
 # Map generation settings
-static var LAYER_COUNT: int = 4
-static var NODES_PER_LAYER: Array[int] = [3, 4, 4, 1]  # Start, Middle, Middle, Boss
+static var LAYER_COUNT: int = 6  # Or however many layers you want
+static var NODES_PER_LAYER: Array[int] = [3, 3, 3, 3, 2, 1]  # Start, Early, Mid, Late, Elite, Boss
 static var MAP_WIDTH: float = 800.0
 static var MAP_HEIGHT: float = 600.0
 static var LAYER_SPACING: float = MAP_HEIGHT / (LAYER_COUNT - 1)
@@ -45,8 +45,13 @@ static func generate_layer_nodes(layer: int, starting_id: int) -> Array[MapNode]
 	# Calculate horizontal spacing for this layer
 	var horizontal_spacing = MAP_WIDTH / (node_count + 1)
 	# Invert the Y position so layer 0 is at the bottom and final layer is at top
-	var y_position = (LAYER_COUNT - 1 - layer) * LAYER_SPACING
-	
+	# Add padding so buttons don't go off-screen (button height is ~60px)
+	var button_height = 60
+	var padding = button_height / 2
+	var usable_height = MAP_HEIGHT - (2 * padding)
+	var layer_spacing = usable_height / (LAYER_COUNT - 1) if LAYER_COUNT > 1 else 0
+	var y_position = padding + (LAYER_COUNT - 1 - layer) * layer_spacing
+
 	for i in range(node_count):
 		var x_position = (i + 1) * horizontal_spacing
 		var position = Vector2(x_position, y_position)
