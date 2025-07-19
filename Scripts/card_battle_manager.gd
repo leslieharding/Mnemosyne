@@ -1091,7 +1091,38 @@ func end_game():
 	var victory = false
 	
 	if scores.player > scores.opponent:
-		winner = "You win!"
+		# Check for perfect victory - player owns all 9 cards on the board
+		var total_board_cards = 0
+		var player_owned_cards = 0
+		
+		for i in range(grid_ownership.size()):
+			if grid_occupied[i]:  # If there's a card in this slot
+				total_board_cards += 1
+				if grid_ownership[i] == Owner.PLAYER:
+					player_owned_cards += 1
+		
+		print("=== PERFECT VICTORY CHECK ===")
+		print("Total cards on board: ", total_board_cards)
+		print("Player owned cards: ", player_owned_cards)
+		print("Grid occupied: ", grid_occupied)
+		print("Grid ownership: ", grid_ownership)
+		print("============================")
+		
+		# Perfect victory = board is full (9 cards) and player owns ALL of them
+		var is_perfect_victory = (total_board_cards == 9 and player_owned_cards == 9)
+		
+		print("Perfect victory achieved: ", is_perfect_victory)
+		
+		if is_perfect_victory:
+			winner = "🏆 Perfect Victory! 🏆"
+			# Show special notification for perfect victory
+			if notification_manager:
+				notification_manager.show_notification("🏆 PERFECT VICTORY ACHIEVED! 🏆")
+			# Make the text gold colored
+			game_status_label.add_theme_color_override("font_color", Color("#FFD700"))
+		else:
+			winner = "You win!"
+		
 		victory = true
 		consecutive_draws = 0  # Reset draw counter on victory
 	elif scores.opponent > scores.player:
@@ -2127,11 +2158,30 @@ func remove_card_from_hand(card_index: int):
 func show_reward_screen():
 	var params = get_scene_params()
 	
+	# Check for perfect victory using board ownership
+	var total_board_cards = 0
+	var player_owned_cards = 0
+	
+	for i in range(grid_ownership.size()):
+		if grid_occupied[i]:  # If there's a card in this slot
+			total_board_cards += 1
+			if grid_ownership[i] == Owner.PLAYER:
+				player_owned_cards += 1
+	
+	var is_perfect_victory = (total_board_cards == 9 and player_owned_cards == 9)
+	
+	print("=== REWARD SCREEN PERFECT VICTORY CHECK ===")
+	print("Total board cards: ", total_board_cards)
+	print("Player owned cards: ", player_owned_cards)
+	print("Perfect victory: ", is_perfect_victory)
+	print("=========================================")
+	
 	get_tree().set_meta("scene_params", {
 		"god": params.get("god", current_god),
 		"deck_index": params.get("deck_index", 0),
 		"map_data": params.get("map_data"),
-		"current_node": params.get("current_node")
+		"current_node": params.get("current_node"),
+		"perfect_victory": is_perfect_victory
 	})
 	get_tree().change_scene_to_file("res://Scenes/RewardScreen.tscn")
 

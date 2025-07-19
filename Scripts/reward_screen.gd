@@ -11,7 +11,7 @@ var current_deck: Array[CardResource] = []
 var deck_indices: Array[int] = []
 var selected_card_index: int = -1
 var selected_experience_type: String = ""  # "capture" or "defense"
-var reward_claimed: bool = false
+
 
 # UI components we'll create
 var cards_container: HBoxContainer
@@ -21,14 +21,26 @@ var defense_button: Button
 var mnemosyne_button: Button
 var reward_info_label: Label
 
+var is_perfect_victory: bool = false
+var rewards_remaining: int = 1
+var claimed_rewards: Array[String] = []
+
+
 func _ready():
 	print("=== REWARD SCREEN STARTING ===")
+	
+	# Get perfect victory status
+	var params = get_scene_params()
+	is_perfect_victory = params.get("perfect_victory", false)
+	rewards_remaining = 2 if is_perfect_victory else 1
+	
+	print("Perfect victory: ", is_perfect_victory, " - Rewards available: ", rewards_remaining)
 	
 	# Connect the continue button first
 	if continue_button:
 		continue_button.pressed.connect(_on_continue_pressed)
 		continue_button.disabled = true
-		continue_button.text = "Choose a Reward"
+		continue_button.text = get_continue_button_text()
 	else:
 		print("Error: Continue button not found!")
 		return
@@ -40,6 +52,15 @@ func _ready():
 	load_deck_data_sync()
 	
 	print("=== REWARD SCREEN READY ===")
+
+
+func get_continue_button_text() -> String:
+	if rewards_remaining > 1:
+		return "Choose " + str(rewards_remaining) + " Rewards"
+	elif rewards_remaining == 1:
+		return "Choose a Reward"
+	else:
+		return "Continue"
 
 # Replace the load_deck_data function with synchronous version
 func load_deck_data_sync():
@@ -101,8 +122,11 @@ func setup_reward_interface():
 	print("Setting up reward interface...")
 	print("Main container children before setup: ", main_container.get_child_count())
 	
-	# Update title
-	title_label.text = "Choose Your Reward"
+	if is_perfect_victory:
+		title_label.text = "🏆 Perfect Victory! Choose Two Rewards 🏆"
+		title_label.add_theme_color_override("font_color", Color("#FFD700"))  # Gold color
+	else:
+		title_label.text = "Choose Your Reward"
 	
 	# Create card selection area with explicit sizing
 	var card_section = VBoxContainer.new()
@@ -630,14 +654,15 @@ func _on_card_panel_input(event: InputEvent, card_index: int):
 		_on_card_selected(card_index)
 
 func _on_card_selected(card_index: int):
-	if reward_claimed:
-		print("Reward already claimed, ignoring selection")
+	# Check if we can still claim rewards
+	if rewards_remaining <= 0:
+		print("No rewards remaining, ignoring selection")
 		return
 	
 	print("=== CARD SELECTION DEBUG ===")
 	print("Card selection attempted - index: ", card_index, ", current selected: ", selected_card_index)
 	print("Card displays array size: ", card_displays.size())
-	print("Reward claimed: ", reward_claimed)
+	print("Rewards remaining: ", rewards_remaining)
 	
 	# Deselect all cards
 	print("Deselecting all cards...")
@@ -656,7 +681,7 @@ func _on_card_selected(card_index: int):
 	if card_index < card_displays.size() and is_instance_valid(card_displays[card_index]):
 		print("Selecting card ", card_index)
 		if card_displays[card_index].has_method("select"):
-			card_displays[card_index].select()  # Fixed: was using 'i' instead of 'card_index'
+			card_displays[card_index].select()
 			print("  Successfully called select() on card ", card_index)
 		else:
 			print("  Card ", card_index, " has no select method!")
@@ -680,8 +705,6 @@ func _on_card_selected(card_index: int):
 		reward_info_label.text = "Selected: " + card_name
 		print("Updated info label to: ", reward_info_label.text)
 		
-		
-		
 		print("Selected card: ", card_name, " at index: ", card_index)
 	else:
 		print("Failed to select card - invalid index or card display")
@@ -690,26 +713,27 @@ func _on_card_selected(card_index: int):
 			print("  is_instance_valid: ", is_instance_valid(card_displays[card_index]))
 	
 	print("=== END CARD SELECTION DEBUG ===")
-	print("")  # Empty line for readability
+	print("")
 
 func _on_capture_button_pressed():
-	print("Capture button pressed - selected_card_index: ", selected_card_index, ", reward_claimed: ", reward_claimed)
-	if selected_card_index == -1 or reward_claimed:
-		print("Cannot apply capture reward - no card selected or reward already claimed")
+	print("Capture button pressed - selected_card_index: ", selected_card_index, ", rewards_remaining: ", rewards_remaining)
+	if selected_card_index == -1 or rewards_remaining <= 0:
+		print("Cannot apply capture reward - no card selected or no rewards remaining")
 		return
 	
 	apply_experience_reward("capture")
 
 func _on_defense_button_pressed():
-	print("Defense button pressed - selected_card_index: ", selected_card_index, ", reward_claimed: ", reward_claimed)
-	if selected_card_index == -1 or reward_claimed:
-		print("Cannot apply defense reward - no card selected or reward already claimed")
+	print("Defense button pressed - selected_card_index: ", selected_card_index, ", rewards_remaining: ", rewards_remaining)
+	if selected_card_index == -1 or rewards_remaining <= 0:
+		print("Cannot apply defense reward - no card selected or no rewards remaining")
 		return
 	
 	apply_experience_reward("defense")
 
 func _on_mnemosyne_button_pressed():
-	if reward_claimed:
+	if rewards_remaining <= 0:
+		print("No rewards remaining, cannot claim Mnemosyne reward")
 		return
 	
 	apply_mnemosyne_reward()
@@ -719,7 +743,7 @@ func apply_experience_reward(exp_type: String):
 	var card_name = current_deck[selected_card_index].card_name
 	var bonus_amount = 15
 	
-	# Check if tracker exists - use get_node_or_null
+	# Check if tracker exists
 	var tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
 	if not tracker:
 		print("RunExperienceTrackerAutoload not found!")
@@ -731,68 +755,113 @@ func apply_experience_reward(exp_type: String):
 	else:
 		tracker.add_defense_exp(card_index, bonus_amount)
 	
-	# Update UI
-	reward_claimed = true
-	continue_button.disabled = false
-	continue_button.text = "Continue"
+	# Track this reward
+	var reward_desc = card_name + " +" + str(bonus_amount) + " " + exp_type.capitalize() + " XP"
+	claimed_rewards.append(reward_desc)
+	rewards_remaining -= 1
 	
-	# Disable all reward options
-	capture_button.disabled = true
-	defense_button.disabled = true
-	mnemosyne_button.disabled = true
+	# Reset selection state for next reward
+	selected_card_index = -1
+	selected_experience_type = ""
 	
-	# Update info label
-	var exp_icon = "⚔️" if exp_type == "capture" else "🛡️"
-	var exp_name = exp_type.capitalize()
-	reward_info_label.text = "Reward Applied: " + card_name + " gained " + str(bonus_amount) + " " + exp_name + " XP!"
-	reward_info_label.add_theme_color_override("font_color", Color("#66BB6A"))
+	# Deselect all cards
+	for display in card_displays:
+		if is_instance_valid(display):
+			display.deselect()
 	
-	print("Applied ", bonus_amount, " ", exp_type, " experience to ", card_name)
+	# Update UI based on remaining rewards
+	if rewards_remaining > 0:
+		# More rewards to claim - re-enable selection
+		update_for_next_reward()
+	else:
+		# All rewards claimed - finish
+		finish_reward_selection()
 
 func apply_mnemosyne_reward():
-	# Check if memory manager exists - use get_node_or_null
+	# Check if memory manager exists
 	var memory_manager = get_node_or_null("/root/MemoryJournalManagerAutoload")
 	if not memory_manager:
 		print("MemoryJournalManagerAutoload not found!")
 		return
 	
 	# Apply consciousness boost
-	var boost_amount = 3  # Equivalent to 3 battles worth of progress
+	var boost_amount = 3
 	memory_manager.add_memory_fragments(boost_amount)
 	
-	# Force consciousness level recalculation by adding battles
+	# Force consciousness level recalculation
 	var current_battles = memory_manager.get_mnemosyne_memory()["total_battles"]
-	# Temporarily boost battle count to trigger level up, then restore
 	memory_manager.memory_data["mnemosyne"]["total_battles"] += boost_amount
 	var new_level = memory_manager.calculate_mnemosyne_consciousness_level()
 	memory_manager.memory_data["mnemosyne"]["consciousness_level"] = new_level
-	memory_manager.memory_data["mnemosyne"]["total_battles"] = current_battles  # Restore original
+	memory_manager.memory_data["mnemosyne"]["total_battles"] = current_battles
 	
 	memory_manager.save_memory_data()
 	
-	# Update UI
-	reward_claimed = true
-	continue_button.disabled = false
-	continue_button.text = "Continue"
+	# Track this reward
+	claimed_rewards.append("Mnemosyne Consciousness Boost")
+	rewards_remaining -= 1
 	
-	# Disable all reward options
-	capture_button.disabled = true
-	defense_button.disabled = true
-	mnemosyne_button.disabled = true
+	# Reset selection state
+	selected_card_index = -1
 	
-	# Deselect any card
+	# Deselect all cards
 	for display in card_displays:
 		if is_instance_valid(display):
 			display.deselect()
 	
-	# Update info label
-	reward_info_label.text = "Reward Applied: Mnemosyne's consciousness has expanded!"
-	reward_info_label.add_theme_color_override("font_color", Color("#DDA0DD"))
+	# Update UI based on remaining rewards
+	if rewards_remaining > 0:
+		update_for_next_reward()
+	else:
+		finish_reward_selection()
+
+
+func update_for_next_reward():
+	# Re-enable all reward options for next selection
+	capture_button.disabled = true  # Will be enabled when card is selected
+	defense_button.disabled = true  # Will be enabled when card is selected
 	
-	print("Applied consciousness boost to Mnemosyne")
+	# Only enable Mnemosyne button if it hasn't been claimed yet
+	var mnemosyne_already_claimed = false
+	for reward in claimed_rewards:
+		if reward.contains("Mnemosyne"):
+			mnemosyne_already_claimed = true
+			break
+	
+	mnemosyne_button.disabled = mnemosyne_already_claimed
+	
+	# Update continue button
+	continue_button.disabled = true
+	continue_button.text = get_continue_button_text()
+	
+	# Update info label to show progress
+	var rewards_claimed_text = "Claimed: " + " | ".join(claimed_rewards)
+	reward_info_label.text = rewards_claimed_text + "\n" + "Choose your next reward"
+	reward_info_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+	
+	print("Updated for next reward - ", rewards_remaining, " remaining")
+
+func finish_reward_selection():
+	# All rewards claimed - finalize
+	capture_button.disabled = true
+	defense_button.disabled = true
+	mnemosyne_button.disabled = true
+	
+	# Enable continue button
+	continue_button.disabled = false
+	continue_button.text = "Continue"
+	
+	# Update info label with summary
+	var summary_text = "Rewards Claimed:\n" + "\n".join(claimed_rewards)
+	reward_info_label.text = summary_text
+	reward_info_label.add_theme_color_override("font_color", Color("#66BB6A"))
+	
+	print("All rewards claimed: ", claimed_rewards)
+
 
 func _on_continue_pressed():
-	if not reward_claimed:
+	if rewards_remaining > 0:
+		print("Still have rewards remaining, cannot continue yet")
 		return
 	
 	# Get the map data and return to map
