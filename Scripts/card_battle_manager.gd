@@ -123,6 +123,10 @@ func _ready():
 		print("Tutorial mode detected - adjusting current_god from ", current_god, " to ", tutorial_god)
 		current_god = tutorial_god
 	
+	# Create styles for grid selection
+	create_grid_styles()
+	
+	
 	# Initialize game managers
 	setup_managers()
 	
@@ -132,8 +136,6 @@ func _ready():
 	# Initialize game board
 	setup_empty_board()
 	
-	# Create styles for grid selection
-	create_grid_styles()
 	
 	# Set up card info panel for smooth fading
 	setup_card_info_panel()
@@ -1739,14 +1741,33 @@ func apply_deck_power_effects(card_data: CardResource, grid_position: int) -> bo
 			return false
 
 func apply_sun_boosted_card_styling(card_display: CardDisplay):
-	# Safety check to ensure we have a valid CardDisplay with a panel
-	if not card_display or not is_instance_valid(card_display):
-		print("ERROR: Invalid card_display in apply_sun_boosted_card_styling")
+	# Debug what we actually received
+	print("DEBUG: apply_sun_boosted_card_styling called with: ", card_display)
+	print("DEBUG: Object type: ", card_display.get_class() if card_display else "null")
+	
+	# Safety check to ensure we have a valid CardDisplay
+	if not card_display:
+		print("ERROR: card_display is null in apply_sun_boosted_card_styling")
 		return
 	
-	if not card_display.panel:
-		print("ERROR: CardDisplay has no panel in apply_sun_boosted_card_styling")
+	if not is_instance_valid(card_display):
+		print("ERROR: card_display is not valid in apply_sun_boosted_card_styling")
 		return
+	
+	# Check if this is actually a CardDisplay
+	if not card_display is CardDisplay:
+		print("ERROR: Object is not a CardDisplay, it's a: ", card_display.get_class())
+		return
+	
+	# Check if the CardDisplay has a panel
+	if not card_display.has_method("get") or not card_display.panel:
+		print("ERROR: CardDisplay has no panel")
+		return
+	
+	# Safety check for player_card_style
+	if not player_card_style:
+		print("ERROR: player_card_style not initialized yet")
+		create_grid_styles()  # Force creation if somehow missing
 	
 	# Create special golden styling for sun-boosted cards
 	var sun_boosted_style = player_card_style.duplicate()
@@ -1760,6 +1781,7 @@ func apply_sun_boosted_card_styling(card_display: CardDisplay):
 	sun_boosted_style.bg_color = Color("#555533")  # Slightly golden background
 	
 	card_display.panel.add_theme_stylebox_override("panel", sun_boosted_style)
+	print("DEBUG: Successfully applied sun boosted styling")
 
 func hide_sun_icon_at_slot(slot: Panel):
 	var sun_icon = slot.get_node_or_null("SunIcon")
@@ -1779,9 +1801,7 @@ func apply_sun_power_boost(card_data: CardResource, grid_position: int) -> bool:
 		
 		print("Card stats boosted to: ", card_data.values)
 		
-		# Show notification
-		if notification_manager:
-			notification_manager.show_notification("☀️ Solar Blessing: +1 to all stats!")
+		
 		
 		return true
 	
@@ -2134,11 +2154,14 @@ func place_card_on_grid():
 		(slot.custom_minimum_size.y - 140) / 2   # Assuming card height is 140
 	)
 	
-	# Set higher z-index so the card appears on top
-	card_display.z_index = 1
+# Wait one frame to ensure _ready() is called and @onready variables are initialized
+	await get_tree().process_frame
 	
-	# Setup the card display with the card resource data (including potentially boosted stats)
+	# NOW setup the card display with the actual card data
 	card_display.setup(card_data)
+	
+	# Wait another frame to ensure setup is complete
+	await get_tree().process_frame
 	
 	# Apply special styling for sun-boosted cards
 	if sun_boosted:
