@@ -1741,11 +1741,7 @@ func apply_deck_power_effects(card_data: CardResource, grid_position: int) -> bo
 			return false
 
 func apply_sun_boosted_card_styling(card_display: CardDisplay):
-	# Debug what we actually received
-	print("DEBUG: apply_sun_boosted_card_styling called with: ", card_display)
-	print("DEBUG: Object type: ", card_display.get_class() if card_display else "null")
-	
-	# Safety check to ensure we have a valid CardDisplay
+	# Safety checks to ensure we have a valid CardDisplay
 	if not card_display:
 		print("ERROR: card_display is null in apply_sun_boosted_card_styling")
 		return
@@ -1759,10 +1755,13 @@ func apply_sun_boosted_card_styling(card_display: CardDisplay):
 		print("ERROR: Object is not a CardDisplay, it's a: ", card_display.get_class())
 		return
 	
-	# Check if the CardDisplay has a panel
-	if not card_display.has_method("get") or not card_display.panel:
-		print("ERROR: CardDisplay has no panel")
-		return
+	# Wait for the card display to be fully ready
+	if not card_display.panel:
+		print("CardDisplay panel not ready yet, waiting...")
+		await get_tree().process_frame
+		if not card_display.panel:
+			print("ERROR: CardDisplay panel still null after waiting")
+			return
 	
 	# Safety check for player_card_style
 	if not player_card_style:
@@ -1781,7 +1780,7 @@ func apply_sun_boosted_card_styling(card_display: CardDisplay):
 	sun_boosted_style.bg_color = Color("#555533")  # Slightly golden background
 	
 	card_display.panel.add_theme_stylebox_override("panel", sun_boosted_style)
-	print("DEBUG: Successfully applied sun boosted styling")
+	print("Successfully applied sun boosted styling")
 
 func hide_sun_icon_at_slot(slot: Panel):
 	var sun_icon = slot.get_node_or_null("SunIcon")
@@ -1818,10 +1817,16 @@ func add_sun_icon_to_slot(slot: Panel):
 	sun_label.name = "SunIcon"
 	sun_label.mouse_filter = Control.MOUSE_FILTER_IGNORE  # Don't interfere with clicks
 	
-	# Position it in the center of the slot
-	sun_label.set_anchors_preset(Control.PRESET_CENTER)
-	sun_label.position = Vector2(slot.size.x/2 - 15, slot.size.y/2 - 15)
-	sun_label.size = Vector2(30, 30)
+	# Set anchors to center and use relative positioning
+	sun_label.set_anchors_preset(Control.PRESET_CENTER_LEFT)
+	sun_label.anchor_left = 0.5
+	sun_label.anchor_right = 0.5
+	sun_label.anchor_top = 0.5
+	sun_label.anchor_bottom = 0.5
+	sun_label.offset_left = -15
+	sun_label.offset_right = 15
+	sun_label.offset_top = -15
+	sun_label.offset_bottom = 15
 	
 	# Add with lower z-index so cards appear on top
 	slot.add_child(sun_label)
@@ -2078,7 +2083,6 @@ func update_card_display(grid_index: int, card_data: CardResource):
 		card_display.setup(card_data)
 		print("Updated card display for ", card_data.card_name, " with new values: ", card_data.values)
 
-# Place the selected card on the selected grid
 func place_card_on_grid():
 	if selected_card_index == -1 or current_grid_index == -1:
 		return
@@ -2154,7 +2158,10 @@ func place_card_on_grid():
 		(slot.custom_minimum_size.y - 140) / 2   # Assuming card height is 140
 	)
 	
-# Wait one frame to ensure _ready() is called and @onready variables are initialized
+	# Set higher z-index so the card appears on top
+	card_display.z_index = 1
+	
+	# Wait one frame to ensure _ready() is called and @onready variables are initialized
 	await get_tree().process_frame
 	
 	# NOW setup the card display with the actual card data
@@ -2165,7 +2172,9 @@ func place_card_on_grid():
 	
 	# Apply special styling for sun-boosted cards
 	if sun_boosted:
-		apply_sun_boosted_card_styling(card_display)
+		# Wait to ensure the card display is fully ready before applying styling
+		await get_tree().process_frame
+		await apply_sun_boosted_card_styling(card_display)
 	elif boss_prediction_hit:
 		# Create a special style for predicted cards
 		var prediction_hit_style = player_card_style.duplicate()
@@ -2224,7 +2233,6 @@ func place_card_on_grid():
 
 	# Switch turns
 	turn_manager.next_turn()
-
 	
 
 # Handle passive abilities when a card is placed
