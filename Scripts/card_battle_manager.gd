@@ -557,7 +557,20 @@ func get_tutorial_status_message() -> String:
 
 # Handle coin flip result
 func _on_coin_flip_result(player_goes_first: bool):
-	if player_goes_first:
+	# Override coin flip result if prophecy power is active
+	if active_deck_power == DeckDefinition.DeckPowerType.PROPHECY_POWER:
+		player_goes_first = true
+		game_status_label.text = "🔮 Divine Prophecy reveals the path! You go first."
+		# Force the turn manager to recognize player goes first
+		turn_manager.current_player = TurnManager.Player.HUMAN
+		
+		# Still activate boss prediction tracking if not a boss battle
+		if not is_boss_battle:
+			get_node("/root/BossPredictionTrackerAutoload").start_recording_battle()
+			# Show atmospheric notification
+			if notification_manager:
+				notification_manager.show_notification("You know you are being watched")
+	elif player_goes_first:
 		game_status_label.text = "You won the coin flip! You go first."
 		# Add this new section:
 		if not is_boss_battle:
@@ -575,7 +588,7 @@ func _on_coin_flip_result(player_goes_first: bool):
 	
 	# Brief pause to show result
 	await get_tree().create_timer(2.0).timeout
-
+	
 # Handle game start after coin flip
 func _on_game_started():
 	print("Game started - current player is: ", "Player" if turn_manager.is_player_turn() else "Opponent")
@@ -1682,10 +1695,17 @@ func initialize_deck_power(deck_def: DeckDefinition):
 	match active_deck_power:
 		DeckDefinition.DeckPowerType.SUN_POWER:
 			setup_sun_power()
+		DeckDefinition.DeckPowerType.PROPHECY_POWER:
+			setup_prophecy_power()
 		DeckDefinition.DeckPowerType.NONE:
 			print("No deck power for this deck")
 		_:
 			print("Unknown deck power type: ", active_deck_power)
+
+func setup_prophecy_power():
+	print("=== SETTING UP PROPHECY POWER ===")
+	print("Divine Prophecy activated - player will go first")
+
 
 func setup_sun_power():
 	print("=== SETTING UP SUN POWER ===")

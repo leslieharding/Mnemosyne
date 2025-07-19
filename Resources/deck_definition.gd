@@ -5,7 +5,8 @@ extends Resource
 # Deck power types
 enum DeckPowerType {
 	NONE,
-	SUN_POWER
+	SUN_POWER,
+	PROPHECY_POWER
 }
 
 @export var deck_name: String
@@ -78,6 +79,8 @@ func get_power_description() -> String:
 	match deck_power_type:
 		DeckPowerType.SUN_POWER:
 			return "☀️ Solar Blessing: 3 random grid spaces are bathed in sunlight, granting +1 to all stats for your cards placed there"
+		DeckPowerType.PROPHECY_POWER:
+			return "🔮 Divine Prophecy: You always go first in battle, seeing the threads of fate"
 		DeckPowerType.NONE:
 			return ""
 		_:

@@ -119,13 +119,16 @@ func format_message_with_bbcode(message: String) -> String:
 		message = message.replace("feeling", "[wave amp=20.0 freq=3.0]feeling[/wave]")
 		
 		print("NotificationManager: Applied wave effect: ", message)
-	
 	# Handle the "knew" message with bold formatting
 	elif lower_message.contains("knew") and lower_message.contains("would"):
 		print("NotificationManager: Detected 'knew' and 'would' in message")
 		message = message.replace("knew", "[b][color=#FF6666]knew[/color][/b]")
 		print("NotificationManager: After bold formatting: ", message)
-	
+	# Handle the "know" message with bold formatting
+	elif lower_message.contains("know") and lower_message.contains("watched"):
+		print("NotificationManager: Detected 'knew' and 'would' in message")
+		message = message.replace("know", "[b][color=#FF6666]knew[/color][/b]")
+		print("NotificationManager: After bold formatting: ", message)
 	return message
 
 # Reset the notification to ready state
