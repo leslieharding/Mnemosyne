@@ -1257,7 +1257,7 @@ func restore_original_decks():
 	var god_name = params.get("god", current_god)
 	var deck_index = params.get("deck_index", 0)
 	
-	var collection_path = "res://Resources/Collections/" + god_name.to_lower() + ".tres"
+	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
 	var collection: GodCardCollection = load(collection_path)
 	if collection:
 		var deck_def = collection.decks[deck_index]

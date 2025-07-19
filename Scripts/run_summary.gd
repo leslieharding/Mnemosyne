@@ -74,7 +74,7 @@ func setup_experience_summary_sync(capture_total_node: Label, defense_total_node
 	defense_total_node.text = "🛡️ Total Defense: " + str(totals["defense_exp"])
 	
 	# Load collection
-	var collection_path = "res://Resources/Collections/" + god_name.to_lower() + ".tres"
+	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
 	var collection: GodCardCollection = load(collection_path)
 	if not collection:
 		print("Failed to load collection")

@@ -52,7 +52,8 @@ func load_deck_data_sync():
 	print("Loading deck data for: ", god_name, " deck ", deck_index)
 	
 	# Load the god's collection
-	var collection_path = "res://Resources/Collections/" + god_name.to_lower() + ".tres"
+	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
+
 	
 	if not ResourceLoader.exists(collection_path):
 		print("ERROR: Collection does not exist at: ", collection_path)
@@ -250,7 +251,7 @@ func load_deck_data():
 	print("Loading deck data for: ", god_name, " deck ", deck_index)
 	
 	# Load the god's collection
-	var collection_path = "res://Resources/Collections/" + god_name.to_lower() + ".tres"
+	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
 	var collection: GodCardCollection = load(collection_path)
 	
 	if not collection:
@@ -268,7 +269,7 @@ func load_deck_data():
 	print("Loaded deck with ", current_deck.size(), " cards")
 	
 	# Create card displays with safer autoload access
-	await create_card_displays_safe()
+	await create_card_displays_sync()
 	
 	# Update Mnemosyne button with current level info
 	update_mnemosyne_button_text()
@@ -371,6 +372,12 @@ func create_card_displays_sync():
 		print("Successfully created display for card ", i)
 	
 	print("Created ", card_displays.size(), " card displays")
+	
+	print("=== FINAL DEBUG OUTPUT ===")
+	print("Cards container children: ", cards_container.get_child_count())
+	print("Cards container size: ", cards_container.size)
+	print("Cards container visible: ", cards_container.visible)
+	print("Main container children: ", main_container.get_child_count())
 	
 	# Force layout update
 	cards_container.queue_redraw()
