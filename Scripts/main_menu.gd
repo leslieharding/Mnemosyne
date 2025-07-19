@@ -13,6 +13,79 @@ var confirmation_dialog: ConfirmationDialog
 func _ready():
 	setup_menu_based_on_save_data()
 	setup_confirmation_dialog()
+	print("=== EXPORT DEBUG START ===")
+	
+	# Check autoloads
+	var autoloads = [
+		"RunExperienceTrackerAutoload",
+		"GlobalProgressTrackerAutoload", 
+		"MemoryJournalManagerAutoload",
+		"ConversationManagerAutoload",
+		"CutsceneManagerAutoload",
+		"BossPredictionTrackerAutoload",
+		"TransitionManagerAutoload"
+	]
+	
+	print("--- AUTOLOAD CHECK ---")
+	for autoload_name in autoloads:
+		var path = "/root/" + autoload_name
+		if has_node(path):
+			print("✓ " + autoload_name + " loaded")
+		else:
+			print("✗ " + autoload_name + " MISSING!")
+	
+	# Check critical resources
+	var resources = [
+		"res://Resources/Collections/Apollo.tres",
+		"res://Resources/Collections/Enemies.tres", 
+		"res://Resources/Collections/Mnemosyne.tres",
+		"res://Resources/Abilities/defensive_counter.tres",
+		"res://Resources/Abilities/passive_boost.tres",
+		"res://Resources/Abilities/stat_boost.tres",
+		"res://Resources/Abilities/stat_nullify.tres"
+	]
+	
+	print("--- RESOURCE CHECK ---")
+	for res_path in resources:
+		if ResourceLoader.exists(res_path):
+			var resource = load(res_path)
+			if resource:
+				print("✓ " + res_path + " loaded successfully")
+			else:
+				print("⚠ " + res_path + " exists but failed to load")
+		else:
+			print("✗ " + res_path + " does not exist")
+	
+	# Check scenes
+	var scenes = [
+		"res://Scenes/MainMenu.tscn",
+		"res://Scenes/GameModeSelect.tscn",
+		"res://Scenes/Apollo.tscn",
+		"res://Scenes/CardBattle.tscn",
+		"res://Scenes/CardDisplay.tscn"
+	]
+	
+	print("--- SCENE CHECK ---")
+	for scene_path in scenes:
+		if ResourceLoader.exists(scene_path):
+			print("✓ " + scene_path + " exists")
+		else:
+			print("✗ " + scene_path + " missing")
+	
+	# Check if we can instantiate key scenes
+	print("--- INSTANTIATION CHECK ---")
+	var card_display_scene = load("res://Scenes/CardDisplay.tscn")
+	if card_display_scene:
+		var instance = card_display_scene.instantiate()
+		if instance:
+			print("✓ CardDisplay instantiation works")
+			instance.queue_free()
+		else:
+			print("✗ CardDisplay instantiation failed")
+	else:
+		print("✗ CardDisplay scene failed to load")
+	
+	print("=== EXPORT DEBUG END ===")
 
 func setup_menu_based_on_save_data():
 	# Check if there's any existing progress

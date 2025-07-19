@@ -136,13 +136,14 @@ func return_to_previous_scene():
 	
 	if last_played == "tutorial_intro":
 		print("Completed tutorial intro cutscene, starting tutorial battle")
-		# Set up tutorial battle parameters
+		# FIXED: Set up tutorial battle parameters more explicitly
 		get_tree().set_meta("scene_params", {
 			"is_tutorial": true,
 			"god": "Mnemosyne",  # This should be the player's god
 			"deck_index": 0,     # Add deck index for consistency
 			"opponent": "Chronos"
 		})
+		print("Tutorial params set: ", get_tree().get_meta("scene_params"))
 		get_tree().change_scene_to_file("res://Scenes/CardBattle.tscn")
 		return
 	elif last_played == "opening_awakening":

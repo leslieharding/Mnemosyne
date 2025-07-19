@@ -16,8 +16,32 @@ var journal_button: JournalButton
 @onready var card_container = $MainContainer/RightPanel/ScrollContainer/CardContainer
 
 func _ready():
+	print("=== APOLLO SCENE STARTING ===")
+	
 	# Load the Apollo card collection
-	apollo_collection = load("res://Resources/Collections/apollo.tres")
+	apollo_collection = load("res://Resources/Collections/Apollo.tres")
+	
+	if not apollo_collection:
+		print("ERROR: Failed to load Apollo collection!")
+		# Try alternative loading method
+		var collection_path = "res://Resources/Collections/Apollo.tres"
+		if ResourceLoader.exists(collection_path):
+			apollo_collection = ResourceLoader.load(collection_path)
+			if apollo_collection:
+				print("Apollo collection loaded with ResourceLoader")
+			else:
+				print("ResourceLoader also failed")
+				return
+		else:
+			print("Apollo.tres file does not exist!")
+			return
+	
+	print("Apollo collection loaded successfully")
+	print("Cards: ", apollo_collection.cards.size())
+	print("Decks: ", apollo_collection.decks.size())
+	
+	# Wait a frame to ensure all nodes are ready
+	await get_tree().process_frame
 	
 	# Update the deck button labels and unlock states
 	if apollo_collection:
@@ -51,44 +75,101 @@ func setup_journal_button():
 
 # Set up deck buttons with unlock conditions
 func setup_deck_buttons():
+	print("=== SETTING UP DECK BUTTONS ===")
+	
+	if not apollo_collection:
+		print("ERROR: Apollo collection is null in setup_deck_buttons!")
+		return
+	
+	if apollo_collection.decks.size() == 0:
+		print("ERROR: Apollo collection has no decks!")
+		return
+	
 	var deck_buttons = [deck1_button, deck2_button, deck3_button]
 	
-	# DEBUG: Check what experience data we actually have
-	if has_node("/root/GlobalProgressTrackerAutoload"):
-		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-		var god_progress = progress_tracker.get_god_progress("Apollo")
-		print("=== APOLLO PROGRESS DEBUG ===")
-		print("Total god progress entries: ", god_progress.size())
+	# Verify buttons exist
+	for i in range(deck_buttons.size()):
+		if not deck_buttons[i]:
+			print("ERROR: Button ", i, " is null!")
+			return
+	
+	print("Apollo collection has ", apollo_collection.decks.size(), " decks")
+	
+	# Get progress tracker with more robust checking
+	var progress_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
+	var god_progress = {}
+	
+	if progress_tracker:
+		print("GlobalProgressTrackerAutoload found")
+		god_progress = progress_tracker.get_god_progress("Apollo")
+		print("God progress entries: ", god_progress.size())
+		
+		# DEBUG: Show experience data
 		for card_index in god_progress:
 			var card_exp = god_progress[card_index]
 			print("Card ", card_index, ": Capture=", card_exp.get("capture_exp", 0), " Defense=", card_exp.get("defense_exp", 0))
+	else:
+		print("WARNING: GlobalProgressTrackerAutoload not found!")
 	
+	# Set up each button
 	for i in range(apollo_collection.decks.size()):
+		if i >= deck_buttons.size():
+			print("Warning: More decks than buttons - skipping deck ", i)
+			continue
+			
 		var deck_def = apollo_collection.decks[i]
 		var button = deck_buttons[i]
-		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-		var god_progress = progress_tracker.get_god_progress("Apollo")
-		var is_unlocked = deck_def.is_unlocked("Apollo", god_progress)
 		
-		# DEBUG: Show unlock calculation details for deck 1 only
-		if i == 1:
-			print("=== DECK 1 DEBUG ===")
-			print("Required capture exp: ", deck_def.required_capture_exp)
-			print("Current capture exp: ", deck_def.get_current_capture_exp("Apollo"))
-			print("Is unlocked: ", is_unlocked)
+		print("=== DECK ", i, " SETUP ===")
+		print("Deck name: ", deck_def.deck_name)
+		print("Required capture exp: ", deck_def.required_capture_exp)
+		print("Required defense exp: ", deck_def.required_defense_exp)
 		
 		# Set button text
 		button.text = deck_def.deck_name
+		print("Button text set to: ", button.text)
 		
-		# Style button based on unlock status
+		# Check unlock status
+		var is_unlocked = true  # Default unlocked if no progress tracker
+		
+		if progress_tracker:
+			# Manual unlock calculation with debug
+			var total_capture_exp = 0
+			var total_defense_exp = 0
+			
+			for card_index in god_progress:
+				var card_exp = god_progress[card_index]
+				total_capture_exp += card_exp.get("capture_exp", 0)
+				total_defense_exp += card_exp.get("defense_exp", 0)
+			
+			print("Total capture exp: ", total_capture_exp)
+			print("Total defense exp: ", total_defense_exp)
+			
+			# Check requirements
+			var capture_met = deck_def.required_capture_exp == 0 or total_capture_exp >= deck_def.required_capture_exp
+			var defense_met = deck_def.required_defense_exp == 0 or total_defense_exp >= deck_def.required_defense_exp
+			
+			is_unlocked = capture_met and defense_met
+			
+			print("Capture requirement met: ", capture_met)
+			print("Defense requirement met: ", defense_met)
+		
+		print("Final unlock status: ", is_unlocked)
+		
+		# Apply button styling
 		if not is_unlocked:
-			# Gray out locked deck
 			button.modulate = Color(0.6, 0.6, 0.6)
-			button.disabled = false  # Keep enabled so they can still click to see requirements
+			button.disabled = false  # Keep clickable for requirement display
+			print("Button styled as LOCKED")
 		else:
-			# Normal appearance for unlocked decks
 			button.modulate = Color.WHITE
 			button.disabled = false
+			print("Button styled as UNLOCKED")
+		
+		print("Button ", i, " setup complete")
+		print("=======================")
+	
+	print("=== DECK BUTTONS SETUP COMPLETE ===")
 
 # Back button
 func _on_button_pressed() -> void:

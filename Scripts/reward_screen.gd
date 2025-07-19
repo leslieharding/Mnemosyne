@@ -22,6 +22,8 @@ var mnemosyne_button: Button
 var reward_info_label: Label
 
 func _ready():
+	print("=== REWARD SCREEN STARTING ===")
+	
 	# Connect the continue button first
 	if continue_button:
 		continue_button.pressed.connect(_on_continue_pressed)
@@ -31,14 +33,60 @@ func _ready():
 		print("Error: Continue button not found!")
 		return
 	
-	# Wait a frame to ensure all @onready variables are initialized
-	await get_tree().process_frame
-	
 	# Setup the interface
 	setup_reward_interface()
 	
-	# Load deck data
-	await safe_load_deck_data()
+	# Load deck data synchronously
+	load_deck_data_sync()
+	
+	print("=== REWARD SCREEN READY ===")
+
+# Replace the load_deck_data function with synchronous version
+func load_deck_data_sync():
+	print("=== LOADING DECK DATA SYNC ===")
+	
+	var params = get_scene_params()
+	var god_name = params.get("god", "Apollo")
+	var deck_index = params.get("deck_index", 0)
+	
+	print("Loading deck data for: ", god_name, " deck ", deck_index)
+	
+	# Load the god's collection
+	var collection_path = "res://Resources/Collections/" + god_name.to_lower() + ".tres"
+	
+	if not ResourceLoader.exists(collection_path):
+		print("ERROR: Collection does not exist at: ", collection_path)
+		return
+	
+	var collection: GodCardCollection = load(collection_path)
+	
+	if not collection:
+		print("ERROR: Failed to load collection: ", collection_path)
+		return
+	
+	if deck_index >= collection.decks.size():
+		print("ERROR: Invalid deck index: ", deck_index, " (collection has ", collection.decks.size(), " decks)")
+		return
+	
+	# Get the deck and indices
+	current_deck = collection.get_deck(deck_index)
+	deck_indices = collection.decks[deck_index].card_indices.duplicate()
+	
+	print("Loaded deck with ", current_deck.size(), " cards")
+	print("Deck indices: ", deck_indices)
+	
+	# Debug: Print card names
+	for i in range(current_deck.size()):
+		if current_deck[i]:
+			print("Card ", i, ": ", current_deck[i].card_name)
+		else:
+			print("Card ", i, ": NULL")
+	
+	# Create card displays synchronously
+	create_card_displays_sync()
+	
+	# Update Mnemosyne button with current level info
+	update_mnemosyne_button_text()
 
 func safe_load_deck_data():
 	# Double-check we're still in the tree
@@ -225,10 +273,20 @@ func load_deck_data():
 	# Update Mnemosyne button with current level info
 	update_mnemosyne_button_text()
 
-func create_card_displays_safe():
+func create_card_displays_sync():
+	print("=== CREATING CARD DISPLAYS ===")
+	
 	# Safety check
-	if not get_tree():
-		print("Error: No scene tree in create_card_displays_safe")
+	if not cards_container:
+		print("ERROR: cards_container is null!")
+		return
+	
+	if current_deck.is_empty():
+		print("ERROR: current_deck is empty!")
+		return
+	
+	if deck_indices.is_empty():
+		print("ERROR: deck_indices is empty!")
 		return
 	
 	# Clear existing displays
@@ -237,51 +295,61 @@ func create_card_displays_safe():
 			display.queue_free()
 	card_displays.clear()
 	
-	# Get tracker safely - use get_node_or_null instead
-	var tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+	# Clear container
+	for child in cards_container.get_children():
+		child.queue_free()
 	
+	# Get tracker safely
+	var tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
 	if not tracker:
-		print("RunExperienceTrackerAutoload not found! Creating cards without experience data.")
+		print("WARNING: RunExperienceTrackerAutoload not found!")
+	
+	print("Creating displays for ", current_deck.size(), " cards")
 	
 	# Create display for each card
 	for i in range(current_deck.size()):
 		var card = current_deck[i]
 		var card_index = deck_indices[i]
 		
-		print("Creating display for card: ", card.card_name)
+		print("Creating display for card ", i, ": ", card.card_name, " (index ", card_index, ")")
 		
 		# Create a horizontal container for card + exp info
 		var card_with_exp_container = HBoxContainer.new()
 		card_with_exp_container.name = "CardWithExpContainer" + str(i)
-		card_with_exp_container.custom_minimum_size = Vector2(180, 150)  # Wider to accommodate exp info
+		card_with_exp_container.custom_minimum_size = Vector2(180, 150)
 		card_with_exp_container.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		card_with_exp_container.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		card_with_exp_container.add_theme_constant_override("separation", 15)  # Gap between card and exp
+		card_with_exp_container.add_theme_constant_override("separation", 15)
 		
 		# Create a Control wrapper for the Node2D card display
 		var card_wrapper = Control.new()
 		card_wrapper.name = "CardWrapper" + str(i)
-		card_wrapper.custom_minimum_size = Vector2(110, 150)  # Original card size
+		card_wrapper.custom_minimum_size = Vector2(110, 150)
 		card_wrapper.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		card_wrapper.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		
 		# Create card display
-		var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
+		var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+		if not card_display_scene:
+			print("ERROR: Could not load CardDisplay scene!")
+			continue
+		
+		var card_display = card_display_scene.instantiate()
+		if not card_display:
+			print("ERROR: Could not instantiate CardDisplay!")
+			continue
 		
 		# Add card to wrapper
 		card_wrapper.add_child(card_display)
 		
-		# Wait for ready
-		await get_tree().process_frame
-		
-		# Setup the card
+		# Setup the card immediately (no await)
 		card_display.setup(card)
 		
 		# Center the card within its wrapper
-		card_display.position = Vector2(5, 5)  # Small offset for centering
+		card_display.position = Vector2(5, 5)
 		
-		# Create experience info display (only if tracker exists)
-		var exp_info_container = create_experience_info_display(card_index, tracker)
+		# Create experience info display
+		var exp_info_container = create_experience_info_display_sync(card_index, tracker)
 		
 		# Add card wrapper and exp info to the horizontal container
 		card_with_exp_container.add_child(card_wrapper)
@@ -290,23 +358,131 @@ func create_card_displays_safe():
 		# Add the complete container to the cards container
 		cards_container.add_child(card_with_exp_container)
 		
-		# Connect selection safely - connect to both wrapper and card panel
+		# Connect selection - using both wrapper and panel for better coverage
 		card_wrapper.gui_input.connect(_on_card_wrapper_input.bind(i))
 		if card_display.panel:
 			card_display.panel.gui_input.connect(_on_card_panel_input.bind(i))
 		else:
-			print("Warning: Card display panel is null for card ", i)
+			print("WARNING: Card display panel is null for card ", i)
 		
 		# Store reference
 		card_displays.append(card_display)
 		
-		print("Card ", i, " added to container with separate exp info")
+		print("Successfully created display for card ", i)
 	
-	print("Created ", card_displays.size(), " card displays with separate exp info")
+	print("Created ", card_displays.size(), " card displays")
 	
 	# Force layout update
 	cards_container.queue_redraw()
-	await get_tree().process_frame
+
+func create_experience_info_display_sync(card_index: int, tracker) -> Control:
+	# Create container for experience info
+	var exp_container = VBoxContainer.new()
+	exp_container.name = "ExperienceInfo"
+	exp_container.custom_minimum_size = Vector2(80, 150)
+	exp_container.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	exp_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	exp_container.add_theme_constant_override("separation", 6)
+	
+	# Add title
+	var title_label = Label.new()
+	title_label.text = "This Run:"
+	title_label.add_theme_font_size_override("font_size", 11)
+	title_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	exp_container.add_child(title_label)
+	
+	# Get experience data if tracker exists
+	if tracker and is_instance_valid(tracker):
+		var exp_data = tracker.get_card_experience(card_index)
+		
+		print("Card ", card_index, " exp data: ", exp_data)
+		
+		# Capture experience label
+		var capture_label = Label.new()
+		capture_label.text = "⚔️ +" + str(exp_data["capture_exp"])
+		capture_label.add_theme_font_size_override("font_size", 12)
+		capture_label.add_theme_color_override("font_color", Color("#FFD700"))
+		capture_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		exp_container.add_child(capture_label)
+		
+		# Defense experience label  
+		var defense_label = Label.new()
+		defense_label.text = "🛡️ +" + str(exp_data["defense_exp"])
+		defense_label.add_theme_font_size_override("font_size", 12)
+		defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
+		defense_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		exp_container.add_child(defense_label)
+		
+		# Add small separator
+		var separator = HSeparator.new()
+		separator.add_theme_constant_override("separation", 4)
+		exp_container.add_child(separator)
+		
+		# Total experience section
+		var total_title = Label.new()
+		total_title.text = "Total:"
+		total_title.add_theme_font_size_override("font_size", 10)
+		total_title.add_theme_color_override("font_color", Color("#AAAAAA"))
+		total_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		exp_container.add_child(total_title)
+		
+		# Get total experience from global tracker
+		var params = get_scene_params()
+		var god_name = params.get("god", "Apollo")
+		
+		var global_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
+		if global_tracker and is_instance_valid(global_tracker):
+			var total_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
+			var total_capture = total_exp_data.get("capture_exp", 0)
+			var total_defense = total_exp_data.get("defense_exp", 0)
+			
+			# Total capture experience
+			var total_capture_label = Label.new()
+			total_capture_label.text = "⚔️ " + str(total_capture)
+			total_capture_label.add_theme_font_size_override("font_size", 10)
+			total_capture_label.add_theme_color_override("font_color", Color("#B8860B"))
+			total_capture_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			exp_container.add_child(total_capture_label)
+			
+			# Total defense experience
+			var total_defense_label = Label.new()
+			total_defense_label.text = "🛡️ " + str(total_defense)
+			total_defense_label.add_theme_font_size_override("font_size", 10)
+			total_defense_label.add_theme_color_override("font_color", Color("#4682B4"))
+			total_defense_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			exp_container.add_child(total_defense_label)
+			
+			# Add level display for quick reference
+			var combined_total = total_capture + total_defense
+			if combined_total > 0:
+				var level = ExperienceHelpers.calculate_level(combined_total)
+				var level_label = Label.new()
+				level_label.text = "Lv." + str(level)
+				level_label.add_theme_font_size_override("font_size", 9)
+				level_label.add_theme_color_override("font_color", Color("#888888"))
+				level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				exp_container.add_child(level_label)
+		else:
+			# No global tracker - show notice
+			var no_total_label = Label.new()
+			no_total_label.text = "Total:\nN/A"
+			no_total_label.add_theme_font_size_override("font_size", 9)
+			no_total_label.add_theme_color_override("font_color", Color("#666666"))
+			no_total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			no_total_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			exp_container.add_child(no_total_label)
+	else:
+		# No tracker available
+		var no_data_label = Label.new()
+		no_data_label.text = "No data\navailable"
+		no_data_label.add_theme_font_size_override("font_size", 10)
+		no_data_label.add_theme_color_override("font_color", Color("#888888"))
+		no_data_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		no_data_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		exp_container.add_child(no_data_label)
+	
+	return exp_container
 
 func create_experience_info_display(card_index: int, tracker) -> Control:
 	# Create container for experience info

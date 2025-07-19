@@ -100,13 +100,23 @@ var tutorial_panel: PanelContainer
 var consecutive_draws: int = 0
 
 func _ready():
+	print("=== BATTLE SCENE STARTING ===")
+	
 	# Get the current god from scene parameters first
 	var params = get_scene_params()
+	print("Raw scene params: ", params)
+	
 	current_god = params.get("god", "Apollo")
 	is_tutorial_mode = params.get("is_tutorial", false)
 	tutorial_god = params.get("god", "Apollo") if is_tutorial_mode else current_god
 	
 	print("Battle scene starting with god: ", current_god, " (tutorial mode: ", is_tutorial_mode, ")")
+	print("Tutorial god set to: ", tutorial_god)
+	
+	# IMPORTANT: For tutorial mode, ensure we're using the right variables
+	if is_tutorial_mode and tutorial_god != current_god:
+		print("Tutorial mode detected - adjusting current_god from ", current_god, " to ", tutorial_god)
+		current_god = tutorial_god
 	
 	# Initialize game managers
 	setup_managers()
@@ -141,12 +151,11 @@ func _ready():
 	else:
 		push_error("No deck was selected!")
 	
-		# Start a new run for conversation tracking (if not tutorial)
+	# Start a new run for conversation tracking (if not tutorial)
 	if not is_tutorial_mode and has_node("/root/ConversationManagerAutoload"):
 		var conv_manager = get_node("/root/ConversationManagerAutoload")
 		conv_manager.start_new_run()
 		print("CardBattle: Started new run for conversations")
-	
 	
 	# Set up input handling (only when it's player's turn)
 	set_process_input(false)  # Start disabled
@@ -1536,14 +1545,20 @@ func load_player_deck(deck_index: int):
 	var collection: GodCardCollection
 	
 	if is_tutorial_mode:
-		# Tutorial mode - use tutorial god
-		collection_path = "res://Resources/Collections/" + tutorial_god.to_lower() + ".tres"
+		# Tutorial mode - use tutorial god, but ensure it's set correctly
+		var god_to_use = tutorial_god if tutorial_god != "" else current_god
+		if god_to_use == "":
+			god_to_use = "Mnemosyne"  # Force default for tutorial
+		
+		print("Tutorial mode detected - using god: ", god_to_use)
+		collection_path = "res://Resources/Collections/" + god_to_use + ".tres"
 		print("Loading tutorial collection from: ", collection_path)
+		
 		collection = load(collection_path)
 		if collection:
-			print(tutorial_god, " collection loaded successfully")
-			print(tutorial_god, " has ", collection.cards.size(), " cards")
-			print(tutorial_god, " has ", collection.decks.size(), " deck definitions")
+			print(god_to_use, " collection loaded successfully")
+			print(god_to_use, " has ", collection.cards.size(), " cards")
+			print(god_to_use, " has ", collection.decks.size(), " deck definitions")
 			
 			# Check if the god has deck definitions
 			if collection.decks.size() > 0:
@@ -1575,8 +1590,8 @@ func load_player_deck(deck_index: int):
 			display_player_hand()
 			return
 		else:
-			print("ERROR: Failed to load ", tutorial_god, " collection from ", collection_path)
-			# Fallback to a working collection
+			print("ERROR: Failed to load ", god_to_use, " collection from ", collection_path)
+			# Fallback to Apollo if the specified god fails
 			print("Trying fallback to Apollo collection...")
 			collection_path = "res://Resources/Collections/Apollo.tres"
 			collection = load(collection_path)
