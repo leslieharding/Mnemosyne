@@ -415,6 +415,11 @@ func display_deck_cards(deck_index: int) -> void:
 	selected_deck_title.text = deck_def.deck_name
 	selected_deck_description.text = deck_def.deck_description
 	
+	# NEW: Add deck power description if present
+	var power_description = deck_def.get_power_description()
+	if power_description != "":
+		selected_deck_description.text += "\n\n" + power_description
+	
 	# Clear existing card displays
 	for child in card_container.get_children():
 		child.queue_free()

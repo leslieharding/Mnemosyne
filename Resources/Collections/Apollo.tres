@@ -171,6 +171,8 @@ card_indices = Array[int]([0, 1, 2, 3, 4])
 is_starter_deck = true
 required_capture_exp = 0
 required_defense_exp = 0
+deck_power_type = 1
+power_config = {}
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [sub_resource type="Resource" id="Resource_cknfu"]
@@ -181,6 +183,8 @@ card_indices = Array[int]([5, 6, 7, 8, 9])
 is_starter_deck = false
 required_capture_exp = 100
 required_defense_exp = 0
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [sub_resource type="Resource" id="Resource_tpnlu"]
@@ -191,6 +195,8 @@ card_indices = Array[int]([10, 11, 12, 13, 14])
 is_starter_deck = false
 required_capture_exp = 0
 required_defense_exp = 100
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [resource]

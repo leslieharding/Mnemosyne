@@ -99,6 +99,11 @@ var tutorial_panel: PanelContainer
 
 var consecutive_draws: int = 0
 
+# Deck power system
+var active_deck_power: DeckDefinition.DeckPowerType = DeckDefinition.DeckPowerType.NONE
+var sunlit_positions: Array[int] = []
+
+
 func _ready():
 	print("=== BATTLE SCENE STARTING ===")
 	
@@ -968,6 +973,9 @@ func _on_opponent_card_placed(grid_index: int):
 	# Get the slot
 	var slot = grid_slots[grid_index]
 	
+	# Hide sun icon if opponent places card on sunlit slot (blocks the power)
+	hide_sun_icon_at_slot(slot)
+	
 	# Create a card display for the opponent's card
 	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 	
@@ -1597,6 +1605,10 @@ func load_player_deck(deck_index: int):
 				var deck_def = collection.decks[0]
 				player_deck = collection.get_deck(0)
 				deck_card_indices = deck_def.card_indices.duplicate()
+				
+				# NEW: Initialize deck power (even in tutorial mode)
+				initialize_deck_power(deck_def)
+				
 				print("Using deck definition: ", deck_def.deck_name)
 				print("Card indices: ", deck_card_indices)
 			else:
@@ -1629,6 +1641,10 @@ func load_player_deck(deck_index: int):
 			if collection:
 				player_deck = collection.get_deck(0)
 				deck_card_indices = collection.decks[0].card_indices.duplicate()
+				
+				# NEW: Initialize deck power for fallback
+				initialize_deck_power(collection.decks[0])
+				
 				print("Fallback successful - using Apollo deck")
 				display_player_hand()
 				return
@@ -1648,10 +1664,149 @@ func load_player_deck(deck_index: int):
 		deck_card_indices = deck_def.card_indices.duplicate()
 		player_deck = collection.get_deck(deck_index)
 		
+		# NEW: Initialize deck power
+		initialize_deck_power(deck_def)
+		
 		setup_experience_panel()
 		display_player_hand()
 	else:
 		push_error("Failed to load collection: " + collection_path)
+
+
+func initialize_deck_power(deck_def: DeckDefinition):
+	active_deck_power = deck_def.deck_power_type
+	
+	print("Initializing deck power: ", active_deck_power)
+	
+	match active_deck_power:
+		DeckDefinition.DeckPowerType.SUN_POWER:
+			setup_sun_power()
+		DeckDefinition.DeckPowerType.NONE:
+			print("No deck power for this deck")
+		_:
+			print("Unknown deck power type: ", active_deck_power)
+
+func setup_sun_power():
+	print("=== SETTING UP SUN POWER ===")
+	
+	# Randomly select 3 grid positions for sunlight
+	var available_positions: Array[int] = []
+	for i in range(9):  # 0-8 for 3x3 grid
+		available_positions.append(i)
+	available_positions.shuffle()
+	
+	# Take first 3 positions
+	sunlit_positions = available_positions.slice(0, 3)
+	
+	print("Sunlit positions: ", sunlit_positions)
+	
+	# Apply visual styling to sunlit grid slots
+	for position in sunlit_positions:
+		apply_sunlit_styling(position)
+	
+	# Show notification about the power
+	if notification_manager:
+		notification_manager.show_notification("☀️ Solar Blessing Active: 3 grid spaces are bathed in sunlight!")
+
+func apply_sunlit_styling(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	var slot = grid_slots[grid_index]
+	
+	# Create sunlit style - golden/yellow border
+	var sunlit_style = StyleBoxFlat.new()
+	sunlit_style.bg_color = Color("#444444")  # Same as default
+	sunlit_style.border_width_left = 3
+	sunlit_style.border_width_top = 3
+	sunlit_style.border_width_right = 3
+	sunlit_style.border_width_bottom = 3
+	sunlit_style.border_color = Color("#FFD700")  # Gold border
+	
+	# Apply the sunlit styling
+	slot.add_theme_stylebox_override("panel", sunlit_style)
+	
+	# Add sun icon overlay
+	add_sun_icon_to_slot(slot)
+
+func apply_deck_power_effects(card_data: CardResource, grid_position: int) -> bool:
+	match active_deck_power:
+		DeckDefinition.DeckPowerType.SUN_POWER:
+			return apply_sun_power_boost(card_data, grid_position)
+		DeckDefinition.DeckPowerType.NONE:
+			return false
+		_:
+			return false
+
+func apply_sun_boosted_card_styling(card_display: CardDisplay):
+	# Safety check to ensure we have a valid CardDisplay with a panel
+	if not card_display or not is_instance_valid(card_display):
+		print("ERROR: Invalid card_display in apply_sun_boosted_card_styling")
+		return
+	
+	if not card_display.panel:
+		print("ERROR: CardDisplay has no panel in apply_sun_boosted_card_styling")
+		return
+	
+	# Create special golden styling for sun-boosted cards
+	var sun_boosted_style = player_card_style.duplicate()
+	sun_boosted_style.border_color = Color("#FFD700")  # Gold border
+	sun_boosted_style.border_width_left = 4
+	sun_boosted_style.border_width_top = 4
+	sun_boosted_style.border_width_right = 4
+	sun_boosted_style.border_width_bottom = 4
+	
+	# Add a slight golden background tint
+	sun_boosted_style.bg_color = Color("#555533")  # Slightly golden background
+	
+	card_display.panel.add_theme_stylebox_override("panel", sun_boosted_style)
+
+func hide_sun_icon_at_slot(slot: Panel):
+	var sun_icon = slot.get_node_or_null("SunIcon")
+	if sun_icon:
+		sun_icon.visible = false
+
+
+func apply_sun_power_boost(card_data: CardResource, grid_position: int) -> bool:
+	if grid_position in sunlit_positions:
+		print("☀️ SUN POWER ACTIVATED! Boosting card stats by +1")
+		
+		# Apply +1 to all stats
+		card_data.values[0] += 1  # North
+		card_data.values[1] += 1  # East
+		card_data.values[2] += 1  # South
+		card_data.values[3] += 1  # West
+		
+		print("Card stats boosted to: ", card_data.values)
+		
+		# Show notification
+		if notification_manager:
+			notification_manager.show_notification("☀️ Solar Blessing: +1 to all stats!")
+		
+		return true
+	
+	return false
+
+
+func add_sun_icon_to_slot(slot: Panel):
+	# Create a label with sun emoji
+	var sun_label = Label.new()
+	sun_label.text = "☀️"
+	sun_label.add_theme_font_size_override("font_size", 20)
+	sun_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sun_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	sun_label.name = "SunIcon"
+	sun_label.mouse_filter = Control.MOUSE_FILTER_IGNORE  # Don't interfere with clicks
+	
+	# Position it in the center of the slot
+	sun_label.set_anchors_preset(Control.PRESET_CENTER)
+	sun_label.position = Vector2(slot.size.x/2 - 15, slot.size.y/2 - 15)
+	sun_label.size = Vector2(30, 30)
+	
+	# Add with lower z-index so cards appear on top
+	slot.add_child(sun_label)
+	sun_label.z_index = -1
+
 
 # Add new function to set up experience panel
 func setup_experience_panel():
@@ -1947,6 +2102,9 @@ func place_card_on_grid():
 			if notification_manager:
 				notification_manager.show_notification("I knew you would go there")
 	
+	# NEW: Apply deck power effects before combat
+	var sun_boosted = apply_deck_power_effects(card_data, current_grid_index)
+	
 	# Get card level for ability checks
 	var card_level = get_card_level(card_collection_index)
 	
@@ -1960,6 +2118,9 @@ func place_card_on_grid():
 	
 	# Get the current slot
 	var slot = grid_slots[current_grid_index]
+	
+	# Hide sun icon if present (card is now covering it)
+	hide_sun_icon_at_slot(slot)
 	
 	# Create a card display for the grid
 	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
@@ -1976,11 +2137,13 @@ func place_card_on_grid():
 	# Set higher z-index so the card appears on top
 	card_display.z_index = 1
 	
-	# Setup the card display with the card resource data (including potentially weakened stats)
+	# Setup the card display with the card resource data (including potentially boosted stats)
 	card_display.setup(card_data)
 	
-	# Apply player styling initially, but make prediction hits more visible
-	if boss_prediction_hit:
+	# Apply special styling for sun-boosted cards
+	if sun_boosted:
+		apply_sun_boosted_card_styling(card_display)
+	elif boss_prediction_hit:
 		# Create a special style for predicted cards
 		var prediction_hit_style = player_card_style.duplicate()
 		prediction_hit_style.border_color = Color("#FF6B6B")  # Red border for prediction hits
@@ -1998,7 +2161,7 @@ func place_card_on_grid():
 	
 	print("Card placed on grid at position", current_grid_index)
 	
-	# EXECUTE ON-PLAY ABILITIES BEFORE COMBAT (but after potential stat reduction)
+	# EXECUTE ON-PLAY ABILITIES BEFORE COMBAT (but after potential stat changes)
 	if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
 		print("Executing on-play abilities for ", card_data.card_name)
 		var ability_context = {
@@ -2015,7 +2178,7 @@ func place_card_on_grid():
 	# HANDLE PASSIVE ABILITIES
 	handle_passive_abilities_on_place(current_grid_index, card_data, card_level)
 	
-	# Resolve combat (abilities may have modified stats, and boss prediction may have weakened the card)
+	# Resolve combat (abilities may have modified stats, and deck powers may have boosted the card)
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 	if captures > 0:
 		print("Player captured ", captures, " cards!")

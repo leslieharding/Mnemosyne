@@ -2,6 +2,12 @@
 class_name DeckDefinition
 extends Resource
 
+# Deck power types
+enum DeckPowerType {
+	NONE,
+	SUN_POWER
+}
+
 @export var deck_name: String
 @export var deck_description: String
 # Store indices into the cards array instead of references
@@ -11,6 +17,10 @@ extends Resource
 @export var is_starter_deck: bool = false  # If true, always unlocked
 @export var required_capture_exp: int = 0  # Total capture exp needed to unlock
 @export var required_defense_exp: int = 0  # Total defense exp needed to unlock
+
+# NEW: Deck power system
+@export var deck_power_type: DeckPowerType = DeckPowerType.NONE
+@export var power_config: Dictionary = {}  # For any power-specific configuration
 
 # Check if this deck is unlocked for a specific god
 func is_unlocked(god_name: String, god_progress: Dictionary = {}) -> bool:
@@ -62,6 +72,16 @@ func get_unlock_description(god_name: String) -> String:
 		requirements.append("Defense XP: " + str(current_defense) + "/" + str(required_defense_exp))
 	
 	return "Requires: " + " & ".join(requirements)
+
+# Get deck power description for UI
+func get_power_description() -> String:
+	match deck_power_type:
+		DeckPowerType.SUN_POWER:
+			return "☀️ Solar Blessing: 3 random grid spaces are bathed in sunlight, granting +1 to all stats for your cards placed there"
+		DeckPowerType.NONE:
+			return ""
+		_:
+			return ""
 
 # Helper to get current capture experience
 func get_current_capture_exp(god_name: String) -> int:
