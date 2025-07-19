@@ -975,8 +975,7 @@ func _on_opponent_card_placed(grid_index: int):
 	# Get the slot
 	var slot = grid_slots[grid_index]
 	
-	# Hide sun icon if opponent places card on sunlit slot (blocks the power)
-	hide_sun_icon_at_slot(slot)
+	
 	
 	# Create a card display for the opponent's card
 	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
@@ -1706,9 +1705,7 @@ func setup_sun_power():
 	for position in sunlit_positions:
 		apply_sunlit_styling(position)
 	
-	# Show notification about the power
-	if notification_manager:
-		notification_manager.show_notification("☀️ Solar Blessing Active: 3 grid spaces are bathed in sunlight!")
+
 
 func apply_sunlit_styling(grid_index: int):
 	if grid_index < 0 or grid_index >= grid_slots.size():
@@ -1728,19 +1725,29 @@ func apply_sunlit_styling(grid_index: int):
 	# Apply the sunlit styling
 	slot.add_theme_stylebox_override("panel", sunlit_style)
 	
-	# Add sun icon overlay
-	add_sun_icon_to_slot(slot)
+	# No sun icon - just the golden border
+	print("Applied sunlit golden border to slot ", grid_index)
 
 func apply_deck_power_effects(card_data: CardResource, grid_position: int) -> bool:
+	print("DEBUG: apply_deck_power_effects called for position ", grid_position)
 	match active_deck_power:
 		DeckDefinition.DeckPowerType.SUN_POWER:
+			print("DEBUG: Applying sun power boost")
 			return apply_sun_power_boost(card_data, grid_position)
 		DeckDefinition.DeckPowerType.NONE:
+			print("DEBUG: No deck power active")
 			return false
 		_:
+			print("DEBUG: Unknown deck power type: ", active_deck_power)
 			return false
 
-func apply_sun_boosted_card_styling(card_display: CardDisplay):
+func apply_sun_boosted_card_styling(card_display: CardDisplay) -> void:
+	print("=== APPLY SUN BOOSTED STYLING DEBUG ===")
+	print("Received object type: ", type_string(typeof(card_display)))
+	print("Object class: ", card_display.get_class() if card_display else "null")
+	print("Is CardDisplay: ", card_display is CardDisplay if card_display else "null object")
+	print("Object name: ", card_display.name if card_display else "null object")
+	
 	# Safety checks to ensure we have a valid CardDisplay
 	if not card_display:
 		print("ERROR: card_display is null in apply_sun_boosted_card_styling")
@@ -1782,13 +1789,13 @@ func apply_sun_boosted_card_styling(card_display: CardDisplay):
 	card_display.panel.add_theme_stylebox_override("panel", sun_boosted_style)
 	print("Successfully applied sun boosted styling")
 
-func hide_sun_icon_at_slot(slot: Panel):
-	var sun_icon = slot.get_node_or_null("SunIcon")
-	if sun_icon:
-		sun_icon.visible = false
+
 
 
 func apply_sun_power_boost(card_data: CardResource, grid_position: int) -> bool:
+	print("DEBUG: apply_sun_power_boost called for position ", grid_position)
+	print("DEBUG: sunlit_positions are: ", sunlit_positions)
+	
 	if grid_position in sunlit_positions:
 		print("☀️ SUN POWER ACTIVATED! Boosting card stats by +1")
 		
@@ -1799,11 +1806,9 @@ func apply_sun_power_boost(card_data: CardResource, grid_position: int) -> bool:
 		card_data.values[3] += 1  # West
 		
 		print("Card stats boosted to: ", card_data.values)
-		
-		
-		
 		return true
 	
+	print("DEBUG: Position ", grid_position, " is not sunlit")
 	return false
 
 
@@ -2042,20 +2047,64 @@ func _on_grid_mouse_entered(grid_index):
 	if selected_card_index != -1 and not grid_occupied[grid_index]:
 		# Clear the previous selection highlight
 		if current_grid_index != -1:
-			grid_slots[current_grid_index].add_theme_stylebox_override("panel", default_grid_style)
+			# Restore the previous slot's original styling
+			restore_slot_original_styling(current_grid_index)
 		
 		# Update the current selection to the hovered slot
 		current_grid_index = grid_index
-		grid_slots[grid_index].add_theme_stylebox_override("panel", selected_grid_style)
+		
+		# Apply selection highlight with awareness of sun spots
+		apply_selection_highlight(grid_index)
 	
 
 func _on_grid_mouse_exited(grid_index):
 	if not turn_manager.is_player_turn():
 		return
 	
-	# If this slot is not the currently selected one, make sure it has default style
+	# If this slot is not the currently selected one, restore its original styling
 	if current_grid_index != grid_index and not grid_occupied[grid_index]:
-		grid_slots[grid_index].add_theme_stylebox_override("panel", default_grid_style)
+		restore_slot_original_styling(grid_index)
+
+
+func restore_slot_original_styling(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	var slot = grid_slots[grid_index]
+	
+	# Check if this is a sunlit position
+	if grid_index in sunlit_positions:
+		# Restore sunlit styling
+		apply_sunlit_styling(grid_index)
+	else:
+		# Restore default styling
+		slot.add_theme_stylebox_override("panel", default_grid_style)
+
+func apply_selection_highlight(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	var slot = grid_slots[grid_index]
+	
+	# Check if this is a sunlit position
+	if grid_index in sunlit_positions:
+		# Create a combined sunlit + selected style
+		var sunlit_selected_style = StyleBoxFlat.new()
+		sunlit_selected_style.bg_color = Color("#444444")
+		sunlit_selected_style.border_width_left = 4  # Thicker border for selection
+		sunlit_selected_style.border_width_top = 4
+		sunlit_selected_style.border_width_right = 4
+		sunlit_selected_style.border_width_bottom = 4
+		sunlit_selected_style.border_color = Color("#44AAFF")  # Blue selection border
+		
+		# Add a golden inner glow effect by using a background color
+		sunlit_selected_style.bg_color = Color("#554422")  # Golden tinted background
+		
+		slot.add_theme_stylebox_override("panel", sunlit_selected_style)
+	else:
+		# Regular selection styling for non-sunlit slots
+		slot.add_theme_stylebox_override("panel", selected_grid_style)
+
 
 # Grid click handler (only during player's turn)
 func _on_grid_gui_input(event, grid_index):
@@ -2142,9 +2191,7 @@ func place_card_on_grid():
 	
 	# Get the current slot
 	var slot = grid_slots[current_grid_index]
-	
-	# Hide sun icon if present (card is now covering it)
-	hide_sun_icon_at_slot(slot)
+
 	
 	# Create a card display for the grid
 	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
@@ -2174,7 +2221,7 @@ func place_card_on_grid():
 	if sun_boosted:
 		# Wait to ensure the card display is fully ready before applying styling
 		await get_tree().process_frame
-		await apply_sun_boosted_card_styling(card_display)
+		apply_sun_boosted_card_styling(card_display)  # Remove the await here
 	elif boss_prediction_hit:
 		# Create a special style for predicted cards
 		var prediction_hit_style = player_card_style.duplicate()
@@ -2223,7 +2270,9 @@ func place_card_on_grid():
 	selected_card_index = -1  # Reset before removing to avoid issues with callbacks
 	remove_card_from_hand(temp_index)
 
-	# Reset grid selection
+	# Reset grid selection and restore any remaining selection styling
+	if current_grid_index != -1:
+		restore_slot_original_styling(current_grid_index)
 	current_grid_index = -1
 
 	# Check if game should end
