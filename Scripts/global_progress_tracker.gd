@@ -6,6 +6,17 @@ class_name GlobalProgressTracker
 var progress_data: Dictionary = {}
 var save_path: String = "user://card_progress.save"
 
+# NEW: God unlock tracking
+var unlocked_gods: Array[String] = ["Apollo"]  # Apollo starts unlocked
+var god_unlock_conditions: Dictionary = {
+	"Hermes": {
+		"type": "boss_defeated",
+		"boss_name": "?????",
+		"description": "Defeat the mysterious final boss"
+	}
+}
+
+
 func _ready():
 	load_progress()
 
@@ -87,7 +98,11 @@ func get_god_progress(god_name: String) -> Dictionary:
 func save_progress():
 	var save_file = FileAccess.open(save_path, FileAccess.WRITE)
 	if save_file:
-		save_file.store_var(progress_data)
+		var save_data = {
+			"progress_data": progress_data,
+			"unlocked_gods": unlocked_gods
+		}
+		save_file.store_var(save_data)
 		save_file.close()
 		print("Progress saved to ", save_path)
 	else:
@@ -98,10 +113,21 @@ func load_progress():
 	if FileAccess.file_exists(save_path):
 		var save_file = FileAccess.open(save_path, FileAccess.READ)
 		if save_file:
-			progress_data = save_file.get_var()
+			var loaded_data = save_file.get_var()
+			
+			# Handle both old and new save formats
+			if loaded_data is Dictionary and loaded_data.has("progress_data"):
+				# New format with god unlocks
+				progress_data = loaded_data.get("progress_data", {})
+				unlocked_gods = loaded_data.get("unlocked_gods", ["Apollo"])
+			else:
+				# Old format - just progress data
+				progress_data = loaded_data if loaded_data is Dictionary else {}
+				unlocked_gods = ["Apollo"]  # Default to just Apollo
+			
 			save_file.close()
 			print("Progress loaded from ", save_path)
-			print("Current progress data: ", progress_data)
+			print("Unlocked gods: ", unlocked_gods)
 		else:
 			print("Failed to load progress!")
 	else:
@@ -117,3 +143,88 @@ func clear_god_progress(god_name: String):
 	if god_name in progress_data:
 		progress_data.erase(god_name)
 		save_progress()
+
+
+
+# === GOD UNLOCK FUNCTIONS ===
+
+# Check if a god is unlocked
+func is_god_unlocked(god_name: String) -> bool:
+	return god_name in unlocked_gods
+
+# Get all unlocked gods
+func get_unlocked_gods() -> Array[String]:
+	return unlocked_gods.duplicate()
+
+# Check and potentially unlock gods based on current progress
+func check_god_unlocks() -> Array[String]:
+	var newly_unlocked: Array[String] = []
+	
+	for god_name in god_unlock_conditions:
+		if is_god_unlocked(god_name):
+			continue  # Already unlocked
+		
+		var condition = god_unlock_conditions[god_name]
+		if check_unlock_condition(condition):
+			unlock_god(god_name)
+			newly_unlocked.append(god_name)
+	
+	return newly_unlocked
+
+# Check if a specific unlock condition is met
+func check_unlock_condition(condition: Dictionary) -> bool:
+	match condition.get("type", ""):
+		"boss_defeated":
+			return check_boss_defeated(condition.get("boss_name", ""))
+		_:
+			return false
+
+# Check if a specific boss has been defeated
+func check_boss_defeated(boss_name: String) -> bool:
+	if not has_node("/root/MemoryJournalManagerAutoload"):
+		return false
+	
+	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
+	var enemy_memories = memory_manager.get_all_enemy_memories()
+	
+	if boss_name in enemy_memories:
+		var boss_data = enemy_memories[boss_name]
+		return boss_data.get("victories", 0) > 0
+	
+	return false
+
+# Unlock a god
+func unlock_god(god_name: String):
+	if not god_name in unlocked_gods:
+		unlocked_gods.append(god_name)
+		save_progress()
+		print("God unlocked: ", god_name)
+		
+		# Trigger conversation if available
+		if has_node("/root/ConversationManagerAutoload"):
+			var conv_manager = get_node("/root/ConversationManagerAutoload")
+			conv_manager.trigger_conversation("god_unlocked_" + god_name.to_lower())
+
+# Get unlock condition description for a locked god
+func get_god_unlock_description(god_name: String) -> String:
+	if is_god_unlocked(god_name):
+		return "Unlocked"
+	
+	if god_name in god_unlock_conditions:
+		var condition = god_unlock_conditions[god_name]
+		var progress = get_unlock_progress_text(condition)
+		return condition.get("description", "Unknown requirement") + progress
+	
+	return "No unlock condition defined"
+
+# Get progress text for unlock conditions
+func get_unlock_progress_text(condition: Dictionary) -> String:
+	match condition.get("type", ""):
+		"boss_defeated":
+			var boss_name = condition.get("boss_name", "")
+			if check_boss_defeated(boss_name):
+				return " ✓"
+			else:
+				return " (Not yet defeated)"
+		_:
+			return ""

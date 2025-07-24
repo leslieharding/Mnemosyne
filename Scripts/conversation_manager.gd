@@ -42,6 +42,9 @@ func setup_conversation_definitions():
 	
 	register_conversation("first_run_defeat", Priority.MILESTONE,
 		"Every setback contains the seeds of future triumph.")
+		
+	register_conversation("hermes_unlocked", Priority.STORY, 
+	"The messenger god takes notice of your growing prowess. Swift feet follow swift minds.")	
 
 # Register a conversation definition
 func register_conversation(id: String, priority: Priority, description: String):

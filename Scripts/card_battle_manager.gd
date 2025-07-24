@@ -1212,6 +1212,9 @@ func end_game():
 	# Record god experience (you used this god in battle)
 	record_god_experience()
 	
+	# Check for god unlocks after recording the encounter
+	check_god_unlocks()
+	
 	# Trigger conversation flags based on battle outcome
 	if has_node("/root/ConversationManagerAutoload"):
 		var conv_manager = get_node("/root/ConversationManagerAutoload")
@@ -2488,3 +2491,24 @@ func record_god_experience():
 	# Record the god experience
 	memory_manager.record_god_experience(god_name, 1, deck_name)
 	print("Recorded god experience: ", god_name, " with deck ", deck_name)
+
+# Check for god unlocks after battle completion
+func check_god_unlocks():
+	if not has_node("/root/GlobalProgressTrackerAutoload"):
+		return
+	
+	var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	var newly_unlocked = progress_tracker.check_god_unlocks()
+	
+	for god_name in newly_unlocked:
+		print("New god unlocked: ", god_name)
+		
+		# Show notification
+		if notification_manager:
+			notification_manager.show_notification("🎉 " + god_name + " unlocked! 🎉")
+		
+		# Could trigger a conversation here too
+		if has_node("/root/ConversationManagerAutoload"):
+			var conv_manager = get_node("/root/ConversationManagerAutoload")
+			# This conversation would need to be defined in conversation_manager.gd
+			conv_manager.trigger_conversation("hermes_unlocked")
