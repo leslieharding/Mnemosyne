@@ -1427,6 +1427,10 @@ func move_grid_selection(dx: int, dy: int):
 		current_grid_index = new_index
 		grid_slots[current_grid_index].add_theme_stylebox_override("panel", selected_grid_style)
 
+
+
+
+
 # Handle horizontal overflow when moving left/right
 func handle_horizontal_overflow(current_x: int, current_y: int, dx: int) -> int:
 	# First, try to wrap within the same row
@@ -2280,6 +2284,8 @@ func place_card_on_grid():
 	# HANDLE PASSIVE ABILITIES
 	handle_passive_abilities_on_place(current_grid_index, card_data, card_level)
 	
+	check_for_couple_union(card_data, current_grid_index)
+	
 	# Resolve combat (abilities may have modified stats, and deck powers may have boosted the card)
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 	if captures > 0:
@@ -2512,3 +2518,23 @@ func check_god_unlocks():
 			var conv_manager = get_node("/root/ConversationManagerAutoload")
 			# This conversation would need to be defined in conversation_manager.gd
 			conv_manager.trigger_conversation("hermes_unlocked")
+
+
+func check_for_couple_union(placed_card: CardResource, grid_position: int):
+	var placed_card_name = placed_card.card_name
+	
+	# Check if this card is part of a couple
+	if not placed_card_name in couple_definitions:
+		return
+	
+	var partner_name = couple_definitions[placed_card_name]
+	
+	# Check all 4 adjacent positions for the partner
+	for direction in range(4):
+		var adjacent_pos = get_adjacent_position(grid_position, direction)
+		if adjacent_pos != -1 and grid_occupied[adjacent_pos]:
+			var adjacent_card = get_card_at_position(adjacent_pos)
+			if adjacent_card and adjacent_card.card_name == partner_name:
+				# Couple found! Record the union
+				record_couple_union(placed_card_name, partner_name)
+				return

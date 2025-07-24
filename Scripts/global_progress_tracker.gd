@@ -13,9 +13,23 @@ var god_unlock_conditions: Dictionary = {
 		"type": "boss_defeated",
 		"boss_name": "?????",
 		"description": "Defeat the mysterious final boss"
-	}
+	},
+	"Aphrodite": {
+	"type": "couples_united",
+	"required_count": 2,
+	"description": "Unite 2 couples"
+}
 }
 
+
+var couple_definitions = {
+	"Phaeton": "Cygnus",
+	"Cygnus": "Phaeton", 
+	"Orpheus": "Euridyce",
+	"Euridyce": "Orpheus"
+}
+
+var couples_united: Array[String] = []  # Track which couples have been united
 
 func _ready():
 	load_progress()
@@ -228,3 +242,33 @@ func get_unlock_progress_text(condition: Dictionary) -> String:
 				return " (Not yet defeated)"
 		_:
 			return ""
+
+
+func record_couple_union(card1_name: String, card2_name: String):
+	# Create a consistent couple identifier (alphabetical order)
+	var couple_names = [card1_name, card2_name]
+	couple_names.sort()
+	var couple_id = couple_names[0] + " & " + couple_names[1]
+	
+	# Only record if not already recorded
+	if not couple_id in couples_united:
+		couples_united.append(couple_id)
+		print("Love blooms! ", couple_id, " have been united!")
+		
+		# Show notification
+		if get_tree().current_scene.has_method("show_notification"):
+			get_tree().current_scene.show_notification("💕 " + couple_id + " united! 💕")
+		
+		# Check for Aphrodite unlock
+		check_aphrodite_unlock()
+		
+		save_progress()
+
+func check_aphrodite_unlock():
+	if couples_united.size() >= 2 and not is_god_unlocked("Aphrodite"):
+		unlock_god("Aphrodite")
+		
+		# Trigger special conversation
+		if has_node("/root/ConversationManagerAutoload"):
+			var conv_manager = get_node("/root/ConversationManagerAutoload")
+			conv_manager.trigger_conversation("aphrodite_unlocked")
