@@ -114,7 +114,8 @@ func save_progress():
 	if save_file:
 		var save_data = {
 			"progress_data": progress_data,
-			"unlocked_gods": unlocked_gods
+			"unlocked_gods": unlocked_gods,
+			"couples_united": couples_united  # Add this line
 		}
 		save_file.store_var(save_data)
 		save_file.close()
@@ -134,14 +135,17 @@ func load_progress():
 				# New format with god unlocks
 				progress_data = loaded_data.get("progress_data", {})
 				unlocked_gods = loaded_data.get("unlocked_gods", ["Apollo"])
+				couples_united = loaded_data.get("couples_united", [])  # Add this line
 			else:
 				# Old format - just progress data
 				progress_data = loaded_data if loaded_data is Dictionary else {}
 				unlocked_gods = ["Apollo"]  # Default to just Apollo
+				couples_united = []  # Add this line
 			
 			save_file.close()
 			print("Progress loaded from ", save_path)
 			print("Unlocked gods: ", unlocked_gods)
+			print("Couples united: ", couples_united)  # Add this line
 		else:
 			print("Failed to load progress!")
 	else:
@@ -185,13 +189,18 @@ func check_god_unlocks() -> Array[String]:
 	
 	return newly_unlocked
 
-# Check if a specific unlock condition is met
+# Replace the check_unlock_condition function in Scripts/global_progress_tracker.gd
 func check_unlock_condition(condition: Dictionary) -> bool:
 	match condition.get("type", ""):
 		"boss_defeated":
 			return check_boss_defeated(condition.get("boss_name", ""))
+		"couples_united":
+			var required = condition.get("required_count", 2)
+			return couples_united.size() >= required
 		_:
 			return false
+
+			
 
 # Check if a specific boss has been defeated
 func check_boss_defeated(boss_name: String) -> bool:
@@ -231,7 +240,6 @@ func get_god_unlock_description(god_name: String) -> String:
 	
 	return "No unlock condition defined"
 
-# Get progress text for unlock conditions
 func get_unlock_progress_text(condition: Dictionary) -> String:
 	match condition.get("type", ""):
 		"boss_defeated":
@@ -240,6 +248,13 @@ func get_unlock_progress_text(condition: Dictionary) -> String:
 				return " ✓"
 			else:
 				return " (Not yet defeated)"
+		"couples_united":
+			var required = condition.get("required_count", 2)
+			var current = couples_united.size()
+			if current >= required:
+				return " ✓"
+			else:
+				return " (" + str(current) + "/" + str(required) + " couples united)"
 		_:
 			return ""
 
@@ -250,25 +265,36 @@ func record_couple_union(card1_name: String, card2_name: String):
 	couple_names.sort()
 	var couple_id = couple_names[0] + " & " + couple_names[1]
 	
-	# Only record if not already recorded
+	# Only record if not already recorded (this ensures uniqueness)
 	if not couple_id in couples_united:
 		couples_united.append(couple_id)
 		print("Love blooms! ", couple_id, " have been united!")
 		
-		# Show notification
-		if get_tree().current_scene.has_method("show_notification"):
-			get_tree().current_scene.show_notification("💕 " + couple_id + " united! 💕")
+		# Show notification if available
+		var current_scene = get_tree().current_scene
+		if current_scene and current_scene.has_method("show_notification"):
+			current_scene.show_notification("💕 " + couple_id + " united! 💕")
+		elif current_scene and "notification_manager" in current_scene:
+			current_scene.notification_manager.show_notification("💕 " + couple_id + " united! 💕")
 		
 		# Check for Aphrodite unlock
 		check_aphrodite_unlock()
 		
 		save_progress()
+	else:
+		print("Couple ", couple_id, " has already been united - no duplicate recording")
+
+func get_couples_united_count() -> int:
+	return couples_united.size()
+
+func get_united_couples() -> Array[String]:
+	return couples_united.duplicate(
 
 func check_aphrodite_unlock():
-	if couples_united.size() >= 2 and not is_god_unlocked("Aphrodite"):
-		unlock_god("Aphrodite")
-		
-		# Trigger special conversation
-		if has_node("/root/ConversationManagerAutoload"):
-			var conv_manager = get_node("/root/ConversationManagerAutoload")
-			conv_manager.trigger_conversation("aphrodite_unlocked")
+		if couples_united.size() >= 2 and not is_god_unlocked("Aphrodite"):
+			unlock_god("Aphrodite")
+			
+			# Trigger special conversation
+			if has_node("/root/ConversationManagerAutoload"):
+				var conv_manager = get_node("/root/ConversationManagerAutoload")
+				conv_manager.trigger_conversation("aphrodite_unlocked")

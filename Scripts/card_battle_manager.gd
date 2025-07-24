@@ -19,6 +19,13 @@ var deck_card_indices: Array[int] = []  # Original indices in god's collection
 var exp_panel: ExpPanel  # Reference to experience panel
 var grid_to_collection_index: Dictionary = {}  # grid_index -> collection_index
 
+
+var couple_definitions = {
+	"Phaeton": "Cygnus",
+	"Cygnus": "Phaeton", 
+	"Orpheus": "Euridyce",
+	"Euridyce": "Orpheus"
+}
 # Journal button reference  
 var journal_button: JournalButton
 
@@ -2520,8 +2527,14 @@ func check_god_unlocks():
 			conv_manager.trigger_conversation("hermes_unlocked")
 
 
+# Replace the check_for_couple_union function in Scripts/card_battle_manager.gd
 func check_for_couple_union(placed_card: CardResource, grid_position: int):
 	var placed_card_name = placed_card.card_name
+	
+	# Get global progress tracker
+	var progress_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
+	if not progress_tracker:
+		return
 	
 	# Check if this card is part of a couple
 	if not placed_card_name in couple_definitions:
@@ -2529,12 +2542,70 @@ func check_for_couple_union(placed_card: CardResource, grid_position: int):
 	
 	var partner_name = couple_definitions[placed_card_name]
 	
+	# Create couple ID to check if already united (same logic as in progress tracker)
+	var couple_names = [placed_card_name, partner_name]
+	couple_names.sort()
+	var couple_id = couple_names[0] + " & " + couple_names[1]
+	
+	# Check if this couple has already been united
+	if couple_id in progress_tracker.couples_united:
+		print("Couple ", couple_id, " has already been united - skipping")
+		return
+	
 	# Check all 4 adjacent positions for the partner
-	for direction in range(4):
-		var adjacent_pos = get_adjacent_position(grid_position, direction)
-		if adjacent_pos != -1 and grid_occupied[adjacent_pos]:
-			var adjacent_card = get_card_at_position(adjacent_pos)
-			if adjacent_card and adjacent_card.card_name == partner_name:
-				# Couple found! Record the union
-				record_couple_union(placed_card_name, partner_name)
-				return
+	var grid_x = grid_position % grid_size
+	var grid_y = grid_position / grid_size
+	
+	var adjacent_positions = [
+		{"dx": 0, "dy": -1},  # North
+		{"dx": 1, "dy": 0},   # East
+		{"dx": 0, "dy": 1},   # South
+		{"dx": -1, "dy": 0}   # West
+	]
+	
+	for adj in adjacent_positions:
+		var adj_x = grid_x + adj.dx
+		var adj_y = grid_y + adj.dy
+		var adj_index = adj_y * grid_size + adj_x
+		
+		# Check if adjacent position is within bounds and occupied
+		if adj_x >= 0 and adj_x < grid_size and adj_y >= 0 and adj_y < grid_size:
+			if grid_occupied[adj_index]:
+				var adjacent_card = get_card_at_position(adj_index)
+				if adjacent_card and adjacent_card.card_name == partner_name:
+					# Couple found! Record the union
+					progress_tracker.record_couple_union(placed_card_name, partner_name)
+					
+					# Show notification if available
+					if notification_manager:
+						notification_manager.show_notification("💕 " + couple_id + " united! 💕")
+					
+					return
+
+func get_adjacent_position(grid_position: int, direction: int) -> int:
+	var grid_x = grid_position % grid_size
+	var grid_y = grid_position / grid_size
+	
+	match direction:
+		0: # North
+			if grid_y > 0:
+				return (grid_y - 1) * grid_size + grid_x
+		1: # East
+			if grid_x < grid_size - 1:
+				return grid_y * grid_size + (grid_x + 1)
+		2: # South
+			if grid_y < grid_size - 1:
+				return (grid_y + 1) * grid_size + grid_x
+		3: # West
+			if grid_x > 0:
+				return grid_y * grid_size + (grid_x - 1)
+	
+	return -1
+
+func record_couple_union(card1_name: String, card2_name: String):
+	# Get global progress tracker
+	var progress_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
+	if not progress_tracker:
+		return
+	
+	progress_tracker.record_couple_union(card1_name, card2_name)
