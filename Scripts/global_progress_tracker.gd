@@ -29,7 +29,7 @@ var couple_definitions = {
 	"Euridyce": "Orpheus"
 }
 
-var couples_united: Array[String] = []  # Track which couples have been united
+var couples_united: Array = []  # Track which couples have been united
 
 func _ready():
 	load_progress()
@@ -288,7 +288,11 @@ func get_couples_united_count() -> int:
 	return couples_united.size()
 
 func get_united_couples() -> Array[String]:
-	return couples_united.duplicate(
+	var result: Array[String] = []
+	for item in couples_united:
+		if item is String:
+			result.append(item as String)
+	return result
 
 func check_aphrodite_unlock():
 		if couples_united.size() >= 2 and not is_god_unlocked("Aphrodite"):
