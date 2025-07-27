@@ -779,125 +779,22 @@ func set_card_ownership(grid_index: int, new_owner: Owner):
 		grid_ownership[grid_index] = new_owner
 		print("Card at slot ", grid_index, " ownership changed to ", "Player" if new_owner == Owner.PLAYER else "Opponent")
 
-# This replaces the existing resolve_combat function
 func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource):
 	print("Resolving combat for card at slot ", grid_index)
 	
 	var captures = []
-	var grid_x = grid_index % grid_size
-	var grid_y = grid_index / grid_size
 	
-	# Check all 4 adjacent positions
-	var directions = [
-		{"dx": 0, "dy": -1, "my_value_index": 0, "their_value_index": 2, "name": "North"},  # North: my North vs their South
-		{"dx": 1, "dy": 0, "my_value_index": 1, "their_value_index": 3, "name": "East"},   # East: my East vs their West
-		{"dx": 0, "dy": 1, "my_value_index": 2, "their_value_index": 0, "name": "South"},  # South: my South vs their North
-		{"dx": -1, "dy": 0, "my_value_index": 3, "their_value_index": 1, "name": "West"}   # West: my West vs their East
-	]
+	# Check if attacking card has extended range ability
+	var has_extended_range = attacking_card.has_meta("has_extended_range") and attacking_card.get_meta("has_extended_range")
 	
-	for direction in directions:
-		var adj_x = grid_x + direction.dx
-		var adj_y = grid_y + direction.dy
-		var adj_index = adj_y * grid_size + adj_x
-		
-		# Check if adjacent position is within bounds and occupied
-		if adj_x >= 0 and adj_x < grid_size and adj_y >= 0 and adj_y < grid_size:
-			if grid_occupied[adj_index]:
-				var adjacent_owner = grid_ownership[adj_index]
-				
-				# Only battle if the adjacent card is owned by the opponent
-				if adjacent_owner != Owner.NONE and adjacent_owner != attacking_owner:
-					var adjacent_card = grid_card_data[adj_index]
-					
-					# Safety check - ensure both cards exist
-					if not attacking_card or not adjacent_card:
-						print("Warning: Missing card data in combat resolution")
-						continue
-					
-					var my_value = attacking_card.values[direction.my_value_index]
-					var their_value = adjacent_card.values[direction.their_value_index]
-					
-					print("Combat ", direction.name, ": My ", my_value, " vs Their ", their_value)
-					
-					# Check for capture or successful defense
-					if my_value > their_value:
-						print("Captured card at slot ", adj_index, "!")
-						captures.append(adj_index)
-						
-						# VISUAL EFFECT: Flash the attacking card's edge
-						var attacking_card_display = get_card_display_at_position(grid_index)
-						if attacking_card_display:
-							var is_player_attack = (attacking_owner == Owner.PLAYER)
-							visual_effects_manager.show_capture_flash(attacking_card_display, direction.my_value_index, is_player_attack)
-						
-						# Award capture experience if it's a player card attacking
-						if attacking_owner == Owner.PLAYER:
-							var card_collection_index = get_card_collection_index(grid_index)
-							if card_collection_index != -1:
-								get_node("/root/RunExperienceTrackerAutoload").add_capture_exp(card_collection_index, 10)
-						
-						# Execute ON_CAPTURE abilities on the card that was just captured
-						var captured_card_level = get_card_level(get_card_collection_index(adj_index))
-						if adjacent_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, captured_card_level):
-							print("Executing ON_CAPTURE abilities for captured card: ", adjacent_card.card_name)
-							
-							var capture_context = {
-								"capturing_card": attacking_card,
-								"capturing_position": grid_index,
-								"captured_card": adjacent_card,
-								"captured_position": adj_index,
-								"game_manager": self,
-								"direction": direction.name,
-								"card_level": captured_card_level
-							}
-							
-							adjacent_card.execute_abilities(CardAbility.TriggerType.ON_CAPTURE, capture_context, captured_card_level)
-					else:
-						# Defense successful - check for ON_DEFEND abilities
-						print("Defense successful at slot ", adj_index, "!")
-						
-						# Award defense experience if defending card is player's
-						if attacking_owner == Owner.OPPONENT and grid_ownership[adj_index] == Owner.PLAYER:
-							var defending_card_index = get_card_collection_index(adj_index)
-							if defending_card_index != -1:
-								get_node("/root/RunExperienceTrackerAutoload").add_defense_exp(defending_card_index, 5)
-						
-						# DEBUG: Check for ON_DEFEND abilities on the defending card
-						print("DEBUG: Checking ON_DEFEND abilities for card: ", adjacent_card.card_name)
-						print("DEBUG: Card abilities count: ", adjacent_card.abilities.size())
-						for i in range(adjacent_card.abilities.size()):
-							var ability = adjacent_card.abilities[i]
-							print("DEBUG: Ability ", i, ": ", ability.ability_name, " trigger: ", ability.trigger_condition)
-						
-						var defending_card_collection_index = get_card_collection_index(adj_index)
-						print("DEBUG: Defending card collection index: ", defending_card_collection_index)
-						
-						var defending_card_level = get_card_level(defending_card_collection_index)
-						print("DEBUG: Defending card level: ", defending_card_level)
-						
-						var has_on_defend = adjacent_card.has_ability_type(CardAbility.TriggerType.ON_DEFEND, defending_card_level)
-						print("DEBUG: Has ON_DEFEND ability: ", has_on_defend)
-						print("DEBUG: TriggerType.ON_DEFEND value: ", CardAbility.TriggerType.ON_DEFEND)
-						
-						if has_on_defend:
-							print("Executing ON_DEFEND abilities for defending card: ", adjacent_card.card_name)
-							
-							var defend_context = {
-								"defending_card": adjacent_card,
-								"defending_position": adj_index,
-								"attacking_card": attacking_card,
-								"attacking_position": grid_index,
-								"game_manager": self,
-								"direction": direction.name,
-								"card_level": defending_card_level
-							}
-							
-							# Execute all ON_DEFEND abilities
-							adjacent_card.execute_abilities(CardAbility.TriggerType.ON_DEFEND, defend_context, defending_card_level)
-						else:
-							print("DEBUG: No ON_DEFEND abilities found or level requirement not met")
+	if has_extended_range:
+		print("Extended Range combat detected!")
+		captures = resolve_extended_range_combat(grid_index, attacking_owner, attacking_card)
+	else:
+		print("Standard combat")
+		captures = resolve_standard_combat(grid_index, attacking_owner, attacking_card)
 	
-	# Apply all captures and handle passive abilities
+	# Apply all captures and handle passive abilities (existing code)
 	for captured_index in captures:
 		# Store the card data before changing ownership (for passive ability removal)
 		var captured_card_data = grid_card_data[captured_index]
@@ -935,7 +832,54 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 	# Update visuals for all affected cards
 	update_board_visuals()
 	
-	return captures.size()  # Return number of captures for potential future use
+	return captures.size()
+
+# Standard 4-direction combat (existing logic)
+func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource) -> Array[int]:
+	var captures: Array[int] = []
+	var grid_x = grid_index % grid_size
+	var grid_y = grid_index / grid_size
+	
+	# Check all 4 adjacent positions (existing directions)
+	var directions = [
+		{"dx": 0, "dy": -1, "my_value_index": 0, "their_value_index": 2, "name": "North"},
+		{"dx": 1, "dy": 0, "my_value_index": 1, "their_value_index": 3, "name": "East"},
+		{"dx": 0, "dy": 1, "my_value_index": 2, "their_value_index": 0, "name": "South"},
+		{"dx": -1, "dy": 0, "my_value_index": 3, "their_value_index": 1, "name": "West"}
+	]
+	
+	for direction in directions:
+		var adj_x = grid_x + direction.dx
+		var adj_y = grid_y + direction.dy
+		var adj_index = adj_y * grid_size + adj_x
+		
+		if adj_x >= 0 and adj_x < grid_size and adj_y >= 0 and adj_y < grid_size:
+			if grid_occupied[adj_index]:
+				var adjacent_owner = grid_ownership[adj_index]
+				
+				if adjacent_owner != Owner.NONE and adjacent_owner != attacking_owner:
+					var adjacent_card = grid_card_data[adj_index]
+					
+					if not attacking_card or not adjacent_card:
+						print("Warning: Missing card data in combat resolution")
+						continue
+					
+					var my_value = attacking_card.values[direction.my_value_index]
+					var their_value = adjacent_card.values[direction.their_value_index]
+					
+					print("Combat ", direction.name, ": My ", my_value, " vs Their ", their_value)
+					
+					if my_value > their_value:
+						print("Captured card at slot ", adj_index, "!")
+						captures.append(adj_index)
+						
+						# Execute abilities and award experience (existing logic)
+						handle_standard_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction)
+					else:
+						# Defense successful
+						handle_standard_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction)
+	
+	return captures
 
 # Add helper function to get collection index from grid position
 func get_card_collection_index(grid_index: int) -> int:
@@ -2609,3 +2553,148 @@ func record_couple_union(card1_name: String, card2_name: String):
 		return
 	
 	progress_tracker.record_couple_union(card1_name, card2_name)
+
+
+# Extended 8-direction combat (new logic)
+func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource) -> Array[int]:
+	var captures: Array[int] = []
+	
+	# Get all 8 adjacent positions using the helper function
+	var adjacent_positions = ExtendedRangeAbility.get_extended_adjacent_positions(grid_index, grid_size)
+	
+	print("Extended range attacking ", adjacent_positions.size(), " positions")
+	
+	for pos_info in adjacent_positions:
+		var adj_index = pos_info.position
+		var direction = pos_info.direction
+		var direction_name = pos_info.name
+		var is_diagonal = pos_info.is_diagonal
+		
+		if grid_occupied[adj_index]:
+			var adjacent_owner = grid_ownership[adj_index]
+			
+			if adjacent_owner != Owner.NONE and adjacent_owner != attacking_owner:
+				var adjacent_card = grid_card_data[adj_index]
+				
+				if not attacking_card or not adjacent_card:
+					print("Warning: Missing card data in extended combat resolution")
+					continue
+				
+				# Calculate attack and defense values based on direction
+				var my_attack_value = ExtendedRangeAbility.get_attack_value_for_direction(attacking_card.values, direction)
+				var their_defense_value = ExtendedRangeAbility.get_defense_value_for_direction(adjacent_card.values, direction)
+				
+				print("Extended Combat ", direction_name, " (", "diagonal" if is_diagonal else "orthogonal", "): My ", my_attack_value, " vs Their ", their_defense_value)
+				
+				if my_attack_value > their_defense_value:
+					print("Extended range captured card at slot ", adj_index, "!")
+					captures.append(adj_index)
+					
+					# Handle combat effects
+					handle_extended_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
+				else:
+					# Defense successful
+					handle_extended_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
+	
+	return captures
+
+# Handle combat effects for standard combat
+func handle_standard_combat_effects(attacker_pos: int, defender_pos: int, attacking_owner: Owner, attacking_card: CardResource, defending_card: CardResource, direction: Dictionary):
+	# VISUAL EFFECT: Flash the attacking card's edge
+	var attacking_card_display = get_card_display_at_position(attacker_pos)
+	if attacking_card_display:
+		var is_player_attack = (attacking_owner == Owner.PLAYER)
+		visual_effects_manager.show_capture_flash(attacking_card_display, direction.my_value_index, is_player_attack)
+	
+	# Award capture experience if it's a player card attacking
+	if attacking_owner == Owner.PLAYER:
+		var card_collection_index = get_card_collection_index(attacker_pos)
+		if card_collection_index != -1:
+			get_node("/root/RunExperienceTrackerAutoload").add_capture_exp(card_collection_index, 10)
+	
+	# Execute ON_CAPTURE abilities on the captured card (existing logic)
+	execute_capture_abilities(defender_pos, defending_card, attacker_pos, attacking_card, direction.name)
+
+# Handle defense effects for standard combat
+func handle_standard_defense_effects(attacker_pos: int, defender_pos: int, attacking_owner: Owner, attacking_card: CardResource, defending_card: CardResource, direction: Dictionary):
+	print("Defense successful at slot ", defender_pos, "!")
+	
+	# Award defense experience if defending card is player's
+	if attacking_owner == Owner.OPPONENT and grid_ownership[defender_pos] == Owner.PLAYER:
+		var defending_card_index = get_card_collection_index(defender_pos)
+		if defending_card_index != -1:
+			get_node("/root/RunExperienceTrackerAutoload").add_defense_exp(defending_card_index, 5)
+	
+	# Execute ON_DEFEND abilities (existing logic)
+	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, direction.name)
+
+# Handle combat effects for extended range combat
+func handle_extended_combat_effects(attacker_pos: int, defender_pos: int, attacking_owner: Owner, attacking_card: CardResource, defending_card: CardResource, pos_info: Dictionary):
+	# VISUAL EFFECT: Flash the attacking card's edge (modified for extended range)
+	var attacking_card_display = get_card_display_at_position(attacker_pos)
+	if attacking_card_display:
+		var is_player_attack = (attacking_owner == Owner.PLAYER)
+		# For extended range, we'll flash based on the actual direction
+		var flash_direction = pos_info.direction if pos_info.direction < 4 else (pos_info.direction - 4)  # Map diagonals to orthogonals for flashing
+		visual_effects_manager.show_capture_flash(attacking_card_display, flash_direction, is_player_attack)
+	
+	# Award capture experience
+	if attacking_owner == Owner.PLAYER:
+		var card_collection_index = get_card_collection_index(attacker_pos)
+		if card_collection_index != -1:
+			get_node("/root/RunExperienceTrackerAutoload").add_capture_exp(card_collection_index, 10)
+	
+	# Execute ON_CAPTURE abilities
+	execute_capture_abilities(defender_pos, defending_card, attacker_pos, attacking_card, pos_info.name)
+
+# Handle defense effects for extended range combat
+func handle_extended_defense_effects(attacker_pos: int, defender_pos: int, attacking_owner: Owner, attacking_card: CardResource, defending_card: CardResource, pos_info: Dictionary):
+	print("Extended defense successful at slot ", defender_pos, "!")
+	
+	# Award defense experience if defending card is player's
+	if attacking_owner == Owner.OPPONENT and grid_ownership[defender_pos] == Owner.PLAYER:
+		var defending_card_index = get_card_collection_index(defender_pos)
+		if defending_card_index != -1:
+			get_node("/root/RunExperienceTrackerAutoload").add_defense_exp(defending_card_index, 5)
+	
+	# Execute ON_DEFEND abilities
+	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, pos_info.name)
+
+# Helper functions for ability execution
+func execute_capture_abilities(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource, direction_name: String):
+	var defending_card_collection_index = get_card_collection_index(defender_pos)
+	var defending_card_level = get_card_level(defending_card_collection_index)
+	
+	if defending_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, defending_card_level):
+		print("Executing ON_CAPTURE abilities for captured card: ", defending_card.card_name)
+		
+		var capture_context = {
+			"capturing_card": attacking_card,
+			"capturing_position": attacker_pos,
+			"captured_card": defending_card,
+			"captured_position": defender_pos,
+			"game_manager": self,
+			"direction": direction_name,
+			"card_level": defending_card_level
+		}
+		
+		defending_card.execute_abilities(CardAbility.TriggerType.ON_CAPTURE, capture_context, defending_card_level)
+
+func execute_defend_abilities(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource, direction_name: String):
+	var defending_card_collection_index = get_card_collection_index(defender_pos)
+	var defending_card_level = get_card_level(defending_card_collection_index)
+	
+	if defending_card.has_ability_type(CardAbility.TriggerType.ON_DEFEND, defending_card_level):
+		print("Executing ON_DEFEND abilities for defending card: ", defending_card.card_name)
+		
+		var defend_context = {
+			"defending_card": defending_card,
+			"defending_position": defender_pos,
+			"attacking_card": attacking_card,
+			"attacking_position": attacker_pos,
+			"game_manager": self,
+			"direction": direction_name,
+			"card_level": defending_card_level
+		}
+		
+		defending_card.execute_abilities(CardAbility.TriggerType.ON_DEFEND, defend_context, defending_card_level)
