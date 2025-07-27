@@ -7,6 +7,7 @@ var journal_button: JournalButton
 @onready var apollo_button: Button = $VBoxContainer/HBoxContainer/ApolloButton
 @onready var hermes_button: Button = $VBoxContainer/HBoxContainer/HermesButton
 @onready var artemis_button: Button = $VBoxContainer/HBoxContainer/ArtemisButton
+@onready var aphrodite_button: Button = $VBoxContainer/HBoxContainer/AphroditeButton  
 @onready var chiron_button: ChironButton = $ChironButton
 
 func _ready():
@@ -33,6 +34,7 @@ func setup_god_buttons():
 	setup_individual_god_button("Apollo", apollo_button, unlocked_gods)
 	setup_individual_god_button("Hermes", hermes_button, unlocked_gods)
 	setup_individual_god_button("Artemis", artemis_button, unlocked_gods)
+	setup_individual_god_button("Aphrodite", aphrodite_button, unlocked_gods)  # Add this line
 	# Add more gods here as needed
 
 func setup_individual_god_button(god_name: String, button: Button, unlocked_gods: Array[String]):
@@ -70,6 +72,12 @@ func _on_artemis_button_pressed() -> void:
 		get_tree().change_scene_to_file("res://Scenes/Artemis.tscn")
 	else:
 		show_unlock_requirements("Artemis")
+
+func _on_aphrodite_button_pressed() -> void:
+	if is_god_available("Aphrodite"):
+		get_tree().change_scene_to_file("res://Scenes/Aphrodite.tscn")
+	else:
+		show_unlock_requirements("Aphrodite")
 
 func is_god_available(god_name: String) -> bool:
 	if not has_node("/root/GlobalProgressTrackerAutoload"):

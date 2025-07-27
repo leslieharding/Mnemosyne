@@ -14,11 +14,16 @@ var god_unlock_conditions: Dictionary = {
 		"boss_name": "?????",
 		"description": "Defeat the mysterious final boss"
 	},
+	"Artemis": {
+		"type": "boss_defeated", 
+		"boss_name": "Stone Guardian",
+		"description": "Defeat the Stone Guardian"
+	},
 	"Aphrodite": {
-	"type": "couples_united",
-	"required_count": 2,
-	"description": "Unite 2 couples"
-}
+		"type": "couples_united",
+		"required_count": 2,
+		"description": "Unite 2 couples by placing them adjacent on the board"
+	}
 }
 
 
@@ -295,10 +300,11 @@ func get_united_couples() -> Array[String]:
 	return result
 
 func check_aphrodite_unlock():
-		if couples_united.size() >= 2 and not is_god_unlocked("Aphrodite"):
-			unlock_god("Aphrodite")
-			
-			# Trigger special conversation
-			if has_node("/root/ConversationManagerAutoload"):
-				var conv_manager = get_node("/root/ConversationManagerAutoload")
-				conv_manager.trigger_conversation("aphrodite_unlocked")
+	if couples_united.size() >= 2 and not is_god_unlocked("Aphrodite"):
+		unlock_god("Aphrodite")
+		print("Aphrodite unlocked due to ", couples_united.size(), " couples united!")
+		
+		# Trigger special conversation
+		if has_node("/root/ConversationManagerAutoload"):
+			var conv_manager = get_node("/root/ConversationManagerAutoload")
+			conv_manager.trigger_conversation("aphrodite_unlocked")
