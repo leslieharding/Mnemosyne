@@ -78,8 +78,8 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_lg4ks"]
 script = ExtResource("7_ej0q7")
-ability_name = ""
-description = ""
+ability_name = "Extended Range"
+description = "This card attacks also attacks diagonal directions"
 unlock_level = 0
 trigger_condition = 0
 metadata/_custom_type_script = "uid://43v8bwokc47i"
