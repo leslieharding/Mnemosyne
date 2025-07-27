@@ -52,7 +52,7 @@ metadata/_custom_type_script = "uid://b72irnrav5w53"
 
 [sub_resource type="Resource" id="Resource_cm1c1"]
 script = ExtResource("1_vqrrp")
-card_name = "Phaetons Boast"
+card_name = "Phaeton"
 values = Array[int]([3, 9, 8, 1])
 description = "You just cant give Epiphus the satisfaction"
 abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_l7o3e")])
