@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ExtendedRangeAbility" load_steps=2 format=3 uid="uid://cas3olnq5c0xt"]
+
+[ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="1_n8w6p"]
+
+[resource]
+script = ExtResource("1_n8w6p")
+ability_name = "Extended Range"
+description = "This card attacks in all 8 directions including diagonals, using averaged values for combat"
+unlock_level = 0
+trigger_condition = 0

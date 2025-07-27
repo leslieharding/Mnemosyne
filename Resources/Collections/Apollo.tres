@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=31 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=33 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_cm1c1"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://b72irnrav5w53" path="res://Resources/Abilities/defensive_counter_ability.gd" id="4_dwe15"]
 [ext_resource type="Script" uid="uid://dgsvwgjhs2vju" path="res://Resources/Abilities/stat_nullify_ability.gd" id="4_ooqpa"]
 [ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="6_e1acv"]
+[ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="7_ej0q7"]
 
 [sub_resource type="Resource" id="Resource_sfw3d"]
 script = ExtResource("3_dwe15")
@@ -75,12 +76,20 @@ description = "Welcome to a new day"
 abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_f31oe")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_lg4ks"]
+script = ExtResource("7_ej0q7")
+ability_name = ""
+description = ""
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://43v8bwokc47i"
+
 [sub_resource type="Resource" id="Resource_ooqpa"]
 script = ExtResource("1_vqrrp")
 card_name = "Phelgon"
 values = Array[int]([8, 8, 2, 2])
 description = "Look at my horse"
-abilities = Array[ExtResource("2_cm1c1")]([])
+abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_lg4ks")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_e1acv"]
