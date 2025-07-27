@@ -159,7 +159,11 @@ func load_progress():
 # Clear all progress (for testing or reset)
 func clear_all_progress():
 	progress_data.clear()
+	unlocked_gods = ["Apollo"]  # Reset to only Apollo unlocked
+	couples_united = []  # Clear united couples
 	save_progress()
+	print("All progress cleared - reset to Apollo only")
+
 
 # Clear progress for a specific god
 func clear_god_progress(god_name: String):

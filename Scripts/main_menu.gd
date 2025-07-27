@@ -177,11 +177,11 @@ func _on_continue_button_pressed():
 func _on_new_game_confirmed():
 	print("Player confirmed new game - erasing all progress")
 	
-	# Clear all progress data
+	# Clear all progress data AND reset god unlocks
 	if has_node("/root/GlobalProgressTrackerAutoload"):
 		var global_tracker = get_node("/root/GlobalProgressTrackerAutoload")
 		global_tracker.clear_all_progress()
-		print("All progress data cleared")
+		print("All progress data cleared and god unlocks reset to Apollo only")
 	
 	# Also clear any current run data
 	if has_node("/root/RunExperienceTrackerAutoload"):
@@ -200,6 +200,12 @@ func _on_new_game_confirmed():
 		var conv_manager = get_node("/root/ConversationManagerAutoload")
 		conv_manager.clear_all_conversations()
 		print("Conversation data cleared")
+	
+	# Clear boss prediction patterns
+	if has_node("/root/BossPredictionTrackerAutoload"):
+		var boss_tracker = get_node("/root/BossPredictionTrackerAutoload")
+		boss_tracker.clear_patterns()
+		print("Boss prediction patterns cleared")
 	
 	# FIXED: Always trigger the tutorial cutscene for new games, regardless of previous data
 	if has_node("/root/CutsceneManagerAutoload"):
