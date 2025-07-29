@@ -190,8 +190,7 @@ func return_to_previous_scene():
 	if has_node("/root/CutsceneManagerAutoload"):
 		get_node("/root/CutsceneManagerAutoload").return_to_previous_scene()
 	else:
-		# Fallback
-		get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
 
 # Signal handlers
 func _on_advance_pressed():

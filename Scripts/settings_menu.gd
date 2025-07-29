@@ -149,4 +149,4 @@ func load_settings():
 
 
 func _on_back_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")

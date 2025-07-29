@@ -173,7 +173,7 @@ func setup_deck_buttons():
 
 # Back button
 func _on_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 # Connect these in the editor or use the existing connections
 func _on_deck_1_button_pressed() -> void:
@@ -210,7 +210,7 @@ func _on_start_game_button_pressed() -> void:
 		})
 		
 		# Change to the map scene instead of directly to game
-		get_tree().change_scene_to_file("res://Scenes/RunMap.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/RunMap.tscn")
 	
 # Helper function to handle deck selection - now handles both locked and unlocked decks
 func select_deck(index: int) -> void:

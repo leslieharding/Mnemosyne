@@ -209,9 +209,10 @@ func _on_new_game_confirmed():
 	
 	# FIXED: Always trigger the tutorial cutscene for new games, regardless of previous data
 	if has_node("/root/CutsceneManagerAutoload"):
+		TransitionManagerAutoload.change_scene_to("res://Scenes/Cutscene.tscn")
+		# The cutscene manager will handle setting up the cutscene data
 		get_node("/root/CutsceneManagerAutoload").play_cutscene("tutorial_intro")
 	else:
-		# Fallback if cutscene manager isn't available
 		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 

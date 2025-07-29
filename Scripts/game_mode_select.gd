@@ -59,23 +59,23 @@ func setup_individual_god_button(god_name: String, button: Button, unlocked_gods
 
 func _on_apollo_button_pressed() -> void:
 	if is_god_available("Apollo"):
-		get_tree().change_scene_to_file("res://Scenes/Apollo.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/Apollo.tscn")
 
 func _on_hermes_button_pressed() -> void:
 	if is_god_available("Hermes"):
-		get_tree().change_scene_to_file("res://Scenes/Hermes.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/Hermes.tscn")
 	else:
 		show_unlock_requirements("Hermes")
 
 func _on_artemis_button_pressed() -> void:
 	if is_god_available("Artemis"):
-		get_tree().change_scene_to_file("res://Scenes/Artemis.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/Artemis.tscn")
 	else:
 		show_unlock_requirements("Artemis")
 
 func _on_aphrodite_button_pressed() -> void:
 	if is_god_available("Aphrodite"):
-		get_tree().change_scene_to_file("res://Scenes/Aphrodite.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/Aphrodite.tscn")
 	else:
 		show_unlock_requirements("Aphrodite")
 
@@ -99,4 +99,4 @@ func show_unlock_requirements(god_name: String):
 	dialog.confirmed.connect(func(): dialog.queue_free())
 
 func _on_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")

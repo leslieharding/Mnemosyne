@@ -226,10 +226,10 @@ func _on_map_node_pressed(map_node: MapNode):
 	# For now, all nodes lead to battle - later we'll check node type
 	match map_node.node_type:
 		MapNode.NodeType.BATTLE, MapNode.NodeType.BOSS:
-			get_tree().change_scene_to_file("res://Scenes/CardBattle.tscn")
+			TransitionManagerAutoload.change_scene_to("res://Scenes/CardBattle.tscn")
 		_:
 			# Future: handle other node types
-			get_tree().change_scene_to_file("res://Scenes/CardBattle.tscn")
+			TransitionManagerAutoload.change_scene_to("res://Scenes/CardBattle.tscn")
 
 # Update the UI labels
 func update_ui():
@@ -259,7 +259,7 @@ func check_run_completion():
 
 # Handle starting a new run
 func _on_new_run_pressed():
-	get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 # Handle viewing run summary
 func _on_view_summary_pressed():
@@ -269,13 +269,13 @@ func _on_view_summary_pressed():
 		"deck_index": selected_deck_index,
 		"victory": true
 	})
-	get_tree().change_scene_to_file("res://Scenes/RunSummary.tscn")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
 
 
 # Handle back button press
 func _on_back_button_pressed():
 	# Return to god selection
-	get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 # Helper to get passed parameters from previous scene
 func get_scene_params() -> Dictionary:

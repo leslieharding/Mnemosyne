@@ -875,7 +875,7 @@ func _on_continue_pressed():
 		"returning_from_battle": true
 	})
 	
-	get_tree().change_scene_to_file("res://Scenes/RunMap.tscn")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/RunMap.tscn")
 
 func get_scene_params() -> Dictionary:
 	if get_tree().has_meta("scene_params"):

@@ -128,7 +128,7 @@ func play_cutscene(cutscene_id: String):
 	print("Playing cutscene: ", cutscene_id)
 	
 	# Switch to cutscene scene
-	get_tree().change_scene_to_file("res://Scenes/Cutscene.tscn")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/Cutscene.tscn")
 
 func return_to_previous_scene():
 	# Special handling for tutorial flow
@@ -144,11 +144,11 @@ func return_to_previous_scene():
 			"opponent": "Chronos"
 		})
 		print("Tutorial params set: ", get_tree().get_meta("scene_params"))
-		get_tree().change_scene_to_file("res://Scenes/CardBattle.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/CardBattle.tscn")
 		return
 	elif last_played == "opening_awakening":
 		print("Completed post-tutorial cutscene, going to god select")
-		get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 		return
 	
 	if return_scene_path != "":
@@ -157,14 +157,14 @@ func return_to_previous_scene():
 			get_tree().set_meta("scene_params", return_scene_params)
 		
 		print("Returning to: ", return_scene_path)
-		get_tree().change_scene_to_file(return_scene_path)
+		TransitionManagerAutoload.change_scene_to(return_scene_path)
 		
 		# Clear stored data
 		return_scene_path = ""
 		return_scene_params.clear()
 	else:
 		print("No return scene stored, going to main menu")
-		get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
 
 # Check if a cutscene has been viewed
 func has_viewed_cutscene(cutscene_id: String) -> bool:

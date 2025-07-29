@@ -261,13 +261,13 @@ func _on_new_run_button_pressed() -> void:
 	save_run_to_global_progress()
 	if has_node("/root/RunExperienceTrackerAutoload"):
 		get_node("/root/RunExperienceTrackerAutoload").clear_run()
-	get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 func _on_main_menu_button_pressed() -> void:
 	save_run_to_global_progress()
 	if has_node("/root/RunExperienceTrackerAutoload"):
 		get_node("/root/RunExperienceTrackerAutoload").clear_run()
-	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
 
 func save_run_to_global_progress():
 	if not has_node("/root/RunExperienceTrackerAutoload") or not has_node("/root/GlobalProgressTrackerAutoload"):

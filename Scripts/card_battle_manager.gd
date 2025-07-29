@@ -1146,7 +1146,7 @@ func end_game():
 				"deck_index": params.get("deck_index", 0),
 				"victory": false
 			})
-			get_tree().change_scene_to_file("res://Scenes/RunSummary.tscn")
+			TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
 			return
 		else:
 			# First draw - restart the round
@@ -1196,7 +1196,7 @@ func end_game():
 			"deck_index": params.get("deck_index", 0),
 			"victory": false
 		})
-		get_tree().change_scene_to_file("res://Scenes/RunSummary.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
 		return
 	
 	# Player won or tied - continue the run
@@ -1285,7 +1285,7 @@ func _on_tutorial_finished():
 		get_node("/root/CutsceneManagerAutoload").play_cutscene("opening_awakening")
 	else:
 		# Fallback if cutscene manager isn't available
-		get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 # Return to the map after completing an encounter
 func return_to_map():
@@ -1301,11 +1301,11 @@ func return_to_map():
 		})
 		
 		# Return to the map scene
-		get_tree().change_scene_to_file("res://Scenes/RunMap.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/RunMap.tscn")
 	else:
 		# Fallback if no map data
 		print("Warning: No map data found, returning to god selection")
-		get_tree().change_scene_to_file("res://Scenes/GameModeSelect.tscn")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 # Set up input processing for keyboard navigation (only when player's turn)
 func _input(event):
@@ -2406,7 +2406,7 @@ func show_reward_screen():
 		"current_node": params.get("current_node"),
 		"perfect_victory": is_perfect_victory
 	})
-	get_tree().change_scene_to_file("res://Scenes/RewardScreen.tscn")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/RewardScreen.tscn")
 
 # Record memory functions - updated to use current god
 func record_enemy_encounter(victory: bool):
