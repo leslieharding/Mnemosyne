@@ -46,6 +46,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="DeckInfoContainer" type="VBoxContainer" parent="MainContainer/RightPanel"]
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 
 [node name="DeckTitleContainer" type="VBoxContainer" parent="MainContainer/RightPanel/DeckInfoContainer"]
@@ -73,11 +74,7 @@ layout_mode = 2
 layout_mode = 2
 text = "Cards in Deck"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/RightPanel/CardsContainer"]
-custom_minimum_size = Vector2(400, 500)
-layout_mode = 2
-
-[node name="CardContainer" type="VBoxContainer" parent="MainContainer/RightPanel/CardsContainer/ScrollContainer"]
+[node name="CardContainer" type="VBoxContainer" parent="MainContainer/RightPanel/CardsContainer"]
 layout_mode = 2
 
 [connection signal="pressed" from="MainContainer/LeftPanel/Deck1Button" to="." method="_on_deck_1_button_pressed"]

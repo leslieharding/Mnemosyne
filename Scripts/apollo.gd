@@ -13,7 +13,7 @@ var journal_button: JournalButton
 @onready var right_panel = $MainContainer/RightPanel
 @onready var selected_deck_title = $MainContainer/RightPanel/DeckInfoContainer/DeckTitleContainer/SelectedDeckTitle
 @onready var selected_deck_description = $MainContainer/RightPanel/DeckInfoContainer/DeckTitleContainer/SelectedDeckDescription
-@onready var card_container = $MainContainer/RightPanel/CardsContainer/ScrollContainer/CardContainer
+@onready var card_container = $MainContainer/RightPanel/CardsContainer/CardContainer
 
 func _ready():
 	print("=== APOLLO SCENE STARTING ===")
