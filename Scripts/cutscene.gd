@@ -12,7 +12,6 @@ extends Control
 @onready var dialogue_area = $MainContainer/DialogueArea
 @onready var speaker_name_label = $MainContainer/DialogueArea/MarginContainer/VBoxContainer/SpeakerNameLabel
 @onready var dialogue_text = $MainContainer/DialogueArea/MarginContainer/VBoxContainer/DialogueText
-@onready var continue_indicator = $MainContainer/DialogueArea/MarginContainer/VBoxContainer/ContinueIndicator
 @onready var skip_button = $MainContainer/Controls/SkipButton
 @onready var advance_button = $MainContainer/Controls/AdvanceButton
 
@@ -20,6 +19,13 @@ extends Control
 var cutscene_data: CutsceneData
 var current_line_index: int = 0
 var is_advancing: bool = false
+
+# Typewriter effect variables
+var typewriter_speed: float = 0.03  # Seconds per character
+var typewriter_tween: Tween
+var is_typing: bool = false
+var full_text: String = ""
+var current_visible_chars: int = 0
 
 # Speaker panel styles
 var active_speaker_style: StyleBoxFlat
@@ -53,7 +59,12 @@ func _ready():
 
 func _input(event):
 	if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_select"):
-		advance_dialogue()
+		if is_typing:
+			# If currently typing, complete the text immediately
+			complete_typewriter_instantly()
+		else:
+			# If not typing, advance to next line
+			advance_dialogue()
 	elif event.is_action_pressed("ui_cancel"):
 		_on_skip_pressed()
 
@@ -141,15 +152,67 @@ func show_current_line():
 		advance_dialogue()
 		return
 	
-	# Update dialogue area
+	# Update speaker name
 	speaker_name_label.text = speaker_character.character_name
 	speaker_name_label.add_theme_color_override("font_color", speaker_character.character_color)
-	dialogue_text.text = current_line.text
 	
 	# Update speaker panel highlighting
 	update_speaker_highlighting(current_line, speaker_character)
 	
+	# Start typewriter effect for dialogue text
+	start_typewriter_effect(current_line.text)
+
+func start_typewriter_effect(text: String):
+	# Stop any existing typewriter effect
+	if typewriter_tween:
+		typewriter_tween.kill()
 	
+	# Store the full text and reset visible characters
+	full_text = text
+	current_visible_chars = 0
+	is_typing = true
+	
+	# Clear the text initially
+	dialogue_text.text = ""
+	
+	# Make sure the RichTextLabel is set up for visible characters
+	dialogue_text.visible_characters = 0
+	dialogue_text.text = full_text
+	
+	# Create tween for typewriter effect
+	typewriter_tween = create_tween()
+	
+	# Calculate duration based on text length
+	var total_duration = full_text.length() * typewriter_speed
+	
+	# Animate the visible_characters property
+	typewriter_tween.tween_method(
+		update_visible_characters,
+		0,
+		full_text.length(),
+		total_duration
+	).set_ease(Tween.EASE_IN_OUT)
+	
+	# When typing is complete
+	typewriter_tween.tween_callback(complete_typewriter)
+
+func update_visible_characters(visible_count: int):
+	current_visible_chars = visible_count
+	dialogue_text.visible_characters = visible_count
+
+func complete_typewriter():
+	is_typing = false
+	current_visible_chars = full_text.length()
+	dialogue_text.visible_characters = -1  # Show all characters
+
+func complete_typewriter_instantly():
+	if typewriter_tween:
+		typewriter_tween.kill()
+	
+	is_typing = false
+	current_visible_chars = full_text.length()
+	dialogue_text.visible_characters = -1  # Show all characters
+	dialogue_text.text = full_text
 
 func update_speaker_highlighting(line: DialogueLine, speaker: Character):
 	# Reset both panels to inactive
@@ -194,7 +257,10 @@ func return_to_previous_scene():
 
 # Signal handlers
 func _on_advance_pressed():
-	advance_dialogue()
+	if is_typing:
+		complete_typewriter_instantly()
+	else:
+		advance_dialogue()
 
 func _on_skip_pressed():
 	# Ask for confirmation before skipping
@@ -218,3 +284,10 @@ func _on_skip_confirmed(dialog: AcceptDialog):
 
 func _on_skip_canceled(dialog: AcceptDialog):
 	dialog.queue_free()
+
+# Optional: Add functions to customize typewriter speed
+func set_typewriter_speed(speed: float):
+	typewriter_speed = speed
+
+func get_typewriter_speed() -> float:
+	return typewriter_speed
