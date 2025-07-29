@@ -24,6 +24,10 @@ BossPredictionTrackerAutoload="*res://Scripts/boss_prediction_tracker.gd"
 CutsceneManagerAutoload="*res://Scripts/cutscene_manager.gd"
 ConversationManagerAutoload="*res://Scripts/conversation_manager.gd"
 
+[gui]
+
+theme/custom_font="uid://dj5vq1reygw03"
+
 [input]
 
 ui_w={

@@ -11,9 +11,9 @@ var journal_button: JournalButton
 @onready var deck3_button = $MainContainer/LeftPanel/Deck3Button
 @onready var start_game_button = $MainContainer/LeftPanel/StartGameButton
 @onready var right_panel = $MainContainer/RightPanel
-@onready var selected_deck_title = $MainContainer/RightPanel/DeckTitleContainer/SelectedDeckTitle
-@onready var selected_deck_description = $MainContainer/RightPanel/DeckTitleContainer/SelectedDeckDescription
-@onready var card_container = $MainContainer/RightPanel/ScrollContainer/CardContainer
+@onready var selected_deck_title = $MainContainer/RightPanel/DeckInfoContainer/DeckTitleContainer/SelectedDeckTitle
+@onready var selected_deck_description = $MainContainer/RightPanel/DeckInfoContainer/DeckTitleContainer/SelectedDeckDescription
+@onready var card_container = $MainContainer/RightPanel/CardsContainer/ScrollContainer/CardContainer
 
 func _ready():
 	print("=== APOLLO SCENE STARTING ===")
@@ -415,10 +415,13 @@ func display_deck_cards(deck_index: int) -> void:
 	selected_deck_title.text = deck_def.deck_name
 	selected_deck_description.text = deck_def.deck_description
 	
-	# NEW: Add deck power description if present
 	var power_description = deck_def.get_power_description()
 	if power_description != "":
 		selected_deck_description.text += "\n\n" + power_description
+
+	# Ensure the description label has proper text wrapping
+	selected_deck_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	selected_deck_description.clip_contents = true
 	
 	# Clear existing card displays
 	for child in card_container.get_children():
