@@ -181,3 +181,65 @@ func get_clean_text() -> String:
 	for segment in parsed_segments:
 		clean += segment.text
 	return clean
+
+
+
+
+#Flexible Text Speed Implementation Guide
+#Basic Implementation
+#Your system is already set up! You just need to use the markup tags in your dialogue text when creating DialogueLine objects.
+#Available Markup Tags
+#Speed Control Tags
+#gdscript"[speed:0.5]slow text[/speed]"     # Half speed (0.5x)
+#"[speed:2.0]fast text[/speed]"     # Double speed (2.0x)
+#"[urgent]emergency![/urgent]"      # Preset fast (2.5x speed)
+#"[slow]contemplative[/slow]"       # Preset slow (0.4x speed)
+#Pause Tags
+#gdscript"Before{pause:1.0}after"           # 1 second pause mid-sentence
+#"Text{pause:0.5}more text"         # 0.5 second pause
+#Line-Level Timing
+#gdscriptDialogueLine.new(
+	#"Speaker",
+	#"Text content",
+	#"position",
+	#1.2,    # typing_speed_multiplier - affects whole line
+	#0.5,    # pre_line_delay - pause before typing starts  
+	#1.0     # post_line_delay - pause after line finishes
+#)
+#Dramatic Effect Examples
+#Building Tension
+#gdscriptDialogueLine.new(
+	#"Villain", 
+	#"You think you can [slow]stop me[/slow]?{pause:1.5} [urgent]Think again![/urgent]",
+	#"right",
+	#0.8,  # Slower base for menace
+	#1.0,  # Pause before speaking
+	#0.5
+#)
+#Emotional Outburst
+#gdscriptDialogueLine.new(
+	#"Hero", 
+	#"[urgent]No! This can't be happening![/urgent]{pause:2.0} [slow]Why didn't I see this coming?[/slow]",
+	#"left",
+	#1.3,  # Faster base for emotion
+	#0.0,  # No delay - immediate reaction
+	#1.5   # Long pause for impact
+#)
+#Mystical/Wise Character
+#gdscriptDialogueLine.new(
+	#"Oracle", 
+	#"The threads of fate{pause:1.0} reveal [slow]many truths[/slow],{pause:0.8} but [urgent]beware[/urgent]{pause:1.5} the [slow]price of knowledge[/slow].",
+	#"center",
+	#0.7,  # Slower base for wisdom
+	#2.0,  # Long pause before speaking
+	#2.5   # Very long pause after prophecy
+#)
+#Quick Banter
+#gdscriptDialogueLine.new(
+	#"Sidekick", 
+	#"[urgent]Wait, what?[/urgent] [speed:1.5]Did you just say we're going WHERE?[/speed]",
+	#"left",
+	#1.4,  # Fast base for energy
+	#0.0,  # Immediate reaction
+	#0.3   # Quick transition
+#)

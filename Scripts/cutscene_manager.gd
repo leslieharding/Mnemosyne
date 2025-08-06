@@ -37,11 +37,54 @@ func create_sample_cutscenes():
 	
 	# Tutorial introduction cutscene
 	var tutorial_lines: Array[DialogueLine] = []
-	tutorial_lines.append(DialogueLine.new("Chronos", "New! Sister dearest. Why won't you join me and the other titans? We have been having fun fighting all morning"))
-	tutorial_lines.append(DialogueLine.new("Mnemosyne", "Chronos thank you for inviting me, but you know I can't fight, I can't really do much of anything."))
-	tutorial_lines.append(DialogueLine.new("Chronos", "Yes I know that but why? You are a titan are you not? We are the straining ones! fighting is what we do. What use is your gift of memory? By all accounts you don't seem to be using your talents anyway, you seem mostly useless, it's vexing."))
-	tutorial_lines.append(DialogueLine.new("Mnemosyne", "You’re right, I don't really understand why I am a titan."))
-	tutorial_lines.append(DialogueLine.new("Chronos", "None of us understand it New. Maybe you just need more encouragement, come lets fight!"))
+	# Chronos speaks energetically - use faster speeds for excitement
+	tutorial_lines.append(DialogueLine.new(
+		"Chronos", 
+		"[urgent]New![/urgent] Sister dearest. Why won't you join me and the other titans? We have been having [speed:1.5]fun fighting[/speed] all morning",
+		"right",
+		1.0,  # Base typing speed
+		0.0,  # Pre-line delay
+		0.5   # Post-line delay for dramatic pause
+	))
+	
+	# Mnemosyne speaks hesitantly - use slower, more thoughtful pacing
+	tutorial_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"Chronos thank you for inviting me, but{pause:0.8} you know I can't fight, [slow]I can't really do much of anything[/slow].",
+		"left",
+		0.8,  # Slightly slower base speed for uncertainty
+		0.3   # Pre-line delay for hesitation
+	))
+	
+	# Chronos gets frustrated - mix of speeds to show emotion
+	tutorial_lines.append(DialogueLine.new(
+		"Chronos", 
+		"Yes I know that but [urgent]why?[/urgent] You are a titan are you not? We are the [speed:1.3]straining ones![/speed] Fighting is what we do.{pause:1.0} What use is your gift of memory?{pause:0.5} By all accounts you don't seem to be using your talents anyway, [slow]you seem mostly useless[/slow], it's vexing.",
+		"right",
+		1.0,
+		0.0,
+		0.8   # Longer pause after harsh words
+	))
+	
+	# Mnemosyne responds sadly - very slow and contemplative
+	tutorial_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"[slow]You're right[/slow], I don't really understand why I am a titan.",
+		"left",
+		0.6,  # Much slower for sadness
+		0.5,  # Pause before speaking
+		1.0   # Long pause after admission
+	))
+	
+	# Chronos tries to be encouraging - building energy
+	tutorial_lines.append(DialogueLine.new(
+		"Chronos", 
+		"None of us understand it New.{pause:0.8} Maybe you just need more [speed:1.4]encouragement[/speed], come [urgent]lets fight![/urgent]",
+		"right",
+		1.2,  # Faster for encouragement
+		0.3,
+		0.5
+	))
 	
 
 	var tutorial_cutscene = CutsceneData.new("tutorial_intro", [mnemosyne, chronos], tutorial_lines)
