@@ -167,25 +167,28 @@ func start_typewriter_effect(text: String):
 	if typewriter_tween:
 		typewriter_tween.kill()
 	
-	# Store the full text and reset visible characters
+	# Get the current dialogue line
+	var current_line = cutscene_data.dialogue_lines[current_line_index]
+	
+	# Use parsed segments if available
+	if current_line.parsed_segments.size() > 0:
+		start_advanced_typewriter(current_line)
+	else:
+		# Fallback to simple typewriter
+		start_simple_typewriter(text, current_line.typing_speed_multiplier)
+
+func start_simple_typewriter(text: String, speed_mult: float = 1.0):
 	full_text = text
 	current_visible_chars = 0
 	is_typing = true
 	
-	# Clear the text initially
-	dialogue_text.text = ""
-	
-	# Make sure the RichTextLabel is set up for visible characters
 	dialogue_text.visible_characters = 0
 	dialogue_text.text = full_text
 	
-	# Create tween for typewriter effect
 	typewriter_tween = create_tween()
 	
-	# Calculate duration based on text length
-	var total_duration = full_text.length() * typewriter_speed
+	var total_duration = full_text.length() * typewriter_speed / speed_mult
 	
-	# Animate the visible_characters property
 	typewriter_tween.tween_method(
 		update_visible_characters,
 		0,
@@ -193,7 +196,60 @@ func start_typewriter_effect(text: String):
 		total_duration
 	).set_ease(Tween.EASE_IN_OUT)
 	
-	# When typing is complete
+	typewriter_tween.tween_callback(complete_typewriter)
+
+func start_advanced_typewriter(dialogue_line: DialogueLine):
+	is_typing = true
+	
+	# Get clean text for display
+	full_text = dialogue_line.get_clean_text()
+	dialogue_text.text = full_text
+	dialogue_text.visible_characters = 0
+	current_visible_chars = 0
+	
+	# Create the tween
+	typewriter_tween = create_tween()
+	
+	# Add pre-line delay if specified
+	if dialogue_line.pre_line_delay > 0:
+		typewriter_tween.tween_interval(dialogue_line.pre_line_delay)
+	
+	var char_position = 0
+	
+	# Process each segment
+	for segment in dialogue_line.parsed_segments:
+		# Add pause before segment if specified
+		if segment.pause_before > 0:
+			typewriter_tween.tween_interval(segment.pause_before)
+		
+		# Type out the segment text
+		if segment.text.length() > 0:
+			var segment_start = char_position
+			var segment_end = char_position + segment.text.length()
+			
+			# Calculate duration based on segment speed and line speed multiplier
+			var segment_speed = segment.speed * dialogue_line.typing_speed_multiplier
+			var segment_duration = segment.text.length() * typewriter_speed / segment_speed
+			
+			# Tween the visible characters for this segment
+			typewriter_tween.tween_method(
+				update_visible_characters,
+				segment_start,
+				segment_end,
+				segment_duration
+			)
+			
+			char_position = segment_end
+		
+		# Add pause after segment if specified
+		if segment.pause_after > 0:
+			typewriter_tween.tween_interval(segment.pause_after)
+	
+	# Add post-line delay if specified
+	if dialogue_line.post_line_delay > 0:
+		typewriter_tween.tween_interval(dialogue_line.post_line_delay)
+	
+	# Mark as complete when done
 	typewriter_tween.tween_callback(complete_typewriter)
 
 func update_visible_characters(visible_count: int):

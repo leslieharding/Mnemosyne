@@ -6,11 +6,13 @@ extends Resource
 @export var text: String = ""
 @export var speaker_position: String = "auto"
 
-# NEW: Timing controls
-@export var typing_speed_multiplier: float = 1.0  # 1.0 = normal, 0.5 = slower, 2.0 = faster
-@export var pre_line_delay: float = 0.0  # Pause before starting typewriter (seconds)
-@export var post_line_delay: float = 0.0  # Pause after finishing before allowing advance (seconds)
-@export var mid_line_pauses: Array[Dictionary] = []  # Array of {position: int, delay: float}
+# Existing timing controls
+@export var typing_speed_multiplier: float = 1.0
+@export var pre_line_delay: float = 0.0
+@export var post_line_delay: float = 0.0
+
+# NEW: Support for inline markup
+var parsed_segments: Array = []  # Will store parsed text segments with their properties
 
 func _init(speaker: String = "", dialogue_text: String = "", position: String = "auto", 
 		   typing_speed: float = 1.0, pre_delay: float = 0.0, post_delay: float = 0.0):
@@ -20,9 +22,162 @@ func _init(speaker: String = "", dialogue_text: String = "", position: String = 
 	typing_speed_multiplier = typing_speed
 	pre_line_delay = pre_delay
 	post_line_delay = post_delay
+	
+	# Parse the text when initialized
+	parse_text_markup()
 
-# Helper function to add mid-line pauses
-func add_mid_pause(character_position: int, delay_duration: float):
-	mid_line_pauses.append({"position": character_position, "delay": delay_duration})
-	# Sort by position to ensure pauses happen in correct order
-	mid_line_pauses.sort_custom(func(a, b): return a.position < b.position)
+# NEW: Parse markup tags in the text
+func parse_text_markup():
+	parsed_segments.clear()
+	
+	# If no markup, treat as single segment
+	if not text.contains("[") and not text.contains("{"):
+		parsed_segments.append({
+			"text": text,
+			"speed": 1.0,
+			"pause_before": 0.0,
+			"pause_after": 0.0
+		})
+		return
+	
+	var current_pos = 0
+	var working_text = text
+	
+	# Regular expression patterns for our markup
+	# [speed:0.5]text[/speed] - changes speed
+	# {pause:1.0} - adds a pause
+	# [urgent]text[/urgent] - preset for urgent text (fast)
+	# [slow]text[/slow] - preset for slow text
+	
+	while current_pos < working_text.length():
+		var next_tag_start = working_text.find("[", current_pos)
+		var next_pause = working_text.find("{pause:", current_pos)
+		
+		# Find which comes first
+		var next_special = -1
+		var tag_type = ""
+		
+		if next_tag_start != -1 and (next_pause == -1 or next_tag_start < next_pause):
+			next_special = next_tag_start
+			tag_type = "speed"
+		elif next_pause != -1:
+			next_special = next_pause
+			tag_type = "pause"
+		
+		# If no more special tags, add remaining text
+		if next_special == -1:
+			if current_pos < working_text.length():
+				parsed_segments.append({
+					"text": working_text.substr(current_pos),
+					"speed": 1.0,
+					"pause_before": 0.0,
+					"pause_after": 0.0
+				})
+			break
+		
+		# Add text before the tag (if any)
+		if next_special > current_pos:
+			parsed_segments.append({
+				"text": working_text.substr(current_pos, next_special - current_pos),
+				"speed": 1.0,
+				"pause_before": 0.0,
+				"pause_after": 0.0
+			})
+		
+		# Process the tag
+		if tag_type == "pause":
+			var pause_end = working_text.find("}", next_special)
+			if pause_end != -1:
+				var pause_content = working_text.substr(next_special + 7, pause_end - next_special - 7)
+				var pause_duration = pause_content.to_float()
+				
+				# Add pause as a special segment
+				parsed_segments.append({
+					"text": "",
+					"speed": 1.0,
+					"pause_before": pause_duration,
+					"pause_after": 0.0
+				})
+				
+				current_pos = pause_end + 1
+			else:
+				current_pos = next_special + 1
+				
+		elif tag_type == "speed":
+			var tag_content = working_text.substr(next_special + 1)
+			var tag_end_marker = "[/"
+			var speed_multiplier = 1.0
+			var end_tag_pos = -1
+			
+			# Check for speed tag with value
+			if tag_content.begins_with("speed:"):
+				var close_bracket = tag_content.find("]")
+				if close_bracket != -1:
+					var speed_value = tag_content.substr(6, close_bracket - 6).to_float()
+					speed_multiplier = speed_value
+					
+					# Find the closing tag
+					var end_tag = "[/speed]"
+					end_tag_pos = working_text.find(end_tag, next_special)
+					
+					if end_tag_pos != -1:
+						var text_start = next_special + close_bracket + 2
+						var segment_text = working_text.substr(text_start, end_tag_pos - text_start)
+						
+						parsed_segments.append({
+							"text": segment_text,
+							"speed": speed_multiplier,
+							"pause_before": 0.0,
+							"pause_after": 0.0
+						})
+						
+						current_pos = end_tag_pos + end_tag.length()
+					else:
+						current_pos = next_special + 1
+				else:
+					current_pos = next_special + 1
+					
+			# Check for preset tags
+			elif tag_content.begins_with("urgent]"):
+				end_tag_pos = working_text.find("[/urgent]", next_special)
+				if end_tag_pos != -1:
+					var text_start = next_special + 8
+					var segment_text = working_text.substr(text_start, end_tag_pos - text_start)
+					
+					parsed_segments.append({
+						"text": segment_text,
+						"speed": 2.5,  # Fast for urgent
+						"pause_before": 0.0,
+						"pause_after": 0.0
+					})
+					
+					current_pos = end_tag_pos + 9
+				else:
+					current_pos = next_special + 1
+					
+			elif tag_content.begins_with("slow]"):
+				end_tag_pos = working_text.find("[/slow]", next_special)
+				if end_tag_pos != -1:
+					var text_start = next_special + 6
+					var segment_text = working_text.substr(text_start, end_tag_pos - text_start)
+					
+					parsed_segments.append({
+						"text": segment_text,
+						"speed": 0.4,  # Slow
+						"pause_before": 0.0,
+						"pause_after": 0.0
+					})
+					
+					current_pos = end_tag_pos + 7
+				else:
+					current_pos = next_special + 1
+			else:
+				# Unrecognized tag, skip it
+				current_pos = next_special + 1
+
+# Get the clean text without markup
+func get_clean_text() -> String:
+	var clean = ""
+	for segment in parsed_segments:
+		clean += segment.text
+	return clean
