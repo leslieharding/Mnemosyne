@@ -60,9 +60,10 @@ text = "X"
 
 [node name="TabContainer" type="TabContainer" parent="MainContainer/VBox"]
 layout_mode = 2
-current_tab = 0
+current_tab = 2
 
 [node name="Bestiary" type="HSplitContainer" parent="MainContainer/VBox/TabContainer"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -120,19 +121,34 @@ layout_mode = 2
 text = "Select a god to view mastery details"
 horizontal_alignment = 1
 
-[node name="Mnemosyne" type="VBoxContainer" parent="MainContainer/VBox/TabContainer"]
-visible = false
+[node name="Mnemosyne" type="HSplitContainer" parent="MainContainer/VBox/TabContainer"]
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Mnemosyne"]
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne"]
+custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
-text = "Self-Reflection"
+
+[node name="Mnemosyne\'sMemories" type="Label" parent="MainContainer/VBox/TabContainer/Mnemosyne/LeftPanel"]
+layout_mode = 2
+text = "Your Deck"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne/LeftPanel"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ContentVBox" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne/ScrollContainer"]
+[node name="MnemosyneCardList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne/LeftPanel/ScrollContainer"]
 layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MnemosyneDetailPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne/RightPanel"]
+layout_mode = 2
+
+[node name="DefaultLabel" type="Label" parent="MainContainer/VBox/TabContainer/Mnemosyne/RightPanel/MnemosyneDetailPanel"]
+layout_mode = 2
+text = "Select a card to view more details"
+horizontal_alignment = 1

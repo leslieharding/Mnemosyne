@@ -2,8 +2,10 @@
 extends Button
 class_name JournalButton
 
+
 # Journal instance
-var journal_instance: MemoryJournalUI = null
+var journal_instance: Control = null
+
 
 # Notification indicator
 var notification_indicator: Control = null
@@ -108,10 +110,18 @@ func _on_journal_button_pressed():
 		print("Journal created with dedicated CanvasLayer at position: ", journal_instance.position, " size: ", journal_instance.size)
 	
 	# Show journal
-	journal_instance.show_journal()
+	journal_instance.visible = true
+	journal_instance.grab_focus()
 	
 	# Hide notifications when opened
 	hide_notification()
+
+func show_journal():
+	# Make sure the journal is visible
+	visible = true
+	# Optionally set focus or bring to front
+	grab_focus()
+	print("Memory journal opened")
 
 func _on_journal_closed():
 	# Clean up the journal and its canvas layer when closed
