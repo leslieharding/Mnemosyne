@@ -737,91 +737,28 @@ func get_god_insight_text(god_name: String, mastery_level: int) -> String:
 # NEW MNEMOSYNE DECK FUNCTIONS
 
 func refresh_mnemosyne_tab():
-	print("=== REFRESHING MNEMOSYNE TAB WITH DECK DISPLAY ===")
+	print("=== REFRESHING MNEMOSYNE TAB WITH SIMPLIFIED DISPLAY ===")
 	
-	# Use the correct paths based on the scene structure
-	var left_panel = mnemosyne_tab.get_node("LeftPanel")
-	var right_panel = mnemosyne_tab.get_node("RightPanel")
-	
-	if not left_panel or not right_panel:
-		print("ERROR: Could not find basic panels")
+	# Get the card container
+	var card_container = mnemosyne_tab.get_node("CardContainer")
+	if not card_container:
+		print("ERROR: Could not find CardContainer")
 		return
 	
-	var scroll_container = left_panel.get_node("ScrollContainer")
-	if not scroll_container:
-		print("ERROR: Could not find ScrollContainer")
-		return
 	
-	var card_list = scroll_container.get_node("MnemosyneCardList")
-	if not card_list:
-		print("ERROR: Could not find MnemosyneCardList")
-		return
-	
-	var detail_panel = right_panel.get_node("MnemosyneDetailPanel")
-	if not detail_panel:
-		print("ERROR: Could not find MnemosyneDetailPanel")
-		return
-	
-	print("SUCCESS: Found all required nodes!")
-	
-	# FIX THE SIZING ISSUES - This is the key fix!
-	left_panel.custom_minimum_size = Vector2(250, 0)
-	left_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	
-	scroll_container.custom_minimum_size = Vector2(0, 400)
-	scroll_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	
-	card_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	
-	# Update the left panel title
-	var title_label = left_panel.get_node("Mnemosyne'sMemories")  # Note: no space in the name
-	if title_label:
-		title_label.text = "Mnemosyne's Memories"
-		title_label.add_theme_color_override("font_color", Color("#DDA0DD"))
-	
-	# Clear existing cards from the list
-	for child in card_list.get_children():
-		child.queue_free()
-	
-	# Clear existing detail panel content
-	for child in detail_panel.get_children():
+	# Clear existing cards
+	for child in card_container.get_children():
 		child.queue_free()
 	
 	await get_tree().process_frame
 	
-	# Add default message to detail panel
-	var default_label = Label.new()
-	default_label.text = "Select a memory card to view details"
-	default_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	default_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	default_label.add_theme_color_override("font_color", Color("#AAAAAA"))
-	detail_panel.add_child(default_label)
+	# Load and display Mnemosyne deck
+	populate_mnemosyne_cards_simple(card_container)
 	
-	# Load and populate Mnemosyne deck
-	await populate_mnemosyne_deck(card_list, detail_panel)
-	
-	# Force layout update after adding content
-	await get_tree().process_frame
-	left_panel.queue_redraw()
-	scroll_container.queue_redraw()
-	card_list.queue_redraw()
-	
-	print("Mnemosyne tab refresh complete with deck display!")
+	print("Mnemosyne tab refresh complete!")
 
-func populate_mnemosyne_deck(card_list_container: VBoxContainer, detail_panel: VBoxContainer):
-	print("Loading Mnemosyne deck...")
-	
-	# Add debugging for container sizing
-	print("DEBUG: card_list_container size: ", card_list_container.size)
-	print("DEBUG: card_list_container custom_minimum_size: ", card_list_container.custom_minimum_size)
-	print("DEBUG: card_list_container visible: ", card_list_container.visible)
-	print("DEBUG: card_list_container children before: ", card_list_container.get_children().size())
-	
-	# Force proper sizing on the card list container
-	card_list_container.custom_minimum_size = Vector2(230, 400)
-	card_list_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card_list_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+func populate_mnemosyne_cards_simple(container: VBoxContainer):
+	print("Loading Mnemosyne deck for simple display...")
 	
 	# Load Mnemosyne collection
 	var collection_path = "res://Resources/Collections/Mnemosyne.tres"
@@ -830,7 +767,7 @@ func populate_mnemosyne_deck(card_list_container: VBoxContainer, detail_panel: V
 		var error_label = Label.new()
 		error_label.text = "Mnemosyne collection not found!"
 		error_label.add_theme_color_override("font_color", Color.RED)
-		card_list_container.add_child(error_label)
+		container.add_child(error_label)
 		return
 	
 	var collection: GodCardCollection = load(collection_path)
@@ -838,7 +775,7 @@ func populate_mnemosyne_deck(card_list_container: VBoxContainer, detail_panel: V
 		print("ERROR: Failed to load Mnemosyne collection")
 		return
 	
-	# Get the Mnemosyne deck (first deck since there's only one)
+	# Get the Mnemosyne deck
 	var mnemosyne_deck = collection.get_deck(0)
 	print("Loaded Mnemosyne deck with ", mnemosyne_deck.size(), " cards")
 	
@@ -846,75 +783,55 @@ func populate_mnemosyne_deck(card_list_container: VBoxContainer, detail_panel: V
 		var no_cards_label = Label.new()
 		no_cards_label.text = "No memory cards found in Mnemosyne's collection."
 		no_cards_label.add_theme_color_override("font_color", Color("#888888"))
-		card_list_container.add_child(no_cards_label)
+		no_cards_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		container.add_child(no_cards_label)
 		return
 	
-	# Create card displays similar to Apollo deck display
+	# Create compact card displays
 	for i in range(mnemosyne_deck.size()):
 		var card = mnemosyne_deck[i]
 		if not card:
-			print("Skipping null card at index ", i)
 			continue
 		
-		var card_display = create_mnemosyne_card_display(card, i)
-		card_list_container.add_child(card_display)
-		
-		print("Created display for Mnemosyne card: ", card.card_name)
-		print("  - Card display size: ", card_display.size)
-		print("  - Card display custom_minimum_size: ", card_display.custom_minimum_size)
-		print("  - Card display visible: ", card_display.visible)
+		var card_display = create_compact_card_display(card)
+		container.add_child(card_display)
 	
-	# Force layout updates
-	await get_tree().process_frame
-	card_list_container.queue_redraw()
-	
-	print("Created ", mnemosyne_deck.size(), " Mnemosyne card displays")
-	print("DEBUG: card_list_container children after: ", card_list_container.get_children().size())
-	print("DEBUG: card_list_container final size: ", card_list_container.size)
-	
-	# Test by adding a simple visible label to verify the container works
-	var test_label = Label.new()
-	test_label.text = "TEST: If you can see this, the container is working!"
-	test_label.add_theme_color_override("font_color", Color.RED)
-	test_label.add_theme_font_size_override("font_size", 16)
-	card_list_container.add_child(test_label)
-	print("Added test label to verify container visibility")
+	print("Created ", mnemosyne_deck.size(), " compact Mnemosyne card displays")
 
-func create_mnemosyne_card_display(card: CardResource, card_index: int) -> Control:
-	print("Creating card display for: ", card.card_name)
-	
-	# Main container for this card
+
+func create_compact_card_display(card: CardResource) -> Control:
+	# Main panel for the card
 	var card_panel = PanelContainer.new()
-	card_panel.custom_minimum_size = Vector2(220, 100)  # Ensure minimum size
-	card_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card_panel.custom_minimum_size = Vector2(500, 80)
 	
-	# Create a style for the panel - using Mnemosyne's purple theme
+	# Mnemosyne purple theme
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color("#2A1A2A")  # Dark purple background
-	style.border_color = Color("#6A4A6A")  # Purple border
+	style.bg_color = Color("#2A1A2A")
+	style.border_color = Color("#6A4A6A")
 	style.border_width_left = 2
 	style.border_width_top = 2
 	style.border_width_right = 2
 	style.border_width_bottom = 2
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.corner_radius_bottom_left = 4
-	style.corner_radius_bottom_right = 4
+	style.corner_radius_top_left = 6
+	style.corner_radius_top_right = 6
+	style.corner_radius_bottom_left = 6
+	style.corner_radius_bottom_right = 6
 	card_panel.add_theme_stylebox_override("panel", style)
 	
-	# Margin container for padding
+	# Margin for padding
 	var margin = MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 10)
-	margin.add_theme_constant_override("margin_right", 10)
-	margin.add_theme_constant_override("margin_top", 8)
-	margin.add_theme_constant_override("margin_bottom", 8)
+	margin.add_theme_constant_override("margin_left", 15)
+	margin.add_theme_constant_override("margin_right", 15)
+	margin.add_theme_constant_override("margin_top", 10)
+	margin.add_theme_constant_override("margin_bottom", 10)
 	card_panel.add_child(margin)
 	
 	# Main horizontal layout
 	var h_container = HBoxContainer.new()
+	h_container.add_theme_constant_override("separation", 20)
 	margin.add_child(h_container)
 	
-	# Left side - Card info
+	# Left side - Card name and description
 	var left_side = VBoxContainer.new()
 	left_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h_container.add_child(left_side)
@@ -923,306 +840,46 @@ func create_mnemosyne_card_display(card: CardResource, card_index: int) -> Contr
 	var name_label = Label.new()
 	name_label.text = card.card_name
 	name_label.add_theme_font_size_override("font_size", 16)
-	name_label.add_theme_color_override("font_color", Color("#DDA0DD"))  # Light purple for Mnemosyne
+	name_label.add_theme_color_override("font_color", Color("#DDA0DD"))
 	left_side.add_child(name_label)
 	
-	# Card description (truncated if too long)
+	# Description (truncated)
 	var desc_label = Label.new()
 	var description = card.description
-	if description.length() > 60:
-		description = description.substr(0, 57) + "..."
+	if description.length() > 80:
+		description = description.substr(0, 77) + "..."
 	desc_label.text = description
 	desc_label.add_theme_font_size_override("font_size", 11)
 	desc_label.add_theme_color_override("font_color", Color("#CCCCCC"))
 	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	left_side.add_child(desc_label)
 	
-	# Card values in a compact format
+	# Right side - Power values
 	var values_container = HBoxContainer.new()
-	left_side.add_child(values_container)
+	values_container.add_theme_constant_override("separation", 15)
+	h_container.add_child(values_container)
 	
 	var directions = ["N", "E", "S", "W"]
-	for i in range(4):
-		var dir_label = Label.new()
-		dir_label.text = directions[i] + ":" + str(card.values[i])
-		dir_label.add_theme_font_size_override("font_size", 12)
-		dir_label.add_theme_color_override("font_color", Color("#AAAAAA"))
-		dir_label.custom_minimum_size.x = 35
-		values_container.add_child(dir_label)
-		
-		# Add small spacer between values
-		if i < 3:
-			var spacer = Control.new()
-			spacer.custom_minimum_size.x = 5
-			values_container.add_child(spacer)
-	
-	# Separator
-	var v_separator = VSeparator.new()
-	h_container.add_child(v_separator)
-	
-	# Right side - Memory enhancement info (placeholder for future upgrades)
-	var right_side = VBoxContainer.new()
-	right_side.size_flags_horizontal = Control.SIZE_SHRINK_END
-	right_side.custom_minimum_size.x = 120  # Reduced to fit better
-	h_container.add_child(right_side)
-	
-	# Enhancement title
-	var enhancement_title = Label.new()
-	enhancement_title.text = "Memory State"
-	enhancement_title.add_theme_font_size_override("font_size", 14)
-	enhancement_title.add_theme_color_override("font_color", Color("#DDA0DD"))
-	enhancement_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	right_side.add_child(enhancement_title)
-	
-	# Base level (placeholder for future enhancement system)
-	var level_label = Label.new()
-	level_label.text = "Base Memory"
-	level_label.add_theme_font_size_override("font_size", 11)
-	level_label.add_theme_color_override("font_color", Color("#BBBBBB"))
-	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	right_side.add_child(level_label)
-	
-	# Enhancement progress (placeholder)
-	var progress_label = Label.new()
-	progress_label.text = "Stable"
-	progress_label.add_theme_font_size_override("font_size", 10)
-	progress_label.add_theme_color_override("font_color", Color("#999999"))
-	progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	right_side.add_child(progress_label)
-	
-	# Make the entire card clickable
-	var button = Button.new()
-	button.flat = true
-	button.custom_minimum_size = Vector2(220, 100)
-	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	button.pressed.connect(_on_mnemosyne_card_selected.bind(card, card_index))
-	
-	# Create final container
-	var container = Control.new()
-	container.custom_minimum_size = Vector2(220, 100)
-	container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	container.add_child(button)
-	container.add_child(card_panel)
-	
-	# Ensure everything fills properly
-	button.anchors_preset = Control.PRESET_FULL_RECT
-	card_panel.anchors_preset = Control.PRESET_FULL_RECT
-	
-	print("  - Created container with size: ", container.custom_minimum_size)
-	return container
-
-func _on_mnemosyne_card_selected(card: CardResource, card_index: int):
-	print("Mnemosyne card selected: ", card_index, " - ", card.card_name)
-	
-	# Get the detail panel from the existing scene structure
-	var detail_panel = mnemosyne_tab.get_node("RightPanel/MnemosyneDetailPanel")
-	if not detail_panel:
-		print("ERROR: Could not find detail panel at RightPanel/MnemosyneDetailPanel")
-		# Try to debug the structure
-		print("Available nodes in mnemosyne_tab:")
-		for child in mnemosyne_tab.get_children():
-			print("  - ", child.name, " (", child.get_class(), ")")
-		return
-	
-	# Clear current detail panel
-	for child in detail_panel.get_children():
-		child.queue_free()
-	
-	# Wait a frame to ensure children are cleared
-	await get_tree().process_frame
-	
-	# Create detailed card display
-	create_detailed_mnemosyne_card_display(detail_panel, card, card_index)
-
-func create_detailed_mnemosyne_card_display(container: VBoxContainer, card: CardResource, card_index: int):
-	# Main container
-	var main_vbox = VBoxContainer.new()
-	main_vbox.add_theme_constant_override("separation", 15)
-	
-	# Card name title
-	var title_label = Label.new()
-	title_label.text = card.card_name
-	title_label.add_theme_font_size_override("font_size", 20)
-	title_label.add_theme_color_override("font_color", Color("#DDA0DD"))  # Mnemosyne purple
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	main_vbox.add_child(title_label)
-	
-	# Separator
-	var separator1 = HSeparator.new()
-	main_vbox.add_child(separator1)
-	
-	# Power values section
-	var values_section = VBoxContainer.new()
-	values_section.add_theme_constant_override("separation", 8)
-	
-	var values_title = Label.new()
-	values_title.text = "Directional Power Values:"
-	values_title.add_theme_font_size_override("font_size", 14)
-	values_title.add_theme_color_override("font_color", Color.WHITE)
-	values_section.add_child(values_title)
-	
-	# Create a grid for power values
-	var power_grid = GridContainer.new()
-	power_grid.columns = 2
-	power_grid.add_theme_constant_override("h_separation", 20)
-	power_grid.add_theme_constant_override("v_separation", 5)
-	
-	var directions = ["North", "East", "South", "West"]
 	var direction_colors = [Color("#87CEEB"), Color("#FFB74D"), Color("#FF7043"), Color("#66BB6A")]
 	
 	for i in range(4):
+		var value_container = VBoxContainer.new()
+		value_container.custom_minimum_size.x = 25
+		
 		var dir_label = Label.new()
-		dir_label.text = directions[i] + ":"
+		dir_label.text = directions[i]
 		dir_label.add_theme_color_override("font_color", direction_colors[i])
-		dir_label.add_theme_font_size_override("font_size", 12)
-		power_grid.add_child(dir_label)
+		dir_label.add_theme_font_size_override("font_size", 10)
+		dir_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		value_container.add_child(dir_label)
 		
 		var value_label = Label.new()
 		value_label.text = str(card.values[i])
 		value_label.add_theme_color_override("font_color", Color.WHITE)
-		value_label.add_theme_font_size_override("font_size", 12)
-		power_grid.add_child(value_label)
-	
-	values_section.add_child(power_grid)
-	main_vbox.add_child(values_section)
-	
-	# Separator
-	var separator2 = HSeparator.new()
-	main_vbox.add_child(separator2)
-	
-	# Description section
-	var desc_section = VBoxContainer.new()
-	desc_section.add_theme_constant_override("separation", 5)
-	
-	var desc_title = Label.new()
-	desc_title.text = "Memory Fragment:"
-	desc_title.add_theme_font_size_override("font_size", 14)
-	desc_title.add_theme_color_override("font_color", Color.WHITE)
-	desc_section.add_child(desc_title)
-	
-	var desc_label = Label.new()
-	desc_label.text = card.description
-	desc_label.add_theme_font_size_override("font_size", 12)
-	desc_label.add_theme_color_override("font_color", Color("#DDDDDD"))
-	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	desc_section.add_child(desc_label)
-	
-	main_vbox.add_child(desc_section)
-	
-	# Abilities section
-	if card.abilities.size() > 0:
-		var separator3 = HSeparator.new()
-		main_vbox.add_child(separator3)
+		value_label.add_theme_font_size_override("font_size", 14)
+		value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		value_container.add_child(value_label)
 		
-		var abilities_section = VBoxContainer.new()
-		abilities_section.add_theme_constant_override("separation", 8)
-		
-		var abilities_title = Label.new()
-		abilities_title.text = "Special Abilities:"
-		abilities_title.add_theme_font_size_override("font_size", 14)
-		abilities_title.add_theme_color_override("font_color", Color.WHITE)
-		abilities_section.add_child(abilities_title)
-		
-		for ability in card.abilities:
-			var ability_container = VBoxContainer.new()
-			ability_container.add_theme_constant_override("separation", 2)
-			
-			var ability_name = Label.new()
-			ability_name.text = "• " + ability.ability_name
-			ability_name.add_theme_font_size_override("font_size", 12)
-			ability_name.add_theme_color_override("font_color", Color("#FFD700"))
-			ability_container.add_child(ability_name)
-			
-			var ability_desc = Label.new()
-			ability_desc.text = "  " + ability.description
-			ability_desc.add_theme_font_size_override("font_size", 11)
-			ability_desc.add_theme_color_override("font_color", Color("#CCCCCC"))
-			ability_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			ability_desc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			ability_container.add_child(ability_desc)
-			
-			abilities_section.add_child(ability_container)
-		
-		main_vbox.add_child(abilities_section)
-	else:
-		# No abilities
-		var separator3 = HSeparator.new()
-		main_vbox.add_child(separator3)
-		
-		var no_abilities_label = Label.new()
-		no_abilities_label.text = "No special abilities (pure memory essence)"
-		no_abilities_label.add_theme_font_size_override("font_size", 11)
-		no_abilities_label.add_theme_color_override("font_color", Color("#888888"))
-		no_abilities_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		main_vbox.add_child(no_abilities_label)
+		values_container.add_child(value_container)
 	
-	# Enhancement status section (placeholder for future upgrade system)
-	var separator4 = HSeparator.new()
-	main_vbox.add_child(separator4)
-	
-	var enhancement_section = VBoxContainer.new()
-	enhancement_section.add_theme_constant_override("separation", 5)
-	
-	var enhancement_title = Label.new()
-	enhancement_title.text = "Memory Enhancement Status:"
-	enhancement_title.add_theme_font_size_override("font_size", 14)
-	enhancement_title.add_theme_color_override("font_color", Color("#DDA0DD"))
-	enhancement_section.add_child(enhancement_title)
-	
-	var enhancement_status = Label.new()
-	enhancement_status.text = "Base Form - Stable Memory Core\n(Future enhancements available through divine victories and consciousness expansion)"
-	enhancement_status.add_theme_font_size_override("font_size", 10)
-	enhancement_status.add_theme_color_override("font_color", Color("#AAAAAA"))
-	enhancement_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	enhancement_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	enhancement_section.add_child(enhancement_status)
-	
-	main_vbox.add_child(enhancement_section)
-	
-	# Add the main container to the detail panel
-	container.add_child(main_vbox)
-	
-	print("Updated detail panel for Mnemosyne card: ", card.card_name)
-
-func debug_mnemosyne_containers():
-	print("=== DEBUGGING MNEMOSYNE CONTAINERS ===")
-	var left_panel = mnemosyne_tab.get_node("LeftPanel")
-	var scroll_container = left_panel.get_node("ScrollContainer")
-	var card_list = scroll_container.get_node("MnemosyneCardList")
-	
-	print("LeftPanel:")
-	print("  - Size: ", left_panel.size)
-	print("  - Custom minimum size: ", left_panel.custom_minimum_size)
-	print("  - Visible: ", left_panel.visible)
-	print("  - Modulate: ", left_panel.modulate)
-	
-	print("ScrollContainer:")
-	print("  - Size: ", scroll_container.size)
-	print("  - Custom minimum size: ", scroll_container.custom_minimum_size)
-	print("  - Visible: ", scroll_container.visible)
-	print("  - Modulate: ", scroll_container.modulate)
-	print("  - Content size: ", scroll_container.get_v_scroll_bar().max_value)
-	
-	print("MnemosyneCardList:")
-	print("  - Size: ", card_list.size)
-	print("  - Custom minimum size: ", card_list.custom_minimum_size)
-	print("  - Visible: ", card_list.visible)
-	print("  - Modulate: ", card_list.modulate)
-	print("  - Children: ", card_list.get_children().size())
-	
-	# Test if we can add a simple colored panel that should be visible
-	var test_panel = PanelContainer.new()
-	test_panel.custom_minimum_size = Vector2(200, 50)
-	var test_style = StyleBoxFlat.new()
-	test_style.bg_color = Color.RED
-	test_panel.add_theme_stylebox_override("panel", test_style)
-	
-	var test_label2 = Label.new()
-	test_label2.text = "BRIGHT RED TEST PANEL"
-	test_label2.add_theme_color_override("font_color", Color.WHITE)
-	test_label2.add_theme_font_size_override("font_size", 16)
-	test_panel.add_child(test_label2)
-	
-	card_list.add_child(test_panel)
-	print("Added bright red test panel to card list")
+	return card_panel
