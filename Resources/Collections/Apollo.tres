@@ -1,6 +1,5 @@
 [gd_resource type="Resource" script_class="GodCardCollection" load_steps=34 format=3 uid="uid://b1qqsnldvvxvp"]
 
-[ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_cm1c1"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_w7xgs"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_cm1c1"]
@@ -9,6 +8,89 @@
 [ext_resource type="Script" uid="uid://dgsvwgjhs2vju" path="res://Resources/Abilities/stat_nullify_ability.gd" id="4_ooqpa"]
 [ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="6_e1acv"]
 [ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="7_ej0q7"]
+
+[sub_resource type="GDScript" id="GDScript_e1acv"]
+script/source = "# res://Resources/card_resource.gd
+class_name CardResource
+extends Resource
+
+# Inner class for level data (no class_name declaration)
+class LevelData extends Resource:
+	@export var level: int = 1
+	@export var values: Array[int] = [1, 1, 1, 1]  # [Up, Right, Down, Left]
+	@export var abilities: Array[CardAbility] = []
+	@export_multiline var description: String = \"\"  # Level-specific description if needed
+
+# Main CardResource fields
+@export var card_name: String
+@export var card_texture: Texture2D
+
+# Legacy fields (for backward compatibility)
+@export var values: Array[int] = [1, 1, 1, 1]  # [Up, Right, Down, Left]
+@export_multiline var description: String = \"\"
+@export var abilities: Array[CardAbility] = []
+
+# NEW: Level progression data
+@export var level_data: Array[LevelData] = []
+@export var uses_level_progression: bool = false
+
+# Get data for specific level
+func get_level_data(level: int) -> LevelData:
+	if not uses_level_progression or level_data.is_empty():
+		# Fallback to legacy data
+		var fallback = LevelData.new()
+		fallback.level = level
+		fallback.values = values.duplicate()
+		fallback.abilities = abilities.duplicate()
+		fallback.description = description
+		return fallback
+	
+	# Find exact level match
+	for data in level_data:
+		if data.level == level:
+			return data
+	
+	# If no exact match, return highest available level <= requested level
+	var best_match: LevelData = null
+	for data in level_data:
+		if data.level <= level:
+			if not best_match or data.level > best_match.level:
+				best_match = data
+	
+	return best_match if best_match else level_data[0]
+
+# Convenience methods
+func get_effective_values(level: int) -> Array[int]:
+	return get_level_data(level).values.duplicate()
+
+func get_effective_abilities(level: int) -> Array[CardAbility]:
+	return get_level_data(level).abilities.duplicate()
+
+func get_effective_description(level: int) -> String:
+	var level_desc = get_level_data(level).description
+	return level_desc if level_desc != \"\" else description
+
+# Check if card has abilities of a specific type at a given level
+func has_ability_type(trigger_type: CardAbility.TriggerType, level: int) -> bool:
+	var abilities = get_effective_abilities(level)
+	for ability in abilities:
+		if ability and ability.trigger_condition == trigger_type:
+			return true
+	return false
+
+# Get all available abilities for a specific level  
+func get_available_abilities(level: int) -> Array[CardAbility]:
+	return get_effective_abilities(level)
+
+# Execute abilities of a specific type
+func execute_abilities(trigger_type: CardAbility.TriggerType, context: Dictionary, level: int):
+	var abilities = get_effective_abilities(level)
+	for ability in abilities:
+		if ability and ability.trigger_condition == trigger_type:
+			if ability.can_execute(context):
+				ability.execute(context)
+				print(\"Executed ability: \", ability.ability_name)
+"
 
 [sub_resource type="Resource" id="Resource_sfw3d"]
 script = ExtResource("3_dwe15")
@@ -22,13 +104,13 @@ metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
 [sub_resource type="GDScript" id="GDScript_ej0q7"]
 
 [sub_resource type="Resource" id="Resource_vqrrp"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Helios"
 values = Array[int]([5, 5, 5, 5])
 description = "The sun titan arrives"
 abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_sfw3d")])
-level_data = Array[SubResource("GDScript_ej0q7")]([])
-uses_level_progression = false
+level_data = Array[SubResource("GDScript_ej0q7")]([null, null, null])
+uses_level_progression = true
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bj61k"]
@@ -40,7 +122,7 @@ trigger_condition = 2
 metadata/_custom_type_script = "uid://dgsvwgjhs2vju"
 
 [sub_resource type="Resource" id="Resource_w7xgs"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Cygnus"
 values = Array[int]([2, 2, 2, 2])
 description = "Oh Phaeton, don't listen to him!"
@@ -58,7 +140,7 @@ trigger_condition = 1
 metadata/_custom_type_script = "uid://b72irnrav5w53"
 
 [sub_resource type="Resource" id="Resource_cm1c1"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Phaeton"
 values = Array[int]([3, 9, 8, 1])
 description = "You just cant give Epiphus the satisfaction"
@@ -77,7 +159,7 @@ trigger_condition = 3
 metadata/_custom_type_script = "uid://d1cwgpmvptcjn"
 
 [sub_resource type="Resource" id="Resource_dwe15"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Eos, the dawn"
 values = Array[int]([2, 2, 2, 2])
 description = "Welcome to a new day"
@@ -95,7 +177,7 @@ trigger_condition = 0
 metadata/_custom_type_script = "uid://43v8bwokc47i"
 
 [sub_resource type="Resource" id="Resource_ooqpa"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Phelgon"
 values = Array[int]([8, 8, 2, 2])
 description = "Look at my horse"
@@ -105,7 +187,7 @@ uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_e1acv"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "The Lyre"
 values = Array[int]([5, 5, 5, 5])
 description = "Heavenly music "
@@ -115,7 +197,7 @@ uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ej0q7"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Orpheus"
 values = Array[int]([6, 7, 6, 7])
 description = "The sweetest voice yet alive"
@@ -125,7 +207,7 @@ uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_gowu1"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Marceius "
 values = Array[int]([8, 2, 8, 2])
 description = "Sometimes you think you got this, reality is often cruel"
@@ -135,7 +217,7 @@ uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_p7jhq"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Euridyce"
 values = Array[int]([6, 4, 4, 8])
 description = "Love you would go all the way to hell for"
@@ -145,7 +227,7 @@ uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2h7tk"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Calliope"
 values = Array[int]([7, 7, 8, 8])
 description = "From when all lovely voices spring"
@@ -155,7 +237,7 @@ uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bufwg"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Delphic Oracle"
 values = Array[int]([3, 3, 3, 3])
 description = "The power and curse of knowing"
@@ -165,7 +247,7 @@ uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ca26u"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Cassandra"
 values = Array[int]([5, 5, 5, 5])
 description = "You wont listen"
@@ -175,7 +257,7 @@ uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qbbw0"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Tiresias"
 values = Array[int]([4, 8, 8, 4])
 description = "He may be blind but it is you who cannot see"
@@ -185,7 +267,7 @@ uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xjxyc"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "Calchas"
 values = Array[int]([2, 6, 8, 4])
 description = "Let the man speak his mind, even if its not what you want to hear"
@@ -195,7 +277,7 @@ uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_b0n1o"]
-script = ExtResource("1_vqrrp")
+script = SubResource("GDScript_e1acv")
 card_name = "The Fates"
 values = Array[int]([8, 9, 8, 6])
 description = "Lets no pretend you have any control over what they are doing"
@@ -243,6 +325,6 @@ metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 [resource]
 script = ExtResource("3_cm1c1")
 god_name = "Apollo"
-cards = Array[ExtResource("1_vqrrp")]([SubResource("Resource_vqrrp"), SubResource("Resource_w7xgs"), SubResource("Resource_cm1c1"), SubResource("Resource_dwe15"), SubResource("Resource_ooqpa"), SubResource("Resource_e1acv"), SubResource("Resource_ej0q7"), SubResource("Resource_gowu1"), SubResource("Resource_p7jhq"), SubResource("Resource_2h7tk"), SubResource("Resource_bufwg"), SubResource("Resource_ca26u"), SubResource("Resource_qbbw0"), SubResource("Resource_xjxyc"), SubResource("Resource_b0n1o")])
+cards = Array[SubResource("GDScript_e1acv")]([SubResource("Resource_vqrrp"), SubResource("Resource_w7xgs"), SubResource("Resource_cm1c1"), SubResource("Resource_dwe15"), SubResource("Resource_ooqpa"), SubResource("Resource_e1acv"), SubResource("Resource_ej0q7"), SubResource("Resource_gowu1"), SubResource("Resource_p7jhq"), SubResource("Resource_2h7tk"), SubResource("Resource_bufwg"), SubResource("Resource_ca26u"), SubResource("Resource_qbbw0"), SubResource("Resource_xjxyc"), SubResource("Resource_b0n1o")])
 decks = Array[ExtResource("2_w7xgs")]([SubResource("Resource_tn03x"), SubResource("Resource_cknfu"), SubResource("Resource_tpnlu")])
 metadata/_custom_type_script = "uid://bdwr18g3ouvfo"

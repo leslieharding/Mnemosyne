@@ -2,13 +2,6 @@
 class_name CardResource
 extends Resource
 
-# Inner class for level data (no class_name declaration)
-class LevelData extends Resource:
-	@export var level: int = 1
-	@export var values: Array[int] = [1, 1, 1, 1]  # [Up, Right, Down, Left]
-	@export var abilities: Array[CardAbility] = []
-	@export_multiline var description: String = ""  # Level-specific description if needed
-
 # Main CardResource fields
 @export var card_name: String
 @export var card_texture: Texture2D
