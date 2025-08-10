@@ -14,49 +14,101 @@ func _ready():
 	deck_index = params.get("deck_index", 0)
 	victory = params.get("victory", true)
 	
+	print("Run Summary parameters:")
+	print("  God: ", god_name)
+	print("  Deck Index: ", deck_index)
+	print("  Victory: ", victory)
+	
 	# Set up UI immediately without waiting
 	setup_ui_safely()
 
 func setup_ui_safely():
 	print("\n=== Setting up UI ===")
 	
-	# Get all required nodes with new structure
+	# Get all required nodes with proper error checking
 	var main_container = get_node_or_null("MainContainer")
 	if not main_container:
 		push_error("MainContainer not found!")
+		print("Available children: ", get_children())
 		return
+	
+	print("MainContainer found: ", main_container.name)
+	print("MainContainer children: ", main_container.get_children().map(func(child): return child.name))
 	
 	var left_panel = main_container.get_node_or_null("LeftPanel")
 	var right_panel = main_container.get_node_or_null("RightPanel")
 	
-	if not left_panel or not right_panel:
-		push_error("Left or Right panel not found!")
+	if not left_panel:
+		push_error("LeftPanel not found!")
+		return
+	if not right_panel:
+		push_error("RightPanel not found!")
 		return
 	
+	print("LeftPanel found: ", left_panel.name)
+	print("RightPanel found: ", right_panel.name)
+	print("RightPanel children: ", right_panel.get_children().map(func(child): return child.name))
+	
 	# Get left panel nodes
-	var title = left_panel.get_node_or_null("Title")
 	var run_details_container = left_panel.get_node_or_null("RunDetailsContainer")
+	if not run_details_container:
+		push_error("RunDetailsContainer not found!")
+		print("LeftPanel children: ", left_panel.get_children().map(func(child): return child.name))
+		return
+	
+	var title = left_panel.get_node_or_null("Title")
 	var god_deck_info = run_details_container.get_node_or_null("GodDeckInfo")
 	var outcome_label = run_details_container.get_node_or_null("OutcomeLabel")
+	
 	var total_exp_container = left_panel.get_node_or_null("TotalExpContainer")
+	if not total_exp_container:
+		push_error("TotalExpContainer not found!")
+		print("LeftPanel children: ", left_panel.get_children().map(func(child): return child.name))
+		return
+	
 	var capture_total = total_exp_container.get_node_or_null("CaptureTotal")
 	var defense_total = total_exp_container.get_node_or_null("DefenseTotal")
+	
 	var button_container = left_panel.get_node_or_null("ButtonContainer")
+	if not button_container:
+		push_error("ButtonContainer not found!")
+		return
+	
 	var new_run_button = button_container.get_node_or_null("NewRunButton")
 	var main_menu_button = button_container.get_node_or_null("MainMenuButton")
 	
-	# Get right panel nodes
-	var card_display_container = right_panel.get_node_or_null("CardDisplayContainer")
+	# Get right panel nodes - FIXED NODE NAME
+	var card_display_container = right_panel.get_node_or_null("CardDetailsContainer")
 	
-	if not title or not god_deck_info or not outcome_label or not capture_total or not defense_total or not card_display_container:
+	if not card_display_container:
+		push_error("CardDetailsContainer not found in RightPanel!")
+		print("RightPanel children: ", right_panel.get_children().map(func(child): return child.name))
+		return
+	
+	print("CardDetailsContainer found: ", card_display_container.name)
+	
+	if not title or not god_deck_info or not outcome_label or not capture_total or not defense_total:
 		push_error("Required UI nodes not found!")
+		print("Missing nodes:")
+		print("  title: ", title != null)
+		print("  god_deck_info: ", god_deck_info != null)
+		print("  outcome_label: ", outcome_label != null)
+		print("  capture_total: ", capture_total != null)
+		print("  defense_total: ", defense_total != null)
 		return
 	
 	# Connect buttons
 	if new_run_button:
 		new_run_button.pressed.connect(_on_new_run_button_pressed)
+		print("Connected new_run_button")
+	else:
+		print("Warning: new_run_button not found")
+		
 	if main_menu_button:
 		main_menu_button.pressed.connect(_on_main_menu_button_pressed)
+		print("Connected main_menu_button")
+	else:
+		print("Warning: main_menu_button not found")
 	
 	print("All nodes found successfully!")
 	
@@ -67,6 +119,8 @@ func setup_ui_safely():
 	setup_card_displays_panel(card_display_container)
 
 func setup_left_panel_content(title_node: Label, god_deck_node: Label, outcome_node: Label, capture_node: Label, defense_node: Label):
+	print("\n=== Setting up left panel content ===")
+	
 	# Set title
 	title_node.text = "Run Complete"
 	
@@ -91,6 +145,8 @@ func setup_left_panel_content(title_node: Label, god_deck_node: Label, outcome_n
 		var tracker = get_node("/root/RunExperienceTrackerAutoload")
 		var totals = tracker.get_total_experience()
 		
+		print("Experience totals: ", totals)
+		
 		# Use unified experience display
 		capture_node.text = "⚡ Total Experience Gained: " + str(totals["total_exp"])
 		capture_node.add_theme_font_size_override("font_size", 16)
@@ -99,8 +155,11 @@ func setup_left_panel_content(title_node: Label, god_deck_node: Label, outcome_n
 		# Hide defense total since we're using unified system
 		defense_node.visible = false
 	else:
+		print("Warning: RunExperienceTrackerAutoload not found")
 		capture_node.text = "⚡ Experience data unavailable"
 		defense_node.visible = false
+	
+	print("Left panel content setup complete")
 
 func get_deck_name() -> String:
 	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
@@ -111,53 +170,101 @@ func get_deck_name() -> String:
 
 func setup_card_displays_panel(container: VBoxContainer):
 	print("\n=== Setting up card displays panel ===")
+	print("Container: ", container.name if container else "null")
 	
 	# Clear any existing content
-	for child in container.get_children():
-		child.queue_free()
+	if container:
+		for child in container.get_children():
+			child.queue_free()
+		print("Cleared existing children from container")
+	else:
+		print("ERROR: Container is null!")
+		return
 	
 	# Check required autoloads
-	if not has_node("/root/RunExperienceTrackerAutoload") or not has_node("/root/GlobalProgressTrackerAutoload"):
-		print("ERROR: Required autoloads not found")
+	var tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+	var global_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
+	
+	if not tracker:
+		print("ERROR: RunExperienceTrackerAutoload not found")
 		var error_label = Label.new()
-		error_label.text = "Experience data unavailable"
+		error_label.text = "RunExperienceTrackerAutoload not available"
 		error_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		error_label.add_theme_color_override("font_color", Color.RED)
+		container.add_child(error_label)
+		return
+	
+	if not global_tracker:
+		print("ERROR: GlobalProgressTrackerAutoload not found")
+		var error_label = Label.new()
+		error_label.text = "GlobalProgressTrackerAutoload not available"
+		error_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		error_label.add_theme_color_override("font_color", Color.RED)
 		container.add_child(error_label)
 		return
 	
 	# Get experience data
-	var tracker = get_node("/root/RunExperienceTrackerAutoload")
-	var global_tracker = get_node("/root/GlobalProgressTrackerAutoload")
 	var all_exp = tracker.get_all_experience()
+	print("All experience data: ", all_exp)
+	
+	if all_exp.is_empty():
+		print("No experience data found")
+		var no_exp_label = Label.new()
+		no_exp_label.text = "No experience data found for this run"
+		no_exp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		no_exp_label.add_theme_color_override("font_color", Color("#888888"))
+		container.add_child(no_exp_label)
+		return
 	
 	# Load collection
 	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
+	print("Loading collection from: ", collection_path)
+	
 	var collection: GodCardCollection = load(collection_path)
 	if not collection:
-		print("Failed to load collection")
+		print("ERROR: Failed to load collection: ", collection_path)
+		var error_label = Label.new()
+		error_label.text = "Failed to load " + god_name + " collection"
+		error_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		error_label.add_theme_color_override("font_color", Color.RED)
+		container.add_child(error_label)
 		return
 	
-	print("Creating card displays for run summary...")
+	print("Collection loaded successfully with ", collection.cards.size(), " cards")
 	
 	# Track if we have any cards with experience
 	var cards_with_exp = 0
 	
-	# Create card displays for all cards in deck (similar to apollo.gd style)
+	# Create card displays for all cards that gained experience
 	for card_index in all_exp:
 		var run_exp_data = all_exp[card_index]
 		
-		# Get card data
-		var card = collection.cards[card_index] if card_index < collection.cards.size() else null
-		if not card:
+		print("Processing card index: ", card_index, " with exp data: ", run_exp_data)
+		
+		# Skip cards with no experience gain
+		if run_exp_data.get("total_exp", 0) <= 0:
+			print("  Skipping card with no experience")
 			continue
 		
-		print("Creating display for: ", card.card_name)
+		# Get card data
+		if card_index >= collection.cards.size():
+			print("  ERROR: Card index ", card_index, " out of bounds (collection has ", collection.cards.size(), " cards)")
+			continue
+			
+		var card = collection.cards[card_index]
+		if not card:
+			print("  ERROR: Card at index ", card_index, " is null")
+			continue
+		
+		print("  Creating display for: ", card.card_name)
 		
 		# Get total experience data - UNIFIED VERSION
 		var before_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
 		var before_total = before_exp_data["total_exp"]
 		var total_gain = run_exp_data["total_exp"]
 		var after_total = before_total + total_gain
+		
+		print("    Before total: ", before_total, ", Gain: ", total_gain, ", After total: ", after_total)
 		
 		# Create card display similar to apollo.gd deck preview style
 		var card_container = create_apollo_style_card_display(
@@ -171,10 +278,11 @@ func setup_card_displays_panel(container: VBoxContainer):
 		container.add_child(card_container)
 		cards_with_exp += 1
 		
-		print("Added card container for: ", card.card_name)
+		print("    Added card container for: ", card.card_name)
 	
 	# If no cards had experience, show a message
 	if cards_with_exp == 0:
+		print("No cards gained experience this run")
 		var no_exp_label = Label.new()
 		no_exp_label.text = "No experience gained this run"
 		no_exp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -184,6 +292,8 @@ func setup_card_displays_panel(container: VBoxContainer):
 	print("Card displays panel setup complete! Created ", cards_with_exp, " displays")
 
 func create_apollo_style_card_display(card: CardResource, card_index: int, before_total: int, after_total: int, total_gain: int) -> Control:
+	print("Creating card display for: ", card.card_name)
+	
 	# Main container for this card (similar to apollo.gd)
 	var card_panel = PanelContainer.new()
 	card_panel.custom_minimum_size = Vector2(0, 120)
@@ -223,15 +333,17 @@ func create_apollo_style_card_display(card: CardResource, card_index: int, befor
 	var current_level = 1
 	if god_name == "Mnemosyne":
 		# Mnemosyne uses consciousness level
-		if has_node("/root/MemoryJournalManagerAutoload"):
-			var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
+		var memory_manager = get_node_or_null("/root/MemoryJournalManagerAutoload")
+		if memory_manager:
 			var mnemosyne_data = memory_manager.get_mnemosyne_memory()
 			current_level = mnemosyne_data.get("consciousness_level", 1)
 	else:
 		# Other gods use experience-based levels
-		if has_node("/root/GlobalProgressTrackerAutoload"):
-			var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		var progress_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
+		if progress_tracker:
 			current_level = progress_tracker.get_card_level(god_name, card_index)
+	
+	print("  Current level for ", card.card_name, ": ", current_level)
 	
 	# Card name with level indicator (similar to apollo.gd)
 	var name_label = Label.new()
@@ -307,6 +419,7 @@ func create_apollo_style_card_display(card: CardResource, card_index: int, befor
 	progression_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	run_exp_container.add_child(progression_label)
 	
+	print("  Card display created successfully")
 	return card_panel
 
 func get_scene_params() -> Dictionary:
@@ -327,13 +440,17 @@ func _on_main_menu_button_pressed() -> void:
 	TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
 
 func save_run_to_global_progress():
-	if not has_node("/root/RunExperienceTrackerAutoload") or not has_node("/root/GlobalProgressTrackerAutoload"):
+	var tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+	var global_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
+	
+	if not tracker or not global_tracker:
+		print("Missing trackers for saving progress")
 		return
 		
-	var tracker = get_node("/root/RunExperienceTrackerAutoload")
-	var global_tracker = get_node("/root/GlobalProgressTrackerAutoload")
 	var run_exp = tracker.get_all_experience()
 	
 	if run_exp.size() > 0:
 		global_tracker.add_run_experience(god_name, run_exp)
 		print("Saved run experience to global progress for ", god_name)
+	else:
+		print("No run experience to save")
