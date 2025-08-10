@@ -17,6 +17,7 @@ func execute(context: Dictionary) -> bool:
 	var game_manager = context.get("game_manager")
 	
 	print("StatBoostAbility: Starting execution for card at position ", grid_position)
+	print("StatBoostAbility: Card values before boost: ", placed_card.values if placed_card else "no card")
 	
 	if not placed_card or grid_position == -1 or not game_manager:
 		print("StatBoostAbility: Missing required context data")
@@ -48,6 +49,7 @@ func execute(context: Dictionary) -> bool:
 	
 	# Print results
 	if boosted_directions.size() > 0:
+		print("StatBoostAbility: Card values after boost: ", placed_card.values)
 		print(ability_name, " activated! Boosted ", " and ".join(boosted_directions), " by +", boost_amount, " each")
 		return true
 	else:

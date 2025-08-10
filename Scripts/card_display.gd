@@ -66,6 +66,10 @@ func setup(card: CardResource, level: int = 1, god: String = "", index: int = -1
 	card_index = index
 	
 	print("CardDisplay setup - Card: ", card.card_name, " Level: ", level, " God: ", god, " Index: ", index)
+	print("CardDisplay setup - Card values: ", card.values)
+	
+	# Always use the values from the card data that was passed in
+	# This card data should already have the correct level-appropriate values applied
 	update_display()
 
 func update_display():
@@ -73,24 +77,27 @@ func update_display():
 		print("CardDisplay: No card data available")
 		return
 	
-	# Get effective stats for current level - THIS IS THE KEY FIX
-	var effective_values = card_data.get_effective_values(card_level)
+	# Use the values directly from the card data
+	# The card data should already have the correct values applied when it was created
+	var values_to_use = card_data.values
 	
-	print("CardDisplay update - Card: ", card_data.card_name, " Level: ", card_level, " Values: ", effective_values)
+	print("CardDisplay: Using card values: ", values_to_use)
 	
-	# Update power values with level-adjusted stats
+	# Update power values
 	if north_power:
-		north_power.text = str(effective_values[0])
+		north_power.text = str(values_to_use[0])
 	if east_power:
-		east_power.text = str(effective_values[1])
+		east_power.text = str(values_to_use[1])
 	if south_power:
-		south_power.text = str(effective_values[2])
+		south_power.text = str(values_to_use[2])
 	if west_power:
-		west_power.text = str(effective_values[3])
+		west_power.text = str(values_to_use[3])
 	
 	# Update card name
 	if card_name_label:
 		card_name_label.text = card_data.card_name
+	
+	print("CardDisplay final values displayed: ", values_to_use)
 
 # Also add this debug function to help track what's happening
 func debug_card_state():

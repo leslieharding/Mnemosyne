@@ -1865,7 +1865,6 @@ func get_card_level(card_index: int) -> int:
 		return progress_tracker.get_card_level(current_god, card_index)
 	return 0  
 
-# Display player's hand of cards using manual positioning
 func display_player_hand():
 	# First, clear existing cards
 	for child in hand_container.get_children():
@@ -1910,8 +1909,20 @@ func display_player_hand():
 		
 		print("Setting up hand card ", i, ": ", card.card_name, " at level ", current_level, " (collection index: ", card_collection_index, ")")
 		
-		# Setup the card with its data and proper level
-		card_display.setup(card, current_level, current_god, card_collection_index)
+		# FOR HAND DISPLAY: Create a copy of the card with level-appropriate values
+		var hand_card_data = card.duplicate()
+		var effective_values = card.get_effective_values(current_level)
+		var effective_abilities = card.get_effective_abilities(current_level)
+		
+		# Apply the level-appropriate values to the hand display copy
+		hand_card_data.values = effective_values.duplicate()
+		hand_card_data.abilities = effective_abilities.duplicate()
+		
+		print("Hand card effective values: ", effective_values)
+		print("Hand card effective abilities count: ", effective_abilities.size())
+		
+		# Setup the card with the level-appropriate data for hand display
+		card_display.setup(hand_card_data, current_level, current_god, card_collection_index)
 		
 		# ALWAYS connect hover signals for info panel (regardless of tutorial mode)
 		card_display.card_hovered.connect(_on_card_hovered)
@@ -2137,9 +2148,25 @@ func place_card_on_grid():
 		selected_card_index = -1
 		return
 	
-	# Store a reference to the card data before removing it
-	var card_data = player_deck[selected_card_index]
+	# Store a reference to the original card data
+	var original_card_data = player_deck[selected_card_index]
 	var card_collection_index = deck_card_indices[selected_card_index]
+	
+	# Get card level for ability checks - UNIFIED VERSION
+	var card_level = get_card_level(card_collection_index)
+	print("Card level for ", original_card_data.card_name, " (index ", card_collection_index, "): ", card_level)
+	
+	# IMPORTANT: Create effective card data for the current level for grid placement
+	var card_data = original_card_data.duplicate()
+	var effective_values = original_card_data.get_effective_values(card_level)
+	var effective_abilities = original_card_data.get_effective_abilities(card_level)
+	
+	# Apply the level-appropriate values and abilities to the grid copy
+	card_data.values = effective_values.duplicate()
+	card_data.abilities = effective_abilities.duplicate()
+	
+	print("Grid placement effective values: ", card_data.values)
+	print("Grid placement effective abilities count: ", card_data.abilities.size())
 	
 	# Record this play for pattern tracking (if not boss battle)
 	if not is_boss_battle:
@@ -2168,10 +2195,6 @@ func place_card_on_grid():
 	
 	# NEW: Apply deck power effects before combat
 	var sun_boosted = apply_deck_power_effects(card_data, current_grid_index)
-	
-	# Get card level for ability checks - UNIFIED VERSION
-	var card_level = get_card_level(card_collection_index)
-	print("Card level for ", card_data.card_name, " (index ", card_collection_index, "): ", card_level)
 	
 	# Mark the slot as occupied and set ownership (always PLAYER - prediction hits don't change ownership)
 	grid_occupied[current_grid_index] = true
