@@ -51,4 +51,22 @@ func get_effective_description(level: int) -> String:
 	var level_desc = get_level_data(level).description
 	return level_desc if level_desc != "" else description
 
-# ... rest of existing methods stay the same ...
+# Check if card has abilities of a specific type at given level
+func has_ability_type(trigger_type: CardAbility.TriggerType, level: int = 0) -> bool:
+	var abilities = get_effective_abilities(level)
+	for ability in abilities:
+		if ability.trigger_condition == trigger_type:
+			return true
+	return false
+
+# Get all available abilities for a specific level
+func get_available_abilities(level: int = 0) -> Array[CardAbility]:
+	return get_effective_abilities(level)
+
+# Execute abilities of a specific type
+func execute_abilities(trigger_type: CardAbility.TriggerType, context: Dictionary, level: int = 0):
+	var abilities = get_effective_abilities(level)
+	for ability in abilities:
+		if ability.trigger_condition == trigger_type:
+			print("Executing ability: ", ability.ability_name, " (", ability.description, ")")
+			ability.execute(context)
