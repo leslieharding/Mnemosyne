@@ -296,11 +296,13 @@ func setup_card_info_panel():
 		card_info_panel.visible = true
 		card_info_panel.modulate.a = 0.0
 		
-		# Create grace period timer
+		# Create grace period timer and add it to the scene
 		panel_grace_timer = Timer.new()
 		panel_grace_timer.wait_time = GRACE_PERIOD_DURATION
 		panel_grace_timer.one_shot = true
 		panel_grace_timer.timeout.connect(_on_grace_period_expired)
+		
+		# Add timer to the scene tree
 		add_child(panel_grace_timer)
 		
 		print("Card info panel fade system initialized")
@@ -1053,7 +1055,12 @@ func end_game():
 		tutorial_dialog.confirmed.connect(_on_tutorial_finished, CONNECT_ONE_SHOT)
 		return
 	
-	var tracker = get_node("/root/BossPredictionTrackerAutoload")
+	# Safety check - ensure we're still in the scene tree
+	if not is_inside_tree():
+		print("Warning: end_game called when not in scene tree")
+		return
+	
+	var tracker = get_node_or_null("/root/BossPredictionTrackerAutoload")
 	if tracker:
 		tracker.stop_recording()
 	
@@ -1119,9 +1126,8 @@ func end_game():
 			record_god_experience()
 			
 			# Trigger conversation flags based on battle outcome
-			if has_node("/root/ConversationManagerAutoload"):
-				var conv_manager = get_node("/root/ConversationManagerAutoload")
-				
+			var conv_manager = get_node_or_null("/root/ConversationManagerAutoload")
+			if conv_manager:
 				# Check if this was a boss battle
 				if is_boss_battle:
 					print("Triggering first_boss_loss conversation")
@@ -1157,27 +1163,25 @@ func end_game():
 			restart_round()
 			return  # Exit early, don't proceed with normal end game logic
 	
-	# Record the enemy encounter in memory journal
+	# Record the enemy encounter in memory journal - with safety check
 	record_enemy_encounter(victory)
 	
-	# Record god experience (you used this god in battle)
+	# Record god experience (you used this god in battle) - with safety check
 	record_god_experience()
 	
-	# Check for god unlocks after recording the encounter
+	# Check for god unlocks after recording the encounter - with safety check
 	check_god_unlocks()
 	
-	# Trigger conversation flags based on battle outcome
-	if has_node("/root/ConversationManagerAutoload"):
-		var conv_manager = get_node("/root/ConversationManagerAutoload")
-		
-		if not victory:
-			# Check if this was a boss battle
-			if is_boss_battle:
-				print("Triggering first_boss_loss conversation")
-				conv_manager.trigger_conversation("first_boss_loss")
-			else:
-				print("Triggering first_run_defeat conversation")
-				conv_manager.trigger_conversation("first_run_defeat")
+	# Trigger conversation flags based on battle outcome - with safety check
+	var conv_manager = get_node_or_null("/root/ConversationManagerAutoload")
+	if conv_manager and not victory:
+		# Check if this was a boss battle
+		if is_boss_battle:
+			print("Triggering first_boss_loss conversation")
+			conv_manager.trigger_conversation("first_boss_loss")
+		else:
+			print("Triggering first_run_defeat conversation")
+			conv_manager.trigger_conversation("first_run_defeat")
 	
 	if not victory:
 		# If player loses, show run summary before ending
@@ -2379,6 +2383,11 @@ func remove_card_from_hand(card_index: int):
 	display_player_hand()
 
 func show_reward_screen():
+	# Safety check
+	if not is_inside_tree():
+		print("Warning: show_reward_screen called when not in scene tree")
+		return
+		
 	var params = get_scene_params()
 	
 	# Check for perfect victory using board ownership

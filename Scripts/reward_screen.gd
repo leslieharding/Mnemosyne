@@ -62,7 +62,6 @@ func get_continue_button_text() -> String:
 	else:
 		return "Continue"
 
-# Replace the load_deck_data function with synchronous version
 func load_deck_data_sync():
 	print("=== LOADING DECK DATA SYNC ===")
 	
@@ -74,7 +73,6 @@ func load_deck_data_sync():
 	
 	# Load the god's collection
 	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
-
 	
 	if not ResourceLoader.exists(collection_path):
 		print("ERROR: Collection does not exist at: ", collection_path)
@@ -367,9 +365,46 @@ func create_card_displays_sync(god_name: String):
 		# Add card to wrapper
 		card_wrapper.add_child(card_display)
 		
-		# Setup the card immediately (no await)
-		var current_level = CardLevelHelper.get_card_current_level(card_index, god_name)
+		# Add to main container first so it's in the scene tree
+		card_with_exp_container.add_child(card_wrapper)
+		cards_container.add_child(card_with_exp_container)
+		
+		# Wait one frame to ensure the card display is fully ready before setup
+		await get_tree().process_frame
+		
+		# Setup the card - CALCULATE LEVEL DIRECTLY HERE
+		var current_level = 1  # Default level
+		
+		# Calculate level directly without using CardLevelHelper
+		if god_name == "Mnemosyne":
+			var memory_manager = get_node_or_null("/root/MemoryJournalManagerAutoload")
+			if memory_manager:
+				var mnemosyne_data = memory_manager.get_mnemosyne_memory()
+				current_level = mnemosyne_data.get("consciousness_level", 1)
+		else:
+			var global_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
+			if global_tracker:
+				var exp_data = global_tracker.get_card_total_experience(god_name, card_index)
+				var total_exp = exp_data["capture_exp"] + exp_data["defense_exp"]
+				current_level = ExperienceHelpers.calculate_level(total_exp)
+		
+		# Debug: Print what we're setting up
+		print("Setting up card display with:")
+		print("  Card: ", card.card_name)
+		print("  Level: ", current_level)
+		print("  God: ", god_name)
+		print("  Index: ", card_index)
+		
 		card_display.setup(card, current_level, god_name, card_index)
+		
+		# Double-check the setup worked
+		if card_display.card_data:
+			print("Card display setup successful - card_data.card_name: ", card_display.card_data.card_name)
+		else:
+			print("ERROR: Card display card_data is null after setup!")
+		
+		# Force an update of the display
+		card_display.update_display()
 		
 		# Center the card within its wrapper
 		card_display.position = Vector2(5, 5)
@@ -377,12 +412,8 @@ func create_card_displays_sync(god_name: String):
 		# Create experience info display
 		var exp_info_container = create_experience_info_display_sync(card_index, tracker)
 		
-		# Add card wrapper and exp info to the horizontal container
-		card_with_exp_container.add_child(card_wrapper)
+		# Add exp info to the horizontal container
 		card_with_exp_container.add_child(exp_info_container)
-		
-		# Add the complete container to the cards container
-		cards_container.add_child(card_with_exp_container)
 		
 		# Connect selection - using both wrapper and panel for better coverage
 		card_wrapper.gui_input.connect(_on_card_wrapper_input.bind(i))
@@ -459,9 +490,20 @@ func create_experience_info_display_sync(card_index: int, tracker) -> Control:
 		total_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		exp_container.add_child(total_title)
 		
-		# Get total experience from global tracker
+		# Get total experience from global tracker - SAFER VERSION
 		var params = get_scene_params()
 		var god_name = params.get("god", "Apollo")
+		
+		# Check if we're still in the tree before accessing autoloads
+		if not is_inside_tree():
+			var no_total_label = Label.new()
+			no_total_label.text = "Total:\nN/A"
+			no_total_label.add_theme_font_size_override("font_size", 9)
+			no_total_label.add_theme_color_override("font_color", Color("#666666"))
+			no_total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			no_total_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			exp_container.add_child(no_total_label)
+			return exp_container
 		
 		var global_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
 		if global_tracker and is_instance_valid(global_tracker):
@@ -624,16 +666,17 @@ func create_experience_info_display(card_index: int, tracker) -> Control:
 	return exp_container
 
 func update_mnemosyne_button_text():
-	# Safety check
-	if not get_tree():
-		print("Error: No scene tree in update_mnemosyne_button_text")
+	# Safety check - ensure we're still in the scene tree
+	if not is_inside_tree():
+		print("Error: Not in scene tree in update_mnemosyne_button_text")
 		return
 	
 	# Use get_node_or_null instead of has_node check
 	var memory_manager = get_node_or_null("/root/MemoryJournalManagerAutoload")
 	if not memory_manager:
 		print("MemoryJournalManagerAutoload not found for Mnemosyne button update")
-		mnemosyne_button.text = "🧠 Consciousness Boost\n(Memory Manager Unavailable)"
+		if mnemosyne_button:
+			mnemosyne_button.text = "🧠 Consciousness Boost\n(Memory Manager Unavailable)"
 		return
 	
 	var mnemosyne_data = memory_manager.get_mnemosyne_memory()
@@ -641,7 +684,8 @@ func update_mnemosyne_button_text():
 	var current_desc = memory_manager.get_consciousness_description(current_level)
 	var next_desc = memory_manager.get_consciousness_description(current_level + 1)
 	
-	mnemosyne_button.text = "🧠 Consciousness Boost\n" + current_desc + " → " + next_desc
+	if mnemosyne_button:
+		mnemosyne_button.text = "🧠 Consciousness Boost\n" + current_desc + " → " + next_desc
 
 # Separate input handlers for wrapper and panel
 func _on_card_wrapper_input(event: InputEvent, card_index: int):
@@ -783,6 +827,11 @@ func apply_mnemosyne_reward():
 	var memory_manager = get_node_or_null("/root/MemoryJournalManagerAutoload")
 	if not memory_manager:
 		print("MemoryJournalManagerAutoload not found!")
+		return
+	
+	# Check if we're still in the scene tree
+	if not is_inside_tree():
+		print("Error: Not in scene tree when applying Mnemosyne reward")
 		return
 	
 	# Apply consciousness boost
