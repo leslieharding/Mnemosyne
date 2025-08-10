@@ -243,33 +243,21 @@ func update_ui():
 # Check if the run is complete after returning from battle
 func check_run_completion():
 	if current_map.is_map_complete():
-		title_label.text = "Run Complete! " + selected_god + " Victorious!"
-		progress_label.text = "Congratulations! You've completed this run."
+		print("Run completed! Going directly to run summary")
 		
-		# Disable all remaining buttons
-		for button in map_node_buttons:
-			button.disabled = true
-		
-		# Add a "View Run Summary" button
-		var summary_button = Button.new()
-		summary_button.text = "View Run Summary"
-		summary_button.position = Vector2(400, 500)
-		summary_button.pressed.connect(_on_view_summary_pressed)
-		map_container.add_child(summary_button)
+		# Go directly to run summary instead of showing completion UI
+		get_tree().set_meta("scene_params", {
+			"god": selected_god,
+			"deck_index": selected_deck_index,
+			"victory": true
+		})
+		TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
 
 # Handle starting a new run
 func _on_new_run_pressed():
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
-# Handle viewing run summary
-func _on_view_summary_pressed():
-	# Pass run data to summary screen
-	get_tree().set_meta("scene_params", {
-		"god": selected_god,
-		"deck_index": selected_deck_index,
-		"victory": true
-	})
-	TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
+
 
 
 # Handle back button press
