@@ -58,29 +58,14 @@ func create_selection_styles():
 
 
 func setup(card: CardResource, level: int = 1, god: String = "", index: int = -1):
-	print("CardDisplay.setup called with:")
-	print("  card: ", card.card_name if card else "NULL")
-	print("  level: ", level)
-	print("  god: ", god)
-	print("  index: ", index)
-	
 	card_data = card
 	card_level = level
 	god_name = god
 	card_index = index
-	
-	# Immediately update the display
 	update_display()
-	
-	print("CardDisplay.setup complete - card_data: ", card_data.card_name if card_data else "NULL")
 
 func update_display():
-	print("CardDisplay.update_display called")
-	print("  card_data: ", card_data.card_name if card_data else "NULL")
-	print("  card_name_label exists: ", card_name_label != null)
-	
 	if not card_data:
-		print("ERROR: No card_data in update_display!")
 		return
 	
 	# Get effective stats for current level
@@ -89,7 +74,6 @@ func update_display():
 	# Update power values with effective stats
 	if north_power:
 		north_power.text = str(effective_values[0])
-		print("  Set north_power to: ", effective_values[0])
 	if east_power:
 		east_power.text = str(effective_values[1])
 	if south_power:
@@ -100,11 +84,6 @@ func update_display():
 	# Update card name
 	if card_name_label:
 		card_name_label.text = card_data.card_name
-		print("  Set card_name_label to: ", card_data.card_name)
-	else:
-		print("ERROR: card_name_label is null!")
-	
-	print("CardDisplay.update_display complete")
 
 # Select this card
 func select():
