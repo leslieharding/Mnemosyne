@@ -8,6 +8,9 @@ func _init():
 	trigger_condition = TriggerType.ON_DEFEND
 	print("DefensiveCounterAbility _init called - trigger_condition set to: ", trigger_condition)
 
+# This replaces the defensive counter ability in Resources/Abilities/defensive_counter_ability.gd
+# Replace the execute function (around lines 30-80):
+
 func execute(context: Dictionary) -> bool:
 	if not can_execute(context):
 		return false
@@ -60,13 +63,17 @@ func execute(context: Dictionary) -> bool:
 	
 	print(ability_name, " activated! ", defending_card.card_name, " captured the attacking ", attacking_card.card_name, "!")
 	
-	# Award bonus experience for successful counter-capture
+	# Award bonus experience for successful counter-capture - UNIFIED VERSION
 	if defending_owner == game_manager.Owner.PLAYER:
 		var defending_card_index = game_manager.get_card_collection_index(defending_position)
 		if defending_card_index != -1:
-			# Use the game_manager to access the experience tracker
-			if game_manager.has_node("/root/RunExperienceTrackerAutoload"):
-				game_manager.get_node("/root/RunExperienceTrackerAutoload").add_capture_exp(defending_card_index, 15)  # Bonus exp for counter-capture
+			# Use the unified experience system
+			var exp_tracker = game_manager.get_node("/root/RunExperienceTrackerAutoload")
+			if exp_tracker:
+				exp_tracker.add_capture_exp(defending_card_index, 15)  # Bonus exp for counter-capture
+				print("Defensive counter awarded 15 capture exp to card at collection index ", defending_card_index)
+			else:
+				print("Warning: RunExperienceTrackerAutoload not found for defensive counter exp")
 	
 	return true
 

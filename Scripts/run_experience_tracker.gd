@@ -1,5 +1,4 @@
-# Replace the entire Scripts/run_experience_tracker.gd file
-
+# res://Scripts/run_experience_tracker.gd
 extends Node
 class_name RunExperienceTracker
 
@@ -36,7 +35,12 @@ func start_new_run(deck_indices: Array[int]):
 func add_capture_exp(card_index: int, amount: int):
 	if not card_index in run_experience:
 		print("Warning: Card index ", card_index, " not in current run!")
-		return
+		# Initialize if missing (defensive programming)
+		run_experience[card_index] = {
+			"capture_exp": 0,
+			"defense_exp": 0,
+			"total_exp": 0
+		}
 	
 	run_experience[card_index]["capture_exp"] += amount
 	run_experience[card_index]["total_exp"] += amount
@@ -47,12 +51,30 @@ func add_capture_exp(card_index: int, amount: int):
 func add_defense_exp(card_index: int, amount: int):
 	if not card_index in run_experience:
 		print("Warning: Card index ", card_index, " not in current run!")
-		return
+		# Initialize if missing (defensive programming)
+		run_experience[card_index] = {
+			"capture_exp": 0,
+			"defense_exp": 0,
+			"total_exp": 0
+		}
 	
 	run_experience[card_index]["defense_exp"] += amount
 	run_experience[card_index]["total_exp"] += amount
 	emit_signal("experience_updated", card_index, "defense", amount)
 	print("Card ", card_index, " gained ", amount, " defense exp. Total: ", run_experience[card_index]["total_exp"])
+
+# NEW: Add total experience directly (for unified reward system)
+func add_total_exp(card_index: int, amount: int):
+	if not card_index in run_experience:
+		print("Warning: Card index ", card_index, " not in current run!")
+		return
+	
+	# For the unified system, we'll add it as "capture_exp" for tracking purposes
+	# but the important thing is that total_exp gets updated
+	run_experience[card_index]["capture_exp"] += amount
+	run_experience[card_index]["total_exp"] += amount
+	emit_signal("experience_updated", card_index, "total", amount)
+	print("Card ", card_index, " gained ", amount, " total exp. Total: ", run_experience[card_index]["total_exp"])
 
 # Get experience for a specific card
 func get_card_experience(card_index: int) -> Dictionary:

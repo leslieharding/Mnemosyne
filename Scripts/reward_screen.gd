@@ -10,21 +10,17 @@ extends Control
 var current_deck: Array[CardResource] = []
 var deck_indices: Array[int] = []
 var selected_card_index: int = -1
-var selected_experience_type: String = ""  # "capture" or "defense"
-
 
 # UI components we'll create
 var cards_container: HBoxContainer
 var card_displays: Array[CardDisplay] = []
-var capture_button: Button
-var defense_button: Button
+var experience_button: Button  # Single unified experience button
 var mnemosyne_button: Button
 var reward_info_label: Label
 
 var is_perfect_victory: bool = false
 var rewards_remaining: int = 1
 var claimed_rewards: Array[String] = []
-
 
 func _ready():
 	print("=== REWARD SCREEN STARTING ===")
@@ -53,7 +49,6 @@ func _ready():
 	
 	print("=== REWARD SCREEN READY ===")
 
-
 func get_continue_button_text() -> String:
 	if rewards_remaining > 1:
 		return "Choose " + str(rewards_remaining) + " Rewards"
@@ -62,7 +57,6 @@ func get_continue_button_text() -> String:
 	else:
 		return "Continue"
 
-# Replace the load_deck_data function with synchronous version
 func load_deck_data_sync():
 	print("=== LOADING DECK DATA SYNC ===")
 	
@@ -74,7 +68,6 @@ func load_deck_data_sync():
 	
 	# Load the god's collection
 	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
-
 	
 	if not ResourceLoader.exists(collection_path):
 		print("ERROR: Collection does not exist at: ", collection_path)
@@ -110,14 +103,6 @@ func load_deck_data_sync():
 	# Update Mnemosyne button with current level info
 	update_mnemosyne_button_text()
 
-func safe_load_deck_data():
-	# Double-check we're still in the tree
-	if not get_tree():
-		print("Error: Node not in scene tree during safe_load_deck_data!")
-		return
-	
-	await load_deck_data()
-
 func setup_reward_interface():
 	print("Setting up reward interface...")
 	print("Main container children before setup: ", main_container.get_child_count())
@@ -131,57 +116,50 @@ func setup_reward_interface():
 	# Create card selection area with explicit sizing
 	var card_section = VBoxContainer.new()
 	card_section.name = "CardSection"
-	card_section.custom_minimum_size = Vector2(900, 200)  # Wider for card+exp layout
+	card_section.custom_minimum_size = Vector2(900, 200)
 	card_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
 	var card_label = Label.new()
 	card_label.text = "Select a card to enhance:"
 	card_label.add_theme_font_size_override("font_size", 16)
-	card_label.add_theme_color_override("font_color", Color.WHITE)  # Make sure it's visible
+	card_label.add_theme_color_override("font_color", Color.WHITE)
 	card_section.add_child(card_label)
 	
-	# Container for card displays with explicit sizing (wider for card+exp layout)
+	# Container for card displays with explicit sizing
 	cards_container = HBoxContainer.new()
 	cards_container.name = "CardsContainer"
 	cards_container.alignment = BoxContainer.ALIGNMENT_CENTER
-	cards_container.add_theme_constant_override("separation", 20)  # More separation between card groups
-	cards_container.custom_minimum_size = Vector2(900, 160)  # Much wider to accommodate card+exp layout
+	cards_container.add_theme_constant_override("separation", 20)
+	cards_container.custom_minimum_size = Vector2(900, 160)
 	cards_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	cards_container.size_flags_vertical = Control.SIZE_SHRINK_CENTER  # Don't expand vertically
+	cards_container.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	card_section.add_child(cards_container)
 	
-	# Experience type selection with explicit sizing
+	# Unified experience section with explicit sizing
 	var exp_section = VBoxContainer.new()
 	exp_section.name = "ExperienceSection"
 	exp_section.custom_minimum_size = Vector2(400, 100)
 	exp_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
 	var exp_label = Label.new()
-	exp_label.text = "Choose experience type:"
+	exp_label.text = "Enhance selected card:"
 	exp_label.add_theme_font_size_override("font_size", 16)
 	exp_label.add_theme_color_override("font_color", Color.WHITE)
 	exp_section.add_child(exp_label)
 	
-	var exp_buttons = HBoxContainer.new()
-	exp_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
-	exp_buttons.add_theme_constant_override("separation", 20)
-	exp_buttons.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var exp_button_container = HBoxContainer.new()
+	exp_button_container.alignment = BoxContainer.ALIGNMENT_CENTER
+	exp_button_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
-	capture_button = Button.new()
-	capture_button.text = "⚔️ +15 Capture XP"
-	capture_button.disabled = true
-	capture_button.custom_minimum_size = Vector2(150, 40)
-	capture_button.pressed.connect(_on_capture_button_pressed)
-	exp_buttons.add_child(capture_button)
+	# Single unified experience button
+	experience_button = Button.new()
+	experience_button.text = "⚡ +15 Experience"
+	experience_button.disabled = true
+	experience_button.custom_minimum_size = Vector2(200, 40)
+	experience_button.pressed.connect(_on_experience_button_pressed)
+	exp_button_container.add_child(experience_button)
 	
-	defense_button = Button.new()
-	defense_button.text = "🛡️ +15 Defense XP"
-	defense_button.disabled = true
-	defense_button.custom_minimum_size = Vector2(150, 40)
-	defense_button.pressed.connect(_on_defense_button_pressed)
-	exp_buttons.add_child(defense_button)
-	
-	exp_section.add_child(exp_buttons)
+	exp_section.add_child(exp_button_container)
 	
 	# Mnemosyne section with explicit sizing
 	var mnemosyne_section = VBoxContainer.new()
@@ -203,17 +181,16 @@ func setup_reward_interface():
 	
 	# Info label for showing current selection
 	reward_info_label = Label.new()
-	reward_info_label.text = "Loading deck..."  # Give it initial text
+	reward_info_label.text = "Loading deck..."
 	reward_info_label.add_theme_font_size_override("font_size", 12)
 	reward_info_label.add_theme_color_override("font_color", Color("#AAAAAA"))
 	reward_info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	reward_info_label.custom_minimum_size = Vector2(400, 30)
 	
-	# Simple approach: just add everything to the end, before continue button
+	# Add everything to the main container before continue button
 	var continue_button_index = main_container.get_children().find(continue_button)
 	print("Continue button found at index: ", continue_button_index)
 	
-	# Use a simpler approach - just insert before the continue button
 	if continue_button_index != -1:
 		main_container.add_child(card_section)
 		main_container.move_child(card_section, continue_button_index)
@@ -261,42 +238,6 @@ func setup_reward_interface():
 	
 	# Force a layout update
 	main_container.queue_redraw()
-	
-	# Debug: print all children
-	for i in range(main_container.get_child_count()):
-		var child = main_container.get_child(i)
-		print("Child ", i, ": ", child.name, " (", child.get_class(), ") - visible: ", child.visible, " - size: ", child.size)
-
-func load_deck_data():
-	var params = get_scene_params()
-	var god_name = params.get("god", "Apollo")
-	var deck_index = params.get("deck_index", 0)
-	
-	print("Loading deck data for: ", god_name, " deck ", deck_index)
-	
-	# Load the god's collection
-	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
-	var collection: GodCardCollection = load(collection_path)
-	
-	if not collection:
-		print("Failed to load collection for rewards: ", collection_path)
-		return
-	
-	if deck_index >= collection.decks.size():
-		print("Invalid deck index: ", deck_index)
-		return
-	
-	# Get the deck and indices
-	current_deck = collection.get_deck(deck_index)
-	deck_indices = collection.decks[deck_index].card_indices.duplicate()
-	
-	print("Loaded deck with ", current_deck.size(), " cards")
-	
-	# Create card displays with safer autoload access
-	await create_card_displays_sync(god_name)
-	
-	# Update Mnemosyne button with current level info
-	update_mnemosyne_button_text()
 
 func create_card_displays_sync(god_name: String):
 	print("=== CREATING CARD DISPLAYS ===")
@@ -386,9 +327,7 @@ func create_card_displays_sync(god_name: String):
 		else:
 			var global_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
 			if global_tracker:
-				var exp_data = global_tracker.get_card_total_experience(god_name, card_index)
-				var total_exp = exp_data["capture_exp"] + exp_data["defense_exp"]
-				current_level = ExperienceHelpers.calculate_level(total_exp)
+				current_level = global_tracker.get_card_level(god_name, card_index)
 		
 		# Debug: Print what we're setting up
 		print("Setting up card display with:")
@@ -411,8 +350,8 @@ func create_card_displays_sync(god_name: String):
 		# Center the card within its wrapper
 		card_display.position = Vector2(5, 5)
 		
-		# Create experience info display
-		var exp_info_container = create_experience_info_display_sync(card_index, tracker)
+		# Create experience info display - UPDATED FOR UNIFIED SYSTEM
+		var exp_info_container = create_unified_experience_info_display(card_index, tracker, god_name)
 		
 		# Add exp info to the horizontal container
 		card_with_exp_container.add_child(exp_info_container)
@@ -430,17 +369,9 @@ func create_card_displays_sync(god_name: String):
 		print("Successfully created display for card ", i)
 	
 	print("Created ", card_displays.size(), " card displays")
-	
-	print("=== FINAL DEBUG OUTPUT ===")
-	print("Cards container children: ", cards_container.get_child_count())
-	print("Cards container size: ", cards_container.size)
-	print("Cards container visible: ", cards_container.visible)
-	print("Main container children: ", main_container.get_child_count())
-	
-	# Force layout update
-	cards_container.queue_redraw()
 
-func create_experience_info_display_sync(card_index: int, tracker) -> Control:
+# UPDATED: Create unified experience info display
+func create_unified_experience_info_display(card_index: int, tracker, god_name: String) -> Control:
 	# Create container for experience info
 	var exp_container = VBoxContainer.new()
 	exp_container.name = "ExperienceInfo"
@@ -463,128 +394,22 @@ func create_experience_info_display_sync(card_index: int, tracker) -> Control:
 		
 		print("Card ", card_index, " exp data: ", exp_data)
 		
-		# Capture experience label
-		var capture_label = Label.new()
-		capture_label.text = "⚔️ +" + str(exp_data["capture_exp"])
-		capture_label.add_theme_font_size_override("font_size", 12)
-		capture_label.add_theme_color_override("font_color", Color("#FFD700"))
-		capture_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		exp_container.add_child(capture_label)
+		# Total experience gained this run (combine capture + defense)
+		var run_total_exp = exp_data.get("total_exp", 0)
+		var run_total_label = Label.new()
+		run_total_label.text = "⚡ +" + str(run_total_exp)
+		run_total_label.add_theme_font_size_override("font_size", 14)
+		run_total_label.add_theme_color_override("font_color", Color("#FFD700"))
+		run_total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		exp_container.add_child(run_total_label)
 		
-		# Defense experience label  
-		var defense_label = Label.new()
-		defense_label.text = "🛡️ +" + str(exp_data["defense_exp"])
-		defense_label.add_theme_font_size_override("font_size", 12)
-		defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
-		defense_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		exp_container.add_child(defense_label)
-		
-		# Add small separator
-		var separator = HSeparator.new()
-		separator.add_theme_constant_override("separation", 4)
-		exp_container.add_child(separator)
-		
-		# Total experience section
-		var total_title = Label.new()
-		total_title.text = "Total:"
-		total_title.add_theme_font_size_override("font_size", 10)
-		total_title.add_theme_color_override("font_color", Color("#AAAAAA"))
-		total_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		exp_container.add_child(total_title)
-		
-		# Get total experience from global tracker
-		var params = get_scene_params()
-		var god_name = params.get("god", "Apollo")
-		
-		var global_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
-		if global_tracker and is_instance_valid(global_tracker):
-			var total_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
-			var total_capture = total_exp_data.get("capture_exp", 0)
-			var total_defense = total_exp_data.get("defense_exp", 0)
-			
-			# Total capture experience
-			var total_capture_label = Label.new()
-			total_capture_label.text = "⚔️ " + str(total_capture)
-			total_capture_label.add_theme_font_size_override("font_size", 10)
-			total_capture_label.add_theme_color_override("font_color", Color("#B8860B"))
-			total_capture_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			exp_container.add_child(total_capture_label)
-			
-			# Total defense experience
-			var total_defense_label = Label.new()
-			total_defense_label.text = "🛡️ " + str(total_defense)
-			total_defense_label.add_theme_font_size_override("font_size", 10)
-			total_defense_label.add_theme_color_override("font_color", Color("#4682B4"))
-			total_defense_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			exp_container.add_child(total_defense_label)
-			
-			# Add level display for quick reference
-			var combined_total = total_capture + total_defense
-			if combined_total > 0:
-				var level = ExperienceHelpers.calculate_level(combined_total)
-				var level_label = Label.new()
-				level_label.text = "Lv." + str(level)
-				level_label.add_theme_font_size_override("font_size", 9)
-				level_label.add_theme_color_override("font_color", Color("#888888"))
-				level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-				exp_container.add_child(level_label)
-		else:
-			# No global tracker - show notice
-			var no_total_label = Label.new()
-			no_total_label.text = "Total:\nN/A"
-			no_total_label.add_theme_font_size_override("font_size", 9)
-			no_total_label.add_theme_color_override("font_color", Color("#666666"))
-			no_total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			no_total_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			exp_container.add_child(no_total_label)
-	else:
-		# No tracker available
-		var no_data_label = Label.new()
-		no_data_label.text = "No data\navailable"
-		no_data_label.add_theme_font_size_override("font_size", 10)
-		no_data_label.add_theme_color_override("font_color", Color("#888888"))
-		no_data_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		no_data_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		exp_container.add_child(no_data_label)
-	
-	return exp_container
-
-func create_experience_info_display(card_index: int, tracker) -> Control:
-	# Create container for experience info
-	var exp_container = VBoxContainer.new()
-	exp_container.name = "ExperienceInfo"
-	exp_container.custom_minimum_size = Vector2(80, 150)  # Slightly wider for total exp
-	exp_container.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	exp_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	exp_container.add_theme_constant_override("separation", 6)  # Tighter spacing for more content
-	
-	# Add title
-	var title_label = Label.new()
-	title_label.text = "This Run:"
-	title_label.add_theme_font_size_override("font_size", 11)
-	title_label.add_theme_color_override("font_color", Color("#CCCCCC"))
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	exp_container.add_child(title_label)
-	
-	# Get experience data if tracker exists
-	if tracker and is_instance_valid(tracker):
-		var exp_data = tracker.get_card_experience(card_index)
-		
-		# Capture experience label
-		var capture_label = Label.new()
-		capture_label.text = "⚔️ +" + str(exp_data["capture_exp"])
-		capture_label.add_theme_font_size_override("font_size", 12)
-		capture_label.add_theme_color_override("font_color", Color("#FFD700"))
-		capture_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		exp_container.add_child(capture_label)
-		
-		# Defense experience label  
-		var defense_label = Label.new()
-		defense_label.text = "🛡️ +" + str(exp_data["defense_exp"])
-		defense_label.add_theme_font_size_override("font_size", 12)
-		defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
-		defense_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		exp_container.add_child(defense_label)
+		# Show breakdown if desired (smaller text)
+		var breakdown_label = Label.new()
+		breakdown_label.text = "(" + str(exp_data.get("capture_exp", 0)) + " + " + str(exp_data.get("defense_exp", 0)) + ")"
+		breakdown_label.add_theme_font_size_override("font_size", 8)
+		breakdown_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+		breakdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		exp_container.add_child(breakdown_label)
 		
 		# Add small separator
 		var separator = HSeparator.new()
@@ -600,35 +425,22 @@ func create_experience_info_display(card_index: int, tracker) -> Control:
 		exp_container.add_child(total_title)
 		
 		# Get total experience from global tracker
-		var params = get_scene_params()
-		var god_name = params.get("god", "Apollo")
-		
 		var global_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
 		if global_tracker and is_instance_valid(global_tracker):
 			var total_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
-			var total_capture = total_exp_data.get("capture_exp", 0)
-			var total_defense = total_exp_data.get("defense_exp", 0)
+			var total_exp = total_exp_data.get("total_exp", 0)
 			
-			# Total capture experience
-			var total_capture_label = Label.new()
-			total_capture_label.text = "⚔️ " + str(total_capture)
-			total_capture_label.add_theme_font_size_override("font_size", 10)
-			total_capture_label.add_theme_color_override("font_color", Color("#B8860B"))  # Darker gold
-			total_capture_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			exp_container.add_child(total_capture_label)
-			
-			# Total defense experience
-			var total_defense_label = Label.new()
-			total_defense_label.text = "🛡️ " + str(total_defense)
-			total_defense_label.add_theme_font_size_override("font_size", 10)
-			total_defense_label.add_theme_color_override("font_color", Color("#4682B4"))  # Darker blue
-			total_defense_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			exp_container.add_child(total_defense_label)
+			# Total experience
+			var total_exp_label = Label.new()
+			total_exp_label.text = "⚡ " + str(total_exp)
+			total_exp_label.add_theme_font_size_override("font_size", 12)
+			total_exp_label.add_theme_color_override("font_color", Color("#B8860B"))
+			total_exp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			exp_container.add_child(total_exp_label)
 			
 			# Add level display for quick reference
-			var combined_total = total_capture + total_defense
-			if combined_total > 0:
-				var level = ExperienceHelpers.calculate_level(combined_total)
+			if total_exp > 0:
+				var level = ExperienceHelpers.calculate_level(total_exp)
 				var level_label = Label.new()
 				level_label.text = "Lv." + str(level)
 				level_label.add_theme_font_size_override("font_size", 9)
@@ -723,16 +535,13 @@ func _on_card_selected(card_index: int):
 		selected_card_index = card_index
 		print("Set selected_card_index to: ", selected_card_index)
 		
-		# Enable experience buttons
-		print("Enabling experience buttons...")
-		print("  Capture button before: disabled = ", capture_button.disabled)
-		print("  Defense button before: disabled = ", defense_button.disabled)
+		# Enable experience button
+		print("Enabling experience button...")
+		print("  Experience button before: disabled = ", experience_button.disabled)
 		
-		capture_button.disabled = false
-		defense_button.disabled = false
+		experience_button.disabled = false
 		
-		print("  Capture button after: disabled = ", capture_button.disabled)
-		print("  Defense button after: disabled = ", defense_button.disabled)
+		print("  Experience button after: disabled = ", experience_button.disabled)
 		
 		# Update info
 		var card_name = current_deck[card_index].card_name
@@ -749,21 +558,14 @@ func _on_card_selected(card_index: int):
 	print("=== END CARD SELECTION DEBUG ===")
 	print("")
 
-func _on_capture_button_pressed():
-	print("Capture button pressed - selected_card_index: ", selected_card_index, ", rewards_remaining: ", rewards_remaining)
+# UPDATED: Single experience button handler
+func _on_experience_button_pressed():
+	print("Experience button pressed - selected_card_index: ", selected_card_index, ", rewards_remaining: ", rewards_remaining)
 	if selected_card_index == -1 or rewards_remaining <= 0:
-		print("Cannot apply capture reward - no card selected or no rewards remaining")
+		print("Cannot apply experience reward - no card selected or no rewards remaining")
 		return
 	
-	apply_experience_reward("capture")
-
-func _on_defense_button_pressed():
-	print("Defense button pressed - selected_card_index: ", selected_card_index, ", rewards_remaining: ", rewards_remaining)
-	if selected_card_index == -1 or rewards_remaining <= 0:
-		print("Cannot apply defense reward - no card selected or no rewards remaining")
-		return
-	
-	apply_experience_reward("defense")
+	apply_unified_experience_reward()
 
 func _on_mnemosyne_button_pressed():
 	if rewards_remaining <= 0:
@@ -772,7 +574,8 @@ func _on_mnemosyne_button_pressed():
 	
 	apply_mnemosyne_reward()
 
-func apply_experience_reward(exp_type: String):
+# UPDATED: Apply unified experience reward
+func apply_unified_experience_reward():
 	var card_index = deck_indices[selected_card_index]
 	var card_name = current_deck[selected_card_index].card_name
 	var bonus_amount = 15
@@ -783,20 +586,21 @@ func apply_experience_reward(exp_type: String):
 		print("RunExperienceTrackerAutoload not found!")
 		return
 	
-	# Apply to run tracker
-	if exp_type == "capture":
-		tracker.add_capture_exp(card_index, bonus_amount)
+	# For the unified system, we'll add to the total_exp directly
+	# The tracker should handle this properly
+	if tracker.has_method("add_total_exp"):
+		tracker.add_total_exp(card_index, bonus_amount)
 	else:
-		tracker.add_defense_exp(card_index, bonus_amount)
+		# Fallback: add to capture_exp (which should update total_exp)
+		tracker.add_capture_exp(card_index, bonus_amount)
 	
 	# Track this reward
-	var reward_desc = card_name + " +" + str(bonus_amount) + " " + exp_type.capitalize() + " XP"
+	var reward_desc = card_name + " +" + str(bonus_amount) + " Experience"
 	claimed_rewards.append(reward_desc)
 	rewards_remaining -= 1
 	
 	# Reset selection state for next reward
 	selected_card_index = -1
-	selected_experience_type = ""
 	
 	# Deselect all cards
 	for display in card_displays:
@@ -849,11 +653,9 @@ func apply_mnemosyne_reward():
 	else:
 		finish_reward_selection()
 
-
 func update_for_next_reward():
-	# Re-enable all reward options for next selection
-	capture_button.disabled = true  # Will be enabled when card is selected
-	defense_button.disabled = true  # Will be enabled when card is selected
+	# Re-enable reward options for next selection
+	experience_button.disabled = true  # Will be enabled when card is selected
 	
 	# Only enable Mnemosyne button if it hasn't been claimed yet
 	var mnemosyne_already_claimed = false
@@ -877,8 +679,7 @@ func update_for_next_reward():
 
 func finish_reward_selection():
 	# All rewards claimed - finalize
-	capture_button.disabled = true
-	defense_button.disabled = true
+	experience_button.disabled = true
 	mnemosyne_button.disabled = true
 	
 	# Enable continue button
@@ -891,7 +692,6 @@ func finish_reward_selection():
 	reward_info_label.add_theme_color_override("font_color", Color("#66BB6A"))
 	
 	print("All rewards claimed: ", claimed_rewards)
-
 
 func _on_continue_pressed():
 	if rewards_remaining > 0:

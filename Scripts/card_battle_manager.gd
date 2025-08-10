@@ -2619,11 +2619,17 @@ func handle_standard_combat_effects(attacker_pos: int, defender_pos: int, attack
 		var is_player_attack = (attacking_owner == Owner.PLAYER)
 		visual_effects_manager.show_capture_flash(attacking_card_display, direction.my_value_index, is_player_attack)
 	
-	# Award capture experience if it's a player card attacking
+	# Award capture experience if it's a player card attacking - UNIFIED VERSION
 	if attacking_owner == Owner.PLAYER:
 		var card_collection_index = get_card_collection_index(attacker_pos)
 		if card_collection_index != -1:
-			get_node("/root/RunExperienceTrackerAutoload").add_capture_exp(card_collection_index, 10)
+			# Use the unified experience system
+			var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
+			if exp_tracker:
+				exp_tracker.add_capture_exp(card_collection_index, 10)
+				print("Player card at position ", attacker_pos, " (collection index ", card_collection_index, ") gained 10 capture exp")
+			else:
+				print("Warning: RunExperienceTrackerAutoload not found for capture exp")
 	
 	# Execute ON_CAPTURE abilities on the captured card (existing logic)
 	execute_capture_abilities(defender_pos, defending_card, attacker_pos, attacking_card, direction.name)
@@ -2632,13 +2638,19 @@ func handle_standard_combat_effects(attacker_pos: int, defender_pos: int, attack
 func handle_standard_defense_effects(attacker_pos: int, defender_pos: int, attacking_owner: Owner, attacking_card: CardResource, defending_card: CardResource, direction: Dictionary):
 	print("Defense successful at slot ", defender_pos, "!")
 	
-	# Award defense experience if defending card is player's
+	# Award defense experience if defending card is player's - UNIFIED VERSION
 	if attacking_owner == Owner.OPPONENT and grid_ownership[defender_pos] == Owner.PLAYER:
 		var defending_card_index = get_card_collection_index(defender_pos)
 		if defending_card_index != -1:
-			get_node("/root/RunExperienceTrackerAutoload").add_defense_exp(defending_card_index, 5)
+			# Use the unified experience system
+			var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
+			if exp_tracker:
+				exp_tracker.add_defense_exp(defending_card_index, 5)
+				print("Player card at position ", defender_pos, " (collection index ", defending_card_index, ") gained 5 defense exp")
+			else:
+				print("Warning: RunExperienceTrackerAutoload not found for defense exp")
 	
-	# Execute ON_DEFEND abilities (existing logic)
+	# Execute ON_DEFEND abilities
 	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, direction.name)
 
 # Handle combat effects for extended range combat
@@ -2651,11 +2663,17 @@ func handle_extended_combat_effects(attacker_pos: int, defender_pos: int, attack
 		var flash_direction = pos_info.direction if pos_info.direction < 4 else (pos_info.direction - 4)  # Map diagonals to orthogonals for flashing
 		visual_effects_manager.show_capture_flash(attacking_card_display, flash_direction, is_player_attack)
 	
-	# Award capture experience
+	# Award capture experience - UNIFIED VERSION
 	if attacking_owner == Owner.PLAYER:
 		var card_collection_index = get_card_collection_index(attacker_pos)
 		if card_collection_index != -1:
-			get_node("/root/RunExperienceTrackerAutoload").add_capture_exp(card_collection_index, 10)
+			# Use the unified experience system
+			var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
+			if exp_tracker:
+				exp_tracker.add_capture_exp(card_collection_index, 10)
+				print("Player card at position ", attacker_pos, " (collection index ", card_collection_index, ") gained 10 extended range capture exp")
+			else:
+				print("Warning: RunExperienceTrackerAutoload not found for extended capture exp")
 	
 	# Execute ON_CAPTURE abilities
 	execute_capture_abilities(defender_pos, defending_card, attacker_pos, attacking_card, pos_info.name)
@@ -2664,15 +2682,20 @@ func handle_extended_combat_effects(attacker_pos: int, defender_pos: int, attack
 func handle_extended_defense_effects(attacker_pos: int, defender_pos: int, attacking_owner: Owner, attacking_card: CardResource, defending_card: CardResource, pos_info: Dictionary):
 	print("Extended defense successful at slot ", defender_pos, "!")
 	
-	# Award defense experience if defending card is player's
+	# Award defense experience if defending card is player's - UNIFIED VERSION
 	if attacking_owner == Owner.OPPONENT and grid_ownership[defender_pos] == Owner.PLAYER:
 		var defending_card_index = get_card_collection_index(defender_pos)
 		if defending_card_index != -1:
-			get_node("/root/RunExperienceTrackerAutoload").add_defense_exp(defending_card_index, 5)
+			# Use the unified experience system
+			var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
+			if exp_tracker:
+				exp_tracker.add_defense_exp(defending_card_index, 5)
+				print("Player card at position ", defender_pos, " (collection index ", defending_card_index, ") gained 5 extended range defense exp")
+			else:
+				print("Warning: RunExperienceTrackerAutoload not found for extended defense exp")
 	
 	# Execute ON_DEFEND abilities
 	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, pos_info.name)
-
 # Helper functions for ability execution
 func execute_capture_abilities(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource, direction_name: String):
 	var defending_card_collection_index = get_card_collection_index(defender_pos)
