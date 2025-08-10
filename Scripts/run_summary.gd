@@ -67,11 +67,11 @@ func setup_experience_summary_sync(capture_total_node: Label, defense_total_node
 	var all_exp = tracker.get_all_experience()
 	var totals = tracker.get_total_experience()
 	
-	print("Total experience - Capture: " + str(totals["capture_exp"]) + ", Defense: " + str(totals["defense_exp"]))
+	print("Total unified experience: " + str(totals["total_exp"]))
 	
-	# Set totals
-	capture_total_node.text = "⚔️ Total Capture: " + str(totals["capture_exp"])
-	defense_total_node.text = "🛡️ Total Defense: " + str(totals["defense_exp"])
+	# Update the labels to show unified experience
+	capture_total_node.text = "⚡ Total Experience Gained: " + str(totals["total_exp"])
+	defense_total_node.visible = false  # Hide the old defense label
 	
 	# Load collection
 	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
@@ -87,7 +87,7 @@ func setup_experience_summary_sync(capture_total_node: Label, defense_total_node
 		var run_exp_data = all_exp[card_index]
 		
 		# Skip cards with no experience
-		if run_exp_data["capture_exp"] == 0 and run_exp_data["defense_exp"] == 0:
+		if run_exp_data["total_exp"] == 0:
 			continue
 		
 		# Get card data
@@ -97,19 +97,17 @@ func setup_experience_summary_sync(capture_total_node: Label, defense_total_node
 		
 		print("Creating display for: ", card.card_name)
 		
-		# Get experience data
+		# Get total experience data - UNIFIED VERSION
 		var before_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
-		var before_capture = before_exp_data["capture_exp"]
-		var before_defense = before_exp_data["defense_exp"]
-		var after_capture = before_capture + run_exp_data["capture_exp"]
-		var after_defense = before_defense + run_exp_data["defense_exp"]
+		var before_total = before_exp_data["total_exp"]
+		var total_gain = run_exp_data["total_exp"]
+		var after_total = before_total + total_gain
 		
-		# Create card display synchronously
+		# Create card display with unified experience
 		var card_container = create_simple_card_display(
 			card, 
-			before_capture, after_capture,
-			before_defense, after_defense,
-			run_exp_data["capture_exp"], run_exp_data["defense_exp"]
+			before_total, after_total,
+			total_gain
 		)
 		
 		card_details_node.add_child(card_container)
@@ -123,13 +121,12 @@ func setup_experience_summary_sync(capture_total_node: Label, defense_total_node
 
 func create_simple_card_display(
 	card: CardResource, 
-	before_capture: int, after_capture: int,
-	before_defense: int, after_defense: int,
-	capture_gain: int, defense_gain: int
+	before_total: int, after_total: int,
+	total_gain: int
 ) -> Control:
 	
 	var container = VBoxContainer.new()
-	container.custom_minimum_size = Vector2(500, 150)
+	container.custom_minimum_size = Vector2(500, 120)
 	
 	# Create panel with background
 	var panel = PanelContainer.new()
@@ -164,84 +161,45 @@ func create_simple_card_display(
 	# Experience gained summary
 	var gains_container = HBoxContainer.new()
 	
-	if capture_gain > 0:
-		var capture_label = Label.new()
-		capture_label.text = "⚔️ +" + str(capture_gain) + " Capture XP"
-		capture_label.add_theme_color_override("font_color", Color("#FFD700"))
-		capture_label.add_theme_font_size_override("font_size", 14)
-		gains_container.add_child(capture_label)
-	
-	if defense_gain > 0:
-		if capture_gain > 0:
-			var spacer = Control.new()
-			spacer.custom_minimum_size.x = 20
-			gains_container.add_child(spacer)
-		
-		var defense_label = Label.new()
-		defense_label.text = "🛡️ +" + str(defense_gain) + " Defense XP"
-		defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
-		defense_label.add_theme_font_size_override("font_size", 14)
-		gains_container.add_child(defense_label)
+	if total_gain > 0:
+		var gain_label = Label.new()
+		gain_label.text = "⚡ +" + str(total_gain) + " Experience"
+		gain_label.add_theme_color_override("font_color", Color("#FFD700"))
+		gain_label.add_theme_font_size_override("font_size", 16)
+		gains_container.add_child(gain_label)
 	
 	inner_container.add_child(gains_container)
 	
 	# Before/After display
-	var progress_container = HBoxContainer.new()
+	var progress_container = VBoxContainer.new()
+	progress_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
-	# Capture progress
-	if capture_gain > 0:
-		var capture_section = VBoxContainer.new()
-		capture_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		
-		var capture_title = Label.new()
-		capture_title.text = "Capture Progress"
-		capture_title.add_theme_font_size_override("font_size", 12)
-		capture_title.add_theme_color_override("font_color", Color("#FFD700"))
-		capture_section.add_child(capture_title)
-		
-		# Simple before/after text instead of progress bars
-		var before_after = Label.new()
-		var before_level = ExperienceHelpers.calculate_level(before_capture)
-		var after_level = ExperienceHelpers.calculate_level(after_capture)
-		var before_progress = ExperienceHelpers.calculate_progress(before_capture)
-		var after_progress = ExperienceHelpers.calculate_progress(after_capture)
-		
-		before_after.text = "Lv." + str(before_level) + " (" + str(before_progress) + "/50) → Lv." + str(after_level) + " (" + str(after_progress) + "/50)"
-		before_after.add_theme_font_size_override("font_size", 10)
-		before_after.add_theme_color_override("font_color", Color("#CCCCCC"))
-		capture_section.add_child(before_after)
-		
-		progress_container.add_child(capture_section)
+	var progress_title = Label.new()
+	progress_title.text = "Experience Progress"
+	progress_title.add_theme_font_size_override("font_size", 14)
+	progress_title.add_theme_color_override("font_color", Color("#FFD700"))
+	progress_container.add_child(progress_title)
 	
-	# Spacer
-	if capture_gain > 0 and defense_gain > 0:
-		var spacer = VSeparator.new()
-		progress_container.add_child(spacer)
+	# Simple before/after text
+	var before_after = Label.new()
+	var before_level = ExperienceHelpers.calculate_level(before_total)
+	var after_level = ExperienceHelpers.calculate_level(after_total)
+	var before_progress = ExperienceHelpers.calculate_progress(before_total)
+	var after_progress = ExperienceHelpers.calculate_progress(after_total)
 	
-	# Defense progress
-	if defense_gain > 0:
-		var defense_section = VBoxContainer.new()
-		defense_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		
-		var defense_title = Label.new()
-		defense_title.text = "Defense Progress"
-		defense_title.add_theme_font_size_override("font_size", 12)
-		defense_title.add_theme_color_override("font_color", Color("#87CEEB"))
-		defense_section.add_child(defense_title)
-		
-		# Simple before/after text
-		var before_after = Label.new()
-		var before_level = ExperienceHelpers.calculate_level(before_defense)
-		var after_level = ExperienceHelpers.calculate_level(after_defense)
-		var before_progress = ExperienceHelpers.calculate_progress(before_defense)
-		var after_progress = ExperienceHelpers.calculate_progress(after_defense)
-		
-		before_after.text = "Lv." + str(before_level) + " (" + str(before_progress) + "/50) → Lv." + str(after_level) + " (" + str(after_progress) + "/50)"
-		before_after.add_theme_font_size_override("font_size", 10)
-		before_after.add_theme_color_override("font_color", Color("#CCCCCC"))
-		defense_section.add_child(before_after)
-		
-		progress_container.add_child(defense_section)
+	before_after.text = "Lv." + str(before_level) + " (" + str(before_progress) + "/50) → Lv." + str(after_level) + " (" + str(after_progress) + "/50)"
+	before_after.add_theme_font_size_override("font_size", 12)
+	before_after.add_theme_color_override("font_color", Color("#CCCCCC"))
+	progress_container.add_child(before_after)
+	
+	# Level up notification if applicable
+	if after_level > before_level:
+		var level_up_label = Label.new()
+		level_up_label.text = "🎉 LEVEL UP! 🎉"
+		level_up_label.add_theme_font_size_override("font_size", 14)
+		level_up_label.add_theme_color_override("font_color", Color("#00FF00"))
+		level_up_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		progress_container.add_child(level_up_label)
 	
 	inner_container.add_child(progress_container)
 	
