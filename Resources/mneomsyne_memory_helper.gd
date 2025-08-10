@@ -1,11 +1,11 @@
 # Helper script to auto-generate uniform Mnemosyne progression
 class_name MnemosyneLevelHelper
 
-static func create_uniform_progression(base_stats: Array[int], max_level: int = 10) -> Array[CardResource.LevelData]:
-	var progression: Array[CardResource.LevelData] = []
+static func create_uniform_progression(base_stats: Array[int], max_level: int = 10) -> Array[LevelData]:
+	var progression: Array[LevelData] = []
 	
 	for level in range(1, max_level + 1):
-		var level_data = CardResource.LevelData.new()
+		var level_data = LevelData.new()
 		level_data.level = level
 		level_data.values = [
 			base_stats[0] + (level - 1),

@@ -1,8 +1,259 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=7 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=40 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
+[ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_w7xgs"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_cm1c1"]
+[ext_resource type="Script" uid="uid://bqbrhjegh1g6e" path="res://Resources/Abilities/stat_boost_ability.gd" id="3_p7jhq"]
+[ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="4_2h7tk"]
+[ext_resource type="Script" uid="uid://b72irnrav5w53" path="res://Resources/Abilities/defensive_counter_ability.gd" id="5_bufwg"]
+[ext_resource type="Script" uid="uid://dgsvwgjhs2vju" path="res://Resources/Abilities/stat_nullify_ability.gd" id="6_ca26u"]
+[ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="7_qbbw0"]
+[ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="8_xjxyc"]
+
+[sub_resource type="Resource" id="Resource_b0n1o"]
+script = ExtResource("3_p7jhq")
+boost_amount = 1
+ability_name = "Stat Boost"
+description = "When attacking increases power by 1"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
+
+[sub_resource type="Resource" id="Resource_sfw3d"]
+script = ExtResource("3_p7jhq")
+boost_amount = 1
+ability_name = "Stat Boost"
+description = ""
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
+
+[sub_resource type="Resource" id="Resource_l7o3e"]
+script = ExtResource("4_2h7tk")
+level = 1
+values = Array[int]([5, 5, 5, 5])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_sfw3d")])
+description = "When attacking increases power by 1"
+metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
+
+[sub_resource type="Resource" id="Resource_bj61k"]
+script = ExtResource("3_p7jhq")
+boost_amount = 1
+ability_name = ""
+description = ""
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
+
+[sub_resource type="Resource" id="Resource_f31oe"]
+script = ExtResource("4_2h7tk")
+level = 2
+values = Array[int]([6, 6, 6, 6])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_bj61k")])
+description = "When attacking increases power by 1"
+metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
+
+[sub_resource type="Resource" id="Resource_lg4ks"]
+script = ExtResource("3_p7jhq")
+boost_amount = 1
+ability_name = ""
+description = ""
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
+
+[sub_resource type="Resource" id="Resource_gs2nm"]
+script = ExtResource("4_2h7tk")
+level = 3
+values = Array[int]([7, 7, 7, 7])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_lg4ks")])
+description = "When attacking increases power by 1"
+metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
+
+[sub_resource type="Resource" id="Resource_80o7w"]
+script = ExtResource("1_vqrrp")
+card_name = "Helios"
+values = Array[int]([5, 5, 5, 5])
+description = "The sun titan arrives"
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_b0n1o")])
+level_data = Array[ExtResource("4_2h7tk")]([SubResource("Resource_l7o3e"), SubResource("Resource_f31oe"), SubResource("Resource_gs2nm")])
+uses_level_progression = true
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_71nia"]
+script = ExtResource("5_bufwg")
+ability_name = "Defensive Counter"
+description = "When this card successfully defends, it also captures"
+unlock_level = 0
+trigger_condition = 1
+metadata/_custom_type_script = "uid://b72irnrav5w53"
+
+[sub_resource type="Resource" id="Resource_ogwmq"]
+script = ExtResource("1_vqrrp")
+card_name = "Phaeton"
+values = Array[int]([2, 1, 9, 8])
+description = "Look up, you will see me driving the sun along"
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_71nia")])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_pwyti"]
+script = ExtResource("6_ca26u")
+ability_name = "Stat Nullify"
+description = "When this card is captured reduces it stats to minimum
+"
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dgsvwgjhs2vju"
+
+[sub_resource type="Resource" id="Resource_pdvfu"]
+script = ExtResource("1_vqrrp")
+card_name = "Cygnus"
+values = Array[int]([2, 2, 2, 2])
+description = "Oh Phaeton dont listen to him"
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_pwyti")])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_njf8p"]
+script = ExtResource("7_qbbw0")
+ability_name = ""
+description = ""
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://43v8bwokc47i"
+
+[sub_resource type="Resource" id="Resource_j3ax7"]
+script = ExtResource("1_vqrrp")
+card_name = "Phlegon"
+values = Array[int]([8, 8, 2, 2])
+description = "Shining bright"
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_njf8p")])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_bi2ap"]
+script = ExtResource("8_xjxyc")
+boost_amount = 1
+ability_name = "Passive Boost"
+description = "When in play and uncaptured increases the other stats of your cards by one"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://d1cwgpmvptcjn"
+
+[sub_resource type="Resource" id="Resource_bvknv"]
+script = ExtResource("1_vqrrp")
+card_name = "Eos"
+values = Array[int]([2, 2, 2, 2])
+description = "The dawn approaches"
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_bi2ap")])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_p3s3h"]
+script = ExtResource("1_vqrrp")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_gowu1")]([])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_s8wyg"]
+script = ExtResource("1_vqrrp")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_gowu1")]([])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_tl28v"]
+script = ExtResource("1_vqrrp")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_gowu1")]([])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_6lt0f"]
+script = ExtResource("1_vqrrp")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_gowu1")]([])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_s7d3i"]
+script = ExtResource("1_vqrrp")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_gowu1")]([])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_vk3b3"]
+script = ExtResource("1_vqrrp")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_gowu1")]([])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_yt4mj"]
+script = ExtResource("1_vqrrp")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_gowu1")]([])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_exg8p"]
+script = ExtResource("1_vqrrp")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_gowu1")]([])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_i5ydv"]
+script = ExtResource("1_vqrrp")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_gowu1")]([])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_vqeif"]
+script = ExtResource("1_vqrrp")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_gowu1")]([])
+level_data = Array[ExtResource("4_2h7tk")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tn03x"]
 script = ExtResource("2_w7xgs")
@@ -43,6 +294,6 @@ metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 [resource]
 script = ExtResource("3_cm1c1")
 god_name = "Apollo"
-cards = Array[ExtResource("1_vqrrp")]([null])
+cards = Array[ExtResource("1_vqrrp")]([SubResource("Resource_80o7w"), SubResource("Resource_ogwmq"), SubResource("Resource_pdvfu"), SubResource("Resource_j3ax7"), SubResource("Resource_bvknv"), SubResource("Resource_p3s3h"), SubResource("Resource_s8wyg"), SubResource("Resource_tl28v"), SubResource("Resource_6lt0f"), SubResource("Resource_s7d3i"), SubResource("Resource_vk3b3"), SubResource("Resource_yt4mj"), SubResource("Resource_exg8p"), SubResource("Resource_i5ydv"), SubResource("Resource_vqeif")])
 decks = Array[ExtResource("2_w7xgs")]([SubResource("Resource_tn03x"), SubResource("Resource_cknfu"), SubResource("Resource_tpnlu")])
 metadata/_custom_type_script = "uid://bdwr18g3ouvfo"
