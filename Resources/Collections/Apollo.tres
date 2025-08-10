@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=33 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=34 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_cm1c1"]
@@ -19,12 +19,16 @@ unlock_level = 0
 trigger_condition = 0
 metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
 
+[sub_resource type="GDScript" id="GDScript_ej0q7"]
+
 [sub_resource type="Resource" id="Resource_vqrrp"]
 script = ExtResource("1_vqrrp")
 card_name = "Helios"
 values = Array[int]([5, 5, 5, 5])
 description = "The sun titan arrives"
 abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_sfw3d")])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bj61k"]
@@ -41,6 +45,8 @@ card_name = "Cygnus"
 values = Array[int]([2, 2, 2, 2])
 description = "Oh Phaeton, don't listen to him!"
 abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_bj61k")])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_l7o3e"]
@@ -57,6 +63,8 @@ card_name = "Phaeton"
 values = Array[int]([3, 9, 8, 1])
 description = "You just cant give Epiphus the satisfaction"
 abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_l7o3e")])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_f31oe"]
@@ -74,6 +82,8 @@ card_name = "Eos, the dawn"
 values = Array[int]([2, 2, 2, 2])
 description = "Welcome to a new day"
 abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_f31oe")])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_lg4ks"]
@@ -90,6 +100,8 @@ card_name = "Phelgon"
 values = Array[int]([8, 8, 2, 2])
 description = "Look at my horse"
 abilities = Array[ExtResource("2_cm1c1")]([SubResource("Resource_lg4ks")])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_e1acv"]
@@ -98,6 +110,8 @@ card_name = "The Lyre"
 values = Array[int]([5, 5, 5, 5])
 description = "Heavenly music "
 abilities = Array[ExtResource("2_cm1c1")]([])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ej0q7"]
@@ -106,6 +120,8 @@ card_name = "Orpheus"
 values = Array[int]([6, 7, 6, 7])
 description = "The sweetest voice yet alive"
 abilities = Array[ExtResource("2_cm1c1")]([])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_gowu1"]
@@ -114,6 +130,8 @@ card_name = "Marceius "
 values = Array[int]([8, 2, 8, 2])
 description = "Sometimes you think you got this, reality is often cruel"
 abilities = Array[ExtResource("2_cm1c1")]([])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_p7jhq"]
@@ -122,6 +140,8 @@ card_name = "Euridyce"
 values = Array[int]([6, 4, 4, 8])
 description = "Love you would go all the way to hell for"
 abilities = Array[ExtResource("2_cm1c1")]([])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2h7tk"]
@@ -130,6 +150,8 @@ card_name = "Calliope"
 values = Array[int]([7, 7, 8, 8])
 description = "From when all lovely voices spring"
 abilities = Array[ExtResource("2_cm1c1")]([])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bufwg"]
@@ -138,6 +160,8 @@ card_name = "Delphic Oracle"
 values = Array[int]([3, 3, 3, 3])
 description = "The power and curse of knowing"
 abilities = Array[ExtResource("2_cm1c1")]([])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ca26u"]
@@ -146,6 +170,8 @@ card_name = "Cassandra"
 values = Array[int]([5, 5, 5, 5])
 description = "You wont listen"
 abilities = Array[ExtResource("2_cm1c1")]([])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qbbw0"]
@@ -154,6 +180,8 @@ card_name = "Tiresias"
 values = Array[int]([4, 8, 8, 4])
 description = "He may be blind but it is you who cannot see"
 abilities = Array[ExtResource("2_cm1c1")]([])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xjxyc"]
@@ -162,6 +190,8 @@ card_name = "Calchas"
 values = Array[int]([2, 6, 8, 4])
 description = "Let the man speak his mind, even if its not what you want to hear"
 abilities = Array[ExtResource("2_cm1c1")]([])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_b0n1o"]
@@ -170,6 +200,8 @@ card_name = "The Fates"
 values = Array[int]([8, 9, 8, 6])
 description = "Lets no pretend you have any control over what they are doing"
 abilities = Array[ExtResource("2_cm1c1")]([])
+level_data = Array[SubResource("GDScript_ej0q7")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tn03x"]
