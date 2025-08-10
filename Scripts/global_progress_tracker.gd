@@ -2,7 +2,7 @@
 extends Node
 class_name GlobalProgressTracker
 
-# Structure: {god_name: {card_index: {capture_exp: X, defense_exp: Y}}}
+# Structure: {god_name: {card_index: {total_exp: X}}}
 var progress_data: Dictionary = {}
 var save_path: String = "user://card_progress.save"
 
@@ -26,7 +26,6 @@ var god_unlock_conditions: Dictionary = {
 	}
 }
 
-
 var couple_definitions = {
 	"Phaeton": "Cygnus",
 	"Cygnus": "Phaeton", 
@@ -45,34 +44,31 @@ func has_any_progress() -> bool:
 		var god_progress = progress_data[god_name]
 		for card_index in god_progress:
 			var card_exp = god_progress[card_index]
-			if card_exp["capture_exp"] > 0 or card_exp["defense_exp"] > 0:
+			if card_exp["total_exp"] > 0:
 				return true
 	return false
 
-
-
-# Add experience from a completed run
-# Replace this entire function in Scripts/global_progress_tracker.gd (around lines 15-35)
-
+# Add experience from a completed run - UNIFIED VERSION
 func add_run_experience(god_name: String, run_experience: Dictionary):
 	# Ensure the god exists in our data
 	if not god_name in progress_data:
 		progress_data[god_name] = {}
 	
-	# Add each card's experience
+	# Add each card's experience (combining capture + defense)
 	for card_index in run_experience:
 		var card_exp = run_experience[card_index]
 		
 		# Ensure this card exists in our data
 		if not card_index in progress_data[god_name]:
 			progress_data[god_name][card_index] = {
-				"capture_exp": 0,
-				"defense_exp": 0
+				"total_exp": 0
 			}
 		
-		# Add the experience
-		progress_data[god_name][card_index]["capture_exp"] += card_exp["capture_exp"]
-		progress_data[god_name][card_index]["defense_exp"] += card_exp["defense_exp"]
+		# Combine both experience types into unified pool
+		var total_gained = card_exp.get("capture_exp", 0) + card_exp.get("defense_exp", 0)
+		progress_data[god_name][card_index]["total_exp"] += total_gained
+		
+		print("Card ", card_index, " gained ", total_gained, " total exp (", card_exp.get("capture_exp", 0), " capture + ", card_exp.get("defense_exp", 0), " defense)")
 	
 	print("Added run experience for ", god_name, ": ", run_experience)
 	
@@ -83,7 +79,7 @@ func add_run_experience(god_name: String, run_experience: Dictionary):
 		# Calculate total experience gained this run
 		var total_run_exp = 0
 		for card_exp in run_experience.values():
-			total_run_exp += card_exp["capture_exp"] + card_exp["defense_exp"]
+			total_run_exp += card_exp.get("capture_exp", 0) + card_exp.get("defense_exp", 0)
 		
 		# Check for Apollo mastery conversation (when significant experience is gained)
 		if god_name == "Apollo" and total_run_exp >= 30:
@@ -93,7 +89,7 @@ func add_run_experience(god_name: String, run_experience: Dictionary):
 		# Check if any card reached a high level for first deck unlock conversation
 		for card_index in progress_data[god_name]:
 			var card_data = progress_data[god_name][card_index]
-			var total_card_exp = card_data["capture_exp"] + card_data["defense_exp"]
+			var total_card_exp = card_data["total_exp"]
 			if total_card_exp >= 100:  # Arbitrary threshold for "significant progress"
 				print("Triggering first_deck_unlock conversation")
 				conv_manager.trigger_conversation("first_deck_unlock")
@@ -101,11 +97,24 @@ func add_run_experience(god_name: String, run_experience: Dictionary):
 	
 	save_progress()
 
-# Get total experience for a specific card
+# Get total experience for a specific card - UNIFIED VERSION
 func get_card_total_experience(god_name: String, card_index: int) -> Dictionary:
 	if god_name in progress_data and card_index in progress_data[god_name]:
-		return progress_data[god_name][card_index].duplicate()
-	return {"capture_exp": 0, "defense_exp": 0}
+		var total_exp = progress_data[god_name][card_index]["total_exp"]
+		# Return in old format for backward compatibility
+		return {
+			"capture_exp": total_exp / 2,  # Split for display purposes
+			"defense_exp": total_exp / 2,
+			"total_exp": total_exp
+		}
+	return {"capture_exp": 0, "defense_exp": 0, "total_exp": 0}
+
+# NEW: Get card level directly
+func get_card_level(god_name: String, card_index: int) -> int:
+	if god_name in progress_data and card_index in progress_data[god_name]:
+		var total_exp = progress_data[god_name][card_index]["total_exp"]
+		return ExperienceHelpers.calculate_level(total_exp)
+	return 1  # Default level is 1, not 0
 
 # Get all card experience for a god
 func get_god_progress(god_name: String) -> Dictionary:
@@ -120,7 +129,7 @@ func save_progress():
 		var save_data = {
 			"progress_data": progress_data,
 			"unlocked_gods": unlocked_gods,
-			"couples_united": couples_united  # Add this line
+			"couples_united": couples_united
 		}
 		save_file.store_var(save_data)
 		save_file.close()
@@ -128,7 +137,7 @@ func save_progress():
 	else:
 		print("Failed to save progress!")
 
-# Load progress from disk
+# Load progress from disk - with migration support
 func load_progress():
 	if FileAccess.file_exists(save_path):
 		var save_file = FileAccess.open(save_path, FileAccess.READ)
@@ -138,23 +147,56 @@ func load_progress():
 			# Handle both old and new save formats
 			if loaded_data is Dictionary and loaded_data.has("progress_data"):
 				# New format with god unlocks
-				progress_data = loaded_data.get("progress_data", {})
+				var old_progress_data = loaded_data.get("progress_data", {})
 				unlocked_gods = loaded_data.get("unlocked_gods", ["Apollo"])
-				couples_united = loaded_data.get("couples_united", [])  # Add this line
+				couples_united = loaded_data.get("couples_united", [])
+				
+				# Migrate old capture_exp/defense_exp format to unified total_exp
+				progress_data = migrate_experience_data(old_progress_data)
 			else:
-				# Old format - just progress data
-				progress_data = loaded_data if loaded_data is Dictionary else {}
+				# Very old format - just progress data
+				var old_progress_data = loaded_data if loaded_data is Dictionary else {}
 				unlocked_gods = ["Apollo"]  # Default to just Apollo
-				couples_united = []  # Add this line
+				couples_united = []
+				progress_data = migrate_experience_data(old_progress_data)
 			
 			save_file.close()
 			print("Progress loaded from ", save_path)
 			print("Unlocked gods: ", unlocked_gods)
-			print("Couples united: ", couples_united)  # Add this line
+			print("Couples united: ", couples_united)
+			
+			# Save immediately to update format
+			save_progress()
 		else:
 			print("Failed to load progress!")
 	else:
 		print("No save file found, starting fresh")
+
+# Migrate old separate experience format to unified
+func migrate_experience_data(old_data: Dictionary) -> Dictionary:
+	var migrated_data: Dictionary = {}
+	
+	for god_name in old_data:
+		migrated_data[god_name] = {}
+		var god_progress = old_data[god_name]
+		
+		for card_index in god_progress:
+			var card_exp = god_progress[card_index]
+			
+			# Convert old format to new format
+			if card_exp.has("capture_exp") and card_exp.has("defense_exp"):
+				# Old format - combine the experiences
+				var total_exp = card_exp.get("capture_exp", 0) + card_exp.get("defense_exp", 0)
+				migrated_data[god_name][card_index] = {"total_exp": total_exp}
+				print("Migrated card ", card_index, " from separate exp (", card_exp.get("capture_exp", 0), "+", card_exp.get("defense_exp", 0), ") to unified (", total_exp, ")")
+			elif card_exp.has("total_exp"):
+				# Already new format
+				migrated_data[god_name][card_index] = card_exp
+			else:
+				# Unknown format - start fresh
+				migrated_data[god_name][card_index] = {"total_exp": 0}
+	
+	return migrated_data
 
 # Clear all progress (for testing or reset)
 func clear_all_progress():
@@ -164,16 +206,13 @@ func clear_all_progress():
 	save_progress()
 	print("All progress cleared - reset to Apollo only")
 
-
 # Clear progress for a specific god
 func clear_god_progress(god_name: String):
 	if god_name in progress_data:
 		progress_data.erase(god_name)
 		save_progress()
 
-
-
-# === GOD UNLOCK FUNCTIONS ===
+# === GOD UNLOCK FUNCTIONS === (unchanged)
 
 # Check if a god is unlocked
 func is_god_unlocked(god_name: String) -> bool:
@@ -198,7 +237,6 @@ func check_god_unlocks() -> Array[String]:
 	
 	return newly_unlocked
 
-# Replace the check_unlock_condition function in Scripts/global_progress_tracker.gd
 func check_unlock_condition(condition: Dictionary) -> bool:
 	match condition.get("type", ""):
 		"boss_defeated":
@@ -208,8 +246,6 @@ func check_unlock_condition(condition: Dictionary) -> bool:
 			return couples_united.size() >= required
 		_:
 			return false
-
-			
 
 # Check if a specific boss has been defeated
 func check_boss_defeated(boss_name: String) -> bool:
@@ -266,7 +302,6 @@ func get_unlock_progress_text(condition: Dictionary) -> String:
 				return " (" + str(current) + "/" + str(required) + " couples united)"
 		_:
 			return ""
-
 
 func record_couple_union(card1_name: String, card2_name: String):
 	# Create a consistent couple identifier (alphabetical order)

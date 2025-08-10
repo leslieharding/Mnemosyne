@@ -36,22 +36,25 @@ func is_unlocked(god_name: String, god_progress: Dictionary = {}) -> bool:
 		return false
 	
 	# Calculate total experience across all cards for this god
-	var total_capture_exp = 0
-	var total_defense_exp = 0
+	var total_exp = 0
 	
 	for card_index in progress_data:
 		var card_exp = progress_data[card_index]
-		total_capture_exp += card_exp.get("capture_exp", 0)
-		total_defense_exp += card_exp.get("defense_exp", 0)
+		# Handle both old and new formats
+		if card_exp.has("total_exp"):
+			total_exp += card_exp.get("total_exp", 0)
+		else:
+			# Fallback for old format
+			total_exp += card_exp.get("capture_exp", 0) + card_exp.get("defense_exp", 0)
+	
+	# For unified experience, we'll use total experience thresholds
+	# Convert old separate requirements to unified requirements
+	var required_total_exp = required_capture_exp + required_defense_exp
 	
 	# Check if requirements are met
-	var capture_met = required_capture_exp == 0 or total_capture_exp >= required_capture_exp
-	var defense_met = required_defense_exp == 0 or total_defense_exp >= required_defense_exp
+	var exp_met = required_total_exp == 0 or total_exp >= required_total_exp
 	
-	return capture_met and defense_met
-	
-	# If no progress tracker found, only starter decks are unlocked
-	return false
+	return exp_met
 
 # Get unlock status description for UI
 func get_unlock_description(god_name: String) -> String:
@@ -61,18 +64,15 @@ func get_unlock_description(god_name: String) -> String:
 	if is_unlocked(god_name):
 		return "Unlocked"
 	
-	# Build requirements string
+	# Build requirements string for unified experience
 	var requirements: Array[String] = []
 	
-	if required_capture_exp > 0:
-		var current_capture = get_current_capture_exp(god_name)
-		requirements.append("Capture XP: " + str(current_capture) + "/" + str(required_capture_exp))
+	var required_total_exp = required_capture_exp + required_defense_exp
+	if required_total_exp > 0:
+		var current_total = get_current_total_exp(god_name)
+		requirements.append("Total XP: " + str(current_total) + "/" + str(required_total_exp))
 	
-	if required_defense_exp > 0:
-		var current_defense = get_current_defense_exp(god_name)
-		requirements.append("Defense XP: " + str(current_defense) + "/" + str(required_defense_exp))
-	
-	return "Requires: " + " & ".join(requirements)
+	return "Requires: " + " & ".join(requirements) if requirements.size() > 0 else "No requirements"
 
 # Get deck power description for UI
 func get_power_description() -> String:
@@ -87,8 +87,8 @@ func get_power_description() -> String:
 			return ""
 
 # Helper to get current capture experience
-func get_current_capture_exp(god_name: String) -> int:
-	print("DEBUG get_current_capture_exp called for: ", god_name)
+func get_current_total_exp(god_name: String) -> int:
+	print("DEBUG get_current_total_exp called for: ", god_name)
 	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
 	print("SceneTree found: ", scene_tree != null)
 	if scene_tree and scene_tree.has_node("/root/GlobalProgressTrackerAutoload"):
@@ -100,25 +100,11 @@ func get_current_capture_exp(god_name: String) -> int:
 		var total = 0
 		for card_index in god_progress:
 			var card_exp = god_progress[card_index]
-			var capture_exp = card_exp.get("capture_exp", 0)
-			print("Card ", card_index, " capture exp: ", capture_exp)
-			total += capture_exp
-		print("Total capture exp calculated: ", total)
+			var total_exp = card_exp.get("total_exp", 0)
+			print("Card ", card_index, " total exp: ", total_exp)
+			total += total_exp
+		print("Total experience calculated: ", total)
 		return total
 	else:
 		print("GlobalProgressTrackerAutoload NOT found")
-	return 0
-
-# Helper to get current defense experience
-func get_current_defense_exp(god_name: String) -> int:
-	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
-	if scene_tree and scene_tree.has_node("/root/GlobalProgressTrackerAutoload"):
-		var progress_tracker = scene_tree.get_node("/root/GlobalProgressTrackerAutoload")
-		var god_progress = progress_tracker.get_god_progress(god_name)
-		
-		var total = 0
-		for card_index in god_progress:
-			var card_exp = god_progress[card_index]
-			total += card_exp.get("defense_exp", 0)
-		return total
 	return 0

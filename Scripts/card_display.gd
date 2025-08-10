@@ -57,21 +57,28 @@ func create_selection_styles():
 	
 
 
+# Replace the setup and update_display functions in Scripts/card_display.gd (around lines 45-70)
+
 func setup(card: CardResource, level: int = 1, god: String = "", index: int = -1):
 	card_data = card
 	card_level = level
 	god_name = god
 	card_index = index
+	
+	print("CardDisplay setup - Card: ", card.card_name, " Level: ", level, " God: ", god, " Index: ", index)
 	update_display()
 
 func update_display():
 	if not card_data:
+		print("CardDisplay: No card data available")
 		return
 	
-	# Get effective stats for current level
+	# Get effective stats for current level - THIS IS THE KEY FIX
 	var effective_values = card_data.get_effective_values(card_level)
 	
-	# Update power values with effective stats
+	print("CardDisplay update - Card: ", card_data.card_name, " Level: ", card_level, " Values: ", effective_values)
+	
+	# Update power values with level-adjusted stats
 	if north_power:
 		north_power.text = str(effective_values[0])
 	if east_power:
@@ -84,6 +91,20 @@ func update_display():
 	# Update card name
 	if card_name_label:
 		card_name_label.text = card_data.card_name
+
+# Also add this debug function to help track what's happening
+func debug_card_state():
+	print("=== CARD DISPLAY DEBUG ===")
+	print("Card name: ", card_data.card_name if card_data else "NULL")
+	print("Card level: ", card_level)
+	print("God name: ", god_name)
+	print("Card index: ", card_index)
+	if card_data:
+		print("Raw values: ", card_data.values)
+		print("Effective values: ", card_data.get_effective_values(card_level))
+		print("Uses level progression: ", card_data.uses_level_progression)
+		print("Level data count: ", card_data.level_data.size())
+	print("===========================")
 
 # Select this card
 func select():

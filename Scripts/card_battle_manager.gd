@@ -1582,11 +1582,19 @@ func load_player_deck(deck_index: int):
 				player_deck = collection.get_deck(0)
 				deck_card_indices = deck_def.card_indices.duplicate()
 				
-				# NEW: Initialize deck power (even in tutorial mode)
+				# Initialize deck power (even in tutorial mode)
 				initialize_deck_power(deck_def)
 				
 				print("Using deck definition: ", deck_def.deck_name)
 				print("Card indices: ", deck_card_indices)
+				
+				# Debug: Print card names and their expected levels
+				for i in range(player_deck.size()):
+					if player_deck[i]:
+						var card_level = get_card_level(deck_card_indices[i])
+						print("Player card ", i, ": ", player_deck[i].card_name, " (level ", card_level, ")")
+					else:
+						print("Player card ", i, ": NULL")
 			else:
 				# Fallback: use first 5 cards if no deck definitions
 				player_deck = []
@@ -1598,14 +1606,6 @@ func load_player_deck(deck_index: int):
 				print("No deck definitions found, using first ", cards_to_use, " cards")
 			
 			print("Final player deck size: ", player_deck.size())
-			
-			# Debug: Print card names
-			for i in range(player_deck.size()):
-				if player_deck[i]:
-					print("Player card ", i, ": ", player_deck[i].card_name)
-				else:
-					print("Player card ", i, ": NULL")
-			
 			display_player_hand()
 			return
 		else:
@@ -1618,7 +1618,7 @@ func load_player_deck(deck_index: int):
 				player_deck = collection.get_deck(0)
 				deck_card_indices = collection.decks[0].card_indices.duplicate()
 				
-				# NEW: Initialize deck power for fallback
+				# Initialize deck power for fallback
 				initialize_deck_power(collection.decks[0])
 				
 				print("Fallback successful - using Apollo deck")
@@ -1635,13 +1635,20 @@ func load_player_deck(deck_index: int):
 	collection = load(collection_path)
 	if collection:
 		print("Collection loaded successfully with ", collection.cards.size(), " cards")
-		# Continue with normal loading...
 		var deck_def = collection.decks[deck_index]
 		deck_card_indices = deck_def.card_indices.duplicate()
 		player_deck = collection.get_deck(deck_index)
 		
-		# NEW: Initialize deck power
+		# Initialize deck power
 		initialize_deck_power(deck_def)
+		
+		# Debug: Print card names and their expected levels
+		for i in range(player_deck.size()):
+			if player_deck[i]:
+				var card_level = get_card_level(deck_card_indices[i])
+				print("Player card ", i, ": ", player_deck[i].card_name, " (level ", card_level, ", collection index ", deck_card_indices[i], ")")
+			else:
+				print("Player card ", i, ": NULL")
 		
 		setup_experience_panel()
 		display_player_hand()
@@ -1855,10 +1862,8 @@ func get_owner_at_position(position: int) -> Owner:
 func get_card_level(card_index: int) -> int:
 	if has_node("/root/GlobalProgressTrackerAutoload"):
 		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-		var exp_data = progress_tracker.get_card_total_experience(current_god, card_index)
-		var total_exp = exp_data.get("capture_exp", 0) + exp_data.get("defense_exp", 0)
-		return ExperienceHelpers.calculate_level(total_exp)
-	return 0
+		return progress_tracker.get_card_level(current_god, card_index)
+	return 0  
 
 # Display player's hand of cards using manual positioning
 func display_player_hand():
@@ -1885,9 +1890,10 @@ func display_player_hand():
 	cards_container.name = "CardsContainer"
 	hand_container.add_child(cards_container)
 	
-	# Add each card from the deck with explicit positioning
+	# Add each card from the deck with explicit positioning and proper leveling
 	for i in range(player_deck.size()):
 		var card = player_deck[i]
+		var card_collection_index = deck_card_indices[i]
 		
 		# Create a card display instance
 		var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
@@ -1899,13 +1905,18 @@ func display_player_hand():
 		# Position the card explicitly with the new spacing
 		card_display.position.x = start_x + i * total_spacing
 		
-		# Setup the card with its data
-		card_display.setup(card)
+		# Get the current level for this card - UNIFIED VERSION
+		var current_level = get_card_level(card_collection_index)
+		
+		print("Setting up hand card ", i, ": ", card.card_name, " at level ", current_level, " (collection index: ", card_collection_index, ")")
+		
+		# Setup the card with its data and proper level
+		card_display.setup(card, current_level, current_god, card_collection_index)
 		
 		# ALWAYS connect hover signals for info panel (regardless of tutorial mode)
 		card_display.card_hovered.connect(_on_card_hovered)
 		card_display.card_unhovered.connect(_on_card_unhovered)
-		print("Tutorial: Connected hover signals for card ", i, ": ", card.card_name)
+		print("Connected hover signals for card ", i, ": ", card.card_name)
 		
 		# DEBUG: Check if panel exists and is ready
 		if not card_display.panel:
@@ -1919,16 +1930,14 @@ func display_player_hand():
 		# Make sure the panel can receive input
 		card_display.panel.mouse_filter = Control.MOUSE_FILTER_PASS
 		
-		# Connect to detect clicks on the card - try multiple approaches
-		
-		
+		# Connect to detect clicks on the card
 		card_display.panel.gui_input.connect(_on_card_gui_input.bind(card_display, i))
-		print("Tutorial: Connected panel gui_input for card ", i)
+		print("Connected panel gui_input for card ", i)
 		
-		# Approach 3: Test if the CardDisplay itself has input handling
+		# Test if the CardDisplay itself has input handling
 		if card_display.has_signal("input_event"):
 			card_display.input_event.connect(_on_card_input_event.bind(card_display, i))
-			print("Tutorial: Connected CardDisplay input_event for card ", i)
+			print("Connected CardDisplay input_event for card ", i)
 
 
 func _on_card_input_event(viewport, event, shape_idx, card_display, card_index):
@@ -2160,8 +2169,9 @@ func place_card_on_grid():
 	# NEW: Apply deck power effects before combat
 	var sun_boosted = apply_deck_power_effects(card_data, current_grid_index)
 	
-	# Get card level for ability checks
+	# Get card level for ability checks - UNIFIED VERSION
 	var card_level = get_card_level(card_collection_index)
+	print("Card level for ", card_data.card_name, " (index ", card_collection_index, "): ", card_level)
 	
 	# Mark the slot as occupied and set ownership (always PLAYER - prediction hits don't change ownership)
 	grid_occupied[current_grid_index] = true
@@ -2174,7 +2184,6 @@ func place_card_on_grid():
 	# Get the current slot
 	var slot = grid_slots[current_grid_index]
 
-	
 	# Create a card display for the grid
 	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 	
@@ -2193,8 +2202,8 @@ func place_card_on_grid():
 	# Wait one frame to ensure _ready() is called and @onready variables are initialized
 	await get_tree().process_frame
 	
-	# NOW setup the card display with the actual card data
-	card_display.setup(card_data)
+	# NOW setup the card display with the actual card data and level
+	card_display.setup(card_data, card_level, current_god, card_collection_index)
 	
 	# Wait another frame to ensure setup is complete
 	await get_tree().process_frame
@@ -2203,7 +2212,7 @@ func place_card_on_grid():
 	if sun_boosted:
 		# Wait to ensure the card display is fully ready before applying styling
 		await get_tree().process_frame
-		apply_sun_boosted_card_styling(card_display)  # Remove the await here
+		apply_sun_boosted_card_styling(card_display)
 	elif boss_prediction_hit:
 		# Create a special style for predicted cards
 		var prediction_hit_style = player_card_style.duplicate()
@@ -2224,7 +2233,7 @@ func place_card_on_grid():
 	
 	# EXECUTE ON-PLAY ABILITIES BEFORE COMBAT (but after potential stat changes)
 	if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
-		print("Executing on-play abilities for ", card_data.card_name)
+		print("Executing on-play abilities for ", card_data.card_name, " at level ", card_level)
 		var ability_context = {
 			"placed_card": card_data,
 			"grid_position": current_grid_index,

@@ -438,11 +438,11 @@ func display_deck_cards(deck_index: int) -> void:
 			var card_display = create_deck_card_display(card, card_index)
 			card_container.add_child(card_display)
 
-# Create a card display panel for deck preview (existing function, unchanged)
+# Create a card display panel for deck preview - UNIFIED EXPERIENCE VERSION
 func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	# Main container for this card
 	var card_panel = PanelContainer.new()
-	card_panel.custom_minimum_size = Vector2(0, 120)  # Slightly taller for progress bars
+	card_panel.custom_minimum_size = Vector2(0, 120)
 	
 	# Create a style for the panel
 	var style = StyleBoxFlat.new()
@@ -475,21 +475,28 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	left_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h_container.add_child(left_side)
 	
-	# Card name
+	# Get current level for this card
+	var current_level = 1
+	if has_node("/root/GlobalProgressTrackerAutoload"):
+		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		current_level = progress_tracker.get_card_level("Apollo", card_index)
+	
+	# Card name with level indicator
 	var name_label = Label.new()
-	name_label.text = card.card_name
+	name_label.text = card.card_name + " (Lv." + str(current_level) + ")"
 	name_label.add_theme_font_size_override("font_size", 16)
 	name_label.add_theme_color_override("font_color", Color("#DDDDDD"))
 	left_side.add_child(name_label)
 	
-	# Card values in a compact format
+	# Card values using effective values for current level
+	var effective_values = card.get_effective_values(current_level)
 	var values_container = HBoxContainer.new()
 	left_side.add_child(values_container)
 	
 	var directions = ["N", "E", "S", "W"]
 	for i in range(4):
 		var dir_label = Label.new()
-		dir_label.text = directions[i] + ":" + str(card.values[i])
+		dir_label.text = directions[i] + ":" + str(effective_values[i])
 		dir_label.add_theme_font_size_override("font_size", 12)
 		dir_label.add_theme_color_override("font_color", Color("#AAAAAA"))
 		dir_label.custom_minimum_size.x = 35
@@ -505,10 +512,10 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	var v_separator = VSeparator.new()
 	h_container.add_child(v_separator)
 	
-	# Right side - Experience info with level display
+	# Right side - Unified Experience info
 	var right_side = VBoxContainer.new()
 	right_side.size_flags_horizontal = Control.SIZE_SHRINK_END
-	right_side.custom_minimum_size.x = 180  # Slightly wider for level display
+	right_side.custom_minimum_size.x = 180
 	h_container.add_child(right_side)
 	
 	# Experience title
@@ -519,53 +526,41 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	exp_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	right_side.add_child(exp_title)
 	
-	# Get experience data from GlobalProgressTracker
-	var capture_exp = 0
-	var defense_exp = 0
+	# Get experience data from GlobalProgressTracker - UNIFIED VERSION
+	var total_exp = 0
 	
 	if has_node("/root/GlobalProgressTrackerAutoload"):
 		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
 		var exp_data = progress_tracker.get_card_total_experience("Apollo", card_index)
-		capture_exp = exp_data.get("capture_exp", 0)
-		defense_exp = exp_data.get("defense_exp", 0)
+		total_exp = exp_data.get("total_exp", 0)
 	
-	# Capture experience level display
-	var capture_container = VBoxContainer.new()
-	right_side.add_child(capture_container)
+	# Show unified experience and level
+	var exp_container = VBoxContainer.new()
+	right_side.add_child(exp_container)
 	
-	var capture_label = Label.new()
-	capture_label.text = "⚔️ Capture"
-	capture_label.add_theme_font_size_override("font_size", 11)
-	capture_label.add_theme_color_override("font_color", Color("#FFD700"))
-	capture_container.add_child(capture_label)
+	var total_exp_label = Label.new()
+	total_exp_label.text = "⚡ " + str(total_exp) + " Total XP"
+	total_exp_label.add_theme_font_size_override("font_size", 12)
+	total_exp_label.add_theme_color_override("font_color", Color("#FFD700"))
+	total_exp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	exp_container.add_child(total_exp_label)
 	
-	# Show level and progress for capture
-	var capture_text = Label.new()
-	capture_text.text = ExperienceHelpers.format_level_display(capture_exp)
-	capture_text.add_theme_font_size_override("font_size", 10)
-	capture_text.add_theme_color_override("font_color", Color("#FFD700"))
-	capture_container.add_child(capture_text)
+	# Show level and progress
+	var level_text = Label.new()
+	level_text.text = ExperienceHelpers.format_level_display(total_exp)
+	level_text.add_theme_font_size_override("font_size", 10)
+	level_text.add_theme_color_override("font_color", Color("#CCCCCC"))
+	level_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	exp_container.add_child(level_text)
 	
-	# Small spacer
-	var spacer = Control.new()
-	spacer.custom_minimum_size.y = 5
-	right_side.add_child(spacer)
-	
-	# Defense experience level display
-	var defense_container = VBoxContainer.new()
-	right_side.add_child(defense_container)
-	
-	var defense_label = Label.new()
-	defense_label.text = "🛡️ Defense"
-	defense_label.add_theme_font_size_override("font_size", 11)
-	defense_label.add_theme_color_override("font_color", Color("#87CEEB"))
-	defense_container.add_child(defense_label)
-	
-	# Show level and progress for defense
-	var defense_text = Label.new()
-	defense_text.text = ExperienceHelpers.format_level_display(defense_exp)
-	defense_text.add_theme_font_size_override("font_size", 10)
-	defense_text.add_theme_color_override("font_color", Color("#87CEEB"))
-	defense_container.add_child(defense_text)
+	# Show next level requirements if not max level
+	var next_level_exp = ExperienceHelpers.get_xp_to_next_level(total_exp)
+	if next_level_exp > 0:
+		var next_level_label = Label.new()
+		next_level_label.text = str(next_level_exp) + " XP to next level"
+		next_level_label.add_theme_font_size_override("font_size", 9)
+		next_level_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+		next_level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		exp_container.add_child(next_level_label)
 	
 	return card_panel

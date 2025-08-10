@@ -1,12 +1,13 @@
-# res://Scripts/run_experience_tracker.gd
+# Replace the entire Scripts/run_experience_tracker.gd file
+
 extends Node
 class_name RunExperienceTracker
 
 signal experience_updated(card_index: int, exp_type: String, amount: int)
 signal run_completed()
 
-# Track experience gained during current run
-# Structure: {card_index: {"capture_exp": 0, "defense_exp": 0}}
+# Track experience gained during current run - UNIFIED VERSION
+# Structure: {card_index: {"capture_exp": 0, "defense_exp": 0, "total_exp": 0}}
 var run_experience: Dictionary = {}
 
 # Track which cards are in the current deck (by their collection index)
@@ -25,7 +26,8 @@ func start_new_run(deck_indices: Array[int]):
 	for index in deck_indices:
 		run_experience[index] = {
 			"capture_exp": 0,
-			"defense_exp": 0
+			"defense_exp": 0,
+			"total_exp": 0
 		}
 	
 	print("Started new run with cards: ", deck_indices)
@@ -37,8 +39,9 @@ func add_capture_exp(card_index: int, amount: int):
 		return
 	
 	run_experience[card_index]["capture_exp"] += amount
+	run_experience[card_index]["total_exp"] += amount
 	emit_signal("experience_updated", card_index, "capture", amount)
-	print("Card ", card_index, " gained ", amount, " capture exp. Total: ", run_experience[card_index]["capture_exp"])
+	print("Card ", card_index, " gained ", amount, " capture exp. Total: ", run_experience[card_index]["total_exp"])
 
 # Add defense experience
 func add_defense_exp(card_index: int, amount: int):
@@ -47,21 +50,23 @@ func add_defense_exp(card_index: int, amount: int):
 		return
 	
 	run_experience[card_index]["defense_exp"] += amount
+	run_experience[card_index]["total_exp"] += amount
 	emit_signal("experience_updated", card_index, "defense", amount)
-	print("Card ", card_index, " gained ", amount, " defense exp. Total: ", run_experience[card_index]["defense_exp"])
+	print("Card ", card_index, " gained ", amount, " defense exp. Total: ", run_experience[card_index]["total_exp"])
 
 # Get experience for a specific card
 func get_card_experience(card_index: int) -> Dictionary:
 	if card_index in run_experience:
 		return run_experience[card_index]
-	return {"capture_exp": 0, "defense_exp": 0}
+	return {"capture_exp": 0, "defense_exp": 0, "total_exp": 0}
 
 # Get total experience gained this run
 func get_total_experience() -> Dictionary:
-	var total = {"capture_exp": 0, "defense_exp": 0}
+	var total = {"capture_exp": 0, "defense_exp": 0, "total_exp": 0}
 	for card_data in run_experience.values():
 		total["capture_exp"] += card_data["capture_exp"]
 		total["defense_exp"] += card_data["defense_exp"]
+		total["total_exp"] += card_data["total_exp"]
 	return total
 
 # Get all run experience data
