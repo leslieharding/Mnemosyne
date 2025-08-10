@@ -1040,6 +1040,8 @@ func should_game_end() -> bool:
 
 
 
+# Replace the end_game() function in Scripts/card_battle_manager.gd (around lines 1155-1180)
+
 func end_game():
 	# Tutorial ending - different flow
 	if is_tutorial_mode:
@@ -1203,7 +1205,7 @@ func end_game():
 		TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
 		return
 	
-	# Player won or tied - continue the run
+	# Player won - check if this completes the run
 	game_status_label.text = "Victory! " + winner
 	disable_player_input()
 	opponent_is_thinking = false
@@ -1214,7 +1216,24 @@ func end_game():
 	# Add a brief celebration delay
 	await get_tree().create_timer(2.0).timeout
 	
-	# Return to map with updated progress
+	# NEW: Check if this was the final boss battle (run complete)
+	var params = get_scene_params()
+	if params.has("current_node"):
+		var current_node = params["current_node"]
+		# If this was a boss battle, the run is complete
+		if current_node.node_type == MapNode.NodeType.BOSS:
+			print("Boss defeated! Run is complete - going directly to run summary")
+			
+			# Pass data to summary screen with victory
+			get_tree().set_meta("scene_params", {
+				"god": params.get("god", current_god),
+				"deck_index": params.get("deck_index", 0),
+				"victory": true
+			})
+			TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
+			return
+	
+	# Not the final boss - continue with reward screen
 	show_reward_screen()
 
 

@@ -11,86 +11,79 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_3mjj1")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="MainContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -76.0
-offset_right = 20.0
-offset_bottom = 76.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Title" type="Label" parent="VBoxContainer"]
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MainContainer/LeftPanel"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 48
 text = "Run Summary"
 horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="MainContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="ResultLabel" type="Label" parent="VBoxContainer"]
+[node name="RunDetailsContainer" type="VBoxContainer" parent="MainContainer/LeftPanel"]
+layout_mode = 2
+
+[node name="GodDeckInfo" type="Label" parent="MainContainer/LeftPanel/RunDetailsContainer"]
+layout_mode = 2
+
+[node name="OutcomeLabel" type="Label" parent="MainContainer/LeftPanel/RunDetailsContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Victory!"
 horizontal_alignment = 1
 
-[node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
-layout_mode = 2
-
-[node name="ExpSummaryLabel" type="Label" parent="VBoxContainer"]
+[node name="ExpSummaryLabel" type="Label" parent="MainContainer/LeftPanel"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Experience Gained"
 horizontal_alignment = 1
 
-[node name="TotalExpContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="TotalExpContainer" type="HBoxContainer" parent="MainContainer/LeftPanel"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="CaptureTotal" type="Label" parent="VBoxContainer/TotalExpContainer"]
+[node name="CaptureTotal" type="Label" parent="MainContainer/LeftPanel/TotalExpContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "⚔️ Total Capture: 0"
 
-[node name="VSeparator" type="VSeparator" parent="VBoxContainer/TotalExpContainer"]
+[node name="VSeparator" type="VSeparator" parent="MainContainer/LeftPanel/TotalExpContainer"]
 layout_mode = 2
 
-[node name="DefenseTotal" type="Label" parent="VBoxContainer/TotalExpContainer"]
+[node name="DefenseTotal" type="Label" parent="MainContainer/LeftPanel/TotalExpContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "🛡️ Total Defense: 0"
 
-[node name="HSeparator3" type="HSeparator" parent="VBoxContainer"]
+[node name="ButtonContainer" type="HBoxContainer" parent="MainContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
-custom_minimum_size = Vector2(600, 200)
-layout_mode = 2
-
-[node name="CardDetailsContainer" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="HSeparator4" type="HSeparator" parent="VBoxContainer"]
-layout_mode = 2
-
-[node name="ButtonContainer" type="HBoxContainer" parent="VBoxContainer"]
-layout_mode = 2
-
-[node name="NewRunButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+[node name="NewRunButton" type="Button" parent="MainContainer/LeftPanel/ButtonContainer"]
 layout_mode = 2
 text = "Start New Run"
 
-[node name="MainMenuButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+[node name="MainMenuButton" type="Button" parent="MainContainer/LeftPanel/ButtonContainer"]
 layout_mode = 2
 text = "Main Menu"
 
-[connection signal="pressed" from="VBoxContainer/ButtonContainer/NewRunButton" to="." method="_on_new_run_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/ButtonContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="CardDetailsContainer" type="VBoxContainer" parent="MainContainer/RightPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[connection signal="pressed" from="MainContainer/LeftPanel/ButtonContainer/NewRunButton" to="." method="_on_new_run_button_pressed"]
+[connection signal="pressed" from="MainContainer/LeftPanel/ButtonContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
