@@ -16,6 +16,9 @@ signal card_unhovered()
 # Card data and state
 var card_data: CardResource
 var is_selected: bool = false
+var card_level: int = 1
+var god_name: String = ""
+var card_index: int = -1
 
 # Selection styles
 var selected_style: StyleBoxFlat
@@ -54,35 +57,29 @@ func create_selection_styles():
 	
 
 
-# Set up the card display with card data
-func setup(card: CardResource):
-	if not card:
-		print("CardDisplay: Warning - no card data provided")
-		return
-	
+func setup(card: CardResource, level: int = 1, god: String = "", index: int = -1):
 	card_data = card
-	
-	# Wait for @onready variables to be initialized
-	if not north_power:
-		await ready
-	
-	# Update display elements
+	card_level = level
+	god_name = god
+	card_index = index
 	update_display()
 
-# Update all display elements with current card data
 func update_display():
 	if not card_data:
 		return
 	
-	# Update power values
+	# Get effective stats for current level
+	var effective_values = card_data.get_effective_values(card_level)
+	
+	# Update power values with effective stats
 	if north_power:
-		north_power.text = str(card_data.values[0])
+		north_power.text = str(effective_values[0])
 	if east_power:
-		east_power.text = str(card_data.values[1])
+		east_power.text = str(effective_values[1])
 	if south_power:
-		south_power.text = str(card_data.values[2])
+		south_power.text = str(effective_values[2])
 	if west_power:
-		west_power.text = str(card_data.values[3])
+		west_power.text = str(effective_values[3])
 	
 	# Update card name
 	if card_name_label:

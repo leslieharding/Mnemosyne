@@ -105,7 +105,7 @@ func load_deck_data_sync():
 			print("Card ", i, ": NULL")
 	
 	# Create card displays synchronously
-	create_card_displays_sync()
+	create_card_displays_sync(god_name)
 	
 	# Update Mnemosyne button with current level info
 	update_mnemosyne_button_text()
@@ -293,12 +293,12 @@ func load_deck_data():
 	print("Loaded deck with ", current_deck.size(), " cards")
 	
 	# Create card displays with safer autoload access
-	await create_card_displays_sync()
+	await create_card_displays_sync(god_name)
 	
 	# Update Mnemosyne button with current level info
 	update_mnemosyne_button_text()
 
-func create_card_displays_sync():
+func create_card_displays_sync(god_name: String):
 	print("=== CREATING CARD DISPLAYS ===")
 	
 	# Safety check
@@ -368,7 +368,8 @@ func create_card_displays_sync():
 		card_wrapper.add_child(card_display)
 		
 		# Setup the card immediately (no await)
-		card_display.setup(card)
+		var current_level = CardLevelHelper.get_card_current_level(card_index, god_name)
+		card_display.setup(card, current_level, god_name, card_index)
 		
 		# Center the card within its wrapper
 		card_display.position = Vector2(5, 5)

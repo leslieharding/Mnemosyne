@@ -8,8 +8,8 @@ var cards: Array[CardDisplay] = []
 var selected_card: CardDisplay = null
 var selected_index: int = -1
 
-# Configure the hand with cards
-func setup_hand(card_resources: Array[CardResource]):
+# Modified setup_hand method
+func setup_hand(card_resources: Array[CardResource], god_name: String = "", deck_indices: Array[int] = []):
 	# Clear any existing cards
 	for child in get_children():
 		child.queue_free()
@@ -22,7 +22,12 @@ func setup_hand(card_resources: Array[CardResource]):
 	for i in range(card_resources.size()):
 		var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 		add_child(card_display)
-		card_display.setup(card_resources[i])
+		
+		# Get current level for this card
+		var card_index = deck_indices[i] if i < deck_indices.size() else i
+		var current_level = CardLevelHelper.get_card_current_level(card_index, god_name)
+		
+		card_display.setup(card_resources[i], current_level, god_name, card_index)
 		cards.append(card_display)
 
 # Handle card selection

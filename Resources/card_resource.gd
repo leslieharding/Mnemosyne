@@ -2,38 +2,60 @@
 class_name CardResource
 extends Resource
 
+# Inner class for level data (no class_name declaration)
+class LevelData extends Resource:
+	@export var level: int = 1
+	@export var values: Array[int] = [1, 1, 1, 1]  # [Up, Right, Down, Left]
+	@export var abilities: Array[CardAbility] = []
+	@export_multiline var description: String = ""  # Level-specific description if needed
+
+# Main CardResource fields
 @export var card_name: String
 @export var card_texture: Texture2D
+
+# Legacy fields (for backward compatibility)
 @export var values: Array[int] = [1, 1, 1, 1]  # [Up, Right, Down, Left]
 @export_multiline var description: String = ""
 @export var abilities: Array[CardAbility] = []
 
-# Get abilities available at a specific level
-func get_available_abilities(level: int) -> Array[CardAbility]:
-	var available: Array[CardAbility] = []
-	for ability in abilities:
-		if ability.unlock_level <= level:
-			available.append(ability)
-	return available
+# NEW: Level progression data
+@export var level_data: Array[LevelData] = []
+@export var uses_level_progression: bool = false
 
-# Check if card has any abilities of a specific trigger type
-func has_ability_type(trigger_type: CardAbility.TriggerType, level: int = 999) -> bool:
-	var available_abilities = get_available_abilities(level)
-	for ability in available_abilities:
-		if ability.trigger_condition == trigger_type:
-			return true
-	return false
+# Get data for specific level
+func get_level_data(level: int) -> LevelData:
+	if not uses_level_progression or level_data.is_empty():
+		# Fallback to legacy data
+		var fallback = LevelData.new()
+		fallback.level = level
+		fallback.values = values.duplicate()
+		fallback.abilities = abilities.duplicate()
+		fallback.description = description
+		return fallback
+	
+	# Find exact level match
+	for data in level_data:
+		if data.level == level:
+			return data
+	
+	# If no exact match, return highest available level <= requested level
+	var best_match: LevelData = null
+	for data in level_data:
+		if data.level <= level:
+			if not best_match or data.level > best_match.level:
+				best_match = data
+	
+	return best_match if best_match else level_data[0]
 
-# Execute all abilities of a specific trigger type
-func execute_abilities(trigger_type: CardAbility.TriggerType, context: Dictionary, level: int = 999) -> Array[bool]:
-	var results: Array[bool] = []
-	var available_abilities = get_available_abilities(level)
-	
-	for ability in available_abilities:
-		if ability.trigger_condition == trigger_type:
-			var success = ability.execute(context)
-			results.append(success)
-			if success:
-				print("Executed ability: ", ability.ability_name)
-	
-	return results
+# Convenience methods
+func get_effective_values(level: int) -> Array[int]:
+	return get_level_data(level).values.duplicate()
+
+func get_effective_abilities(level: int) -> Array[CardAbility]:
+	return get_level_data(level).abilities.duplicate()
+
+func get_effective_description(level: int) -> String:
+	var level_desc = get_level_data(level).description
+	return level_desc if level_desc != "" else description
+
+# ... rest of existing methods stay the same ...
