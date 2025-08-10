@@ -6,7 +6,12 @@ static func get_card_current_level(card_index: int, god_name: String) -> int:
 		return get_mnemosyne_card_level()
 	
 	# Regular god cards - use experience-based level
-	var global_tracker = Engine.get_singleton("SceneTree").get_node_or_null("/root/GlobalProgressTrackerAutoload")
+	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
+	if not scene_tree:
+		print("Warning: SceneTree not available, returning level 1")
+		return 1
+		
+	var global_tracker = scene_tree.get_node_or_null("/root/GlobalProgressTrackerAutoload")
 	if not global_tracker:
 		return 1
 	
@@ -15,7 +20,12 @@ static func get_card_current_level(card_index: int, god_name: String) -> int:
 	return ExperienceHelpers.calculate_level(total_exp)
 
 static func get_mnemosyne_card_level() -> int:
-	var memory_manager = Engine.get_singleton("SceneTree").get_node_or_null("/root/MemoryJournalManagerAutoload")
+	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
+	if not scene_tree:
+		print("Warning: SceneTree not available, returning level 1")
+		return 1
+		
+	var memory_manager = scene_tree.get_node_or_null("/root/MemoryJournalManagerAutoload")
 	if memory_manager:
 		var mnemosyne_data = memory_manager.get_mnemosyne_memory()
 		return mnemosyne_data.get("consciousness_level", 1)

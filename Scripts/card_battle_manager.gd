@@ -501,8 +501,12 @@ func start_grace_period():
 	"""Start the grace period timer"""
 	panel_state = PanelState.GRACE_PERIOD
 	
-	# Start or restart the grace timer
-	panel_grace_timer.start()
+	# Check if timer is still valid and in tree before starting
+	if panel_grace_timer and is_instance_valid(panel_grace_timer) and panel_grace_timer.is_inside_tree():
+		panel_grace_timer.start()
+	else:
+		# If timer is invalid, skip grace period and go straight to fade out
+		_on_grace_period_expired()
 
 func start_fade_out():
 	"""Begin fading the panel out"""

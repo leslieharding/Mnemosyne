@@ -367,9 +367,46 @@ func create_card_displays_sync(god_name: String):
 		# Add card to wrapper
 		card_wrapper.add_child(card_display)
 		
-		# Setup the card immediately (no await)
-		var current_level = CardLevelHelper.get_card_current_level(card_index, god_name)
+		# Add to main container first so it's in the scene tree
+		card_with_exp_container.add_child(card_wrapper)
+		cards_container.add_child(card_with_exp_container)
+		
+		# Wait one frame to ensure the card display is fully ready before setup
+		await get_tree().process_frame
+		
+		# Setup the card - CALCULATE LEVEL DIRECTLY HERE
+		var current_level = 1  # Default level
+		
+		# Calculate level directly without using CardLevelHelper
+		if god_name == "Mnemosyne":
+			var memory_manager = get_node_or_null("/root/MemoryJournalManagerAutoload")
+			if memory_manager:
+				var mnemosyne_data = memory_manager.get_mnemosyne_memory()
+				current_level = mnemosyne_data.get("consciousness_level", 1)
+		else:
+			var global_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
+			if global_tracker:
+				var exp_data = global_tracker.get_card_total_experience(god_name, card_index)
+				var total_exp = exp_data["capture_exp"] + exp_data["defense_exp"]
+				current_level = ExperienceHelpers.calculate_level(total_exp)
+		
+		# Debug: Print what we're setting up
+		print("Setting up card display with:")
+		print("  Card: ", card.card_name)
+		print("  Level: ", current_level)
+		print("  God: ", god_name)
+		print("  Index: ", card_index)
+		
 		card_display.setup(card, current_level, god_name, card_index)
+		
+		# Double-check the setup worked
+		if card_display.card_data:
+			print("Card display setup successful - card_data.card_name: ", card_display.card_data.card_name)
+		else:
+			print("ERROR: Card display card_data is null after setup!")
+		
+		# Force an update of the display
+		card_display.update_display()
 		
 		# Center the card within its wrapper
 		card_display.position = Vector2(5, 5)
@@ -377,12 +414,8 @@ func create_card_displays_sync(god_name: String):
 		# Create experience info display
 		var exp_info_container = create_experience_info_display_sync(card_index, tracker)
 		
-		# Add card wrapper and exp info to the horizontal container
-		card_with_exp_container.add_child(card_wrapper)
+		# Add exp info to the horizontal container
 		card_with_exp_container.add_child(exp_info_container)
-		
-		# Add the complete container to the cards container
-		cards_container.add_child(card_with_exp_container)
 		
 		# Connect selection - using both wrapper and panel for better coverage
 		card_wrapper.gui_input.connect(_on_card_wrapper_input.bind(i))
