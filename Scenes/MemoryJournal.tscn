@@ -47,12 +47,6 @@ size_flags_horizontal = 3
 text = "Memory Journal"
 horizontal_alignment = 1
 
-[node name="SummaryLabel" type="Label" parent="MainContainer/VBox/Header"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Growing Awareness • 0 Enemies • 0 Gods"
-horizontal_alignment = 1
-
 [node name="CloseButton" type="Button" parent="MainContainer/VBox/Header"]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2

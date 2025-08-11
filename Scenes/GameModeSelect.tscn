@@ -20,6 +20,14 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Button" type="Button" parent="Background"]
+layout_mode = 2
+offset_left = 836.0
+offset_top = 595.0
+offset_right = 946.0
+offset_bottom = 626.0
+text = "Back"
+
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
@@ -67,21 +75,9 @@ text = "Aphrodite"
 layout_mode = 2
 text = "Dionysus"
 
-[node name="AresButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "Ares"
-
 [node name="AthenaButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "Athena"
-
-[node name="PoseidonButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "Poseidon"
-
-[node name="Button" type="Button" parent="VBoxContainer"]
-layout_mode = 2
-text = "Back"
 
 [node name="ChironButton" type="Button" parent="."]
 layout_mode = 1
@@ -90,15 +86,17 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -97.0
-offset_top = -31.0
+offset_left = -142.0
+offset_top = -53.0
+offset_right = -31.0
+offset_bottom = -22.0
 grow_horizontal = 0
 grow_vertical = 0
 text = "Visit Chiron"
 script = ExtResource("2_1fq1s")
 
+[connection signal="pressed" from="Background/Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/ApolloButton" to="." method="_on_apollo_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/HermesButton" to="." method="_on_hermes_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/ArtemisButton" to="." method="_on_artemis_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/AphroditeButton" to="." method="_on_aphrodite_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/Button" to="." method="_on_button_pressed"]

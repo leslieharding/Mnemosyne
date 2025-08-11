@@ -149,7 +149,7 @@ metadata/_custom_type_script = "uid://d1cwgpmvptcjn"
 script = ExtResource("1_vqrrp")
 card_name = "Eos"
 values = Array[int]([2, 2, 2, 2])
-description = "The dawn approaches"
+description = "Rosey Fingered Eos throws open the doors to a new day"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_bi2ap")])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
@@ -157,9 +157,9 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_p3s3h"]
 script = ExtResource("1_vqrrp")
-card_name = ""
-values = Array[int]([1, 1, 1, 1])
-description = ""
+card_name = "Calliope"
+values = Array[int]([6, 6, 6, 6])
+description = "lovely voice personified"
 abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
@@ -167,9 +167,9 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_s8wyg"]
 script = ExtResource("1_vqrrp")
-card_name = ""
-values = Array[int]([1, 1, 1, 1])
-description = ""
+card_name = "Orpheus"
+values = Array[int]([3, 3, 3, 3])
+description = "Row you bastards row"
 abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
@@ -177,9 +177,9 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tl28v"]
 script = ExtResource("1_vqrrp")
-card_name = ""
-values = Array[int]([1, 1, 1, 1])
-description = ""
+card_name = "Eurydice"
+values = Array[int]([5, 5, 5, 5])
+description = "I'll be right behind you, have faith "
 abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
@@ -187,9 +187,9 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_6lt0f"]
 script = ExtResource("1_vqrrp")
-card_name = ""
-values = Array[int]([1, 1, 1, 1])
-description = ""
+card_name = "Marsyas "
+values = Array[int]([2, 2, 2, 2])
+description = "Of course I cant play it upside down, you're a cheat Apollo"
 abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
@@ -197,9 +197,9 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_s7d3i"]
 script = ExtResource("1_vqrrp")
-card_name = ""
-values = Array[int]([1, 1, 1, 1])
-description = ""
+card_name = "Arion"
+values = Array[int]([2, 2, 2, 2])
+description = "Would you allow me one last song? Before the sea takes me?"
 abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
@@ -207,9 +207,9 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_vk3b3"]
 script = ExtResource("1_vqrrp")
-card_name = ""
-values = Array[int]([1, 1, 1, 1])
-description = ""
+card_name = "Cassandra"
+values = Array[int]([3, 4, 3, 4])
+description = "Burn the horse, burn it now!"
 abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
@@ -217,9 +217,9 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_yt4mj"]
 script = ExtResource("1_vqrrp")
-card_name = ""
-values = Array[int]([1, 1, 1, 1])
-description = ""
+card_name = "Tiresias"
+values = Array[int]([6, 5, 6, 5])
+description = "Use your famed logic Oedipus, the killer of Laius is among us"
 abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
@@ -227,9 +227,9 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_exg8p"]
 script = ExtResource("1_vqrrp")
-card_name = ""
-values = Array[int]([1, 1, 1, 1])
-description = ""
+card_name = "Calchas"
+values = Array[int]([7, 2, 6, 4])
+description = "9 years it will take my lord, it is as clear to me as ever anything has been"
 abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
@@ -237,9 +237,9 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_i5ydv"]
 script = ExtResource("1_vqrrp")
-card_name = ""
-values = Array[int]([1, 1, 1, 1])
-description = ""
+card_name = "The Oracle At Delphi"
+values = Array[int]([2, 2, 2, 2])
+description = "Nothing good will come of asking me, but by all means ask away"
 abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
@@ -247,9 +247,9 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_vqeif"]
 script = ExtResource("1_vqrrp")
-card_name = ""
+card_name = "The Fates"
 values = Array[int]([1, 1, 1, 1])
-description = ""
+description = "What these scissors? Don't you worry my dear just close your eyes"
 abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
