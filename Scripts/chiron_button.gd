@@ -159,8 +159,6 @@ func start_chiron_conversation(conv_id: String, conv_data: Dictionary):
 			cutscene_id = "first_defeat_conversation"
 		"first_boss_loss":
 			cutscene_id = "first_boss_loss_conversation"  # You can add this later
-		"consciousness_breakthrough":
-			cutscene_id = "consciousness_breakthrough_conversation"  # You can add this later
 		"first_deck_unlock":
 			cutscene_id = "first_deck_unlock_conversation"  # You can add this later
 		"apollo_mastery":
