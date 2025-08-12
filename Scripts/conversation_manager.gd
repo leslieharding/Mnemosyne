@@ -40,8 +40,8 @@ func setup_conversation_definitions():
 	register_conversation("first_enemy_mastered", Priority.MILESTONE,
 		"Understanding your opponents is the path to true victory.")
 	
-	register_conversation("first_run_defeat", Priority.MILESTONE,
-		"Every setback contains the seeds of future triumph.")
+	register_conversation("first_run_defeat", Priority.STORY,
+	"Chiron offers wisdom about the nature of progress and victory.")
 		
 	register_conversation("hermes_unlocked", Priority.STORY, 
 	"The messenger god takes notice of your growing prowess. Swift feet follow swift minds.")	
@@ -77,17 +77,17 @@ func can_show_conversation_this_run() -> bool:
 func get_conversation_button_state() -> Dictionary:
 	# Check if we've already shown a conversation this run
 	if conversation_shown_this_run:
-		return {"available": false, "priority": "", "text": "Speak with Chiron"}
+		return {"available": false, "priority": "", "text": "Visit Chiron"}
 	
 	var next_conv = get_next_conversation()
 	if next_conv.is_empty():
-		return {"available": false, "priority": "", "text": "Speak with Chiron"}
+		return {"available": false, "priority": "", "text": "Visit Chiron"}
 	
 	var is_story = next_conv["data"]["priority"] == Priority.STORY
 	return {
 		"available": true,
 		"priority": "STORY" if is_story else "MILESTONE",
-		"text": "Speak with Chiron!" if is_story else "Speak with Chiron"
+		"text": "Visit Chiron" if is_story else "Visit Chiron"
 	}
 
 

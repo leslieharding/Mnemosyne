@@ -80,7 +80,7 @@ func get_power_description() -> String:
 		DeckPowerType.SUN_POWER:
 			return "☀️ Solar Blessing: 3 random grid spaces are bathed in sunlight, granting +1 to all stats for your cards placed there"
 		DeckPowerType.PROPHECY_POWER:
-			return "🔮 Divine Prophecy: You always go first in battle, seeing the threads of fate"
+			return "🔮 Divine Prophecy: You always go first in battle"
 		DeckPowerType.NONE:
 			return ""
 		_:

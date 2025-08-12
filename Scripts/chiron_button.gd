@@ -148,32 +148,35 @@ func _on_chiron_button_pressed():
 	# Update button state after conversation is marked as shown
 	update_button_state()
 
+# Replace the start_chiron_conversation function in Scripts/chiron_button.gd (around lines 140-170)
+
 func start_chiron_conversation(conv_id: String, conv_data: Dictionary):
-	# Create a simple Chiron conversation
-	# For now, we'll create a basic cutscene structure
+	# Create a mapping between conversation IDs and their corresponding cutscene IDs
+	var cutscene_id = ""
+	
+	match conv_id:
+		"first_run_defeat":
+			cutscene_id = "first_defeat_conversation"
+		"first_boss_loss":
+			cutscene_id = "first_boss_loss_conversation"  # You can add this later
+		"consciousness_breakthrough":
+			cutscene_id = "consciousness_breakthrough_conversation"  # You can add this later
+		"first_deck_unlock":
+			cutscene_id = "first_deck_unlock_conversation"  # You can add this later
+		"apollo_mastery":
+			cutscene_id = "apollo_mastery_conversation"  # You can add this later
+		"first_enemy_mastered":
+			cutscene_id = "first_enemy_mastered_conversation"  # You can add this later
+		"hermes_unlocked":
+			cutscene_id = "hermes_unlocked_conversation"  # You can add this later
+		_:
+			print("Unknown conversation ID: ", conv_id)
+			return
+	
+	# Play the cutscene
 	if has_node("/root/CutsceneManagerAutoload"):
 		var cutscene_manager = get_node("/root/CutsceneManagerAutoload")
-		
-		# Create characters
-		var mnemosyne = Character.new("Mnemosyne", Color("#DDA0DD"), null, "left")
-		var chiron = Character.new("Chiron", Color("#FFD700"), null, "right")
-		
-		# Create simple dialogue based on conversation
-		var dialogue_lines: Array[DialogueLine] = []
-		dialogue_lines.append(DialogueLine.new("Chiron", conv_data["description"]))
-		dialogue_lines.append(DialogueLine.new("Mnemosyne", "I understand, wise centaur. Your words give me much to consider."))
-		dialogue_lines.append(DialogueLine.new("Chiron", "Take these lessons with you into battle, young titaness."))
-		
-		# Create and play the cutscene
-		var cutscene_data = CutsceneData.new("chiron_" + conv_id, [mnemosyne, chiron], dialogue_lines)
-		cutscene_manager.add_cutscene(cutscene_data)
-		cutscene_manager.play_cutscene("chiron_" + conv_id)
+		print("Playing conversation cutscene: ", cutscene_id)
+		cutscene_manager.play_cutscene(cutscene_id)
 	else:
-		print("CutsceneManager not available, showing simple dialog")
-		# Fallback: show a simple dialog
-		var dialog = AcceptDialog.new()
-		dialog.dialog_text = "Chiron says: \"" + conv_data["description"] + "\""
-		dialog.title = "Wisdom from Chiron"
-		get_tree().current_scene.add_child(dialog)
-		dialog.popup_centered()
-		dialog.confirmed.connect(func(): dialog.queue_free())
+		print("ERROR: CutsceneManager not available!")

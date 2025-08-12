@@ -24,13 +24,10 @@ func load_cutscenes():
 func create_sample_cutscenes():
 	# Create Mnemosyne character
 	var mnemosyne = Character.new("Mnemosyne", Color("#DDA0DD"), null, "left")
-	
 	# Create Chrion character  
 	var chiron = Character.new("Chiron", Color("#FFD700"), null, "right")
-	
 	# Create Apollo character  
 	var apollo = Character.new("Apollo", Color("#FFD700"), null, "right")
-	
 	# Create Chronos character  
 	var chronos = Character.new("Chronos", Color("#8B4513"), null, "right")
 	
@@ -59,7 +56,18 @@ func create_sample_cutscenes():
 	# Chronos gets frustrated - mix of speeds to show emotion
 	tutorial_lines.append(DialogueLine.new(
 		"Chronos", 
-		"Yes I know that but [urgent]why?[/urgent] You are a titan are you not? We are the [speed:1.3]straining ones![/speed] Fighting is what we do.{pause:1.0} What use is your gift of memory?{pause:0.5} By all accounts you don't seem to be using your talents anyway, [slow]you seem mostly useless[/slow], it's vexing.",
+		"Yes I know that but [urgent]why?[/urgent] You are a titan are you not? We are the [speed:1.3]straining ones![/speed] Fighting is what we do.{pause:1.0} Have you seen Atlas? He's so strong I bet he could hold up the entire world if he tried. 
+",
+		"right",
+		1.0,
+		0.0,
+		0.8   # Longer pause after harsh words
+	))
+	
+	tutorial_lines.append(DialogueLine.new(
+		"Chronos", 
+		"What use is your gift of memory? By all accounts you don't seem to be using your talents anyway, you seem mostly useless, it's vexing. 
+",
 		"right",
 		1.0,
 		0.0,
@@ -91,7 +99,7 @@ func create_sample_cutscenes():
 	cutscenes["tutorial_intro"] = tutorial_cutscene
 	
 	
-	# NEW: Opening awakening cutscene
+	# First conversation with Chiron
 	var opening_lines: Array[DialogueLine] = []
 	opening_lines.append(DialogueLine.new("Chiron", "You fought well Mnemosyne"))
 	opening_lines.append(DialogueLine.new("Mnemosyne", " I don't think I…"))
@@ -107,44 +115,181 @@ func create_sample_cutscenes():
 	opening_lines.append(DialogueLine.new("Chiron", "Chaos, the Fate’s, Moros if you will, whatever source you want to invoke has decided your realm would be that of memory.  More than that, a divine infinite capacity to remember and learn."))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "So I can learn? That's it?"))
 	opening_lines.append(DialogueLine.new("Chiron", "Why yes but can't you see what that means? You are immortal, you will live forever. Forever is a long time to learn, to improve. "))
-	opening_lines.append(DialogueLine.new("Chiron", "Chronos as divine a being he undoubtedly is, doesn't have this potential. What you see now is what you will see come millenia."))
+	opening_lines.append(DialogueLine.new("Chiron", "Chronos as divine a being he undoubtedly is, doesn't have this potential. What you see now is what you will get come millenia."))
 	opening_lines.append(DialogueLine.new("Chiron", "So in a cosmic sense the only way you could possibly ever lose to someone like Chronos is to never do anything. You could take a step once every hundred years and eventually you would win. "))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "Well okay I must say when you put it like that it's quite encouraging, but I don't really know where to start."))
 	opening_lines.append(DialogueLine.new("Chiron", "It feels a little ridiculous me telling you of all people how to learn"))
 	opening_lines.append(DialogueLine.new("Chiron", "But when I learn something new, I usually find someone I trust and ask them to teach me."))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "So will you then? Teach me?"))
 	opening_lines.append(DialogueLine.new("Chiron", "Of course I will. Who would be foolish enough to pass up such an opportunity. Where should we start?"))
-	opening_lines.append(DialogueLine.new("Mnemosyne", "I want to be able to stand up for myself"))
-	opening_lines.append(DialogueLine.new("Chiron", "My advice, start with relying on the power of others, until you have built up your own strength"))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "I want to be able to stand up for myself, I want to show Chronos i'm worthy of being a Titan"))
+	opening_lines.append(DialogueLine.new("Chiron", "As I just mentioned, first find a trustworthy mentor, rely on their knowledge and skills - while learning. You will find eventually your own strength is all that is required. "))
 	opening_lines.append(DialogueLine.new("Chiron", "Go and visit Apollo, he owes me one for Asclepius."))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "Thank you Chiron. "))
-	
+	opening_lines.append(DialogueLine.new("Chiron", "I’ll be here when you need me."))
 
-	
-	var opening_cutscene = CutsceneData.new("opening_awakening", [mnemosyne, chiron], opening_lines)
-	cutscenes["opening_awakening"] = opening_cutscene
-	
-	# Sample awakening cutscene (existing)
-	var awakening_lines: Array[DialogueLine] = []
-	awakening_lines.append(DialogueLine.new("Mnemosyne", "I... what is this sensation? Fragments of thought coalescing..."))
-	awakening_lines.append(DialogueLine.new("Apollo", "Ah, the titaness stirs. Your awareness grows with each battle witnessed."))
-	awakening_lines.append(DialogueLine.new("Mnemosyne", "Apollo? How do I know your name? These memories... they are not mine."))
-	awakening_lines.append(DialogueLine.new("Apollo", "They are mine, and those of countless others. You are becoming the keeper of all memory."))
-	awakening_lines.append(DialogueLine.new("Mnemosyne", "The weight of infinite battles... I begin to understand my purpose."))
-	
-	var awakening_cutscene = CutsceneData.new("mnemosyne_awakening", [mnemosyne, chiron], awakening_lines)
-	cutscenes["mnemosyne_awakening"] = awakening_cutscene
-	
-	# Sample boss encounter cutscene (existing)
-	var boss_lines: Array[DialogueLine] = []
-	boss_lines.append(DialogueLine.new("Mnemosyne", "This presence... it knows my thoughts before I think them."))
-	boss_lines.append(DialogueLine.new("Apollo", "The final guardian has been watching, learning your patterns."))
-	boss_lines.append(DialogueLine.new("Mnemosyne", "Then I must transcend prediction itself. Memory is more than pattern."))
-	
-	var boss_cutscene = CutsceneData.new("boss_encounter", [mnemosyne, chiron], boss_lines)
-	cutscenes["boss_encounter"] = boss_cutscene
-	
-	print("Loaded ", cutscenes.size(), " cutscenes")
+
+	# First defeat conversation 
+	var first_defeat_lines: Array[DialogueLine] = []
+
+	# Create the full conversation with proper pacing and emotional beats
+	first_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Back already New? Come on in and rest.",
+		"right",
+		1.0,
+		0.0,
+		0.5
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"[slow]I didn't do so well Chiron[/slow]",
+		"left",
+		0.8,
+		0.3,
+		0.8
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Tell me what happened?",
+		"right",
+		0.9,
+		0.2,
+		0.5
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"I was defeated.{pause:0.8} [slow]Quite easily it seems, nothing was achieved.[/slow]",
+		"left",
+		0.7,
+		0.3,
+		1.0
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Nothing was achieved?",
+		"right",
+		1.0,
+		0.3,
+		0.8
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Hmmm{pause:0.5} colour me confused….",
+		"right",
+		0.9,
+		0.2,
+		0.8
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"How so?",
+		"left",
+		1.0,
+		0.2,
+		0.5
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Word has come to me [speed:1.2]Phoebus Apollo[/speed] has agreed to be your ally.{pause:1.0} Only someone as mighty as a Titan could consider such a union, with an Olympian no less, as [slow]nothing[/slow].",
+		"right",
+		0.9,
+		0.3,
+		1.2
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"Well….",
+		"left",
+		0.8,
+		0.5,
+		0.8
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"I am also informed that your confederates on this joint quest have also improved their experience through combat under your guidance.",
+		"right",
+		1.0,
+		0.2,
+		0.8
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"I'm told they [speed:1.3]can't wait[/speed] to see what strength and abilities future ventures with you will yield them.",
+		"right",
+		1.1,
+		0.1,
+		1.0
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"……..{pause:2.0}",
+		"left",
+		0.5,
+		0.5,
+		1.5
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Sorry for being so direct.{pause:0.8} But we talked earlier about victory being assured if you only took one step every hundred years.",
+		"right",
+		0.9,
+		0.3,
+		0.8
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Yet in a cosmic blink of an eye you have already taken several,{pause:0.5} I can't help but celebrate,{pause:0.3} [speed:1.4]how could I not?[/speed]",
+		"right",
+		1.0,
+		0.2,
+		1.2
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"Thank you for your kind words Chiron.",
+		"left",
+		0.9,
+		0.8,
+		0.8
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"I can feel the pull of [speed:1.2]Ananke[/speed] and with your gift of inspiration{pause:0.5} I'm ready to try again.",
+		"left",
+		1.0,
+		0.3,
+		0.8
+	))
+
+	first_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"[slow]I'll be here when you need me.[/slow]",
+		"right",
+		0.7,
+		0.5,
+		1.0
+	))
+
+	var first_defeat_cutscene = CutsceneData.new("first_defeat_conversation", [mnemosyne, chiron], first_defeat_lines)
+	cutscenes["first_defeat_conversation"] = first_defeat_cutscene
+
+
 
 # Main function to trigger a cutscene
 func play_cutscene(cutscene_id: String):
