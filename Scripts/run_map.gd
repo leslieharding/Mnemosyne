@@ -119,9 +119,10 @@ func create_map_node_button(map_node: MapNode):
 	var button = Button.new()
 	button.text = map_node.display_name
 	
-	# Force a fixed size for all buttons
-	button.custom_minimum_size = Vector2(180, 60)
-	button.size = Vector2(120, 60)
+	# Use consistent size for both properties
+	var button_size = Vector2(180, 60)
+	button.custom_minimum_size = button_size
+	button.size = button_size
 	
 	# Disable auto-sizing so the button stays at our fixed size
 	button.clip_contents = true
@@ -129,8 +130,8 @@ func create_map_node_button(map_node: MapNode):
 	
 	# Position the button so its center is at the map node position
 	button.position = Vector2(
-		map_node.position.x - 60,  # Half of width (120/2)
-		map_node.position.y - 30   # Half of height (60/2)
+		map_node.position.x - button_size.x / 2,  # Half of actual width
+		map_node.position.y - button_size.y / 2   # Half of actual height
 	)
 	
 	# Style the button based on node type and availability
