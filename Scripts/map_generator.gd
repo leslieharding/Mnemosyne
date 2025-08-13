@@ -2,9 +2,9 @@
 class_name MapGenerator
 extends RefCounted
 
-# Map generation settings
-static var LAYER_COUNT: int = 6  # Or however many layers you want
-static var NODES_PER_LAYER: Array[int] = [3, 3, 3, 3, 2, 1]  # Start, Early, Mid, Late, Elite, Boss
+# Map generation settings - UPDATED for linear path
+static var LAYER_COUNT: int = 6  # 5 unique enemies + 1 boss
+static var NODES_PER_LAYER: Array[int] = [1, 1, 1, 1, 1, 1]  # Single path through all enemies
 static var MAP_WIDTH: float = 800.0
 static var MAP_HEIGHT: float = 600.0
 static var LAYER_SPACING: float = MAP_HEIGHT / (LAYER_COUNT - 1)
@@ -73,15 +73,19 @@ static func assign_enemies_to_tiers() -> Dictionary:
 	
 	return tier_assignments
 
-
-
 # Generate nodes for a specific layer
 static func generate_layer_nodes(layer: int, starting_id: int, tier_enemy_assignments: Dictionary) -> Array[MapNode]:
 	var layer_nodes: Array[MapNode] = []
 	var node_count = NODES_PER_LAYER[layer]
 	
+	# Get actual screen width dynamically
+	var screen_width = DisplayServer.window_get_size().x
+	var screen_center_x = screen_width / 2.0
+	
 	# Calculate horizontal spacing for this layer
-	var horizontal_spacing = MAP_WIDTH / (node_count + 1)
+	var horizontal_spacing = (screen_width * 0.8) / (node_count + 1)  # Use 80% of screen width
+	var start_x = screen_width * 0.1  # Start at 10% from left edge
+	
 	# Invert the Y position so layer 0 is at the bottom and final layer is at top
 	# Add padding so buttons don't go off-screen (button height is ~60px)
 	var button_height = 60
@@ -91,7 +95,7 @@ static func generate_layer_nodes(layer: int, starting_id: int, tier_enemy_assign
 	var y_position = padding + (LAYER_COUNT - 1 - layer) * layer_spacing
 
 	for i in range(node_count):
-		var x_position = (i + 1) * horizontal_spacing
+		var x_position = start_x + (i + 1) * horizontal_spacing
 		var position = Vector2(x_position, y_position)
 		
 		# Determine node type based on layer
@@ -162,14 +166,14 @@ static func assign_enemy_to_node_with_tier_assignments(node: MapNode, layer: int
 			print("WARNING: No deck found for ", assigned_enemy, " at difficulty ", difficulty, " - falling back to difficulty 1")
 			node.enemy_difficulty = 1
 
-# Connect nodes between layers - REVERSE the connection direction
+# Connect nodes between layers - SIMPLIFIED for linear path
 static func connect_layers(nodes_by_layer: Array, map_data: MapData):
 	# Connect each layer to the PREVIOUS layer (so starting nodes have no connections)
 	for layer in range(1, LAYER_COUNT):  # Start from layer 1, not 0
 		var current_layer_nodes = nodes_by_layer[layer]
 		var previous_layer_nodes = nodes_by_layer[layer - 1]
 		
-		# Each node in current layer connects to some nodes in previous layer
+		# Each node in current layer connects to the single node in previous layer
 		for current_node in current_layer_nodes:
 			var connections = generate_connections_for_node(
 				current_node, 
@@ -178,7 +182,7 @@ static func connect_layers(nodes_by_layer: Array, map_data: MapData):
 			)
 			current_node.connections = connections
 
-# Generate connections for a specific node
+# Generate connections for a specific node - SIMPLIFIED for linear path
 static func generate_connections_for_node(
 	current_node: MapNode, 
 	current_layer: Array[MapNode], 
@@ -187,22 +191,9 @@ static func generate_connections_for_node(
 	
 	var connections: Array[int] = []
 	
-	# Simple connection logic: each node connects to 1-2 nodes in the next layer
-	var connection_count = randi_range(1, min(2, next_layer.size()))
-	
-	# Find the closest nodes in the next layer based on horizontal position
-	var distances: Array = []
-	for i in range(next_layer.size()):
-		var next_node = next_layer[i]
-		var distance = abs(current_node.position.x - next_node.position.x)
-		distances.append({"index": i, "distance": distance, "node_id": next_node.node_id})
-	
-	# Sort by distance
-	distances.sort_custom(func(a, b): return a.distance < b.distance)
-	
-	# Connect to the closest nodes
-	for i in range(min(connection_count, distances.size())):
-		connections.append(distances[i].node_id)
+	# For a linear path, each node simply connects to the single node in the previous layer
+	if next_layer.size() > 0:
+		connections.append(next_layer[0].node_id)
 	
 	return connections
 

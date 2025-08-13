@@ -118,10 +118,20 @@ func create_map_node_button(map_node: MapNode):
 	# Create the button
 	var button = Button.new()
 	button.text = map_node.display_name
-	button.custom_minimum_size = Vector2(80, 60)
 	
-	# Position the button based on the map node's position
-	button.position = map_node.position
+	# Force a fixed size for all buttons
+	button.custom_minimum_size = Vector2(180, 60)
+	button.size = Vector2(120, 60)
+	
+	# Disable auto-sizing so the button stays at our fixed size
+	button.clip_contents = true
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	
+	# Position the button so its center is at the map node position
+	button.position = Vector2(
+		map_node.position.x - 60,  # Half of width (120/2)
+		map_node.position.y - 30   # Half of height (60/2)
+	)
 	
 	# Style the button based on node type and availability
 	style_map_node_button(button, map_node)
@@ -132,9 +142,7 @@ func create_map_node_button(map_node: MapNode):
 	# Add to the scene and track it
 	map_container.add_child(button)
 	map_node_buttons.append(button)
-
-# Replace the style_map_node_button function (around lines 150-200)
-
+	
 # Style a map node button based on its state
 func style_map_node_button(button: Button, map_node: MapNode):
 	# Create custom style based on node state
