@@ -15,12 +15,16 @@ static func generate_map() -> MapData:
 	map_data.total_layers = LAYER_COUNT
 	map_data.layer_node_counts = NODES_PER_LAYER
 	
+	# PRE-ASSIGN ENEMIES TO TIERS
+	var tier_enemy_assignments = assign_enemies_to_tiers()
+	print("Tier enemy assignments: ", tier_enemy_assignments)
+	
 	# Generate nodes for each layer
 	var node_id_counter = 0
 	var nodes_by_layer: Array = []
 	
 	for layer in range(LAYER_COUNT):
-		var layer_nodes = generate_layer_nodes(layer, node_id_counter)
+		var layer_nodes = generate_layer_nodes(layer, node_id_counter, tier_enemy_assignments)
 		nodes_by_layer.append(layer_nodes)
 		
 		# Add nodes to the main array
@@ -37,8 +41,42 @@ static func generate_map() -> MapData:
 	
 	return map_data
 
+# Pre-assign enemies to tiers to ensure each enemy is used exactly once
+static func assign_enemies_to_tiers() -> Dictionary:
+	var enemies_collection: EnemiesCollection = load("res://Resources/Collections/Enemies.tres")
+	if not enemies_collection:
+		print("ERROR: Could not load enemies collection")
+		return {}
+	
+	var all_enemies = enemies_collection.get_enemy_names()
+	
+	# Get the first 5 enemies for Apollo runs
+	var apollo_enemies = []
+	for i in range(min(5, all_enemies.size())):
+		apollo_enemies.append(all_enemies[i])
+	
+	print("Apollo enemies available: ", apollo_enemies)
+	
+	# Shuffle the enemies randomly
+	apollo_enemies.shuffle()
+	
+	# Assign one enemy to each tier (0-4)
+	var tier_assignments = {}
+	for tier in range(5):
+		if tier < apollo_enemies.size():
+			tier_assignments[tier] = apollo_enemies[tier]
+			print("Tier ", tier, " assigned enemy: ", apollo_enemies[tier])
+		else:
+			# Fallback if we somehow don't have enough enemies
+			tier_assignments[tier] = "Shadow Acolyte"
+			print("Tier ", tier, " fallback to Shadow Acolyte")
+	
+	return tier_assignments
+
+
+
 # Generate nodes for a specific layer
-static func generate_layer_nodes(layer: int, starting_id: int) -> Array[MapNode]:
+static func generate_layer_nodes(layer: int, starting_id: int, tier_enemy_assignments: Dictionary) -> Array[MapNode]:
 	var layer_nodes: Array[MapNode] = []
 	var node_count = NODES_PER_LAYER[layer]
 	
@@ -62,8 +100,8 @@ static func generate_layer_nodes(layer: int, starting_id: int) -> Array[MapNode]
 		# Create the node
 		var node = MapNode.new(starting_id + i, node_type, position)
 		
-		# Assign enemy to this node
-		assign_enemy_to_node(node, layer, i)
+		# Assign enemy to this node using the pre-assigned tier enemies
+		assign_enemy_to_node_with_tier_assignments(node, layer, tier_enemy_assignments)
 		
 		layer_nodes.append(node)
 	
@@ -77,7 +115,7 @@ static func determine_node_type(layer: int, index_in_layer: int) -> MapNode.Node
 	else:
 		return MapNode.NodeType.BATTLE
 
-static func assign_enemy_to_node(node: MapNode, layer: int, index_in_layer: int):
+static func assign_enemy_to_node_with_tier_assignments(node: MapNode, layer: int, tier_assignments: Dictionary):
 	var enemies_collection: EnemiesCollection = load("res://Resources/Collections/Enemies.tres")
 	if not enemies_collection:
 		# Fallback if enemies collection not found
@@ -85,44 +123,44 @@ static func assign_enemy_to_node(node: MapNode, layer: int, index_in_layer: int)
 		node.enemy_difficulty = 0
 		return
 	
-	var enemy_names = enemies_collection.get_enemy_names()
-	
-	# Assign enemy based on node type first, then layer
+	# Assign enemy based on node type
 	if node.node_type == MapNode.NodeType.BOSS:
 		# Always assign the boss to boss nodes
 		node.enemy_name = "?????"
 		node.enemy_difficulty = 2  # Master difficulty for boss
 		print("Assigned boss: ????? to boss node")
 	else:
-		# Regular enemy assignment based on layer
+		# Get the pre-assigned enemy for this tier
+		var assigned_enemy = tier_assignments.get(layer, "Shadow Acolyte")
+		
+		# Determine difficulty based on tier
+		var difficulty: int
 		match layer:
-			0:  # Starting layer - easy enemies
-				# Use the first few enemies, excluding the boss
-				var regular_enemies = []
-				for enemy_name in enemy_names:
-					if enemy_name != "?????":
-						regular_enemies.append(enemy_name)
-				
-				if regular_enemies.size() > 0:
-					node.enemy_name = regular_enemies[index_in_layer % regular_enemies.size()]
+			0, 1, 2:  # First 3 tiers - difficulty 1 (Adept)
+				difficulty = 1
+			3:        # 4th tier - difficulty 2 (Master)
+				difficulty = 2
+			_:        # 5th tier and beyond - difficulty 3 (or 2 if 3 doesn't exist)
+				difficulty = 3
+				# Verify difficulty 3 exists for this enemy
+				var enemy_collection = enemies_collection.get_enemy(assigned_enemy)
+				if enemy_collection:
+					var available_difficulties = enemy_collection.get_available_difficulties()
+					if not 3 in available_difficulties:
+						difficulty = 2  # Fall back to difficulty 2
 				else:
-					node.enemy_name = "Shadow Acolyte"  # Fallback
-				node.enemy_difficulty = 0
-			1, 2:  # Middle layers - medium enemies
-				var regular_enemies = []
-				for enemy_name in enemy_names:
-					if enemy_name != "?????":
-						regular_enemies.append(enemy_name)
-				
-				if regular_enemies.size() > 0:
-					node.enemy_name = regular_enemies[index_in_layer % regular_enemies.size()]
-				else:
-					node.enemy_name = "Shadow Acolyte"  # Fallback
-				node.enemy_difficulty = 1
-			_:
-				# Fallback for any other layers
-				node.enemy_name = "Shadow Acolyte"
-				node.enemy_difficulty = 0
+					difficulty = 2  # Fallback
+		
+		node.enemy_name = assigned_enemy
+		node.enemy_difficulty = difficulty
+		
+		print("Assigned enemy: ", assigned_enemy, " (difficulty ", difficulty, ") to layer ", layer, " node")
+		
+		# Verify the assignment worked
+		var enemy_deck = enemies_collection.get_enemy_deck(assigned_enemy, difficulty)
+		if enemy_deck.is_empty():
+			print("WARNING: No deck found for ", assigned_enemy, " at difficulty ", difficulty, " - falling back to difficulty 1")
+			node.enemy_difficulty = 1
 
 # Connect nodes between layers - REVERSE the connection direction
 static func connect_layers(nodes_by_layer: Array, map_data: MapData):
