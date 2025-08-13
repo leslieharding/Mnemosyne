@@ -7,7 +7,8 @@ var journal_button: JournalButton
 @onready var apollo_button: Button = $VBoxContainer/HBoxContainer/ApolloButton
 @onready var hermes_button: Button = $VBoxContainer/HBoxContainer/HermesButton
 @onready var artemis_button: Button = $VBoxContainer/HBoxContainer/ArtemisButton
-@onready var aphrodite_button: Button = $VBoxContainer/HBoxContainer/AphroditeButton  
+@onready var aphrodite_button: Button = $VBoxContainer/HBoxContainer/AphroditeButton
+@onready var demeter_button: Button = $VBoxContainer/HBoxContainer/DemeterButton  
 @onready var chiron_button: ChironButton = $ChironButton
 
 func _ready():
@@ -46,7 +47,8 @@ func setup_god_buttons():
 	setup_individual_god_button("Apollo", apollo_button, unlocked_gods)
 	setup_individual_god_button("Hermes", hermes_button, unlocked_gods)
 	setup_individual_god_button("Artemis", artemis_button, unlocked_gods)
-	setup_individual_god_button("Aphrodite", aphrodite_button, unlocked_gods)  # Add this line
+	setup_individual_god_button("Aphrodite", aphrodite_button, unlocked_gods)
+	setup_individual_god_button("Demeter", demeter_button, unlocked_gods)
 	# Add more gods here as needed
 
 func setup_individual_god_button(god_name: String, button: Button, unlocked_gods: Array[String]):
@@ -90,6 +92,12 @@ func _on_aphrodite_button_pressed() -> void:
 		TransitionManagerAutoload.change_scene_to("res://Scenes/Aphrodite.tscn")
 	else:
 		show_unlock_requirements("Aphrodite")
+
+func _on_demeter_button_pressed() -> void:
+	if is_god_available("Demeter"):
+		TransitionManagerAutoload.change_scene_to("res://Scenes/Demeter.tscn")
+	else:
+		show_unlock_requirements("Demeter")
 
 func is_god_available(god_name: String) -> bool:
 	if not has_node("/root/GlobalProgressTrackerAutoload"):

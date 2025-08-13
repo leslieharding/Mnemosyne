@@ -23,6 +23,11 @@ var god_unlock_conditions: Dictionary = {
 		"type": "couples_united",
 		"required_count": 2,
 		"description": "Unite 2 couples by placing them adjacent on the board"
+	},
+	"Demeter": {
+		"type": "cards_leveled",
+		"required_count": 5,
+		"description": "Level up 5 different cards"
 	}
 }
 
@@ -244,6 +249,9 @@ func check_unlock_condition(condition: Dictionary) -> bool:
 		"couples_united":
 			var required = condition.get("required_count", 2)
 			return couples_united.size() >= required
+		"cards_leveled":
+			var required = condition.get("required_count", 5)
+			return count_leveled_cards() >= required
 		_:
 			return false
 
@@ -260,6 +268,22 @@ func check_boss_defeated(boss_name: String) -> bool:
 		return boss_data.get("victories", 0) > 0
 	
 	return false
+
+# Check if enough cards have been leveled up
+func count_leveled_cards() -> int:
+	var leveled_count = 0
+	
+	# Count cards across all gods that have reached level 2 or higher
+	for god_name in progress_data:
+		var god_progress = progress_data[god_name]
+		for card_index in god_progress:
+			var card_data = god_progress[card_index]
+			var card_level = ExperienceHelpers.calculate_level(card_data["total_exp"])
+			if card_level >= 2:  # Level 2 or higher counts as "leveled up"
+				leveled_count += 1
+	
+	return leveled_count
+
 
 # Unlock a god
 func unlock_god(god_name: String):
@@ -300,6 +324,13 @@ func get_unlock_progress_text(condition: Dictionary) -> String:
 				return " ✓"
 			else:
 				return " (" + str(current) + "/" + str(required) + " couples united)"
+		"cards_leveled":
+			var required = condition.get("required_count", 5)
+			var current = count_leveled_cards()
+			if current >= required:
+				return " ✓"
+			else:
+				return " (" + str(current) + "/" + str(required) + " cards leveled)"
 		_:
 			return ""
 
