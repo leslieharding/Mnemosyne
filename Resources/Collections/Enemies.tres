@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=126 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=129 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -725,12 +725,36 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_x2e5i"]
+script = ExtResource("3_601pn")
+deck_name = "The Wrong Note 1"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_hou4s"]
+script = ExtResource("3_601pn")
+deck_name = "The Wrong Note 2"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_145qj"]
+script = ExtResource("3_601pn")
+deck_name = "The Wrong Note 3"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
 [sub_resource type="Resource" id="Resource_tahvs"]
 script = ExtResource("1_e7ref")
 enemy_name = "The Wrong Note"
 enemy_description = "We cant all get lessons from Calliope and Euterpe directly"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_61b1n"), SubResource("Resource_8k02u"), SubResource("Resource_2yxw7"), SubResource("Resource_srqjw"), SubResource("Resource_1shm4"), SubResource("Resource_i860w"), SubResource("Resource_0fei0"), SubResource("Resource_yc4hw"), SubResource("Resource_cd5hd"), SubResource("Resource_703p7"), SubResource("Resource_eoqwl"), SubResource("Resource_msags"), SubResource("Resource_pugcu"), SubResource("Resource_t2t3x"), SubResource("Resource_wrrra")])
-decks = null
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_x2e5i"), SubResource("Resource_hou4s"), SubResource("Resource_145qj")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
 [sub_resource type="Resource" id="Resource_wesbp"]
