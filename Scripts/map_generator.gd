@@ -87,12 +87,12 @@ static func generate_layer_nodes(layer: int, starting_id: int, tier_enemy_assign
 	var start_x = screen_width * 0.1  # Start at 10% from left edge
 	
 	# Invert the Y position so layer 0 is at the bottom and final layer is at top
-	# Add padding so buttons don't go off-screen (button height is ~60px)
 	var button_height = 60
-	var padding = button_height / 2
-	var usable_height = MAP_HEIGHT - (2 * padding)
+	var top_padding = button_height  # More space at top for boss
+	var bottom_padding = button_height / 2
+	var usable_height = MAP_HEIGHT - top_padding - bottom_padding
 	var layer_spacing = usable_height / (LAYER_COUNT - 1) if LAYER_COUNT > 1 else 0
-	var y_position = padding + (LAYER_COUNT - 1 - layer) * layer_spacing
+	var y_position = top_padding + layer * layer_spacing
 
 	for i in range(node_count):
 		var x_position = start_x + (i + 1) * horizontal_spacing
