@@ -289,6 +289,8 @@ func create_sample_cutscenes():
 	var first_defeat_cutscene = CutsceneData.new("first_defeat_conversation", [mnemosyne, chiron], first_defeat_lines)
 	cutscenes["first_defeat_conversation"] = first_defeat_cutscene
 
+	var opening_awakening_cutscene = CutsceneData.new("opening_awakening", [mnemosyne, chiron], opening_lines)
+	cutscenes["opening_awakening"] = opening_awakening_cutscene
 
 
 # Main function to trigger a cutscene
