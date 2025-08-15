@@ -20,6 +20,20 @@ signal journal_closed()
 var journal_tween: Tween
 
 func _ready():
+	# Wait one frame to ensure all @onready variables are initialized
+	await get_tree().process_frame
+	
+	# Verify all required nodes exist before proceeding
+	if not close_button:
+		push_error("MemoryJournal: close_button not found!")
+		return
+	if not main_panel:
+		push_error("MemoryJournal: main_panel not found!")
+		return
+	if not title_label:
+		push_error("MemoryJournal: title_label not found!")
+		return
+	
 	# Connect signals
 	close_button.pressed.connect(_on_close_pressed)
 	
@@ -94,9 +108,13 @@ func refresh_all_content():
 	refresh_gods_tab()
 	refresh_mnemosyne_tab()
 
-# Update the header with summary info
 func update_header():
 	if not has_node("/root/MemoryJournalManagerAutoload"):
+		return
+	
+	# Check if UI nodes exist before trying to update them
+	if not title_label or not summary_label:
+		print("MemoryJournal: Header labels not found, skipping header update")
 		return
 	
 	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
