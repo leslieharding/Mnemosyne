@@ -285,9 +285,185 @@ func create_sample_cutscenes():
 		0.5,
 		1.0
 	))
+	# Second defeat conversation - NEW ADDITION
+	var second_defeat_lines: Array[DialogueLine] = []
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"New! Come on in, come on in",
+		"right",
+		1.1,
+		0.0,
+		0.5
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"Chiron, you are so positive but{pause:0.5} [slow]it is with ill tidings I return[/slow]",
+		"left",
+		0.8,
+		0.3,
+		0.8
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"For I am once again, defeated.",
+		"left",
+		0.7,
+		0.2,
+		1.0
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Tell me about your last adventure, [speed:1.3]you must![/speed]",
+		"right",
+		1.0,
+		0.2,
+		0.5
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"There's not much to tell unfortunately,{pause:0.8} [slow]that is the point[/slow]",
+		"left",
+		0.8,
+		0.3,
+		1.0
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"You remind me of a tale from the east.{pause:0.5} Would you believe it? [speed:1.2]Whole worlds exist beyond the wine dark sea.[/speed]",
+		"right",
+		0.9,
+		0.3,
+		0.8
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"But anyway, to the east there was once a fish.",
+		"right",
+		1.0,
+		0.2,
+		0.8
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"A fish?",
+		"left",
+		1.0,
+		0.3,
+		0.5
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Well more specifically a carp, but more importantly{pause:0.5} [speed:1.2]the carp was magic[/speed]",
+		"right",
+		0.9,
+		0.2,
+		0.8
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"A magic carp?",
+		"left",
+		1.0,
+		0.3,
+		0.5
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Indeed. The carp was forced to fight! Often against it's will.",
+		"right",
+		1.0,
+		0.2,
+		0.8
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"In the beginning the carp could do nearly nothing,{pause:0.5} more specifically it could splash around,{pause:0.3} [slow]the effect was negligible.[/slow]",
+		"right",
+		0.9,
+		0.2,
+		1.0
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Once it had run out of the energy to splash, it found it could struggle.{pause:0.8} It would hurt itself whilst struggling but{pause:0.5} at least it could make progress.",
+		"right",
+		0.9,
+		0.2,
+		1.0
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Eventually after struggling for some time it learned it could tackle.{pause:0.5} It was still slow progress but [speed:1.3]lightning quick[/speed] compared to memories of splashing.",
+		"right",
+		1.0,
+		0.2,
+		1.0
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"One day after tackling a particularly challenging adversary{pause:1.0} [speed:1.4]The carp transformed into a massive dragon, powerful and fearsome.[/speed]",
+		"right",
+		0.9,
+		0.3,
+		1.2
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"It's a lovely tale Chiron.{pause:0.8} Am I to interpret{pause:0.5} [slow]I am a carp splashing so to speak?[/slow]",
+		"left",
+		0.8,
+		0.3,
+		1.0
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Splashing yes, struggling maybe.{pause:0.8} But [speed:1.2]blessedly[/speed] on one's way to dragoonhood.",
+		"right",
+		0.9,
+		0.3,
+		1.2
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"I can feel the pull of [speed:1.2]Ananke[/speed] and with your gift of inspiration{pause:0.5} I'm ready to try again.",
+		"left",
+		1.0,
+		0.3,
+		0.8
+	))
+
+	second_defeat_lines.append(DialogueLine.new(
+		"Chiron", 
+		"[slow]I can be found in this locale whence my presence is required.[/slow]",
+		"right",
+		0.7,
+		0.5,
+		1.0
+	))
 
 	var first_defeat_cutscene = CutsceneData.new("first_defeat_conversation", [mnemosyne, chiron], first_defeat_lines)
 	cutscenes["first_defeat_conversation"] = first_defeat_cutscene
+	
+	var second_defeat_cutscene = CutsceneData.new("second_defeat_conversation", [mnemosyne, chiron], second_defeat_lines)
+	cutscenes["second_defeat_conversation"] = second_defeat_cutscene
 
 	var opening_awakening_cutscene = CutsceneData.new("opening_awakening", [mnemosyne, chiron], opening_lines)
 	cutscenes["opening_awakening"] = opening_awakening_cutscene

@@ -17,6 +17,8 @@ var save_path: String = "user://conversations.save"
 var conversation_shown_this_run: bool = false
 var current_run_id: String = ""
 
+var defeat_count: int = 0
+
 func _ready():
 	load_conversations()
 	setup_conversation_definitions()
@@ -42,9 +44,12 @@ func setup_conversation_definitions():
 	
 	register_conversation("first_run_defeat", Priority.STORY,
 	"Chiron offers wisdom about the nature of progress and victory.")
+	
+	register_conversation("second_run_defeat", Priority.STORY,
+	"A tale of eastern dragons and the path from weakness to strength.")
 		
 	register_conversation("hermes_unlocked", Priority.STORY, 
-	"The messenger god takes notice of your growing prowess. Swift feet follow swift minds.")	
+	"The messenger god takes notice of your growing prowess. Swift feet follow swift minds.")
 
 # Register a conversation definition
 func register_conversation(id: String, priority: Priority, description: String):
@@ -90,7 +95,17 @@ func get_conversation_button_state() -> Dictionary:
 		"text": "Visit Chiron" if is_story else "Visit Chiron"
 	}
 
-
+func increment_defeat_count():
+	defeat_count += 1
+	print("Defeat count incremented to: ", defeat_count)
+	
+	# Trigger appropriate conversation based on defeat count
+	if defeat_count == 1:
+		print("Triggering first_run_defeat conversation")
+		trigger_conversation("first_run_defeat")
+	elif defeat_count == 2:
+		print("Triggering second_run_defeat conversation")
+		trigger_conversation("second_run_defeat")
 
 # Trigger a conversation to become available
 func trigger_conversation(conversation_id: String):
@@ -150,29 +165,28 @@ func has_available_conversations() -> bool:
 	return get_next_conversation().size() > 0
 
 
-# Save conversations to disk
 func save_conversations():
 	var save_file = FileAccess.open(save_path, FileAccess.WRITE)
 	if save_file:
-		save_file.store_var(conversations)
+		var save_data = {
+			"conversations": conversations,
+			"defeat_count": defeat_count
+		}
+		save_file.store_var(save_data)
 		save_file.close()
-	else:
-		print("Failed to save conversations!")
 
-# Load conversations from disk
 func load_conversations():
 	if FileAccess.file_exists(save_path):
 		var save_file = FileAccess.open(save_path, FileAccess.READ)
 		if save_file:
 			var loaded_data = save_file.get_var()
 			if loaded_data is Dictionary:
-				conversations = loaded_data
-			save_file.close()
-			print("Conversations loaded")
-		else:
-			print("Failed to load conversations!")
-	else:
-		print("No conversation save found, starting fresh")
+				if loaded_data.has("conversations"):
+					conversations = loaded_data.get("conversations", {})
+					defeat_count = loaded_data.get("defeat_count", 0)
+				else:
+					conversations = loaded_data
+					defeat_count = 0
 
 # Clear all conversation data (for new game)
 func clear_all_conversations():

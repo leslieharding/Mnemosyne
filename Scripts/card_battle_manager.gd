@@ -1040,7 +1040,7 @@ func should_game_end() -> bool:
 
 
 
-# Replace the end_game() function in Scripts/card_battle_manager.gd (around lines 1155-1180)
+
 
 func end_game():
 	# Tutorial ending - different flow
@@ -1133,8 +1133,8 @@ func end_game():
 					print("Triggering first_boss_loss conversation")
 					conv_manager.trigger_conversation("first_boss_loss")
 				else:
-					print("Triggering first_run_defeat conversation")
-					conv_manager.trigger_conversation("first_run_defeat")
+					print("Recording defeat (from consecutive draws) for conversation tracking")
+					conv_manager.increment_defeat_count()
 			
 			# Show defeat message and go to summary
 			game_status_label.text = "Defeat! " + winner
@@ -1182,8 +1182,8 @@ func end_game():
 				print("Triggering first_boss_loss conversation")
 				conv_manager.trigger_conversation("first_boss_loss")
 			else:
-				print("Triggering first_run_defeat conversation")
-				conv_manager.trigger_conversation("first_run_defeat")
+				print("Recording defeat for conversation tracking")
+				conv_manager.increment_defeat_count()
 	
 	if not victory:
 		# If player loses, show run summary before ending
