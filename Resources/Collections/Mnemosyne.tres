@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=11 format=3 uid="uid://ba4obktkm1t7a"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=12 format=3 uid="uid://ba4obktkm1t7a"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_lnd8j"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_fw0bv"]
+[ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_fw0bv"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="3_njtec"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="4_04wac"]
 
@@ -11,6 +12,8 @@ card_name = "Clio"
 values = Array[int]([1, 1, 1, 1])
 description = "Is there ever anything more ignorable than a lesson from history?"
 abilities = Array[ExtResource("2_fw0bv")]([])
+level_data = Array[ExtResource("3_fw0bv")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qjfog"]
@@ -19,14 +22,18 @@ card_name = "Euterpe"
 values = Array[int]([1, 1, 1, 1])
 description = "Witty music related comment goes here"
 abilities = Array[ExtResource("2_fw0bv")]([])
+level_data = Array[ExtResource("3_fw0bv")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_vcysh"]
 script = ExtResource("1_lnd8j")
 card_name = "Terpsichore"
 values = Array[int]([1, 1, 1, 1])
-description = "Witty dance related comment goes here"
+description = "What is the natural product of music and a body?  It is of course dance"
 abilities = Array[ExtResource("2_fw0bv")]([])
+level_data = Array[ExtResource("3_fw0bv")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0lbui"]
@@ -35,6 +42,8 @@ card_name = "Thalia"
 values = Array[int]([1, 1, 1, 1])
 description = "witty joke goes here"
 abilities = Array[ExtResource("2_fw0bv")]([])
+level_data = Array[ExtResource("3_fw0bv")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tn1am"]
@@ -43,6 +52,8 @@ card_name = "Melpomene"
 values = Array[int]([1, 1, 1, 1])
 description = "Witty tradgey/drama comment goes here"
 abilities = Array[ExtResource("2_fw0bv")]([])
+level_data = Array[ExtResource("3_fw0bv")]([])
+uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_lnd8j"]
@@ -53,6 +64,8 @@ card_indices = Array[int]([0, 1, 2, 3, 4])
 is_starter_deck = true
 required_capture_exp = 0
 required_defense_exp = 0
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [resource]
