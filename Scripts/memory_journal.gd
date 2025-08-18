@@ -437,36 +437,6 @@ func create_detailed_enemy_display(container: Control, info: Dictionary):
 		tactical_label.add_theme_color_override("font_color", Color("#BBBBBB"))
 		main_vbox.add_child(tactical_label)
 	
-	# Weakness hints (level 4+)
-	if "weakness_hint" in info and info["weakness_hint"] != "":
-		var weakness_title = Label.new()
-		weakness_title.text = "Identified Weaknesses"
-		weakness_title.add_theme_font_size_override("font_size", 14)
-		weakness_title.add_theme_color_override("font_color", Color("#FFB74D"))
-		main_vbox.add_child(weakness_title)
-		
-		var weakness_label = Label.new()
-		weakness_label.text = info["weakness_hint"]
-		weakness_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		weakness_label.add_theme_font_size_override("font_size", 12)
-		weakness_label.add_theme_color_override("font_color", Color("#FFB74D"))
-		main_vbox.add_child(weakness_label)
-	
-	# Optimal strategy (level 5)
-	if "optimal_strategy" in info and info["optimal_strategy"] != "":
-		var strategy_title = Label.new()
-		strategy_title.text = "Optimal Strategy"
-		strategy_title.add_theme_font_size_override("font_size", 14)
-		strategy_title.add_theme_color_override("font_color", Color("#AB47BC"))
-		main_vbox.add_child(strategy_title)
-		
-		var strategy_label = Label.new()
-		strategy_label.text = info["optimal_strategy"]
-		strategy_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		strategy_label.add_theme_font_size_override("font_size", 12)
-		strategy_label.add_theme_color_override("font_color", Color("#AB47BC"))
-		main_vbox.add_child(strategy_label)
-	
 	# Add main container to the details panel
 	container.add_child(main_vbox)
 
