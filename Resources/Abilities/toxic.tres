@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ToxicAbility" load_steps=2 format=3 uid="uid://s05x0a8pr6qb"]
+
+[ext_resource type="Script" uid="uid://dyur10e6s3lah" path="res://Resources/Abilities/toxic_ability.gd" id="1_jf8ww"]
+
+[resource]
+script = ExtResource("1_jf8ww")
+ability_name = "Toxic"
+description = "When this card is captured, it captures the card that captured it"
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dyur10e6s3lah"

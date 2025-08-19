@@ -8,8 +8,6 @@ func _init():
 	trigger_condition = TriggerType.ON_DEFEND
 	print("DefensiveCounterAbility _init called - trigger_condition set to: ", trigger_condition)
 
-# This replaces the defensive counter ability in Resources/Abilities/defensive_counter_ability.gd
-# Replace the execute function (around lines 30-80):
 
 func execute(context: Dictionary) -> bool:
 	if not can_execute(context):
@@ -62,6 +60,23 @@ func execute(context: Dictionary) -> bool:
 	game_manager.set_card_ownership(attacking_position, defending_owner)
 	
 	print(ability_name, " activated! ", defending_card.card_name, " captured the attacking ", attacking_card.card_name, "!")
+	
+	# IMPORTANT: Execute ON_CAPTURE abilities on the captured card (like Toxic)
+	var attacking_card_level = game_manager.get_card_level(game_manager.get_card_collection_index(attacking_position))
+	if attacking_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, attacking_card_level):
+		print("DefensiveCounterAbility: Executing ON_CAPTURE abilities for captured card: ", attacking_card.card_name)
+		
+		var capture_context = {
+			"capturing_card": defending_card,
+			"capturing_position": defending_position,
+			"captured_card": attacking_card,
+			"captured_position": attacking_position,
+			"game_manager": game_manager,
+			"direction": direction,
+			"card_level": attacking_card_level
+		}
+		
+		attacking_card.execute_abilities(CardAbility.TriggerType.ON_CAPTURE, capture_context, attacking_card_level)
 	
 	# Award bonus experience for successful counter-capture - UNIFIED VERSION
 	if defending_owner == game_manager.Owner.PLAYER:

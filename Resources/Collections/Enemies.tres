@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=129 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=133 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://b72irnrav5w53" path="res://Resources/Abilities/defensive_counter_ability.gd" id="6_mxtxa"]
 [ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="7_oovod"]
 [ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="8_m5w2u"]
+[ext_resource type="Script" uid="uid://dyur10e6s3lah" path="res://Resources/Abilities/toxic_ability.gd" id="8_oovod"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("7_oovod")
@@ -781,12 +782,20 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_61b1n"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_x2e5i"), SubResource("Resource_hou4s"), SubResource("Resource_145qj")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_g6p1i"]
+script = ExtResource("8_oovod")
+ability_name = "Toxic"
+description = "When this card is captured, it captures the card that captured it"
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dyur10e6s3lah"
+
 [sub_resource type="Resource" id="Resource_wesbp"]
 script = ExtResource("2_xcqsp")
 card_name = "Nosos"
 values = Array[int]([2, 2, 2, 2])
 description = "Come closer breath me in, I'm sure nothing bad will happen"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_g6p1i")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -831,12 +840,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_0i5ty"]
+script = ExtResource("8_oovod")
+ability_name = "Toxic"
+description = "When this card is captured, it captures the card that captured it"
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dyur10e6s3lah"
+
 [sub_resource type="Resource" id="Resource_ylk1d"]
 script = ExtResource("2_xcqsp")
 card_name = "Nosos"
 values = Array[int]([3, 3, 3, 3])
 description = "Come closer breath me in, I'm sure nothing bad will happen"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0i5ty")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -881,12 +898,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_pee5b"]
+script = ExtResource("8_oovod")
+ability_name = "Toxic"
+description = "When this card is captured, it captures the card that captured it"
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dyur10e6s3lah"
+
 [sub_resource type="Resource" id="Resource_gimv3"]
 script = ExtResource("2_xcqsp")
 card_name = "Nosos"
 values = Array[int]([4, 4, 4, 4])
 description = "Come closer breath me in, I'm sure nothing bad will happen"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_pee5b")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

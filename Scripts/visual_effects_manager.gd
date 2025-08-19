@@ -309,6 +309,34 @@ func create_all_edge_overlays(card_size: Vector2) -> Array[ColorRect]:
 	
 	return edges
 
+# Add this method to VisualEffectsManager
+func show_toxic_counter_flash(card_display: CardDisplay):
+	if not card_display or not card_display.panel:
+		return
+	
+	# Create a toxic green flash effect
+	var flash_overlay = ColorRect.new()
+	flash_overlay.color = Color("#44FF44", 0.7)  # Bright green with transparency
+	flash_overlay.size = card_display.panel.size
+	flash_overlay.position = Vector2.ZERO
+	flash_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	card_display.panel.add_child(flash_overlay)
+	
+	# Animate the toxic flash
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Pulse effect - in and out twice for toxic feel
+	tween.tween_property(flash_overlay, "modulate:a", 0.8, 0.15)
+	tween.tween_property(flash_overlay, "modulate:a", 0.2, 0.15).set_delay(0.15)
+	tween.tween_property(flash_overlay, "modulate:a", 0.8, 0.15).set_delay(0.3)
+	tween.tween_property(flash_overlay, "modulate:a", 0.0, 0.2).set_delay(0.45)
+	
+	# Clean up
+	tween.tween_callback(func(): flash_overlay.queue_free()).set_delay(0.65)
+
+
 # Start the continuous pulsing animation
 func start_pulse_animation(pulse_container: Control):
 	if not is_instance_valid(pulse_container):
