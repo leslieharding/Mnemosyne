@@ -185,6 +185,8 @@ deck_name = "Pythons Brood 1"
 deck_description = "Level 1"
 difficulty_level = 1
 card_indices = Array[int]([0, 1, 2, 3, 4])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_57iqf"]
@@ -193,6 +195,8 @@ deck_name = "Pythons Brood 2"
 deck_description = "Level 2"
 difficulty_level = 2
 card_indices = Array[int]([5, 6, 7, 8, 9])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_kjbhx"]
@@ -201,6 +205,8 @@ deck_name = "Pythons Brood 3"
 deck_description = "Level 3"
 difficulty_level = 3
 card_indices = Array[int]([10, 11, 12, 13, 14])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_efy6x"]
@@ -367,6 +373,8 @@ deck_name = "Niobes Brood 1"
 deck_description = "Level 1"
 difficulty_level = 1
 card_indices = Array[int]([0, 1, 2, 3, 4])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_unt1i"]
@@ -375,6 +383,8 @@ deck_name = "Niobes Brood 2"
 deck_description = "Level 2"
 difficulty_level = 2
 card_indices = Array[int]([5, 6, 7, 8, 9])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_jq8at"]
@@ -383,6 +393,8 @@ deck_name = "Niobes Brood 3"
 deck_description = "Level 3"
 difficulty_level = 3
 card_indices = Array[int]([10, 11, 12, 13, 14])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_y0w8m"]
@@ -549,6 +561,8 @@ deck_name = ""
 deck_description = ""
 difficulty_level = 0
 card_indices = Array[int]([0, 1, 2, 3, 4])
+deck_power_type = 1
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_wg2k6"]
@@ -557,6 +571,8 @@ deck_name = ""
 deck_description = ""
 difficulty_level = 1
 card_indices = Array[int]([5, 6, 7, 8, 9])
+deck_power_type = 1
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_mvnyh"]
@@ -565,6 +581,8 @@ deck_name = ""
 deck_description = ""
 difficulty_level = 2
 card_indices = Array[int]([10, 11, 12, 13, 14])
+deck_power_type = 1
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_bdmj8"]
@@ -731,6 +749,8 @@ deck_name = "The Wrong Note 1"
 deck_description = "Level 1"
 difficulty_level = 1
 card_indices = Array[int]([0, 1, 2, 3, 4])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_hou4s"]
@@ -739,6 +759,8 @@ deck_name = "The Wrong Note 2"
 deck_description = "Level 2"
 difficulty_level = 2
 card_indices = Array[int]([5, 6, 7, 8, 9])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_145qj"]
@@ -747,6 +769,8 @@ deck_name = "The Wrong Note 3"
 deck_description = "Level 3"
 difficulty_level = 3
 card_indices = Array[int]([10, 11, 12, 13, 14])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_tahvs"]
@@ -913,6 +937,8 @@ deck_name = "The Plague 1"
 deck_description = "Level 1"
 difficulty_level = 1
 card_indices = Array[int]([0, 1, 2, 3, 4])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_ctnn8"]
@@ -921,6 +947,8 @@ deck_name = "The Plague 2"
 deck_description = "Level 2"
 difficulty_level = 2
 card_indices = Array[int]([5, 6, 7, 8, 9])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_c4kby"]
@@ -929,6 +957,8 @@ deck_name = "The Plague 3"
 deck_description = "Level 3"
 difficulty_level = 3
 card_indices = Array[int]([10, 11, 12, 13, 14])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_bsikd"]
@@ -1030,6 +1060,8 @@ deck_name = "Chronos"
 deck_description = "tutorial deck"
 difficulty_level = 0
 card_indices = Array[int]([0, 1, 2, 3, 4])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_25nh6"]
@@ -1122,6 +1154,8 @@ deck_name = "Boss1 deck"
 deck_description = "the first hurdle"
 difficulty_level = 0
 card_indices = Array[int]([0, 1, 2, 3, 4])
+deck_power_type = 0
+power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_i1x7r"]

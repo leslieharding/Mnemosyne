@@ -17,6 +17,9 @@ var think_time_max: float = 2.5
 # Enemy collection reference
 var enemies_collection: EnemiesCollection
 
+var current_deck_definition: EnemyDeckDefinition = null
+
+
 func _ready():
 	load_enemies_collection()
 
@@ -26,7 +29,6 @@ func load_enemies_collection():
 	if not enemies_collection:
 		push_error("Failed to load enemies collection!")
 
-# Set up opponent with specific enemy and difficulty
 func setup_opponent(enemy_name: String, difficulty: int = 0):
 	print("OpponentManager: Setting up opponent: ", enemy_name, " with difficulty ", difficulty)
 	
@@ -39,7 +41,21 @@ func setup_opponent(enemy_name: String, difficulty: int = 0):
 	
 	print("OpponentManager: Enemies collection loaded, available enemies: ", enemies_collection.get_enemy_names())
 	
-	# Get the enemy deck
+	# Get the enemy collection for this enemy type
+	var enemy_collection = enemies_collection.get_enemy(enemy_name)
+	if not enemy_collection:
+		print("Warning: Enemy '", enemy_name, "' not found")
+		setup_fallback_opponent()
+		return
+	
+	# Get the deck definition (this contains the power info)
+	current_deck_definition = enemy_collection.get_deck_definition_by_difficulty(difficulty)
+	if not current_deck_definition:
+		print("Warning: No deck definition found for enemy '", enemy_name, "' with difficulty ", difficulty)
+		setup_fallback_opponent()
+		return
+	
+	# Get the opponent deck
 	opponent_deck = enemies_collection.get_enemy_deck(enemy_name, difficulty)
 	
 	print("OpponentManager: Got deck with ", opponent_deck.size(), " cards")
@@ -63,10 +79,22 @@ func setup_opponent(enemy_name: String, difficulty: int = 0):
 		opponent_description = "A mysterious opponent"
 	
 	print("OpponentManager: Opponent loaded: ", opponent_name, " with ", opponent_deck.size(), " cards")
+	
+	# Debug deck power info
+	if current_deck_definition.deck_power_type != EnemyDeckDefinition.EnemyDeckPowerType.NONE:
+		print("OpponentManager: Deck has power: ", current_deck_definition.get_power_description())
+	else:
+		print("OpponentManager: Deck has no special power")
 
-# Fallback to Apollo deck if enemy system fails
+# Add this new function to get the current deck definition
+func get_current_deck_definition() -> EnemyDeckDefinition:
+	return current_deck_definition
+
+# Update the setup_fallback_opponent function to clear deck definition
 func setup_fallback_opponent():
 	print("Using fallback opponent (Apollo deck)")
+	current_deck_definition = null  # No special powers for fallback
+	
 	var apollo_collection: GodCardCollection = load("res://Resources/Collections/Apollo.tres")
 	if apollo_collection:
 		opponent_deck = apollo_collection.get_deck(0)

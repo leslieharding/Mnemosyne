@@ -19,6 +19,8 @@ var deck_card_indices: Array[int] = []  # Original indices in god's collection
 var exp_panel: ExpPanel  # Reference to experience panel
 var grid_to_collection_index: Dictionary = {}  # grid_index -> collection_index
 
+var active_enemy_deck_power: EnemyDeckDefinition.EnemyDeckPowerType = EnemyDeckDefinition.EnemyDeckPowerType.NONE
+var darkness_shroud_active: bool = false
 
 var couple_definitions = {
 	"Phaeton": "Cygnus",
@@ -352,7 +354,6 @@ func setup_managers():
 	# Set up opponent based on map node data
 	setup_opponent_from_params()
 
-# Set up opponent based on parameters from map
 func setup_opponent_from_params():
 	var params = get_scene_params()
 	
@@ -380,9 +381,57 @@ func setup_opponent_from_params():
 			
 			print("Setting up opponent: ", enemy_name, " (difficulty ", enemy_difficulty, ")")
 			opponent_manager.setup_opponent(enemy_name, enemy_difficulty)
+			
+			# REMOVED: Enemy deck power initialization moved to start_game()
 		else:
 			print("No enemy data found, using default Shadow Acolyte")
 			opponent_manager.setup_opponent("Shadow Acolyte", 0)
+
+
+func initialize_enemy_deck_power(deck_def: EnemyDeckDefinition):
+	active_enemy_deck_power = deck_def.deck_power_type
+	
+	print("Initializing enemy deck power: ", active_enemy_deck_power)
+	
+	match active_enemy_deck_power:
+		EnemyDeckDefinition.EnemyDeckPowerType.DARKNESS_SHROUD:
+			setup_darkness_shroud()
+		
+		EnemyDeckDefinition.EnemyDeckPowerType.NONE:
+			print("No enemy deck power for this deck")
+		_:
+			print("Unknown enemy deck power type: ", active_enemy_deck_power)
+
+func setup_darkness_shroud():
+	print("=== SETTING UP DARKNESS SHROUD ===")
+	darkness_shroud_active = true
+	
+	# Check if player has sun power active
+	if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER:
+		print("🌑 Darkness Shroud activated! The cultists' shadows nullify the sun's blessing.")
+		
+		# IMPORTANT: Clear sunlit positions FIRST, then restore styling
+		var positions_to_restore = sunlit_positions.duplicate()  # Save the positions
+		sunlit_positions.clear()  # Clear the array so restore_slot_original_styling works properly
+		
+		# Now remove sun styling from all formerly sunlit positions
+		for position in positions_to_restore:
+			restore_slot_original_styling(position)
+		
+		# Show notification
+		if notification_manager:
+			notification_manager.show_notification("🌑 The shadows swallow the light...")
+		
+		# Update game status to show the power clash
+		game_status_label.text = "🌑 Darkness Shroud nullifies Solar Blessing! No sun bonuses this battle."
+	else:
+		print("🌑 Darkness Shroud activated! No sun power to counter, but shadows linger.")
+		
+		# Show notification even if no sun power to counter
+		if notification_manager:
+			notification_manager.show_notification("🌑 Shadows gather on the battlefield...")
+
+
 
 func setup_chronos_opponent():
 	print("Setting up Chronos as tutorial opponent")
@@ -544,6 +593,19 @@ func get_panel_state_name() -> String:
 		_: return "UNKNOWN"
 
 func start_game():
+	# MOVE enemy deck power initialization HERE - before player deck power effects
+	var params = get_scene_params()
+	if not is_tutorial_mode and params.has("current_node"):
+		var current_node = params["current_node"]
+		var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
+		var enemy_difficulty = current_node.enemy_difficulty
+		
+		# Initialize enemy deck power EARLY
+		var deck_def = opponent_manager.get_current_deck_definition()
+		if deck_def and deck_def.deck_power_type != EnemyDeckDefinition.EnemyDeckPowerType.NONE:
+			print("Early enemy deck power initialization: ", deck_def.get_power_description())
+			initialize_enemy_deck_power(deck_def)
+	
 	if is_tutorial_mode:
 		game_status_label.text = "Tutorial: Learning the Basics"
 		# Simple tutorial setup - just start the game normally
@@ -701,7 +763,6 @@ func get_current_scores() -> Dictionary:
 	
 	return {"player": player_score, "opponent": opponent_score}
 
-# Update the game status display
 func update_game_status():
 	var scores = get_current_scores()
 	
@@ -713,18 +774,34 @@ func update_game_status():
 		print("  is_player_turn(): ", turn_manager.is_player_turn())
 		print("  tutorial_step: ", tutorial_step)
 	
+	# Check for special power status messages
+	var special_status = ""
+	
+	# Check if darkness shroud countered sun power
+	if darkness_shroud_active and active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER:
+		special_status = "🌑 Darkness Shroud vs ☀️ Solar Blessing - Shadows prevail! "
+	elif darkness_shroud_active:
+		special_status = "🌑 Darkness Shroud active - Shadows gather... "
+	elif active_enemy_deck_power != EnemyDeckDefinition.EnemyDeckPowerType.NONE:
+		# Show other enemy power status
+		match active_enemy_deck_power:
+			EnemyDeckDefinition.EnemyDeckPowerType.TITAN_STRENGTH:
+				special_status = "⚡ Titan Strength empowers your enemies! "
+			EnemyDeckDefinition.EnemyDeckPowerType.PLAGUE_CURSE:
+				special_status = "☠️ Plague Curse spreads corruption! "
+	
 	if is_tutorial_mode:
 		# Special tutorial status messages
 		if turn_manager.is_player_turn():
-			game_status_label.text = "Tutorial: Your Turn - " + get_tutorial_status_message()
+			game_status_label.text = special_status + "Tutorial: Your Turn - " + get_tutorial_status_message()
 		else:
-			game_status_label.text = "Tutorial: Chronos is thinking..."
+			game_status_label.text = special_status + "Tutorial: Chronos is thinking..."
 			print("ERROR: Tutorial thinks it's opponent's turn!")
 	elif turn_manager.is_player_turn():
-		game_status_label.text = "Your Turn - Select a card and place it"
+		game_status_label.text = special_status + "Your Turn - Select a card and place it"
 	else:
 		var opponent_info = opponent_manager.get_opponent_info()
-		game_status_label.text = "Opponent's Turn - " + opponent_info.name + " is thinking..."
+		game_status_label.text = special_status + "Opponent's Turn - " + opponent_info.name + " is thinking..."
 	
 	# Update to show scores instead of card counts
 	deck_name_label.text = "Score - Player: " + str(scores.player) + " | Opponent: " + str(scores.opponent)
@@ -1803,6 +1880,12 @@ func apply_sun_boosted_card_styling(card_display: CardDisplay) -> void:
 func apply_sun_power_boost(card_data: CardResource, grid_position: int) -> bool:
 	print("DEBUG: apply_sun_power_boost called for position ", grid_position)
 	print("DEBUG: sunlit_positions are: ", sunlit_positions)
+	print("DEBUG: darkness_shroud_active: ", darkness_shroud_active)
+	
+	# Check if darkness shroud is active - it nullifies sun power
+	if darkness_shroud_active:
+		print("🌑 Darkness Shroud blocks sun power - no boost applied")
+		return false
 	
 	if grid_position in sunlit_positions:
 		print("☀️ SUN POWER ACTIVATED! Boosting card stats by +1")
@@ -1818,7 +1901,6 @@ func apply_sun_power_boost(card_data: CardResource, grid_position: int) -> bool:
 	
 	print("DEBUG: Position ", grid_position, " is not sunlit")
 	return false
-
 
 func add_sun_icon_to_slot(slot: Panel):
 	# Create a label with sun emoji
