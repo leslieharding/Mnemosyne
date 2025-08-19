@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TremorAbility" load_steps=2 format=3 uid="uid://lso7yphlv73m"]
+
+[ext_resource type="Script" uid="uid://myxy4oox5wct" path="res://Resources/Abilities/tremor_ability.gd" id="1_0n7ps"]
+
+[resource]
+script = ExtResource("1_0n7ps")
+ability_name = "Tremor"
+description = "After placement, this card causes tremors in adjacent empty spaces for 2 turns, attacking any cards that move into those zones"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://myxy4oox5wct"

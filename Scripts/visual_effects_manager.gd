@@ -349,3 +349,43 @@ func start_pulse_animation(pulse_container: Control):
 	
 	pulse_tween.tween_property(pulse_container, "modulate:a", PASSIVE_PULSE_MAX_ALPHA, PASSIVE_PULSE_DURATION * 0.5).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 	pulse_tween.tween_property(pulse_container, "modulate:a", PASSIVE_PULSE_MIN_ALPHA, PASSIVE_PULSE_DURATION * 0.5).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+
+
+func show_tremor_capture_flash(card_display: CardDisplay):
+	if not card_display or not card_display.panel:
+		return
+	
+	# Create a brown/earth tremor flash effect
+	var flash_overlay = ColorRect.new()
+	flash_overlay.color = Color("#8B4513", 0.8)  # Brown earth color
+	flash_overlay.size = card_display.panel.size
+	flash_overlay.position = Vector2.ZERO
+	flash_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	card_display.panel.add_child(flash_overlay)
+	
+	# Animate the tremor flash with a shake-like effect
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Shake effect while flashing
+	var original_pos = flash_overlay.position
+	tween.tween_method(_shake_overlay.bind(flash_overlay, original_pos), 0.0, 1.0, 0.6)
+	
+	# Fade effect
+	tween.tween_property(flash_overlay, "modulate:a", 0.8, 0.1)
+	tween.tween_property(flash_overlay, "modulate:a", 0.3, 0.2).set_delay(0.1)
+	tween.tween_property(flash_overlay, "modulate:a", 0.7, 0.1).set_delay(0.3)
+	tween.tween_property(flash_overlay, "modulate:a", 0.0, 0.2).set_delay(0.4)
+	
+	# Clean up
+	tween.tween_callback(func(): flash_overlay.queue_free()).set_delay(0.6)
+
+# Helper function for tremor shake effect
+func _shake_overlay(overlay: Control, original_pos: Vector2, progress: float):
+	if not is_instance_valid(overlay):
+		return
+	var shake_intensity = 3.0 * (1.0 - progress)  # Shake reduces over time
+	var shake_x = randf_range(-shake_intensity, shake_intensity)
+	var shake_y = randf_range(-shake_intensity, shake_intensity)
+	overlay.position = original_pos + Vector2(shake_x, shake_y)

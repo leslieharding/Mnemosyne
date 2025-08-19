@@ -22,6 +22,10 @@ var grid_to_collection_index: Dictionary = {}  # grid_index -> collection_index
 var active_enemy_deck_power: EnemyDeckDefinition.EnemyDeckPowerType = EnemyDeckDefinition.EnemyDeckPowerType.NONE
 var darkness_shroud_active: bool = false
 
+# Tremor tracking system
+var active_tremors: Dictionary = {}  # tremor_id -> tremor_data
+var tremor_id_counter: int = 0
+
 var couple_definitions = {
 	"Phaeton": "Cygnus",
 	"Cygnus": "Phaeton", 
@@ -678,16 +682,18 @@ func _on_game_started():
 		print("Starting opponent's first turn")
 		call_deferred("opponent_take_turn")
 
-# Handle turn changes
 func _on_turn_changed(is_player_turn: bool):
 	print("Turn changed - is_player_turn: ", is_player_turn, " | opponent_is_thinking: ", opponent_is_thinking)
 	update_game_status()
 	
+	# Process tremors at the start of each player's turn
 	if is_player_turn:
+		process_tremors_for_player(Owner.PLAYER)
 		enable_player_input()
 		if is_boss_battle:
 			make_boss_prediction()
 	else:
+		process_tremors_for_player(Owner.OPPONENT)
 		disable_player_input()
 		# Only start opponent turn if they're not already thinking
 		if not opponent_is_thinking:
@@ -1020,8 +1026,6 @@ func _on_opponent_card_placed(grid_index: int):
 	# Get the slot
 	var slot = grid_slots[grid_index]
 	
-	
-	
 	# Create a card display for the opponent's card
 	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 	
@@ -1082,6 +1086,24 @@ func _on_opponent_card_placed(grid_index: int):
 	for i in range(opponent_card_data.abilities.size()):
 		var ability = opponent_card_data.abilities[i]
 		print("  Ability ", i, ": ", ability.ability_name, " - ", ability.description)
+	
+	# NEW: EXECUTE ON-PLAY ABILITIES FOR OPPONENT CARDS
+	if opponent_card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, opponent_card_level):
+		print("Opponent card has on-play abilities - executing")
+		
+		var ability_context = {
+			"placed_card": opponent_card_data,
+			"grid_position": grid_index,
+			"game_manager": self,
+			"card_level": opponent_card_level
+		}
+		opponent_card_data.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, opponent_card_level)
+		
+		# Update the visual display after abilities execute
+		update_card_display(grid_index, opponent_card_data)
+	
+	# Handle passive abilities when opponent places card
+	handle_passive_abilities_on_place(grid_index, opponent_card_data, opponent_card_level)
 	
 	# Resolve combat
 	var captures = resolve_combat(grid_index, Owner.OPPONENT, opponent_card_data)
@@ -2858,3 +2880,176 @@ func execute_defend_abilities(defender_pos: int, defending_card: CardResource, a
 		}
 		
 		defending_card.execute_abilities(CardAbility.TriggerType.ON_DEFEND, defend_context, defending_card_level)
+
+
+func register_tremors(source_position: int, tremor_zones: Array[int], owner: Owner, turns_remaining: int):
+	var tremor_id = tremor_id_counter
+	tremor_id_counter += 1
+	
+	active_tremors[tremor_id] = {
+		"source_position": source_position,
+		"tremor_zones": tremor_zones.duplicate(),
+		"owner": owner,
+		"turns_remaining": turns_remaining,
+		"turn_placed": get_current_turn_number()
+	}
+	
+	print("Tremors registered: ID ", tremor_id, " from position ", source_position, " affecting zones ", tremor_zones)
+
+# Process tremors at start of player's turn
+func process_tremors_for_player(player_owner: Owner):
+	print("Processing tremors for ", "Player" if player_owner == Owner.PLAYER else "Opponent")
+	
+	var tremors_to_remove = []
+	
+	for tremor_id in active_tremors:
+		var tremor_data = active_tremors[tremor_id]
+		
+		# Only process tremors owned by the current player
+		if tremor_data.owner != player_owner:
+			continue
+		
+		# Check if source card still exists and is owned by the original owner
+		var source_position = tremor_data.source_position
+		if not grid_occupied[source_position] or grid_ownership[source_position] != tremor_data.owner:
+			print("Tremor source card captured/removed - ending tremors for ID ", tremor_id)
+			tremors_to_remove.append(tremor_id)
+			continue
+		
+		# Process tremor attacks
+		process_single_tremor(tremor_id, tremor_data)
+		
+		# Decrease turns remaining
+		tremor_data.turns_remaining -= 1
+		if tremor_data.turns_remaining <= 0:
+			print("Tremor expired: ID ", tremor_id)
+			tremors_to_remove.append(tremor_id)
+	
+	# Remove expired tremors
+	for tremor_id in tremors_to_remove:
+		active_tremors.erase(tremor_id)
+
+# Process a single tremor's attacks
+func process_single_tremor(tremor_id: int, tremor_data: Dictionary):
+	var source_position = tremor_data.source_position
+	var tremor_zones = tremor_data.tremor_zones
+	var tremor_owner = tremor_data.owner
+	
+	# Get the source card's current stats
+	var source_card = get_card_at_position(source_position)
+	if not source_card:
+		return
+	
+	print("Processing tremor attacks from ", source_card.card_name, " at position ", source_position)
+	
+	var captures = []
+	
+	# Check each tremor zone for enemies to attack
+	for tremor_zone in tremor_zones:
+		if not grid_occupied[tremor_zone]:
+			continue  # Still empty, no tremor attack
+		
+		var target_owner = grid_ownership[tremor_zone]
+		if target_owner == tremor_owner:
+			continue  # Don't attack own cards
+		
+		var target_card = get_card_at_position(tremor_zone)
+		if not target_card:
+			continue
+		
+		# Determine attack direction from source to tremor zone
+		var attack_direction = get_direction_between_positions(source_position, tremor_zone)
+		if attack_direction == -1:
+			continue
+		
+		# Perform tremor combat
+		var tremor_attack_value = source_card.values[attack_direction]
+		var target_defense_value = target_card.values[get_opposite_direction(attack_direction)]
+		
+		print("Tremor combat: ", source_card.card_name, " (", tremor_attack_value, ") vs ", target_card.card_name, " (", target_defense_value, ") at zone ", tremor_zone)
+		
+		if tremor_attack_value > target_defense_value:
+			print("Tremor captured card at position ", tremor_zone, "!")
+			captures.append(tremor_zone)
+			
+			# Show tremor capture visual effect
+			var target_card_display = get_card_display_at_position(tremor_zone)
+			if target_card_display and visual_effects_manager:
+				visual_effects_manager.show_tremor_capture_flash(target_card_display)
+			
+			# Execute capture
+			grid_ownership[tremor_zone] = tremor_owner
+			
+			# Award experience for tremor capture
+			if tremor_owner == Owner.PLAYER:
+				var source_card_index = get_card_collection_index(source_position)
+				if source_card_index != -1:
+					var exp_tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+					if exp_tracker:
+						exp_tracker.add_capture_exp(source_card_index, 8)  # Slightly less than normal capture
+						print("Tremor capture awarded 8 exp to card at collection index ", source_card_index)
+			
+			# Execute ON_CAPTURE abilities on captured card
+			execute_tremor_capture_abilities(tremor_zone, target_card, source_position, source_card)
+	
+	if captures.size() > 0:
+		print("Tremors captured ", captures.size(), " cards!")
+		update_board_visuals()
+		update_game_status()
+
+# Execute capture abilities for tremor captures
+func execute_tremor_capture_abilities(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource):
+	var defending_card_collection_index = get_card_collection_index(defender_pos)
+	var defending_card_level = get_card_level(defending_card_collection_index)
+	
+	if defending_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, defending_card_level):
+		print("Executing ON_CAPTURE abilities for tremor-captured card: ", defending_card.card_name)
+		
+		var capture_context = {
+			"capturing_card": attacking_card,
+			"capturing_position": attacker_pos,
+			"captured_card": defending_card,
+			"captured_position": defender_pos,
+			"game_manager": self,
+			"direction": "tremor",
+			"card_level": defending_card_level
+		}
+		
+		defending_card.execute_abilities(CardAbility.TriggerType.ON_CAPTURE, capture_context, defending_card_level)
+
+# Get direction between two positions
+func get_direction_between_positions(from_pos: int, to_pos: int) -> int:
+	var from_x = from_pos % grid_size
+	var from_y = from_pos / grid_size
+	var to_x = to_pos % grid_size
+	var to_y = to_pos / grid_size
+	
+	var dx = to_x - from_x
+	var dy = to_y - from_y
+	
+	# Only handle orthogonal directions
+	if dx == 0 and dy == -1:  # North
+		return 0
+	elif dx == 1 and dy == 0:  # East
+		return 1
+	elif dx == 0 and dy == 1:  # South
+		return 2
+	elif dx == -1 and dy == 0:  # West
+		return 3
+	
+	return -1  # Invalid direction
+
+# Get opposite direction for defense calculation
+func get_opposite_direction(direction: int) -> int:
+	match direction:
+		0: return 2  # North -> South
+		1: return 3  # East -> West
+		2: return 0  # South -> North
+		3: return 1  # West -> East
+		_: return 0
+
+# Get current turn number for tracking
+func get_current_turn_number() -> int:
+	# This is a simple implementation - you might want to track this more accurately
+	var cards_played_total = (5 - player_deck.size()) + (5 - opponent_manager.get_remaining_cards())
+	return cards_played_total + 1

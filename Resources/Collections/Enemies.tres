@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=133 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=134 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
 [ext_resource type="Script" uid="uid://ctv7ajt5j616m" path="res://Resources/enemy_deck_definition.gd" id="3_601pn"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="3_lm3ty"]
 [ext_resource type="Script" uid="uid://i485ofebv0j8" path="res://Resources/enemies_collection.gd" id="4_a5nvj"]
+[ext_resource type="Script" uid="uid://myxy4oox5wct" path="res://Resources/Abilities/tremor_ability.gd" id="4_qmggo"]
 [ext_resource type="Script" uid="uid://bqbrhjegh1g6e" path="res://Resources/Abilities/stat_boost_ability.gd" id="5_m5w2u"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="5_mxtxa"]
 [ext_resource type="Script" uid="uid://b72irnrav5w53" path="res://Resources/Abilities/defensive_counter_ability.gd" id="6_mxtxa"]
@@ -13,13 +14,12 @@
 [ext_resource type="Script" uid="uid://dyur10e6s3lah" path="res://Resources/Abilities/toxic_ability.gd" id="8_oovod"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
-script = ExtResource("7_oovod")
-boost_amount = 1
-ability_name = "Divine Inspiration"
-description = "While under your control, all other friendly cards gain +1 to all stats"
+script = ExtResource("4_qmggo")
+ability_name = "Tremor"
+description = "On play sets up tremor slots, which reactivate combat at the start of the next two turns."
 unlock_level = 0
 trigger_condition = 0
-metadata/_custom_type_script = "uid://d1cwgpmvptcjn"
+metadata/_custom_type_script = "uid://myxy4oox5wct"
 
 [sub_resource type="Resource" id="Resource_lm3ty"]
 script = ExtResource("2_xcqsp")
