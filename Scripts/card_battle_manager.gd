@@ -1140,23 +1140,10 @@ func should_game_end() -> bool:
 
 
 
-
 func end_game():
-	# Tutorial ending - different flow
-	if is_tutorial_mode:
-		game_status_label.text = "Tutorial Complete!"
-		disable_player_input()
-		opponent_is_thinking = false
-		turn_manager.end_game()
-		
-		# Create and show tutorial completion dialog
-		var tutorial_dialog = AcceptDialog.new()
-		tutorial_dialog.dialog_text = "Chronos crushes you"
-		tutorial_dialog.title = "Tutorial Complete"
-		add_child(tutorial_dialog)
-		tutorial_dialog.popup_centered()
-		tutorial_dialog.confirmed.connect(_on_tutorial_finished, CONNECT_ONE_SHOT)
-		return
+	# Clean up all tremor visual effects first
+	if visual_effects_manager:
+		visual_effects_manager.clear_all_tremor_shake_effects(grid_slots)
 	
 	var tracker = get_node("/root/BossPredictionTrackerAutoload")
 	if tracker:
@@ -2894,9 +2881,12 @@ func register_tremors(source_position: int, tremor_zones: Array[int], owner: Own
 		"turn_placed": get_current_turn_number()
 	}
 	
+	# Apply shake effects through VisualEffectsManager
+	if visual_effects_manager:
+		visual_effects_manager.apply_tremor_shake_effects(tremor_zones, grid_slots)
+	
 	print("Tremors registered: ID ", tremor_id, " from position ", source_position, " affecting zones ", tremor_zones)
 
-# Process tremors at start of player's turn
 func process_tremors_for_player(player_owner: Owner):
 	print("Processing tremors for ", "Player" if player_owner == Owner.PLAYER else "Opponent")
 	
@@ -2925,8 +2915,14 @@ func process_tremors_for_player(player_owner: Owner):
 			print("Tremor expired: ID ", tremor_id)
 			tremors_to_remove.append(tremor_id)
 	
-	# Remove expired tremors
+	# Remove expired tremors and their visual effects
 	for tremor_id in tremors_to_remove:
+		var tremor_data = active_tremors[tremor_id]
+		
+		# Remove shake effects through VisualEffectsManager
+		if visual_effects_manager:
+			visual_effects_manager.remove_tremor_shake_effects(tremor_data.tremor_zones, grid_slots)
+		
 		active_tremors.erase(tremor_id)
 
 # Process a single tremor's attacks

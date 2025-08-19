@@ -22,6 +22,7 @@ const ARROW_SIZE: float = 20.0  # Size of the arrow
 # Track active passive pulses to avoid duplicates
 var active_passive_pulses: Dictionary = {}  # card_display -> pulse_effect
 
+var tremor_shake_effects: Dictionary = {}  # position -> shake_tween
 
 func _ready():
 	pass
@@ -389,3 +390,82 @@ func _shake_overlay(overlay: Control, original_pos: Vector2, progress: float):
 	var shake_x = randf_range(-shake_intensity, shake_intensity)
 	var shake_y = randf_range(-shake_intensity, shake_intensity)
 	overlay.position = original_pos + Vector2(shake_x, shake_y)
+
+# Apply tremor shake effects to slots
+func apply_tremor_shake_effects(tremor_zones: Array[int], grid_slots: Array):
+	for tremor_zone in tremor_zones:
+		if tremor_zone < 0 or tremor_zone >= grid_slots.size():
+			continue
+		
+		var slot = grid_slots[tremor_zone]
+		start_tremor_shake_animation(tremor_zone, slot)
+
+# Start shake animation for a tremor slot
+func start_tremor_shake_animation(grid_position: int, slot: Panel):
+	# Remove any existing shake for this position
+	stop_tremor_shake_animation(grid_position, slot)
+	
+	var original_position = slot.position
+	
+	# Create repeating shake animation
+	var shake_tween = create_tween()
+	shake_tween.set_loops()  # Infinite loop
+	
+	# Gentle shake sequence
+	var shake_intensity = 2.0  # Subtle movement
+	var shake_duration = 0.1
+	
+	# Shake pattern: slight movements in different directions
+	shake_tween.tween_property(slot, "position", original_position + Vector2(-shake_intensity, 0), shake_duration)
+	shake_tween.tween_property(slot, "position", original_position + Vector2(shake_intensity, 0), shake_duration)
+	shake_tween.tween_property(slot, "position", original_position + Vector2(0, -shake_intensity), shake_duration)
+	shake_tween.tween_property(slot, "position", original_position + Vector2(0, shake_intensity), shake_duration)
+	shake_tween.tween_property(slot, "position", original_position, shake_duration)
+	
+	# Pause between shake cycles
+	shake_tween.tween_interval(3.0)
+	
+	# Store the tween and original position for cleanup
+	tremor_shake_effects[grid_position] = {
+		"shake_tween": shake_tween,
+		"original_position": original_position,
+		"slot": slot
+	}
+	
+	print("VisualEffects: Started tremor shake for slot ", grid_position)
+
+# Remove tremor shake effects from specific zones
+func remove_tremor_shake_effects(tremor_zones: Array[int], grid_slots: Array):
+	for tremor_zone in tremor_zones:
+		if tremor_zone < 0 or tremor_zone >= grid_slots.size():
+			continue
+		
+		var slot = grid_slots[tremor_zone]
+		stop_tremor_shake_animation(tremor_zone, slot)
+
+# Stop shake animation for a single slot
+func stop_tremor_shake_animation(grid_position: int, slot: Panel):
+	if not grid_position in tremor_shake_effects:
+		return
+	
+	var shake_data = tremor_shake_effects[grid_position]
+	
+	# Stop shake animation
+	if shake_data.get("shake_tween"):
+		shake_data["shake_tween"].kill()
+	
+	# Reset slot position to original
+	if shake_data.get("original_position"):
+		slot.position = shake_data["original_position"]
+	
+	# Clean up tracking
+	tremor_shake_effects.erase(grid_position)
+	
+	print("VisualEffects: Stopped tremor shake for slot ", grid_position)
+
+# Clean up all tremor shake effects (useful for game end or reset)
+func clear_all_tremor_shake_effects(grid_slots: Array):
+	for grid_position in tremor_shake_effects.keys():
+		if grid_position < grid_slots.size():
+			var slot = grid_slots[grid_position]
+			stop_tremor_shake_animation(grid_position, slot)
