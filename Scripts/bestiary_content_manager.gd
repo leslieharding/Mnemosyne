@@ -7,18 +7,18 @@ var enemy_profiles: Dictionary = {
 	
 	"Pythons Gang": {
 		"lore": [
-			"",
-			"",
-			"",
-			"",
-			"",
-			""
+			"Yes I found all the snakes, yes they all want to be here and no you can't join our club",
+			"Python: Hera commanded Python to attack Leto. For she bore the divine twins Apollo and Artemis, the result of Zeus’ latest infidelity. Hearing of this Apollo (a day old at this point) strode out to meet the beast striking it down with his golden bow.",
+			"The Omphalos: Rhea once tricked Chronos into eating this stone instead of the infant Zeus. When Zeus returned to overthrow Chronos he flung this stone as far as he could. Where it landed became the Center of the world. Apollo would build his shrine to the Delphic Oracle here.",
+			"Ismenian Dragon: Cadmus would strike down this fearsome foe unaware of its divine parentage. Enraged, Ares unleashed his curse upon the royal house of Thebes. Many generations later a prince would; kill his father, have children by his mother before stabbing his own eyes out. So you know, normal curse stuff.",
+			"Ladon: Guard of the golden apples of the Hesperides, the fruit that confers immortality. Ladon would prevent mortals from getting close to the tree until Heracles cleared the way. Later a golden apple with the phrase ‘to the fairest’ on it, would send the known world to war.",
+			"Calcian Dragon: Medea’s soporific potion would make this beast easy pickings for the hero Jason. He would emerge with the golden fleece ecstatic. Having successfully led the Argo’s voyage and with a wildly devoted wife he set off for home. To tragedy. "
 		],
 		"tactical_notes": [
 			"",
+			"The Calcian Dragon slumbers under the effect of Medea’s potion making it an easy target for capture experience farming.",
 			"",
-			"",
-			"",
+			"Ladon has an extreme north-facing power level. Filling the southern slots will result in it being relatively useless.",
 			"",
 			""
 		]
@@ -26,18 +26,18 @@ var enemy_profiles: Dictionary = {
 	
 	"Niobes Brood": {
 		"lore": [
-			"",
-			"",
-			"",
-			"",
-			"",
-			""
+			"Fourteen infinities of weeping bore fruit, rise my children defend our pride",
+			"The annual festival to the titaness Leto was taking place. Niobe looked on scornfully",
+			"How could anyone consider Leto a paragon of fertility, for does she not only have the two children?",
+			"I have fourteen, who's to say they won't go on to change the world, perhaps achieve divinity themselves",
+			"Such sacrilege would not go unanswered. Apollo defending his mothers pride would slay Niobe’s 7 daughters and 7 sons",
+			"Forever bound in her grief Niobe was turned to stone, out of which tears still fall to this day"
 		],
 		"tactical_notes": [
 			"",
+			"Just like every family, this lot doesn't get along",
 			"",
-			"",
-			"",
+			"Target the faltering family members and they will fight on your side",
 			"",
 			""
 		]
@@ -45,7 +45,7 @@ var enemy_profiles: Dictionary = {
 	
 	"Cultists of Nyx": {
 		"lore": [
-			"",
+			"Who has the time to wait for an eclipse? Why not destroy the sun?",
 			"",
 			"",
 			"",
@@ -64,7 +64,7 @@ var enemy_profiles: Dictionary = {
 	
 	"The Wrong Note": {
 		"lore": [
-			"",
+			"We can't all get lessons from Calliope and Euterpe directly",
 			"",
 			"",
 			"",
@@ -83,7 +83,7 @@ var enemy_profiles: Dictionary = {
 	
 	"The Plague": {
 		"lore": [
-			"",
+			"Atone, Consult, Dose, Rest - but ultimately Pray",
 			"",
 			"",
 			"",
@@ -102,7 +102,7 @@ var enemy_profiles: Dictionary = {
 	
 	"Chronos": {
 		"lore": [
-			"",
+			"I rule here and I have all the time in the world",
 			"",
 			"",
 			"",
@@ -121,7 +121,7 @@ var enemy_profiles: Dictionary = {
 	
 	"?????": {
 		"lore": [
-			"",
+			"Who could it be",
 			"",
 			"",
 			"",
@@ -138,6 +138,7 @@ var enemy_profiles: Dictionary = {
 		]
 	}
 }
+
 
 # Get complete enemy profile based on memory level and performance
 func get_enemy_profile(enemy_name: String, memory_level: int, encounters: int = 0, victories: int = 0) -> Dictionary:
