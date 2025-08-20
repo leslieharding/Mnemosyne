@@ -458,7 +458,139 @@ func create_sample_cutscenes():
 		0.5,
 		1.0
 	))
+	var first_boss_loss_lines: Array[DialogueLine] = []
 
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Chiron", 
+		"New! Come on in, you look{pause:0.5} [slow]perturbed[/slow]",
+		"right",
+		1.0,
+		0.0,
+		0.8
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"I came up against a foe,{pause:0.8} [slow]I could not see who they were.[/slow]",
+		"left",
+		0.8,
+		0.3,
+		1.0
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"Nor did I recognise any of the forces used against me,{pause:0.5} such powers I had never seen before.",
+		"left",
+		0.9,
+		0.2,
+		0.8
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Describe them if you will",
+		"right",
+		1.0,
+		0.3,
+		0.5
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"A giant, whose blows rang out with such force they could still be felt many moments after they had landed.{pause:1.0} A woman slender, but [urgent]sharp[/urgent]…. [slow]sharp in every way you could imagine.[/slow]",
+		"left",
+		0.9,
+		0.2,
+		1.2
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"But most perplexing was their leader.{pause:0.8} It seemed they could [speed:1.3]predict my every move[/speed], I found myself second guessing my plays.{pause:1.0} [slow]In the chaos I was defeated.[/slow]",
+		"left",
+		0.8,
+		0.3,
+		1.5
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Predicting your moves you say?{pause:0.5} Could sister [speed:1.2]Phoebe[/speed] be playing a joke on you?{pause:0.8} Who else could out predict the God of Augury himself?",
+		"right",
+		0.9,
+		0.3,
+		1.0
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Did you notice anything else out of the ordinary?",
+		"right",
+		1.0,
+		0.5,
+		0.8
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"Well sometimes I got the feeling I was being watched.{pause:0.8} But I can't know for sure how relevant that is.",
+		"left",
+		0.9,
+		0.3,
+		0.8
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Chiron", 
+		"You should [speed:1.2]trust your instinct[/speed].{pause:0.5} The sense of being watched came to you for a reason.{pause:0.8} Perhaps this foe is no divinator but a [slow]simple spy.[/slow]",
+		"right",
+		1.0,
+		0.2,
+		1.0
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Chiron", 
+		"Hmmmm{pause:1.0} Observing your tactics prior to engaging you.{pause:0.8} They are taking you seriously as an enemy which paints them as [speed:1.3]intelligent[/speed].",
+		"right",
+		0.9,
+		0.3,
+		1.2
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Chiron", 
+		"I will need to meditate on what this portends,{pause:0.8} in the meantime, [urgent]try again, you must![/urgent]",
+		"right",
+		1.0,
+		0.3,
+		0.8
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Mnemosyne", 
+		"I can feel the pull of [speed:1.2]Ananke[/speed] and with your gift of inspiration{pause:0.5} I'm ready to try again.",
+		"left",
+		1.0,
+		0.3,
+		0.8
+	))
+
+	first_boss_loss_lines.append(DialogueLine.new(
+		"Chiron", 
+		"[slow]I'll be here when you need me.[/slow]",
+		"right",
+		0.7,
+		0.5,
+		1.0
+	))
+
+	var first_boss_loss_cutscene = CutsceneData.new("first_boss_loss_conversation", [mnemosyne, chiron], first_boss_loss_lines)
+	cutscenes["first_boss_loss_conversation"] = first_boss_loss_cutscene
+	
+	
+	
 	var first_defeat_cutscene = CutsceneData.new("first_defeat_conversation", [mnemosyne, chiron], first_defeat_lines)
 	cutscenes["first_defeat_conversation"] = first_defeat_cutscene
 	
