@@ -1282,9 +1282,17 @@ func end_game():
 			TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
 			return
 		else:
-			# First draw - restart the round
+			# First draw - restart the round with improved error handling
 			winner = "It's a draw! Restarting round... (Warning: Second draw will count as defeat)"
 			game_status_label.text = winner
+			
+			print("=== DRAW DETECTED - RESTARTING ROUND ===")
+			print("Consecutive draws: ", consecutive_draws)
+			
+			# Disable input during restart
+			disable_player_input()
+			opponent_is_thinking = false
+			turn_manager.end_game()
 			
 			# Reset the game state for a new round
 			restart_round()
@@ -1363,15 +1371,32 @@ func end_game():
 	# Not the final boss - continue with reward screen
 	show_reward_screen()
 
-# Add this new function to Scripts/card_battle_manager.gd
 func restart_round():
-	print("Restarting round due to draw")
+	print("=== RESTARTING ROUND DUE TO DRAW ===")
 	
-	# Clear the grid
+	# Store original game parameters for restoration
+	var params = get_scene_params()
+	var god_name = params.get("god", current_god)
+	var deck_index = params.get("deck_index", 0)
+	
+	print("Restoring: God=", god_name, " DeckIndex=", deck_index)
+	
+	# Clear all visual effects first
+	if visual_effects_manager:
+		visual_effects_manager.clear_all_tremor_shake_effects(grid_slots)
+		visual_effects_manager.clear_all_hunt_effects(grid_slots)
+	
+	# Clear all special game state
+	clear_all_hunt_traps()
+	active_passive_abilities.clear()
+	active_tremors.clear()
+	grid_to_collection_index.clear()
+	
+	# Clear the grid completely
 	for i in range(grid_slots.size()):
 		if grid_occupied[i]:
-			var slot = grid_slots[i]  # Get the slot reference
-			# Remove card display if present
+			var slot = grid_slots[i]
+			# Remove all children (cards, effects, etc.)
 			for child in slot.get_children():
 				child.queue_free()
 		
@@ -1380,51 +1405,160 @@ func restart_round():
 		grid_ownership[i] = Owner.NONE
 		grid_card_data[i] = null
 		
-		# Reset slot styling - get slot reference again
+		# Reset slot styling
 		var slot = grid_slots[i]
-		slot.add_theme_stylebox_override("panel", default_grid_style)
+		restore_slot_original_styling(i)
 	
-	# Clear grid to collection index mapping
-	grid_to_collection_index.clear()
+	# Wait for cleanup to complete
+	await get_tree().process_frame
 	
-	# Reset passive abilities tracking
-	active_passive_abilities.clear()
-	
-	# Reset card selection
+	# Reset card selection state
 	selected_card_index = -1
 	current_grid_index = -1
 	
-	# Reset opponent thinking state
+	# Reset game state flags
 	opponent_is_thinking = false
+	hunt_mode_active = false
 	
-	# Restore original decks (you'll need to reload them)
-	restore_original_decks()
+	# CRITICAL: Properly restore original decks
+	var restoration_success = restore_original_decks_properly(god_name, deck_index)
+	if not restoration_success:
+		print("ERROR: Failed to restore decks properly!")
+		# Fallback to end game as loss
+		end_game()
+		return
 	
-	# Redisplay player hand
+	# Validate deck restoration
+	if player_deck.is_empty() or deck_card_indices.is_empty():
+		print("ERROR: Player deck is empty after restoration!")
+		end_game()
+		return
+	
+	if not opponent_manager.has_cards():
+		print("ERROR: Opponent deck is empty after restoration!")
+		end_game()
+		return
+	
+	# Re-apply deck power effects (sun positions, etc.)
+	reapply_deck_powers()
+	
+	# Redisplay player hand with proper card data
 	display_player_hand()
 	
-	# Start a new coin flip
-	await get_tree().create_timer(2.0).timeout  # Brief pause
+	# Verify hand display worked
+	await get_tree().process_frame
+	var hand_container_cards = hand_container.get_node_or_null("CardsContainer")
+	if not hand_container_cards or hand_container_cards.get_child_count() == 0:
+		print("ERROR: Failed to display player hand after restart!")
+		end_game()
+		return
+	
+	print("Round restart successful - starting new coin flip")
+	
+	# Brief pause to show result, then start new game
+	await get_tree().create_timer(2.0).timeout
 	turn_manager.start_game()
 
-func restore_original_decks():
-	# Reload player deck
+
+func restore_original_decks_properly(god_name: String, deck_index: int) -> bool:
+	print("=== RESTORING ORIGINAL DECKS ===")
+	
+	# Restore player deck with full validation
+	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
+	var collection: GodCardCollection = load(collection_path)
+	
+	if not collection:
+		print("ERROR: Failed to load collection: ", collection_path)
+		return false
+	
+	if deck_index >= collection.decks.size():
+		print("ERROR: Invalid deck index ", deck_index, " for ", god_name)
+		return false
+	
+	# Get the original deck definition
+	var deck_def = collection.decks[deck_index]
+	
+	# Restore deck card indices (this is critical!)
+	deck_card_indices = deck_def.card_indices.duplicate()
+	
+	# Restore the actual cards
+	player_deck = collection.get_deck(deck_index)
+	
+	print("Restored player deck: ", player_deck.size(), " cards")
+	print("Restored deck indices: ", deck_card_indices)
+	
+	# Validate restoration
+	if player_deck.size() != deck_card_indices.size():
+		print("ERROR: Deck size mismatch after restoration!")
+		return false
+	
+	if player_deck.size() == 0:
+		print("ERROR: Empty deck after restoration!")
+		return false
+	
+	# Restore opponent deck
+	var opponent_restoration = restore_opponent_deck()
+	if not opponent_restoration:
+		print("ERROR: Failed to restore opponent deck!")
+		return false
+	
+	print("=== DECK RESTORATION SUCCESSFUL ===")
+	return true
+
+func restore_opponent_deck() -> bool:
+	print("Restoring opponent deck...")
+	
+	# Re-setup opponent based on current parameters
+	var params = get_scene_params()
+	
+	if is_tutorial_mode:
+		setup_chronos_opponent()
+	else:
+		if params.has("current_node"):
+			var current_node = params["current_node"]
+			var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
+			var enemy_difficulty = current_node.enemy_difficulty
+			
+			print("Restoring opponent: ", enemy_name, " (difficulty ", enemy_difficulty, ")")
+			opponent_manager.setup_opponent(enemy_name, enemy_difficulty)
+		else:
+			print("No enemy data found, using default Shadow Acolyte")
+			opponent_manager.setup_opponent("Shadow Acolyte", 0)
+	
+	# Validate opponent restoration
+	if not opponent_manager.has_cards():
+		print("ERROR: Opponent manager has no cards after restoration!")
+		return false
+	
+	print("Opponent deck restored: ", opponent_manager.get_remaining_cards(), " cards")
+	return true
+
+func reapply_deck_powers():
+	print("=== REAPPLYING DECK POWERS ===")
+	
+	# Re-initialize deck power effects
 	var params = get_scene_params()
 	var god_name = params.get("god", current_god)
 	var deck_index = params.get("deck_index", 0)
 	
 	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
 	var collection: GodCardCollection = load(collection_path)
-	if collection:
-		var deck_def = collection.decks[deck_index]
-		deck_card_indices = deck_def.card_indices.duplicate()
-		player_deck = collection.get_deck(deck_index)
 	
-	# Reload opponent deck
-	setup_opponent_from_params()  # This will reload their deck
-
-
-
+	if collection and deck_index < collection.decks.size():
+		var deck_def = collection.decks[deck_index]
+		initialize_deck_power(deck_def)
+	
+	# Re-initialize enemy deck power
+	if not is_tutorial_mode and params.has("current_node"):
+		var current_node = params["current_node"]
+		var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
+		var enemy_difficulty = current_node.enemy_difficulty
+		
+		var deck_def = opponent_manager.get_current_deck_definition()
+		if deck_def and deck_def.deck_power_type != EnemyDeckDefinition.EnemyDeckPowerType.NONE:
+			initialize_enemy_deck_power(deck_def)
+	
+	print("Deck powers reapplied successfully")
 
 func _on_tutorial_finished():
 	print("Tutorial battle completed, transitioning to post-battle cutscene")
