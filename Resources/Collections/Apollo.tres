@@ -3,15 +3,15 @@
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_w7xgs"]
+[ext_resource type="Script" uid="uid://cf0rb8uoxl6jj" path="res://Resources/Abilities/hunt_ability.gd" id="3_2h7tk"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_cm1c1"]
 [ext_resource type="Script" uid="uid://bqbrhjegh1g6e" path="res://Resources/Abilities/stat_boost_ability.gd" id="3_p7jhq"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="4_2h7tk"]
 [ext_resource type="Script" uid="uid://b72irnrav5w53" path="res://Resources/Abilities/defensive_counter_ability.gd" id="5_bufwg"]
-[ext_resource type="Script" uid="uid://dgsvwgjhs2vju" path="res://Resources/Abilities/stat_nullify_ability.gd" id="6_ca26u"]
 [ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="7_qbbw0"]
 [ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="8_xjxyc"]
 
-[sub_resource type="Resource" id="Resource_b0n1o"]
+[sub_resource type="Resource" id="Resource_gowu1"]
 script = ExtResource("3_p7jhq")
 boost_amount = 1
 ability_name = "Stat Boost"
@@ -76,7 +76,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Helios"
 values = Array[int]([5, 5, 5, 5])
 description = "The sun titan arrives"
-abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_b0n1o")])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_gowu1")])
 level_data = Array[ExtResource("4_2h7tk")]([SubResource("Resource_l7o3e"), SubResource("Resource_f31oe"), SubResource("Resource_gs2nm")])
 uses_level_progression = true
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -99,21 +99,20 @@ level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
-[sub_resource type="Resource" id="Resource_pwyti"]
-script = ExtResource("6_ca26u")
-ability_name = "Stat Nullify"
-description = "When this card is captured reduces it stats to minimum
-"
+[sub_resource type="Resource" id="Resource_p7jhq"]
+script = ExtResource("3_2h7tk")
+ability_name = "Hunt"
+description = "Select a slot to hunt. Either fight an enemy card directly or lay a trap on an empty slot."
 unlock_level = 0
-trigger_condition = 2
-metadata/_custom_type_script = "uid://dgsvwgjhs2vju"
+trigger_condition = 0
+metadata/_custom_type_script = "uid://cf0rb8uoxl6jj"
 
 [sub_resource type="Resource" id="Resource_pdvfu"]
 script = ExtResource("1_vqrrp")
 card_name = "Cygnus"
 values = Array[int]([2, 2, 2, 2])
 description = "Oh Phaeton dont listen to him"
-abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_pwyti")])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_p7jhq")])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

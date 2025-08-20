@@ -51,6 +51,8 @@ var default_grid_style: StyleBoxFlat
 var hover_grid_style: StyleBoxFlat
 var player_card_style: StyleBoxFlat
 var opponent_card_style: StyleBoxFlat
+var hunt_target_style: StyleBoxFlat
+
 
 # Game managers
 var turn_manager: TurnManager
@@ -62,6 +64,14 @@ var opponent_is_thinking: bool = false
 
 # Notification system
 var notification_manager: NotificationManager
+
+# Hunt tracking system
+var hunt_mode_active: bool = false
+var current_hunter_position: int = -1
+var current_hunter_owner: Owner = Owner.NONE
+var current_hunter_card: CardResource = null
+var active_hunts: Dictionary = {}  # target_position -> hunt_data
+var hunt_id_counter: int = 0
 
 # UI References
 @onready var hand_container = $VBoxContainer/HBoxContainer
@@ -708,9 +718,10 @@ func get_card_display_at_position(grid_index: int) -> CardDisplay:
 	
 	var slot = grid_slots[grid_index]
 	if slot.get_child_count() > 0:
-		var child = slot.get_child(0)
-		if child is CardDisplay:
-			return child
+		# Look through all children to find the CardDisplay (ignore hunt icons and other UI elements)
+		for child in slot.get_children():
+			if child is CardDisplay:
+				return child
 	
 	return null
 
@@ -987,7 +998,6 @@ func update_board_visuals():
 			elif grid_ownership[i] == Owner.OPPONENT:
 				card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
 
-# Handle opponent card placement
 func _on_opponent_card_placed(grid_index: int):
 	print("Opponent card placed signal received for slot: ", grid_index)
 	
@@ -1087,6 +1097,9 @@ func _on_opponent_card_placed(grid_index: int):
 		var ability = opponent_card_data.abilities[i]
 		print("  Ability ", i, ": ", ability.ability_name, " - ", ability.description)
 	
+	# Check for hunt traps when opponent places cards
+	check_hunt_trap_trigger(grid_index, opponent_card_data, Owner.OPPONENT)
+	
 	# NEW: EXECUTE ON-PLAY ABILITIES FOR OPPONENT CARDS
 	if opponent_card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, opponent_card_level):
 		print("Opponent card has on-play abilities - executing")
@@ -1138,12 +1151,13 @@ func should_game_end() -> bool:
 	return available_slots == 0 or (player_deck.is_empty() and not opponent_manager.has_cards())
 
 
-
-
 func end_game():
 	# Clean up all tremor visual effects first
 	if visual_effects_manager:
 		visual_effects_manager.clear_all_tremor_shake_effects(grid_slots)
+		visual_effects_manager.clear_all_hunt_effects(grid_slots)
+	
+	clear_all_hunt_traps()
 	
 	var tracker = get_node("/root/BossPredictionTrackerAutoload")
 	if tracker:
@@ -1321,7 +1335,6 @@ func end_game():
 	
 	# Not the final boss - continue with reward screen
 	show_reward_screen()
-
 
 # Add this new function to Scripts/card_battle_manager.gd
 func restart_round():
@@ -1605,6 +1618,15 @@ func create_grid_styles():
 	opponent_card_style.border_width_right = 2
 	opponent_card_style.border_width_bottom = 2
 	opponent_card_style.border_color = Color("#FF4444")  # Red for opponent
+	
+	# Hunt target style (orange border for hunting targets)
+	hunt_target_style = StyleBoxFlat.new()
+	hunt_target_style.bg_color = Color("#444444")
+	hunt_target_style.border_width_left = 3
+	hunt_target_style.border_width_top = 3
+	hunt_target_style.border_width_right = 3
+	hunt_target_style.border_width_bottom = 3
+	hunt_target_style.border_color = Color("#FF8800")  # Orange for hunt targets
 
 # Helper to get passed parameters from previous scene
 func get_scene_params() -> Dictionary:
@@ -2220,6 +2242,13 @@ func apply_selection_highlight(grid_index: int):
 
 # Grid click handler (only during player's turn)
 func _on_grid_gui_input(event, grid_index):
+	# Handle hunt target selection FIRST (before other input handling)
+	if hunt_mode_active and current_hunter_owner == Owner.PLAYER:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				select_hunt_target(grid_index)
+				return  # Don't process normal card placement
+	
 	if not turn_manager.is_player_turn():
 		return
 		
@@ -2243,6 +2272,8 @@ func update_card_display(grid_index: int, card_data: CardResource):
 		# Re-setup the card display with updated values
 		card_display.setup(card_data)
 		print("Updated card display for ", card_data.card_name, " with new values: ", card_data.values)
+
+# REPLACE the entire place_card_on_grid() function with this version:
 
 func place_card_on_grid():
 	if selected_card_index == -1 or current_grid_index == -1:
@@ -2364,6 +2395,9 @@ func place_card_on_grid():
 	
 	print("Card placed on grid at position", current_grid_index)
 	
+	# Check for hunt traps before normal combat
+	check_hunt_trap_trigger(current_grid_index, card_data, Owner.PLAYER)
+	
 	# EXECUTE ON-PLAY ABILITIES BEFORE COMBAT (but after potential stat changes)
 	if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
 		print("Executing on-play abilities for ", card_data.card_name, " at level ", card_level)
@@ -2406,8 +2440,14 @@ func place_card_on_grid():
 		end_game()
 		return
 
-	# Switch turns
+	# HUNT FIX: DON'T switch turns if hunt mode is active - player needs to select hunt target first
+	if hunt_mode_active:
+		print("Hunt mode active - staying on player turn for target selection")
+		return
+	
+	# Switch turns only if hunt mode is not active
 	turn_manager.next_turn()
+
 	
 
 # Handle passive abilities when a card is placed
@@ -2444,7 +2484,6 @@ func handle_passive_abilities_on_place(grid_position: int, card_data: CardResour
 	# Also trigger passive abilities of existing cards (in case they need to affect the new card)
 	refresh_all_passive_abilities()
 
-# Handle passive abilities when a card is captured/removed
 func handle_passive_abilities_on_capture(grid_position: int, card_data: CardResource):
 	if grid_position in active_passive_abilities:
 		print("Removing passive abilities for captured card at position ", grid_position)
@@ -2467,6 +2506,13 @@ func handle_passive_abilities_on_capture(grid_position: int, card_data: CardReso
 		
 		# Remove from tracking
 		active_passive_abilities.erase(grid_position)
+	
+	# Check if captured card had any active hunts and remove them
+	for target_pos in active_hunts.keys():
+		var hunt_data = active_hunts[target_pos]
+		if hunt_data.hunter_position == grid_position:
+			print("Removing hunt trap due to hunter capture")
+			remove_hunt_trap(target_pos)
 	
 	# Refresh remaining passive abilities
 	refresh_all_passive_abilities()
@@ -3049,3 +3095,282 @@ func get_current_turn_number() -> int:
 	# This is a simple implementation - you might want to track this more accurately
 	var cards_played_total = (5 - player_deck.size()) + (5 - opponent_manager.get_remaining_cards())
 	return cards_played_total + 1
+
+
+
+# Start hunt target selection mode
+func start_hunt_mode(hunter_position: int, hunter_owner: Owner, hunter_card: CardResource):
+	hunt_mode_active = true
+	current_hunter_position = hunter_position
+	current_hunter_owner = hunter_owner
+	current_hunter_card = hunter_card
+	
+	# Update game status
+	if hunter_owner == Owner.PLAYER:
+		game_status_label.text = "🎯 HUNT MODE: Select a slot to hunt"
+	else:
+		game_status_label.text = "🎯 " + opponent_manager.get_opponent_info().name + " is hunting..."
+		# Auto-select target for opponent
+		call_deferred("opponent_select_hunt_target")
+	
+	print("Hunt mode activated for ", hunter_card.card_name, " at position ", hunter_position)
+
+func select_hunt_target(target_position: int):
+	if not hunt_mode_active:
+		return
+	
+	print("Hunt target selected: position ", target_position)
+	
+	# Check if target slot is occupied
+	if grid_occupied[target_position]:
+		# Immediate hunt combat
+		execute_immediate_hunt(target_position)
+	else:
+		# Set up hunt trap
+		setup_hunt_trap(target_position)
+	
+	# Exit hunt mode
+	hunt_mode_active = false
+	current_hunter_position = -1
+	current_hunter_owner = Owner.NONE
+	current_hunter_card = null
+	
+	# Update game status
+	update_game_status()
+	
+	# NOW switch turns after hunt target is selected
+	if should_game_end():
+		end_game()
+		return
+	
+	turn_manager.next_turn()
+
+# Execute immediate hunt combat
+func execute_immediate_hunt(target_position: int):
+	var hunted_card = get_card_at_position(target_position)
+	var hunted_owner = get_owner_at_position(target_position)
+	
+	if not hunted_card or hunted_owner == current_hunter_owner:
+		print("Invalid hunt target - no card or friendly card")
+		return
+	
+	print("Executing immediate hunt: ", current_hunter_card.card_name, " hunts ", hunted_card.card_name)
+	
+	# Calculate combat values
+	var hunter_stats = HuntAbility.get_highest_stat(current_hunter_card.values)
+	var hunted_stats = HuntAbility.get_lowest_stat(hunted_card.values)
+	
+	print("Hunt combat: Hunter ", hunter_stats.value, " vs Hunted ", hunted_stats.value)
+	
+	# Show hunt combat visual effect
+	if visual_effects_manager:
+		var hunter_display = get_card_display_at_position(current_hunter_position)
+		var hunted_display = get_card_display_at_position(target_position)
+		if hunter_display and hunted_display:
+			visual_effects_manager.show_hunt_combat_flash(hunter_display, hunted_display)
+	
+	# Resolve hunt combat
+	if hunter_stats.value > hunted_stats.value:
+		print("Hunt successful! Capturing hunted card")
+		
+		# Capture the hunted card
+		set_card_ownership(target_position, current_hunter_owner)
+		
+		# Award experience for hunt capture
+		if current_hunter_owner == Owner.PLAYER:
+			var hunter_card_index = get_card_collection_index(current_hunter_position)
+			if hunter_card_index != -1:
+				var exp_tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+				if exp_tracker:
+					exp_tracker.add_capture_exp(hunter_card_index, 12)  # Bonus exp for hunt
+					print("Hunt capture awarded 12 exp to hunter")
+		
+		# Execute ON_CAPTURE abilities on the hunted card
+		execute_hunt_capture_abilities(target_position, hunted_card, current_hunter_position, current_hunter_card)
+		
+		# Update visuals
+		update_board_visuals()
+	else:
+		print("Hunt failed - hunted card resisted")
+		
+		# Award defense experience to hunted card if it's a player card
+		if hunted_owner == Owner.PLAYER:
+			var hunted_card_index = get_card_collection_index(target_position)
+			if hunted_card_index != -1:
+				var exp_tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+				if exp_tracker:
+					exp_tracker.add_defense_exp(hunted_card_index, 7)  # Bonus exp for resisting hunt
+					print("Hunt resistance awarded 7 defense exp")
+
+# Set up hunt trap for empty slot
+func setup_hunt_trap(target_position: int):
+	print("Setting up hunt trap at position ", target_position)
+	
+	# Remove any existing hunt on this slot
+	if target_position in active_hunts:
+		remove_hunt_trap(target_position)
+	
+	var hunt_id = hunt_id_counter
+	hunt_id_counter += 1
+	
+	active_hunts[target_position] = {
+		"hunt_id": hunt_id,
+		"hunter_position": current_hunter_position,
+		"hunter_owner": current_hunter_owner,
+		"hunter_card": current_hunter_card,
+		"target_position": target_position
+	}
+	
+	# Apply visual styling to show this slot is being hunted
+	apply_hunt_target_styling(target_position)
+	
+	print("Hunt trap set up with ID ", hunt_id, " at position ", target_position)
+
+func apply_hunt_target_styling(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	var slot = grid_slots[grid_index]
+	slot.add_theme_stylebox_override("panel", hunt_target_style)
+	
+	print("Applied hunt target styling (orange border) to slot ", grid_index)
+
+
+
+func remove_hunt_trap(target_position: int):
+	if not target_position in active_hunts:
+		return
+	
+	print("Removing hunt trap from position ", target_position)
+	
+	# Remove visual styling
+	restore_slot_original_styling(target_position)
+	
+	# Remove from tracking
+	active_hunts.erase(target_position)
+
+# Check for hunt traps when cards are placed
+func check_hunt_trap_trigger(grid_position: int, placed_card: CardResource, placing_owner: Owner):
+	if not grid_position in active_hunts:
+		return
+	
+	var hunt_data = active_hunts[grid_position]
+	
+	# Check if hunter card still exists and is owned by original owner
+	if not grid_occupied[hunt_data.hunter_position] or grid_ownership[hunt_data.hunter_position] != hunt_data.hunter_owner:
+		print("Hunt trap expired - hunter card captured/removed")
+		remove_hunt_trap(grid_position)
+		return
+	
+	# Don't trigger on friendly cards
+	if placing_owner == hunt_data.hunter_owner:
+		print("Hunt trap not triggered - friendly card placed")
+		remove_hunt_trap(grid_position)
+		return
+	
+	print("Hunt trap triggered! ", hunt_data.hunter_card.card_name, " hunts the newly placed ", placed_card.card_name)
+	
+	# Execute trap hunt combat
+	execute_trap_hunt_combat(grid_position, placed_card, hunt_data)
+	
+	# Remove the trap (used up)
+	remove_hunt_trap(grid_position)
+
+# Execute hunt combat when trap is triggered
+func execute_trap_hunt_combat(target_position: int, hunted_card: CardResource, hunt_data: Dictionary):
+	var hunter_card = hunt_data.hunter_card
+	
+	# Calculate combat values
+	var hunter_stats = HuntAbility.get_highest_stat(hunter_card.values)
+	var hunted_stats = HuntAbility.get_lowest_stat(hunted_card.values)
+	
+	print("Trap hunt combat: Hunter ", hunter_stats.value, " vs Hunted ", hunted_stats.value)
+	
+	# Show hunt combat visual effect
+	if visual_effects_manager:
+		var hunter_display = get_card_display_at_position(hunt_data.hunter_position)
+		var hunted_display = get_card_display_at_position(target_position)
+		if hunter_display and hunted_display:
+			visual_effects_manager.show_hunt_trap_flash(hunter_display, hunted_display)
+	
+	# Resolve hunt combat
+	if hunter_stats.value > hunted_stats.value:
+		print("Hunt trap successful! Capturing hunted card")
+		
+		# Capture the hunted card
+		set_card_ownership(target_position, hunt_data.hunter_owner)
+		
+		# Award experience for hunt capture
+		if hunt_data.hunter_owner == Owner.PLAYER:
+			var hunter_card_index = get_card_collection_index(hunt_data.hunter_position)
+			if hunter_card_index != -1:
+				var exp_tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+				if exp_tracker:
+					exp_tracker.add_capture_exp(hunter_card_index, 10)  # Standard hunt exp
+					print("Hunt trap capture awarded 10 exp to hunter")
+		
+		# Execute ON_CAPTURE abilities on the hunted card
+		execute_hunt_capture_abilities(target_position, hunted_card, hunt_data.hunter_position, hunter_card)
+		
+		# Update visuals
+		update_board_visuals()
+	else:
+		print("Hunt trap failed - hunted card resisted")
+
+# Execute capture abilities for hunt captures
+func execute_hunt_capture_abilities(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource):
+	var defending_card_collection_index = get_card_collection_index(defender_pos)
+	var defending_card_level = get_card_level(defending_card_collection_index)
+	
+	if defending_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, defending_card_level):
+		print("Executing ON_CAPTURE abilities for hunt-captured card: ", defending_card.card_name)
+		
+		var capture_context = {
+			"capturing_card": attacking_card,
+			"capturing_position": attacker_pos,
+			"captured_card": defending_card,
+			"captured_position": defender_pos,
+			"game_manager": self,
+			"direction": "hunt",
+			"card_level": defending_card_level
+		}
+		
+		defending_card.execute_abilities(CardAbility.TriggerType.ON_CAPTURE, capture_context, defending_card_level)
+
+# Opponent AI hunt target selection
+func opponent_select_hunt_target():
+	if not hunt_mode_active:
+		return
+	
+	# Simple AI: prefer occupied enemy slots, otherwise pick random empty slot
+	var possible_targets = []
+	var enemy_targets = []
+	
+	for i in range(grid_slots.size()):
+		if grid_occupied[i]:
+			var owner = get_owner_at_position(i)
+			if owner != current_hunter_owner:
+				enemy_targets.append(i)
+		else:
+			possible_targets.append(i)
+	
+	# Prefer enemy targets if available
+	var target_position = -1
+	if enemy_targets.size() > 0:
+		target_position = enemy_targets[randi() % enemy_targets.size()]
+	elif possible_targets.size() > 0:
+		target_position = possible_targets[randi() % possible_targets.size()]
+	
+	if target_position != -1:
+		select_hunt_target(target_position)
+
+# Clear all hunt traps (for game end or reset)
+func clear_all_hunt_traps():
+	for target_position in active_hunts.keys():
+		remove_hunt_trap(target_position)
+	active_hunts.clear()
+	hunt_mode_active = false
+	current_hunter_position = -1
+	current_hunter_owner = Owner.NONE
+	current_hunter_card = null
+	print("All hunt traps cleared")

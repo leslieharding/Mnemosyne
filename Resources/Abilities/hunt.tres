@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="HuntAbility" load_steps=2 format=3 uid="uid://bt4nns2ge1jjn"]
+
+[ext_resource type="Script" uid="uid://cf0rb8uoxl6jj" path="res://Resources/Abilities/hunt_ability.gd" id="1_iggo7"]
+
+[resource]
+script = ExtResource("1_iggo7")
+ability_name = "Hunt"
+description = "Select a slot to hunt. Either fight an enemy card directly or lay a trap on an empty slot. "
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://cf0rb8uoxl6jj"

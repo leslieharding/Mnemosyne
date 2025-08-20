@@ -24,6 +24,10 @@ var active_passive_pulses: Dictionary = {}  # card_display -> pulse_effect
 
 var tremor_shake_effects: Dictionary = {}  # position -> shake_tween
 
+const HUNT_FLASH_COLOR: Color = Color("#FF8800")  # Orange for hunt attacks
+const HUNT_TRAP_FLASH_COLOR: Color = Color("#FFAA44")  # Lighter orange for trap triggers
+
+
 func _ready():
 	pass
 
@@ -469,3 +473,68 @@ func clear_all_tremor_shake_effects(grid_slots: Array):
 		if grid_position < grid_slots.size():
 			var slot = grid_slots[grid_position]
 			stop_tremor_shake_animation(grid_position, slot)
+
+# Show hunt combat flash effect
+func show_hunt_combat_flash(hunter_display: CardDisplay, hunted_display: CardDisplay):
+	if not hunter_display or not hunted_display:
+		return
+	
+	# Flash both cards with hunt colors
+	flash_hunt_card(hunter_display, true)   # Hunter flashes brighter
+	flash_hunt_card(hunted_display, false)  # Hunted flashes dimmer
+
+# Show hunt trap triggered flash
+func show_hunt_trap_flash(hunter_display: CardDisplay, hunted_display: CardDisplay):
+	if not hunter_display or not hunted_display:
+		return
+	
+	# Flash with trap colors (slightly different for distinction)
+	flash_hunt_card(hunter_display, true, HUNT_TRAP_FLASH_COLOR)
+	flash_hunt_card(hunted_display, false, HUNT_TRAP_FLASH_COLOR)
+
+# Flash a card with hunt-specific styling
+func flash_hunt_card(card_display: CardDisplay, is_hunter: bool, override_color: Color = HUNT_FLASH_COLOR):
+	if not card_display or not card_display.panel:
+		return
+	
+	# Wait one frame to ensure card is rendered
+	await get_tree().process_frame
+	
+	# Create hunt flash overlay
+	var flash_overlay = ColorRect.new()
+	flash_overlay.color = override_color
+	flash_overlay.size = card_display.panel.size
+	flash_overlay.position = Vector2.ZERO
+	flash_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flash_overlay.modulate.a = 0.0
+	
+	card_display.panel.add_child(flash_overlay)
+	flash_overlay.z_index = 120  # Higher than other effects
+	
+	# Animate hunt flash
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	if is_hunter:
+		# Hunter gets a strong, predatory flash
+		tween.tween_property(flash_overlay, "modulate:a", 0.9, 0.1)
+		tween.tween_property(flash_overlay, "modulate:a", 0.7, 0.2).set_delay(0.1)
+		tween.tween_property(flash_overlay, "modulate:a", 0.9, 0.1).set_delay(0.3)
+		tween.tween_property(flash_overlay, "modulate:a", 0.0, 0.3).set_delay(0.4)
+	else:
+		# Hunted gets a quick defensive flash
+		tween.tween_property(flash_overlay, "modulate:a", 0.6, 0.15)
+		tween.tween_property(flash_overlay, "modulate:a", 0.3, 0.2).set_delay(0.15)
+		tween.tween_property(flash_overlay, "modulate:a", 0.0, 0.25).set_delay(0.35)
+	
+	# Clean up
+	tween.tween_callback(func(): flash_overlay.queue_free()).set_delay(0.7)
+
+# Clear all hunt effects (add this method)
+func clear_all_hunt_effects(grid_slots: Array):
+	# Remove hunt icons from all slots
+	for slot in grid_slots:
+		var hunt_icon = slot.get_node_or_null("HuntIcon")
+		if hunt_icon:
+			hunt_icon.queue_free()
+	print("All hunt visual effects cleared")
