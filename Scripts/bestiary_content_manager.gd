@@ -164,15 +164,24 @@ func get_enemy_profile(enemy_name: String, memory_level: int, encounters: int = 
 
 # Get description based on memory level and win rate
 func get_description(profile: Dictionary, memory_level: int, win_rate: float) -> String:
-	var base_lore = profile["lore"][memory_level] if memory_level < profile["lore"].size() else profile["lore"][-1]
+	var complete_lore = ""
+	
+	# Build up lore from level 0 to current memory level
+	for level in range(memory_level + 1):
+		if level < profile["lore"].size():
+			var level_lore = profile["lore"][level]
+			if level_lore != "":  # Only add non-empty lore entries
+				if complete_lore != "":
+					complete_lore += "\n\n"  # Add spacing between lore sections
+				complete_lore += level_lore
 	
 	# Add performance-based context for higher memory levels
-	if memory_level >= 3:
+	if memory_level >= 3 and complete_lore != "":
 		var performance_context = get_performance_context(win_rate)
 		if performance_context != "":
-			base_lore += " " + performance_context
+			complete_lore += "\n\n" + performance_context
 	
-	return base_lore
+	return complete_lore
 
 # Get performance context based on win rate
 func get_performance_context(win_rate: float) -> String:
@@ -192,15 +201,24 @@ func get_tactical_note(profile: Dictionary, memory_level: int, win_rate: float) 
 	if memory_level < 2:
 		return ""
 	
-	var base_note = profile["tactical_notes"][memory_level] if memory_level < profile["tactical_notes"].size() else profile["tactical_notes"][-1]
+	var complete_tactical = ""
+	
+	# Build up tactical notes from level 2 to current memory level
+	for level in range(2, memory_level + 1):  # Start from level 2 since tactical info starts there
+		if level < profile["tactical_notes"].size():
+			var level_tactical = profile["tactical_notes"][level]
+			if level_tactical != "":  # Only add non-empty tactical entries
+				if complete_tactical != "":
+					complete_tactical += "\n\n"  # Add spacing between tactical sections
+				complete_tactical += level_tactical
 	
 	# Add win rate specific advice for levels 3+
-	if memory_level >= 3 and base_note != "":
+	if memory_level >= 3 and complete_tactical != "":
 		var advice = get_tactical_advice(win_rate)
 		if advice != "":
-			base_note += " " + advice
+			complete_tactical += "\n\n" + advice
 	
-	return base_note
+	return complete_tactical
 
 # Get tactical advice based on win rate
 func get_tactical_advice(win_rate: float) -> String:
