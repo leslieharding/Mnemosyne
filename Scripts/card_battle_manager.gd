@@ -1165,6 +1165,33 @@ func end_game():
 	
 	await get_tree().process_frame
 	
+	# TUTORIAL MODE CHECK - Handle tutorial completion first
+	if is_tutorial_mode:
+		print("Tutorial battle completed!")
+		
+		var scores = get_current_scores()
+		if scores.opponent > scores.player:
+			game_status_label.text = "Chronos crushes you! But you're learning..."
+		else:
+			game_status_label.text = "You did well! Time to learn more..."
+		
+		disable_player_input()
+		opponent_is_thinking = false
+		turn_manager.end_game()
+		
+		# Wait a moment to show the result
+		await get_tree().create_timer(2.0).timeout
+		
+		# Trigger the post-tutorial cutscene (opening_awakening)
+		if has_node("/root/CutsceneManagerAutoload"):
+			get_node("/root/CutsceneManagerAutoload").play_cutscene("opening_awakening")
+		else:
+			# Fallback if cutscene manager isn't available
+			TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+		
+		return  # Exit early for tutorial mode
+	
+	# NORMAL GAME MODE - Continue with regular end game logic
 	var scores = get_current_scores()
 	var winner = ""
 	var victory = false
