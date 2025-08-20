@@ -2184,10 +2184,14 @@ func _on_grid_mouse_entered(grid_index):
 			# Restore the previous slot's original styling
 			restore_slot_original_styling(current_grid_index)
 		
-		# Update the current selection to the hovered slot
 		current_grid_index = grid_index
 		
-		# Apply selection highlight with awareness of sun spots
+		if grid_index in active_hunts:
+			print("Mouse entered hunt trap slot - preserving hunt styling but allowing selection")
+			# Don't change the visual styling, but the slot is now selected for placement
+			return
+		
+		# Apply selection highlight with awareness of sun spots (for non-hunt slots)
 		apply_selection_highlight(grid_index)
 	
 
@@ -2198,6 +2202,9 @@ func _on_grid_mouse_exited(grid_index):
 	# If this slot is not the currently selected one, restore its original styling
 	if current_grid_index != grid_index and not grid_occupied[grid_index]:
 		restore_slot_original_styling(grid_index)
+	# FIXED: If this IS the currently selected slot but has a hunt trap, restore hunt styling
+	elif current_grid_index == grid_index and grid_index in active_hunts:
+		apply_hunt_target_styling(grid_index)
 
 
 func restore_slot_original_styling(grid_index: int):
@@ -2206,8 +2213,11 @@ func restore_slot_original_styling(grid_index: int):
 	
 	var slot = grid_slots[grid_index]
 	
-	# Check if this is a sunlit position
-	if grid_index in sunlit_positions:
+	# FIXED: Check for hunt trap first, then sunlit position
+	if grid_index in active_hunts:
+		# Restore hunt trap styling
+		apply_hunt_target_styling(grid_index)
+	elif grid_index in sunlit_positions:
 		# Restore sunlit styling
 		apply_sunlit_styling(grid_index)
 	else:
@@ -2220,8 +2230,11 @@ func apply_selection_highlight(grid_index: int):
 	
 	var slot = grid_slots[grid_index]
 	
-	# Check if this is a sunlit position
-	if grid_index in sunlit_positions:
+	# FIXED: Check for hunt trap first, then sunlit position
+	if grid_index in active_hunts:
+		# Don't override hunt trap styling with selection highlight
+		return
+	elif grid_index in sunlit_positions:
 		# Create a combined sunlit + selected style
 		var sunlit_selected_style = StyleBoxFlat.new()
 		sunlit_selected_style.bg_color = Color("#444444")
@@ -2236,28 +2249,31 @@ func apply_selection_highlight(grid_index: int):
 		
 		slot.add_theme_stylebox_override("panel", sunlit_selected_style)
 	else:
-		# Regular selection styling for non-sunlit slots
+		# Regular selection styling for non-special slots
 		slot.add_theme_stylebox_override("panel", selected_grid_style)
 
 
 # Grid click handler (only during player's turn)
 func _on_grid_gui_input(event, grid_index):
-	# Handle hunt target selection FIRST (before other input handling)
+	# Handle hunt target selection FIRST (but only during hunt mode setup)
 	if hunt_mode_active and current_hunter_owner == Owner.PLAYER:
 		if event is InputEventMouseButton:
 			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-				select_hunt_target(grid_index)
-				return  # Don't process normal card placement
+				# Only allow trap setup on empty slots for now (disable direct combat)
+				if not grid_occupied[grid_index]:
+					select_hunt_target(grid_index)
+				else:
+					print("Direct hunt combat disabled - can only set traps on empty slots")
+				return  # Don't process normal card placement during hunt mode
 	
 	if not turn_manager.is_player_turn():
 		return
 		
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			# Only place card if a card is selected and grid is not occupied
+			# SIMPLIFIED: Just check if card selected and slot not occupied
+			# Hunt trap handling moved to place_card_on_grid()
 			if selected_card_index != -1 and not grid_occupied[grid_index]:
-				# The grid selection is already handled by mouse_entered
-				# Just place the card
 				place_card_on_grid()
 
 # Update the visual display of a card after its stats change
@@ -2273,11 +2289,20 @@ func update_card_display(grid_index: int, card_data: CardResource):
 		card_display.setup(card_data)
 		print("Updated card display for ", card_data.card_name, " with new values: ", card_data.values)
 
-# REPLACE the entire place_card_on_grid() function with this version:
-
 func place_card_on_grid():
 	if selected_card_index == -1 or current_grid_index == -1:
 		return
+	
+	# FIXED: Handle hunt trap removal BEFORE checking if slot is occupied
+	if current_grid_index in active_hunts:
+		var hunt_data = active_hunts[current_grid_index]
+		# Only remove if it's our own hunt trap
+		if hunt_data.hunter_owner == Owner.PLAYER:
+			print("Removing player's own hunt trap from slot ", current_grid_index)
+			remove_hunt_trap(current_grid_index)
+		else:
+			print("Cannot place on enemy hunt trap!")
+			return
 	
 	if grid_occupied[current_grid_index]:
 		print("Grid slot is already occupied!")
@@ -2395,7 +2420,7 @@ func place_card_on_grid():
 	
 	print("Card placed on grid at position", current_grid_index)
 	
-	# Check for hunt traps before normal combat
+	# Check for hunt traps before normal combat (this will only affect enemy hunt traps now)
 	check_hunt_trap_trigger(current_grid_index, card_data, Owner.PLAYER)
 	
 	# EXECUTE ON-PLAY ABILITIES BEFORE COMBAT (but after potential stat changes)
@@ -3249,7 +3274,6 @@ func remove_hunt_trap(target_position: int):
 	# Remove from tracking
 	active_hunts.erase(target_position)
 
-# Check for hunt traps when cards are placed
 func check_hunt_trap_trigger(grid_position: int, placed_card: CardResource, placing_owner: Owner):
 	if not grid_position in active_hunts:
 		return
@@ -3262,9 +3286,10 @@ func check_hunt_trap_trigger(grid_position: int, placed_card: CardResource, plac
 		remove_hunt_trap(grid_position)
 		return
 	
-	# Don't trigger on friendly cards
+	# This function should only be called for enemy placements now
+	# (friendly placements handle trap removal in place_card_on_grid)
 	if placing_owner == hunt_data.hunter_owner:
-		print("Hunt trap not triggered - friendly card placed")
+		print("WARNING: check_hunt_trap_trigger called for friendly placement - this shouldn't happen")
 		remove_hunt_trap(grid_position)
 		return
 	

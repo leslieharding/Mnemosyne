@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_iggo7")
 ability_name = "Hunt"
-description = "Select a slot to hunt. Either fight an enemy card directly or lay a trap on an empty slot. "
+description = "Select a slot to hunt. If an enemy plays a card in the hunted slot the hunter attacks. "
 unlock_level = 0
 trigger_condition = 0
 metadata/_custom_type_script = "uid://cf0rb8uoxl6jj"
