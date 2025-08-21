@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ChaosAbility" load_steps=2 format=3 uid="uid://dhwhostau5raj"]
+
+[ext_resource type="Script" uid="uid://cjryt268c8rko" path="res://Resources/Abilities/chaos_ability.gd" id="1_4ifwh"]
+
+[resource]
+script = ExtResource("1_4ifwh")
+ability_name = "Chaos"
+description = "n play, this card's stats are randomized."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://cjryt268c8rko"

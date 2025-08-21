@@ -607,6 +607,10 @@ func get_panel_state_name() -> String:
 		_: return "UNKNOWN"
 
 func start_game():
+	
+	# Reset consecutive draws counter for new battle
+	consecutive_draws = 0
+	
 	# MOVE enemy deck power initialization HERE - before player deck power effects
 	var params = get_scene_params()
 	if not is_tutorial_mode and params.has("current_node"):

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=136 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=140 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="7_oovod"]
 [ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="8_m5w2u"]
 [ext_resource type="Script" uid="uid://dyur10e6s3lah" path="res://Resources/Abilities/toxic_ability.gd" id="8_oovod"]
+[ext_resource type="Script" uid="uid://cjryt268c8rko" path="res://Resources/Abilities/chaos_ability.gd" id="8_vfgb0"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -462,12 +463,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_crfbb"]
+script = ExtResource("8_vfgb0")
+ability_name = "Chaos"
+description = "On play, this card's stats are randomized. "
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://cjryt268c8rko"
+
 [sub_resource type="Resource" id="Resource_mpjhg"]
 script = ExtResource("2_xcqsp")
 card_name = "Chaos"
 values = Array[int]([1, 1, 1, 1])
 description = "I'm just glad the family still invites me to things"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_crfbb")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -512,12 +521,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_buye7"]
+script = ExtResource("8_vfgb0")
+ability_name = "Chaos"
+description = "On play, this card's stats are randomized. "
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://cjryt268c8rko"
+
 [sub_resource type="Resource" id="Resource_e5rwc"]
 script = ExtResource("2_xcqsp")
 card_name = "Chaos"
 values = Array[int]([1, 1, 1, 1])
 description = "I'm just glad the family still invites me to things"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_buye7")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -562,12 +579,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_hi20n"]
+script = ExtResource("8_vfgb0")
+ability_name = "Chaos"
+description = "On play, this card's stats are randomized. "
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://cjryt268c8rko"
+
 [sub_resource type="Resource" id="Resource_spvwg"]
 script = ExtResource("2_xcqsp")
 card_name = "Chaos"
 values = Array[int]([1, 1, 1, 1])
 description = "I'm just glad the family still invites me to things"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_hi20n")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
