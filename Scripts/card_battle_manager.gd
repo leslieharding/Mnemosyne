@@ -700,6 +700,9 @@ func _on_turn_changed(is_player_turn: bool):
 	print("Turn changed - is_player_turn: ", is_player_turn, " | opponent_is_thinking: ", opponent_is_thinking)
 	update_game_status()
 	
+	# Process adaptive defense abilities on turn change
+	handle_adaptive_defense_turn_change(is_player_turn)
+	
 	# Process tremors at the start of each player's turn
 	if is_player_turn:
 		process_tremors_for_player(Owner.PLAYER)
@@ -875,11 +878,14 @@ func opponent_take_turn():
 	# Let opponent make their move
 	opponent_manager.take_turn(available_slots)
 
-# Add this helper method to set card ownership
+# helper method to set card ownership
 func set_card_ownership(grid_index: int, new_owner: Owner):
 	if grid_index >= 0 and grid_index < grid_ownership.size():
 		grid_ownership[grid_index] = new_owner
 		print("Card at slot ", grid_index, " ownership changed to ", "Player" if new_owner == Owner.PLAYER else "Opponent")
+		
+		# Handle adaptive defense when ownership changes
+		handle_adaptive_defense_ownership_change(grid_index)
 
 func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource):
 	print("Resolving combat for card at slot ", grid_index)
@@ -3564,3 +3570,92 @@ func clear_all_hunt_traps():
 	current_hunter_owner = Owner.NONE
 	current_hunter_card = null
 	print("All hunt traps cleared")
+
+func handle_adaptive_defense_turn_change(is_player_turn: bool):
+	print("Processing adaptive defense for turn change - is_player_turn: ", is_player_turn)
+	
+	# Check all cards on the board
+	for position in range(grid_slots.size()):
+		if not grid_occupied[position]:
+			continue
+			
+		var card_data = get_card_at_position(position)
+		var card_owner = get_owner_at_position(position)
+		var card_level = get_card_level(get_card_collection_index(position))
+		
+		if not card_data:
+			continue
+		
+		# Check if this card has adaptive defense ability
+		var has_adaptive_defense = false
+		var adaptive_defense_ability = null
+		
+		if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			for ability in card_data.get_available_abilities(card_level):
+				if ability.ability_name == "Adaptive Defense":
+					has_adaptive_defense = true
+					adaptive_defense_ability = ability
+					break
+		
+		if not has_adaptive_defense:
+			continue
+		
+		# Determine if adaptive defense should be active
+		# Active when it's NOT the controlling player's turn
+		var should_be_active = (card_owner == Owner.PLAYER and not is_player_turn) or (card_owner == Owner.OPPONENT and is_player_turn)
+		
+		print("Card ", card_data.card_name, " at position ", position, " owned by ", "Player" if card_owner == Owner.PLAYER else "Opponent", " - should be active: ", should_be_active)
+		
+		# Apply or remove adaptive defense
+		var context = {
+			"passive_action": "apply" if should_be_active else "remove",
+			"boosting_card": card_data,
+			"boosting_position": position,
+			"game_manager": self,
+			"card_level": card_level
+		}
+		
+		adaptive_defense_ability.execute(context)
+
+func handle_adaptive_defense_ownership_change(grid_index: int):
+	"""Handle adaptive defense when card ownership changes"""
+	if not grid_occupied[grid_index]:
+		return
+	
+	var card_data = get_card_at_position(grid_index)
+	var card_level = get_card_level(get_card_collection_index(grid_index))
+	
+	if not card_data or not card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+		return
+	
+	# Check if this card has adaptive defense
+	var adaptive_defense_ability = null
+	for ability in card_data.get_available_abilities(card_level):
+		if ability.ability_name == "Adaptive Defense":
+			adaptive_defense_ability = ability
+			break
+	
+	if not adaptive_defense_ability:
+		return
+	
+	print("Handling adaptive defense ownership change for ", card_data.card_name, " at position ", grid_index)
+	
+	# Get new owner after capture
+	var new_owner = get_owner_at_position(grid_index)
+	var is_player_turn = turn_manager.is_player_turn()
+	
+	# Determine if adaptive defense should be active under new ownership
+	var should_be_active = (new_owner == Owner.PLAYER and not is_player_turn) or (new_owner == Owner.OPPONENT and is_player_turn)
+	
+	print("New owner: ", "Player" if new_owner == Owner.PLAYER else "Opponent", " - should be active: ", should_be_active)
+	
+	# Apply or remove adaptive defense based on new ownership
+	var context = {
+		"passive_action": "apply" if should_be_active else "remove",
+		"boosting_card": card_data,
+		"boosting_position": grid_index,
+		"game_manager": self,
+		"card_level": card_level
+	}
+	
+	adaptive_defense_ability.execute(context)

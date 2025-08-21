@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AdaptiveDefenseAbility" load_steps=2 format=3 uid="uid://dvbixtg0f20oi"]
+
+[ext_resource type="Script" uid="uid://cc6gfqyhfm0k4" path="res://Resources/Abilities/adaptive_defense_ability.gd" id="1_2eec6"]
+
+[resource]
+script = ExtResource("1_2eec6")
+ability_name = "Adaptive Defensive"
+description = "Has double stats on opponents turn."
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cc6gfqyhfm0k4"
