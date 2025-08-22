@@ -1,14 +1,14 @@
-# res://Scripts/memory_journal_manager.gd
 extends Node
 class_name MemoryJournalManager
 
 signal new_memory_formed(memory_type: String, subject: String)
 signal memory_level_increased(memory_type: String, subject: String, new_level: int)
 
-# NEW: Content managers
+# Content managers
 var bestiary_content: BestiaryContentManager
+var god_content: GodContentManager  # NEW
 
-# Memory data structure
+# Memory data structure (unchanged)
 var memory_data: Dictionary = {
 	"bestiary": {},
 	"gods": {},
@@ -37,9 +37,11 @@ const WIN_EXPERIENCE = 2
 const LOSS_EXPERIENCE = 3
 
 func _ready():
-	# NEW: Initialize content managers
+	# Initialize both content managers
 	bestiary_content = BestiaryContentManager.new()
+	god_content = GodContentManager.new()  # NEW
 	print("BestiaryContentManager initialized with ", bestiary_content.get_available_enemies().size(), " enemy profiles")
+	print("GodContentManager initialized with ", god_content.get_available_gods().size(), " god profiles")  # NEW
 	
 	load_memory_data()
 	
@@ -48,7 +50,7 @@ func _ready():
 		memory_data["mnemosyne"]["awakening_date"] = Time.get_datetime_string_from_system()
 		save_memory_data()
 
-# === BESTIARY FUNCTIONS ===
+# === BESTIARY FUNCTIONS === (unchanged)
 
 func record_enemy_encounter(enemy_name: String, victory: bool, enemy_difficulty: int = 0):
 	# Calculate experience gained
@@ -90,7 +92,7 @@ func record_enemy_encounter(enemy_name: String, victory: bool, enemy_difficulty:
 		print("Enemy memory level increased! ", enemy_name, " is now level ", new_level)
 		
 		# Check for conversation trigger when enemy reaches mastery level
-		if new_level >= 4 and has_node("/root/ConversationManagerAutoload"):  # "Analyzed" level or higher
+		if new_level >= 4 and has_node("/root/ConversationManagerAutoload"):
 			var conv_manager = get_node("/root/ConversationManagerAutoload")
 			print("Triggering first_enemy_mastered conversation")
 			conv_manager.trigger_conversation("first_enemy_mastered")
@@ -109,11 +111,11 @@ func calculate_bestiary_memory_level(total_experience: int) -> int:
 			return i
 	return 0
 
-# UPDATED: Get memory level description for bestiary using content manager
+# Get memory level description for bestiary using content manager
 func get_bestiary_memory_description(level: int) -> String:
 	return bestiary_content.get_memory_level_description(level)
 
-# COMPLETELY REPLACED: Get detailed enemy information using BestiaryContentManager
+# Get detailed enemy information using BestiaryContentManager
 func get_enemy_detailed_info(enemy_name: String) -> Dictionary:
 	if not enemy_name in memory_data["bestiary"]:
 		return {}
@@ -135,7 +137,7 @@ func get_enemy_detailed_info(enemy_name: String) -> Dictionary:
 	
 	return detailed_info
 
-# NEW: Check if enemy has custom content available
+# Check if enemy has custom content available
 func has_custom_enemy_content(enemy_name: String) -> bool:
 	return bestiary_content.has_enemy_profile(enemy_name)
 
@@ -149,9 +151,9 @@ func get_enemy_memory(enemy_name: String) -> Dictionary:
 func get_all_enemy_memories() -> Dictionary:
 	return memory_data["bestiary"]
 
-# === GOD FUNCTIONS ===
+# === GOD FUNCTIONS === (ENHANCED WITH GOD CONTENT MANAGER)
 
-# Record experience with a god
+# Record experience with a god - ENHANCED
 func record_god_experience(god_name: String, battles_fought: int = 1, deck_used: String = ""):
 	if not god_name in memory_data["gods"]:
 		memory_data["gods"][god_name] = {
@@ -163,7 +165,8 @@ func record_god_experience(god_name: String, battles_fought: int = 1, deck_used:
 			"synergies_learned": [],
 			"mastery_insights": [],
 			"favorite_deck": "",
-			"total_experience_gained": 0
+			"total_experience_gained": 0,
+			"achievements": {}  # NEW: For future achievement tracking
 		}
 		
 		# Add to Mnemosyne's encountered gods list
@@ -179,6 +182,10 @@ func record_god_experience(god_name: String, battles_fought: int = 1, deck_used:
 	# Track deck usage
 	if deck_used != "" and not deck_used in god_data["decks_discovered"]:
 		god_data["decks_discovered"].append(deck_used)
+		print("New deck discovered for ", god_name, ": ", deck_used)
+		
+		# Future: Record deck discovery achievement
+		# god_content.record_god_achievement(god_name, "deck_discovered", deck_used)
 	
 	# Check for memory level increase
 	var old_level = god_data["memory_level"]
@@ -186,17 +193,45 @@ func record_god_experience(god_name: String, battles_fought: int = 1, deck_used:
 	if new_level > old_level:
 		god_data["memory_level"] = new_level
 		emit_signal("memory_level_increased", "gods", god_name, new_level)
+		print("God mastery level increased! ", god_name, " is now level ", new_level, " (", get_god_memory_description(new_level), ")")
+		
+		# Future: Record mastery level achievement
+		# god_content.record_god_achievement(god_name, "mastery_level", new_level)
 	
 	save_memory_data()
 
-# Calculate god memory level based on battles fought
+# ENHANCED: Get detailed god information using GodContentManager
+func get_god_detailed_info(god_name: String) -> Dictionary:
+	if not god_name in memory_data["gods"]:
+		return {}
+	
+	var god_data = memory_data["gods"][god_name]
+	var achievements = god_data.get("achievements", {})
+	
+	# Use the GodContentManager to get rich, god-specific content
+	var detailed_info = god_content.get_god_profile(
+		god_name,
+		god_data["memory_level"],
+		god_data["battles_fought"],
+		achievements
+	)
+	
+	# Add our statistical data that the content manager doesn't track
+	detailed_info["first_used"] = god_data["first_used"]
+	detailed_info["last_used"] = god_data["last_used"]
+	detailed_info["decks_discovered"] = god_data["decks_discovered"]
+	detailed_info["synergies_learned"] = god_data["synergies_learned"]
+	
+	return detailed_info
+
+# Calculate god memory level based on battles fought (unchanged)
 func calculate_god_memory_level(battles: int) -> int:
 	for i in range(GOD_LEVEL_THRESHOLDS.size()):
 		if battles < GOD_LEVEL_THRESHOLDS[i]:
 			return i
 	return GOD_LEVEL_THRESHOLDS.size()
 
-# Get memory level description for gods
+# Get memory level description for gods (unchanged)
 func get_god_memory_description(level: int) -> String:
 	match level:
 		0: return "Unfamiliar"
@@ -207,17 +242,36 @@ func get_god_memory_description(level: int) -> String:
 		5: return "Divine Mastery"
 		_: return "Eternal Bond"
 
-# Get god memory data
+# NEW: Check if god has custom content available
+func has_custom_god_content(god_name: String) -> bool:
+	return god_content.has_god_profile(god_name)
+
+# Get god memory data (unchanged)
 func get_god_memory(god_name: String) -> Dictionary:
 	if god_name in memory_data["gods"]:
 		return memory_data["gods"][god_name]
 	return {}
 
-# Get all god memories
+# Get all god memories (unchanged)
 func get_all_god_memories() -> Dictionary:
 	return memory_data["gods"]
 
-# === MNEMOSYNE FUNCTIONS ===
+# NEW: Future achievement recording methods (examples)
+func record_god_achievement(god_name: String, achievement_type: String, value: Variant = true):
+	if not god_name in memory_data["gods"]:
+		return
+	
+	var god_data = memory_data["gods"][god_name]
+	if not "achievements" in god_data:
+		god_data["achievements"] = {}
+	
+	god_data["achievements"][achievement_type] = value
+	god_content.record_god_achievement(god_name, achievement_type, value)
+	
+	print("Achievement recorded for ", god_name, ": ", achievement_type, " = ", value)
+	save_memory_data()
+
+# === MNEMOSYNE FUNCTIONS === (unchanged)
 
 func update_mnemosyne_battle_stats(victory: bool):
 	memory_data["mnemosyne"]["total_battles"] += 1
@@ -242,7 +296,7 @@ func update_mnemosyne_battle_stats(victory: bool):
 		# Add insight when leveling up
 		add_mnemosyne_insight("My understanding deepens... I can feel my awareness expanding beyond mortal comprehension.")
 
-# Calculate Mnemosyne's consciousness level
+# Calculate Mnemosyne's consciousness level (unchanged)
 func calculate_mnemosyne_consciousness_level() -> int:
 	var total_battles = memory_data["mnemosyne"]["total_battles"]
 	for i in range(MNEMOSYNE_LEVEL_THRESHOLDS.size()):
@@ -250,7 +304,7 @@ func calculate_mnemosyne_consciousness_level() -> int:
 			return i + 1
 	return MNEMOSYNE_LEVEL_THRESHOLDS.size() + 1
 
-# Add a personal note/insight for Mnemosyne
+# Add a personal note/insight for Mnemosyne (unchanged)
 func add_mnemosyne_insight(note: String):
 	var insight = {
 		"text": note,
@@ -263,15 +317,15 @@ func add_mnemosyne_insight(note: String):
 	if memory_data["mnemosyne"]["personal_notes"].size() > 50:
 		memory_data["mnemosyne"]["personal_notes"].pop_front()
 
-# Add memory fragments (currency for future features)
+# Add memory fragments (unchanged)
 func add_memory_fragments(amount: int):
 	memory_data["mnemosyne"]["memory_fragments"] += amount
 
-# Get Mnemosyne's full data
+# Get Mnemosyne's full data (unchanged)
 func get_mnemosyne_memory() -> Dictionary:
 	return memory_data["mnemosyne"]
 
-# Get consciousness level description
+# Get consciousness level description (unchanged)
 func get_consciousness_description(level: int) -> String:
 	match level:
 		1: return "Nascent Awareness"
@@ -282,7 +336,7 @@ func get_consciousness_description(level: int) -> String:
 		6: return "Transcendent Knowledge"
 		_: return "Omniscient Memory"
 
-# === SAVE/LOAD FUNCTIONS ===
+# === SAVE/LOAD FUNCTIONS === (unchanged)
 
 # Save memory data to disk
 func save_memory_data():
@@ -307,7 +361,7 @@ func load_memory_data():
 	else:
 		print("No memory journal save found, starting fresh")
 
-# Clear all memory data (for testing or new game+)
+# Clear all memory data (unchanged)
 func clear_all_memories():
 	memory_data = {
 		"bestiary": {},
@@ -326,7 +380,7 @@ func clear_all_memories():
 	}
 	save_memory_data()
 
-# === UTILITY FUNCTIONS ===
+# === UTILITY FUNCTIONS === (mostly unchanged)
 
 # Check if there are any new memories to highlight
 func has_new_memories() -> bool:
@@ -352,18 +406,25 @@ func count_mastered_enemies() -> int:
 			count += 1
 	return count
 
-# NEW: Get enemies with custom content for special highlighting
+# Get enemies with custom content for special highlighting
 func get_enemies_with_custom_content() -> Array[String]:
 	return bestiary_content.get_available_enemies()
 
-# ENHANCED: Debug function that includes content manager info
+# NEW: Get gods with custom content for special highlighting
+func get_gods_with_custom_content() -> Array[String]:
+	return god_content.get_available_gods()
+
+# ENHANCED: Debug function that includes both content managers
 func debug_memory_state():
 	print("=== MEMORY MANAGER DEBUG ===")
 	print("Save path: ", save_path)
 	print("Memory data structure: ", memory_data.keys())
 	print("Bestiary entries: ", memory_data["bestiary"].size())
+	print("God entries: ", memory_data["gods"].size())
 	print("Enemies with custom content: ", bestiary_content.get_available_enemies().size())
+	print("Gods with custom content: ", god_content.get_available_gods().size())  # NEW
 	print("Available enemy profiles: ", bestiary_content.get_available_enemies())
+	print("Available god profiles: ", god_content.get_available_gods())  # NEW
 	
 	for enemy_name in memory_data["bestiary"]:
 		var enemy_data = memory_data["bestiary"][enemy_name]
@@ -371,8 +432,14 @@ func debug_memory_state():
 		print("Enemy: ", enemy_name, " (Custom content: ", has_custom, ")")
 		print("  Total Experience: ", enemy_data["total_experience"])
 		print("  Memory Level: ", enemy_data["memory_level"])
-		print("  Encounters: ", enemy_data["encounters"])
-		print("  Victories: ", enemy_data["victories"])
-		print("  Defeats: ", enemy_data["defeats"])
+	
+	# NEW: Debug god data
+	for god_name in memory_data["gods"]:
+		var god_data = memory_data["gods"][god_name]
+		var has_custom = god_content.has_god_profile(god_name)
+		print("God: ", god_name, " (Custom content: ", has_custom, ")")
+		print("  Battles Fought: ", god_data["battles_fought"])
+		print("  Mastery Level: ", god_data["memory_level"])
+		print("  Decks Discovered: ", god_data["decks_discovered"].size())
 	
 	print("===========================")

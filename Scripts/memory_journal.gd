@@ -320,7 +320,9 @@ func create_enemy_list_button(enemy_name: String, enemy_data: Dictionary, memory
 
 # Handle enemy selection in bestiary with detailed information
 func _on_enemy_selected(enemy_name: String, enemy_data: Dictionary):
-	var details_panel = bestiary_tab.get_node("RightPanel")
+	var details_panel = bestiary_tab.get_node("RightPanel/ScrollContainer/RightPanel")
+
+
 	
 	# Clear existing content
 	for child in details_panel.get_children():
@@ -531,7 +533,12 @@ func create_god_list_button(god_name: String, god_data: Dictionary, memory_manag
 	var battles_info = str(god_data["battles_fought"]) + " battles"
 	var decks_info = str(god_data["decks_discovered"].size()) + " decks"
 	
-	button.text = god_name + "\n" + level_desc + "\n" + battles_info + " • " + decks_info
+	# NEW: Add indicator for rich content availability
+	var content_indicator = ""
+	if memory_manager.has_custom_god_content(god_name):
+		content_indicator = " ✦"  # Special symbol for rich content
+	
+	button.text = god_name + content_indicator + "\n" + level_desc + "\n" + battles_info + " • " + decks_info
 	
 	# Create a style based on mastery level
 	var style = StyleBoxFlat.new()
@@ -540,29 +547,40 @@ func create_god_list_button(god_name: String, god_data: Dictionary, memory_manag
 	style.corner_radius_bottom_left = 4
 	style.corner_radius_bottom_right = 4
 	
-	# Color based on mastery level
+	# Enhanced color scheme - brighter for gods with rich content
+	var has_custom_content = memory_manager.has_custom_god_content(god_name)
+	var brightness_multiplier = 1.3 if has_custom_content else 1.0
+	
+	# Color based on mastery level with brightness enhancement
 	match god_data["memory_level"]:
 		0: # Unfamiliar - dark gray
-			style.bg_color = Color("#2A2A2A")
-			style.border_color = Color("#444444")
+			var base_color = Color("#2A2A2A") * brightness_multiplier
+			style.bg_color = base_color
+			style.border_color = Color("#444444") * brightness_multiplier
 		1: # Novice - light blue
-			style.bg_color = Color("#1A2A4A")
-			style.border_color = Color("#2A4A6A")
+			var base_color = Color("#1A2A4A") * brightness_multiplier
+			style.bg_color = base_color
+			style.border_color = Color("#2A4A6A") * brightness_multiplier
 		2: # Practiced - blue
-			style.bg_color = Color("#2A3A5A")
-			style.border_color = Color("#4A5A7A")
+			var base_color = Color("#2A3A5A") * brightness_multiplier
+			style.bg_color = base_color
+			style.border_color = Color("#4A5A7A") * brightness_multiplier
 		3: # Skilled - green
-			style.bg_color = Color("#2A4A2A")
-			style.border_color = Color("#4A6A4A")
+			var base_color = Color("#2A4A2A") * brightness_multiplier
+			style.bg_color = base_color
+			style.border_color = Color("#4A6A4A") * brightness_multiplier
 		4: # Expert - gold
-			style.bg_color = Color("#4A4A2A")
-			style.border_color = Color("#6A6A2A")
+			var base_color = Color("#4A4A2A") * brightness_multiplier
+			style.bg_color = base_color
+			style.border_color = Color("#6A6A2A") * brightness_multiplier
 		5: # Divine Mastery - purple
-			style.bg_color = Color("#4A2A4A")
-			style.border_color = Color("#6A4A6A")
+			var base_color = Color("#4A2A4A") * brightness_multiplier
+			style.bg_color = base_color
+			style.border_color = Color("#6A4A6A") * brightness_multiplier
 		_: # Eternal Bond - bright gold
-			style.bg_color = Color("#5A5A2A")
-			style.border_color = Color("#8A8A4A")
+			var base_color = Color("#5A5A2A") * brightness_multiplier
+			style.bg_color = base_color
+			style.border_color = Color("#8A8A4A") * brightness_multiplier
 	
 	style.border_width_left = 2
 	style.border_width_top = 2
@@ -575,8 +593,9 @@ func create_god_list_button(god_name: String, god_data: Dictionary, memory_manag
 	button.add_theme_stylebox_override("pressed", style)
 	button.add_theme_stylebox_override("focus", style)
 	
-	# Text styling
-	button.add_theme_color_override("font_color", Color("#DDDDDD"))
+	# Enhanced text styling for gods with rich content
+	var text_color = Color("#EEEEEE") if has_custom_content else Color("#DDDDDD")
+	button.add_theme_color_override("font_color", text_color)
 	button.add_theme_font_size_override("font_size", 12)
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	
@@ -584,14 +603,211 @@ func create_god_list_button(god_name: String, god_data: Dictionary, memory_manag
 
 # Handle god selection
 func _on_god_selected(god_name: String, god_data: Dictionary):
-	var details_panel = gods_tab.get_node("RightPanel")
+	var details_panel = gods_tab.get_node("RightPanel/ScrollContainer/RightPanel")
 	
 	# Clear existing content
 	for child in details_panel.get_children():
 		child.queue_free()
 	
-	# Create detailed god display
-	create_detailed_god_display(details_panel, god_name, god_data)
+	# Get detailed god information using the new god content manager
+	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
+	var detailed_info = memory_manager.get_god_detailed_info(god_name)
+	
+	if detailed_info.is_empty():
+		var error_label = Label.new()
+		error_label.text = "No information available for this deity."
+		details_panel.add_child(error_label)
+		return
+	
+	# Create detailed god display using the new rich content
+	create_enhanced_god_display(details_panel, detailed_info)
+
+func create_enhanced_god_display(container: Control, info: Dictionary):
+	var main_vbox = VBoxContainer.new()
+	main_vbox.add_theme_constant_override("separation", 12)
+	
+	# === HEADER SECTION ===
+	var header_container = VBoxContainer.new()
+	
+	var name_label = Label.new()
+	name_label.text = info["name"]
+	name_label.add_theme_font_size_override("font_size", 28)
+	name_label.add_theme_color_override("font_color", Color("#FFD700"))  # Divine gold
+	header_container.add_child(name_label)
+	
+	var mastery_label = Label.new()
+	mastery_label.text = "Mastery Level: " + str(info["mastery_level"]) + " (" + info["mastery_description"] + ")"
+	mastery_label.add_theme_font_size_override("font_size", 16)
+	mastery_label.add_theme_color_override("font_color", Color("#DDA0DD"))  # Plum purple
+	header_container.add_child(mastery_label)
+	
+	var battles_label = Label.new()
+	battles_label.text = "Battles Fought Together: " + str(info["battles_fought"])
+	battles_label.add_theme_font_size_override("font_size", 12)
+	battles_label.add_theme_color_override("font_color", Color("#BBBBBB"))
+	header_container.add_child(battles_label)
+	
+	main_vbox.add_child(header_container)
+	
+	# === DIVINE LORE SECTION === (Always visible)
+	var separator1 = HSeparator.new()
+	main_vbox.add_child(separator1)
+	
+	var lore_container = VBoxContainer.new()
+	
+	var lore_title = Label.new()
+	lore_title.text = "Divine Lore"
+	lore_title.add_theme_font_size_override("font_size", 20)
+	lore_title.add_theme_color_override("font_color", Color("#87CEEB"))  # Sky blue
+	lore_container.add_child(lore_title)
+	
+	var lore_label = Label.new()
+	lore_label.text = info["description"]
+	lore_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lore_label.add_theme_font_size_override("font_size", 14)
+	lore_label.add_theme_color_override("font_color", Color("#DDDDDD"))
+	lore_container.add_child(lore_label)
+	
+	main_vbox.add_child(lore_container)
+	
+	# === TACTICAL ADVICE SECTION === (Level 2+)
+	if "tactical_advice" in info["visible_content"] and info["tactical_advice"] != "":
+		var separator2 = HSeparator.new()
+		main_vbox.add_child(separator2)
+		
+		var tactical_container = VBoxContainer.new()
+		
+		var tactical_title = Label.new()
+		tactical_title.text = "Tactical Mastery"
+		tactical_title.add_theme_font_size_override("font_size", 18)
+		tactical_title.add_theme_color_override("font_color", Color("#FF6347"))  # Tomato red
+		tactical_container.add_child(tactical_title)
+		
+		var tactical_label = Label.new()
+		tactical_label.text = info["tactical_advice"]
+		tactical_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		tactical_label.add_theme_font_size_override("font_size", 13)
+		tactical_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+		tactical_container.add_child(tactical_label)
+		
+		main_vbox.add_child(tactical_container)
+	
+	# === DIVINE INSIGHTS SECTION === (Level 4+)
+	if "divine_insights" in info["visible_content"] and info["divine_insights"] != "":
+		var separator3 = HSeparator.new()
+		main_vbox.add_child(separator3)
+		
+		var insights_container = VBoxContainer.new()
+		
+		var insights_title = Label.new()
+		insights_title.text = "Divine Insights"
+		insights_title.add_theme_font_size_override("font_size", 18)
+		insights_title.add_theme_color_override("font_color", Color("#9370DB"))  # Medium purple
+		insights_container.add_child(insights_title)
+		
+		var insights_label = Label.new()
+		insights_label.text = info["divine_insights"]
+		insights_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		insights_label.add_theme_font_size_override("font_size", 13)
+		insights_label.add_theme_color_override("font_color", Color("#E6E6FA"))  # Lavender
+		insights_container.add_child(insights_label)
+		
+		main_vbox.add_child(insights_container)
+	
+	# === SACRED STATISTICS SECTION ===
+	var separator4 = HSeparator.new()
+	main_vbox.add_child(separator4)
+	
+	var stats_container = VBoxContainer.new()
+	
+	var stats_title = Label.new()
+	stats_title.text = "Sacred Statistics"
+	stats_title.add_theme_font_size_override("font_size", 16)
+	stats_title.add_theme_color_override("font_color", Color("#98FB98"))  # Pale green
+	stats_container.add_child(stats_title)
+	
+	var first_used_label = Label.new()
+	first_used_label.text = "First Divine Connection: " + info.get("first_used", "Unknown")
+	first_used_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+	stats_container.add_child(first_used_label)
+	
+	var last_used_label = Label.new()
+	last_used_label.text = "Last Communion: " + info.get("last_used", "Unknown")
+	last_used_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+	stats_container.add_child(last_used_label)
+	
+	main_vbox.add_child(stats_container)
+	
+	# === DISCOVERED MANIFESTATIONS SECTION ===
+	var separator5 = HSeparator.new()
+	main_vbox.add_child(separator5)
+	
+	var decks_container = VBoxContainer.new()
+	
+	var decks_title = Label.new()
+	var deck_count = info.get("decks_discovered", []).size()
+	decks_title.text = "Divine Manifestations Discovered (" + str(deck_count) + ")"
+	decks_title.add_theme_font_size_override("font_size", 16)
+	decks_title.add_theme_color_override("font_color", Color("#FFA500"))  # Orange
+	decks_container.add_child(decks_title)
+	
+	if deck_count > 0:
+		for deck_name in info.get("decks_discovered", []):
+			var deck_label = Label.new()
+			deck_label.text = "• " + deck_name
+			deck_label.add_theme_color_override("font_color", Color("#DDD"))
+			deck_label.add_theme_font_size_override("font_size", 12)
+			decks_container.add_child(deck_label)
+	else:
+		var no_decks_label = Label.new()
+		no_decks_label.text = "No manifestations discovered yet. Continue your divine communion to unlock their various forms."
+		no_decks_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		no_decks_label.add_theme_color_override("font_color", Color("#999999"))
+		no_decks_label.add_theme_font_size_override("font_size", 12)
+		decks_container.add_child(no_decks_label)
+	
+	main_vbox.add_child(decks_container)
+	
+	# === PROGRESSION HINTS === (For lower mastery levels)
+	if info["mastery_level"] < 5:  # Not at Divine Mastery yet
+		var separator6 = HSeparator.new()
+		main_vbox.add_child(separator6)
+		
+		var progression_container = VBoxContainer.new()
+		
+		var progression_title = Label.new()
+		progression_title.text = "Path to Greater Understanding"
+		progression_title.add_theme_font_size_override("font_size", 14)
+		progression_title.add_theme_color_override("font_color", Color("#FFE4B5"))  # Moccasin
+		progression_container.add_child(progression_title)
+		
+		var hint_text = get_progression_hint(info["mastery_level"])
+		var hint_label = Label.new()
+		hint_label.text = hint_text
+		hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		hint_label.add_theme_color_override("font_color", Color("#BBBBBB"))
+		hint_label.add_theme_font_size_override("font_size", 11)
+		progression_container.add_child(hint_label)
+		
+		main_vbox.add_child(progression_container)
+	
+	# Add main container to the details panel
+	container.add_child(main_vbox)
+
+func get_progression_hint(mastery_level: int) -> String:
+	match mastery_level:
+		0:
+			return "Fight more battles with this god to begin understanding their divine nature."
+		1:
+			return "Continue your communion to unlock tactical insights. (Need 5 total battles)"
+		2:
+			return "Deepen your understanding through combat to reveal divine wisdom. (Need 15 total battles)"
+		3:
+			return "Approach expert mastery to unlock profound insights. (Need 30 total battles)"
+		4:
+			return "You are close to achieving perfect divine harmony. (Need 50 total battles)"
+		_:
+			return "You have transcended mortal limitations in understanding this deity."
 
 func create_detailed_god_display(container: Control, god_name: String, god_data: Dictionary):
 	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")

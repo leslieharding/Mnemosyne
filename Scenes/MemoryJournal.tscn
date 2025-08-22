@@ -77,11 +77,14 @@ size_flags_vertical = 3
 [node name="EnemyList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary/LeftPanel/ScrollContainer"]
 layout_mode = 2
 
-[node name="RightPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Bestiary"]
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Bestiary/RightPanel"]
+[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Bestiary/ScrollContainer/RightPanel"]
 layout_mode = 2
 text = "Select an enemy to view details"
 horizontal_alignment = 1
@@ -107,10 +110,13 @@ size_flags_vertical = 3
 [node name="GodList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods/LeftPanel/ScrollContainer"]
 layout_mode = 2
 
-[node name="RightPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Gods"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Gods/RightPanel"]
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods/ScrollContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Gods/ScrollContainer/RightPanel"]
 layout_mode = 2
 text = "Select a god to view mastery details"
 horizontal_alignment = 1
