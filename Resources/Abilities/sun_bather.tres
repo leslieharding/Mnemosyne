@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SunBatherAbility" load_steps=2 format=3 uid="uid://cy5avrgqvoj0s"]
+
+[ext_resource type="Script" uid="uid://bjrn1xq2fqgxo" path="res://Resources/Abilities/sun_bather_ability.gd" id="1_8g5tk"]
+
+[resource]
+script = ExtResource("1_8g5tk")
+ability_name = "Sun Bather"
+description = "Receives double stats from the sun"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://bjrn1xq2fqgxo"
