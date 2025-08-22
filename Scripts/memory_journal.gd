@@ -320,9 +320,7 @@ func create_enemy_list_button(enemy_name: String, enemy_data: Dictionary, memory
 
 # Handle enemy selection in bestiary with detailed information
 func _on_enemy_selected(enemy_name: String, enemy_data: Dictionary):
-	var details_panel = bestiary_tab.get_node("RightPanel/ScrollContainer/RightPanel")
-
-
+	var details_panel = bestiary_tab.get_node("ScrollContainer/RightPanel")
 	
 	# Clear existing content
 	for child in details_panel.get_children():
@@ -603,7 +601,7 @@ func create_god_list_button(god_name: String, god_data: Dictionary, memory_manag
 
 # Handle god selection
 func _on_god_selected(god_name: String, god_data: Dictionary):
-	var details_panel = gods_tab.get_node("RightPanel/ScrollContainer/RightPanel")
+	var details_panel = gods_tab.get_node("ScrollContainer/RightPanel")
 	
 	# Clear existing content
 	for child in details_panel.get_children():
