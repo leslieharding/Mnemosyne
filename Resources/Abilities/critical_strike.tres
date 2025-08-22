@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CriticalStrikeAbility" load_steps=2 format=3 uid="uid://dknmbtbani421"]
+
+[ext_resource type="Script" uid="uid://b3qdfwuofelgc" path="res://Resources/Abilities/critical_strike_ability.gd" id="1_jbyte"]
+
+[resource]
+script = ExtResource("1_jbyte")
+ability_name = "Critical Strike"
+description = "When played, regardless of direction of attack, the opponents weakest stat will be used in defense"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://b3qdfwuofelgc"

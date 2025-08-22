@@ -942,7 +942,6 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 	
 	return captures.size()
 
-# Standard 4-direction combat (existing logic)
 func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource) -> Array[int]:
 	var captures: Array[int] = []
 	var grid_x = grid_index % grid_size
@@ -973,7 +972,19 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 						continue
 					
 					var my_value = attacking_card.values[direction.my_value_index]
-					var their_value = adjacent_card.values[direction.their_value_index]
+					var their_value: int
+					
+					# Check for critical strike
+					if should_apply_critical_strike(attacking_card, grid_index):
+						# Use the defending card's weakest stat instead of directional stat
+						their_value = get_weakest_stat_value(adjacent_card.values)
+						print("CRITICAL STRIKE! Using enemy's weakest stat: ", their_value, " instead of directional stat: ", adjacent_card.values[direction.their_value_index])
+						
+						# Mark critical strike as used
+						CriticalStrikeAbility.mark_critical_strike_used(attacking_card)
+					else:
+						# Normal combat - use directional stat
+						their_value = adjacent_card.values[direction.their_value_index]
 					
 					print("Combat ", direction.name, ": My ", my_value, " vs Their ", their_value)
 					
@@ -988,6 +999,62 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 						handle_standard_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction)
 	
 	return captures
+
+func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource) -> Array[int]:
+	var captures: Array[int] = []
+	
+	# Get all 8 adjacent positions using the helper function
+	var adjacent_positions = ExtendedRangeAbility.get_extended_adjacent_positions(grid_index, grid_size)
+	
+	print("Extended range attacking ", adjacent_positions.size(), " positions")
+	
+	for pos_info in adjacent_positions:
+		var adj_index = pos_info.position
+		var direction = pos_info.direction
+		var direction_name = pos_info.name
+		var is_diagonal = pos_info.is_diagonal
+		
+		if grid_occupied[adj_index]:
+			var adjacent_owner = grid_ownership[adj_index]
+			
+			if adjacent_owner != Owner.NONE and adjacent_owner != attacking_owner:
+				var adjacent_card = grid_card_data[adj_index]
+				
+				if not attacking_card or not adjacent_card:
+					print("Warning: Missing card data in extended combat resolution")
+					continue
+				
+				# Calculate attack value based on direction
+				var my_attack_value = ExtendedRangeAbility.get_attack_value_for_direction(attacking_card.values, direction)
+				var their_defense_value: int
+				
+				# Check for critical strike
+				if should_apply_critical_strike(attacking_card, grid_index):
+					# Use the defending card's weakest stat instead of calculated defense
+					their_defense_value = get_weakest_stat_value(adjacent_card.values)
+					print("CRITICAL STRIKE (Extended)! Using enemy's weakest stat: ", their_defense_value, " instead of calculated defense: ", ExtendedRangeAbility.get_defense_value_for_direction(adjacent_card.values, direction))
+					
+					# Mark critical strike as used
+					CriticalStrikeAbility.mark_critical_strike_used(attacking_card)
+				else:
+					# Normal extended combat - use calculated defense value
+					their_defense_value = ExtendedRangeAbility.get_defense_value_for_direction(adjacent_card.values, direction)
+				
+				print("Extended Combat ", direction_name, " (", "diagonal" if is_diagonal else "orthogonal", "): My ", my_attack_value, " vs Their ", their_defense_value)
+				
+				if my_attack_value > their_defense_value:
+					print("Extended range captured card at slot ", adj_index, "!")
+					captures.append(adj_index)
+					
+					# Handle combat effects
+					handle_extended_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
+				else:
+					# Defense successful
+					handle_extended_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
+	
+	return captures
+
+
 
 # Add helper function to get collection index from grid position
 func get_card_collection_index(grid_index: int) -> int:
@@ -2943,48 +3010,7 @@ func record_couple_union(card1_name: String, card2_name: String):
 	progress_tracker.record_couple_union(card1_name, card2_name)
 
 
-# Extended 8-direction combat (new logic)
-func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource) -> Array[int]:
-	var captures: Array[int] = []
-	
-	# Get all 8 adjacent positions using the helper function
-	var adjacent_positions = ExtendedRangeAbility.get_extended_adjacent_positions(grid_index, grid_size)
-	
-	print("Extended range attacking ", adjacent_positions.size(), " positions")
-	
-	for pos_info in adjacent_positions:
-		var adj_index = pos_info.position
-		var direction = pos_info.direction
-		var direction_name = pos_info.name
-		var is_diagonal = pos_info.is_diagonal
-		
-		if grid_occupied[adj_index]:
-			var adjacent_owner = grid_ownership[adj_index]
-			
-			if adjacent_owner != Owner.NONE and adjacent_owner != attacking_owner:
-				var adjacent_card = grid_card_data[adj_index]
-				
-				if not attacking_card or not adjacent_card:
-					print("Warning: Missing card data in extended combat resolution")
-					continue
-				
-				# Calculate attack and defense values based on direction
-				var my_attack_value = ExtendedRangeAbility.get_attack_value_for_direction(attacking_card.values, direction)
-				var their_defense_value = ExtendedRangeAbility.get_defense_value_for_direction(adjacent_card.values, direction)
-				
-				print("Extended Combat ", direction_name, " (", "diagonal" if is_diagonal else "orthogonal", "): My ", my_attack_value, " vs Their ", their_defense_value)
-				
-				if my_attack_value > their_defense_value:
-					print("Extended range captured card at slot ", adj_index, "!")
-					captures.append(adj_index)
-					
-					# Handle combat effects
-					handle_extended_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
-				else:
-					# Defense successful
-					handle_extended_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
-	
-	return captures
+
 
 # Handle combat effects for standard combat
 func handle_standard_combat_effects(attacker_pos: int, defender_pos: int, attacking_owner: Owner, attacking_card: CardResource, defending_card: CardResource, direction: Dictionary):
@@ -3659,3 +3685,29 @@ func handle_adaptive_defense_ownership_change(grid_index: int):
 	}
 	
 	adaptive_defense_ability.execute(context)
+
+
+func should_apply_critical_strike(attacking_card: CardResource, attacker_position: int) -> bool:
+	if not attacking_card:
+		return false
+	
+	# Get the card level for ability checks
+	var card_collection_index = get_card_collection_index(attacker_position)
+	var card_level = get_card_level(card_collection_index)
+	
+	# Check if the card has critical strike ability and can still use it
+	if attacking_card.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+		var abilities = attacking_card.get_available_abilities(card_level)
+		for ability in abilities:
+			if ability.ability_name == "Critical Strike":
+				return CriticalStrikeAbility.can_use_critical_strike(attacking_card)
+	
+	return false
+
+# Add this helper function to get the weakest stat
+func get_weakest_stat_value(card_values: Array[int]) -> int:
+	var weakest = card_values[0]
+	for i in range(1, card_values.size()):
+		if card_values[i] < weakest:
+			weakest = card_values[i]
+	return weakest
