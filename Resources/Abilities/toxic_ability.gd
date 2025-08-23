@@ -48,6 +48,16 @@ func execute(context: Dictionary) -> bool:
 	print("ToxicAbility: Toxic card was captured by ", "Player" if capturing_owner == game_manager.Owner.PLAYER else "Opponent")
 	print("ToxicAbility: Toxic card is now owned by ", "Player" if toxic_current_owner == game_manager.Owner.PLAYER else "Opponent")
 	
+	# NEW: Record trap encounter if player captured toxic and lost their card to opponent
+	if capturing_owner == game_manager.Owner.PLAYER and toxic_current_owner == game_manager.Owner.OPPONENT:
+		# FIXED: Use game_manager to access the global progress tracker
+		var progress_tracker = game_manager.get_node("/root/GlobalProgressTrackerAutoload")
+		if progress_tracker:
+			progress_tracker.record_trap_fallen_for("toxic", "Poisoned by toxic card counter-capture")
+		
+		if game_manager.notification_manager:
+			game_manager.notification_manager.show_notification("Artemis observes your trap encounter")
+	
 	# TOXIC EFFECT: The capturing card gets captured by whoever now owns the toxic card
 	# This works both ways - if player captures toxic, they lose their attacking card to opponent
 	# If opponent re-captures toxic, they lose their attacking card to player

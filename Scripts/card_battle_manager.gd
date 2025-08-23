@@ -2584,6 +2584,12 @@ func place_card_on_grid():
 		if current_boss_prediction["card"] == card_collection_index and current_boss_prediction["position"] == current_grid_index:
 			boss_prediction_hit = true
 			print("BOSS PREDICTION HIT! The boss anticipated your move!")
+			
+			# NEW: Record trap encounter
+			get_node("/root/GlobalProgressTrackerAutoload").record_trap_fallen_for("boss_prediction", "Fell into boss's prediction trap")
+			if notification_manager:
+				notification_manager.show_notification("Artemis observes your trap encounter")
+			
 			# Apply the stat reduction - weakens the card but doesn't change ownership
 			card_data.values[0] = 1  # North
 			card_data.values[1] = 1  # East
@@ -3236,6 +3242,12 @@ func process_single_tremor(tremor_id: int, tremor_data: Dictionary):
 			print("Tremor captured card at position ", tremor_zone, "!")
 			captures.append(tremor_zone)
 			
+			# NEW: Record trap encounter if player card was captured
+			if target_owner == Owner.PLAYER:
+				get_node("/root/GlobalProgressTrackerAutoload").record_trap_fallen_for("tremor", "Card captured by earthquake tremors")
+				if notification_manager:
+					notification_manager.show_notification("Artemis observes your trap encounter")
+			
 			# Show tremor capture visual effect
 			var target_card_display = get_card_display_at_position(tremor_zone)
 			if target_card_display and visual_effects_manager:
@@ -3498,7 +3510,6 @@ func check_hunt_trap_trigger(grid_position: int, placed_card: CardResource, plac
 	# Remove the trap (used up)
 	remove_hunt_trap(grid_position)
 
-# Execute hunt combat when trap is triggered
 func execute_trap_hunt_combat(target_position: int, hunted_card: CardResource, hunt_data: Dictionary):
 	var hunter_card = hunt_data.hunter_card
 	
@@ -3518,6 +3529,13 @@ func execute_trap_hunt_combat(target_position: int, hunted_card: CardResource, h
 	# Resolve hunt combat
 	if hunter_stats.value > hunted_stats.value:
 		print("Hunt trap successful! Capturing hunted card")
+		
+		# NEW: Record trap encounter if player walked into enemy hunt trap
+		var hunted_owner = get_owner_at_position(target_position)
+		if hunted_owner == Owner.PLAYER:
+			get_node("/root/GlobalProgressTrackerAutoload").record_trap_fallen_for("hunt_trap", "Caught in enemy hunting snare")
+			if notification_manager:
+				notification_manager.show_notification("Artemis observes your trap encounter")
 		
 		# Capture the hunted card
 		set_card_ownership(target_position, hunt_data.hunter_owner)

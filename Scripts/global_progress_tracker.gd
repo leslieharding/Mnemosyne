@@ -6,6 +6,9 @@ class_name GlobalProgressTracker
 var progress_data: Dictionary = {}
 var save_path: String = "user://card_progress.save"
 
+var traps_fallen_for: int = 0  # Track trap encounters for Artemis unlock
+
+
 # NEW: God unlock tracking
 var unlocked_gods: Array[String] = ["Apollo"]  # Apollo starts unlocked
 var god_unlock_conditions: Dictionary = {
@@ -15,9 +18,9 @@ var god_unlock_conditions: Dictionary = {
 		"description": "Defeat the mysterious final boss"
 	},
 	"Artemis": {
-		"type": "boss_defeated", 
-		"boss_name": "Stone Guardian",
-		"description": "Defeat the Stone Guardian"
+		"type": "traps_fallen_for",  
+		"required_count": 3,         
+		"description": "Fall for 3 different traps"  
 	},
 	"Aphrodite": {
 		"type": "couples_united",
@@ -134,7 +137,8 @@ func save_progress():
 		var save_data = {
 			"progress_data": progress_data,
 			"unlocked_gods": unlocked_gods,
-			"couples_united": couples_united
+			"couples_united": couples_united,
+			"traps_fallen_for": traps_fallen_for  # NEW LINE
 		}
 		save_file.store_var(save_data)
 		save_file.close()
@@ -142,6 +146,7 @@ func save_progress():
 	else:
 		print("Failed to save progress!")
 
+# Load progress from disk - with migration support
 # Load progress from disk - with migration support
 func load_progress():
 	if FileAccess.file_exists(save_path):
@@ -155,6 +160,7 @@ func load_progress():
 				var old_progress_data = loaded_data.get("progress_data", {})
 				unlocked_gods = loaded_data.get("unlocked_gods", ["Apollo"])
 				couples_united = loaded_data.get("couples_united", [])
+				traps_fallen_for = loaded_data.get("traps_fallen_for", 0)  # NEW LINE
 				
 				# Migrate old capture_exp/defense_exp format to unified total_exp
 				progress_data = migrate_experience_data(old_progress_data)
@@ -163,12 +169,14 @@ func load_progress():
 				var old_progress_data = loaded_data if loaded_data is Dictionary else {}
 				unlocked_gods = ["Apollo"]  # Default to just Apollo
 				couples_united = []
+				traps_fallen_for = 0  # NEW LINE
 				progress_data = migrate_experience_data(old_progress_data)
 			
 			save_file.close()
 			print("Progress loaded from ", save_path)
 			print("Unlocked gods: ", unlocked_gods)
 			print("Couples united: ", couples_united)
+			print("Traps fallen for: ", traps_fallen_for)  # NEW LINE
 			
 			# Save immediately to update format
 			save_progress()
@@ -208,6 +216,7 @@ func clear_all_progress():
 	progress_data.clear()
 	unlocked_gods = ["Apollo"]  # Reset to only Apollo unlocked
 	couples_united = []  # Clear united couples
+	traps_fallen_for = 0  # NEW LINE
 	save_progress()
 	print("All progress cleared - reset to Apollo only")
 
@@ -252,6 +261,9 @@ func check_unlock_condition(condition: Dictionary) -> bool:
 		"cards_leveled":
 			var required = condition.get("required_count", 5)
 			return count_leveled_cards() >= required
+		"traps_fallen_for":  # NEW CASE
+			var required = condition.get("required_count", 3)
+			return traps_fallen_for >= required
 		_:
 			return false
 
@@ -268,6 +280,8 @@ func check_boss_defeated(boss_name: String) -> bool:
 		return boss_data.get("victories", 0) > 0
 	
 	return false
+
+
 
 # Check if enough cards have been leveled up
 func count_leveled_cards() -> int:
@@ -331,8 +345,32 @@ func get_unlock_progress_text(condition: Dictionary) -> String:
 				return " ✓"
 			else:
 				return " (" + str(current) + "/" + str(required) + " cards leveled)"
+		"traps_fallen_for":  # NEW CASE
+			var required = condition.get("required_count", 3)
+			if traps_fallen_for >= required:
+				return " ✓"
+			else:
+				return " (" + str(traps_fallen_for) + "/" + str(required) + " traps encountered)"
 		_:
 			return ""
+
+func record_trap_fallen_for(trap_type: String, details: String = ""):
+	traps_fallen_for += 1
+	print("Player fell for trap: ", trap_type, " - ", details, " (", traps_fallen_for, "/3)")
+	
+	# Save progress
+	save_progress()
+	
+	# Check for Artemis unlock
+	if not is_god_unlocked("Artemis") and traps_fallen_for >= 3:
+		unlock_god("Artemis")
+		print("🏹 Artemis unlocked through trap encounters! 🏹")
+		
+		# Trigger conversation if available
+		if has_node("/root/ConversationManagerAutoload"):
+			var conv_manager = get_node("/root/ConversationManagerAutoload")
+			conv_manager.trigger_conversation("artemis_unlocked")
+
 
 func record_couple_union(card1_name: String, card2_name: String):
 	# Create a consistent couple identifier (alphabetical order)
