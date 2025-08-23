@@ -11,7 +11,8 @@ const SLIDE_DURATION: float = 0.8
 const DISPLAY_DURATION: float = 3.0
 const FADE_DURATION: float = 0.6
 
-# State tracking
+# Queue system
+var notification_queue: Array[String] = []
 var is_showing: bool = false
 var current_tween: Tween
 
@@ -56,17 +57,28 @@ func setup_rich_text_label():
 
 # Show a notification message with BBCode formatting
 func show_notification(message: String):
-	# Don't show if already showing a notification
-	if is_showing:
-		print("NotificationManager: Already showing notification, skipping")
+	print("NotificationManager: Queuing notification: '", message, "'")
+	
+	# Add to queue
+	notification_queue.append(message)
+	
+	# Start processing queue if not already showing
+	if not is_showing:
+		process_next_notification()
+
+# Process the next notification in the queue
+func process_next_notification():
+	if notification_queue.is_empty():
 		return
+	
+	# Get the next message from queue
+	var message = notification_queue.pop_front()
 	
 	is_showing = true
 	
 	# Apply BBCode formatting to specific messages
 	var formatted_message = format_message_with_bbcode(message)
-	print("NotificationManager: Original message: '", message, "'")
-	print("NotificationManager: Formatted message: '", formatted_message, "'")
+	print("NotificationManager: Showing notification: '", formatted_message, "'")
 	
 	# Set the text
 	if message_label is RichTextLabel:
@@ -92,8 +104,19 @@ func show_notification(message: String):
 	# Fade out
 	current_tween.tween_property(self, "modulate:a", 0.0, FADE_DURATION).set_ease(Tween.EASE_IN)
 	
-	# Reset when done
-	current_tween.tween_callback(reset_notification)
+	# Reset when done and process next
+	current_tween.tween_callback(on_notification_complete)
+
+# Called when a notification finishes
+func on_notification_complete():
+	is_showing = false
+	modulate.a = 0.0
+	
+	# Process the next notification in queue (if any)
+	if not notification_queue.is_empty():
+		# Small delay between notifications for better UX
+		await get_tree().create_timer(0.3).timeout
+		process_next_notification()
 
 # Format messages with BBCode for special effects
 func format_message_with_bbcode(message: String) -> String:
@@ -106,19 +129,10 @@ func format_message_with_bbcode(message: String) -> String:
 	if lower_message.contains("feeling") and lower_message.contains("watched"):
 		print("NotificationManager: Detected 'feeling' and 'watched' in message")
 		
-		# Option 2: Pulse effect only (animated pulsing opacity)
-		message = message.replace("feeling", "[pulse freq=2.0 color=#9966FF ease=-2.0]feeling[/pulse]")
+		# Combine wave effect with color for better visibility
+		message = message.replace("feeling", "[wave amp=20.0 freq=3.0][color=#9966FF]feeling[/color][/wave]")
 		
-		# Option 3: Shake effect (makes text shake)
-		message = message.replace("feeling", "[shake rate=20.0 level=5]feeling[/shake]")
-		
-		# Option 6: Fade effect (static fade)
-		message = message.replace("feeling", "[fade start=0 length=7]feeling[/fade]")
-		
-		# Let's start with wave effect - it should be the most visible
-		message = message.replace("feeling", "[wave amp=20.0 freq=3.0]feeling[/wave]")
-		
-		print("NotificationManager: Applied wave effect: ", message)
+		print("NotificationManager: Applied wave effect with color: ", message)
 	# Handle the "knew" message with bold formatting
 	elif lower_message.contains("knew") and lower_message.contains("would"):
 		print("NotificationManager: Detected 'knew' and 'would' in message")
@@ -129,9 +143,14 @@ func format_message_with_bbcode(message: String) -> String:
 		print("NotificationManager: Detected 'know' and 'watched' in message")
 		message = message.replace("know", "[b][pulse freq=1.2 color=#FFD700 ease=-4.0][color=#FFD700]know[/color][/pulse][/b]")  
 		print("NotificationManager: After bold formatting: ", message)
+	
 	return message
 
-# Reset the notification to ready state
-func reset_notification():
-	is_showing = false
-	modulate.a = 0.0
+# Clear all queued notifications (useful for scene transitions)
+func clear_queue():
+	notification_queue.clear()
+	print("NotificationManager: Queue cleared")
+
+# Get current queue size (for debugging)
+func get_queue_size() -> int:
+	return notification_queue.size()
