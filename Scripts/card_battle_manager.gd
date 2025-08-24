@@ -902,10 +902,44 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 		print("Standard combat")
 		captures = resolve_standard_combat(grid_index, attacking_owner, attacking_card)
 	
+	# NEW: Execute Bolster Confidence on the attacking card if it made any captures
+	if captures.size() > 0:
+		var attacking_card_level = 0  # Enemy cards typically use level 0
+		if attacking_owner == Owner.PLAYER:
+			var attacking_card_index = get_card_collection_index(grid_index)
+			attacking_card_level = get_card_level(attacking_card_index)
+		
+		# Check specifically for Bolster Confidence ability on the attacking card
+		var available_abilities = attacking_card.get_available_abilities(attacking_card_level)
+		for ability in available_abilities:
+			if ability.ability_name == "Bolster Confidence":
+				print("DEBUG: Attacking card ", attacking_card.card_name, " has Bolster Confidence - checking captures")
+				
+				# Execute Bolster Confidence for each player card captured
+				for captured_index in captures:
+					var captured_card_data = grid_card_data[captured_index]
+					
+					var bolster_context = {
+						"capturing_card": attacking_card,
+						"capturing_position": grid_index,
+						"captured_card": captured_card_data,
+						"captured_position": captured_index,
+						"game_manager": self,
+						"direction": "combat_capture",
+						"card_level": attacking_card_level
+					}
+					
+					ability.execute(bolster_context)
+				break  # Only execute Bolster Confidence once per attacking card
+	
 	# Apply all captures and handle passive abilities (existing code)
 	for captured_index in captures:
+		print("=== PROCESSING CAPTURE AT POSITION ", captured_index, " ===")
+		
 		# Store the card data before changing ownership (for passive ability removal)
 		var captured_card_data = grid_card_data[captured_index]
+		
+		print("DEBUG: Captured card is: ", captured_card_data.card_name if captured_card_data else "NULL")
 		
 		# Remove passive abilities of the captured card BEFORE changing ownership
 		handle_passive_abilities_on_capture(captured_index, captured_card_data)
@@ -914,8 +948,39 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 		grid_ownership[captured_index] = attacking_owner
 		print("Card at slot ", captured_index, " is now owned by ", "Player" if attacking_owner == Owner.PLAYER else "Opponent")
 		
+		# DEBUG: Check for ON_CAPTURE abilities
+		var card_collection_index = get_card_collection_index(captured_index)
+		var card_level = get_card_level(card_collection_index)
+		
+		print("DEBUG: Card collection index: ", card_collection_index, ", level: ", card_level)
+		print("DEBUG: About to check ON_CAPTURE abilities for ", captured_card_data.card_name, " at position ", captured_index)
+		
+		if captured_card_data.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, card_level):
+			print("DEBUG: Card ", captured_card_data.card_name, " HAS ON_CAPTURE abilities at level ", card_level)
+			
+			# EXECUTE ON_CAPTURE abilities on the captured card (like Infighting)
+			print("DEBUG: Executing ON_CAPTURE abilities for captured card: ", captured_card_data.card_name)
+			
+			var capture_context = {
+				"capturing_card": attacking_card,
+				"capturing_position": grid_index,  # The attacking position
+				"captured_card": captured_card_data,
+				"captured_position": captured_index,
+				"game_manager": self,
+				"direction": "standard_combat",
+				"card_level": card_level
+			}
+			
+			captured_card_data.execute_abilities(CardAbility.TriggerType.ON_CAPTURE, capture_context, card_level)
+		else:
+			print("DEBUG: Card ", captured_card_data.card_name, " has NO ON_CAPTURE abilities at level ", card_level)
+			if captured_card_data.abilities.size() > 0:
+				print("DEBUG: But it does have ", captured_card_data.abilities.size(), " abilities:")
+				for i in range(captured_card_data.abilities.size()):
+					var ability = captured_card_data.abilities[i]
+					print("  Ability ", i, ": ", ability.ability_name, " (trigger: ", ability.trigger_condition, ")")
+		
 		# Check if the newly captured card has passive abilities and restart pulse effect
-		var card_level = get_card_level(get_card_collection_index(captured_index))
 		if captured_card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
 			print("Restarting passive abilities for captured card at position ", captured_index)
 			

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="BolsterConfidenceAbility" load_steps=2 format=3 uid="uid://breburd5ihpsp"]
+
+[ext_resource type="Script" uid="uid://bskifvkjo5blo" path="res://Resources/Abilities/bolster_confidence_ability.gd" id="1_p62ag"]
+
+[resource]
+script = ExtResource("1_p62ag")
+ability_name = "Bolster Confidence"
+description = "When this card captures a player's card it increases the stats of wavering family members by 1"
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://bskifvkjo5blo"
