@@ -3307,9 +3307,9 @@ func process_single_tremor(tremor_id: int, tremor_data: Dictionary):
 			print("Tremor captured card at position ", tremor_zone, "!")
 			captures.append(tremor_zone)
 			
-			# NEW: Record trap encounter if player card was captured
-			if target_owner == Owner.PLAYER:
-				get_node("/root/GlobalProgressTrackerAutoload").record_trap_fallen_for("tremor", "Card captured by earthquake tremors")
+			# FIXED: Only record trap encounter if PLAYER card was captured by ENEMY tremor
+			if target_owner == Owner.PLAYER and tremor_owner == Owner.OPPONENT:
+				get_node("/root/GlobalProgressTrackerAutoload").record_trap_fallen_for("tremor", "Player's card captured by earthquake tremors")
 				if notification_manager:
 					notification_manager.show_notification("Artemis observes your trap encounter")
 			
@@ -3595,10 +3595,12 @@ func execute_trap_hunt_combat(target_position: int, hunted_card: CardResource, h
 	if hunter_stats.value > hunted_stats.value:
 		print("Hunt trap successful! Capturing hunted card")
 		
-		# NEW: Record trap encounter if player walked into enemy hunt trap
+		# Get the owner of the hunted card
 		var hunted_owner = get_owner_at_position(target_position)
-		if hunted_owner == Owner.PLAYER:
-			get_node("/root/GlobalProgressTrackerAutoload").record_trap_fallen_for("hunt_trap", "Caught in enemy hunting snare")
+		
+		# FIXED: Only record trap encounter if PLAYER walked into ENEMY hunt trap
+		if hunted_owner == Owner.PLAYER and hunt_data.hunter_owner == Owner.OPPONENT:
+			get_node("/root/GlobalProgressTrackerAutoload").record_trap_fallen_for("hunt_trap", "Player's card caught in enemy hunting snare")
 			if notification_manager:
 				notification_manager.show_notification("Artemis observes your trap encounter")
 		
