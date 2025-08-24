@@ -538,3 +538,35 @@ func clear_all_hunt_effects(grid_slots: Array):
 		if hunt_icon:
 			hunt_icon.queue_free()
 	print("All hunt visual effects cleared")
+
+
+const HARMONY_FLASH_COLOR: Color = Color("#FFD700")  # Gold color for harmony
+
+# Show harmony capture flash effect
+func show_harmony_capture_flash(card_display: CardDisplay):
+	if not card_display or not card_display.panel:
+		return
+	
+	# Create a golden harmony flash effect
+	var flash_overlay = ColorRect.new()
+	flash_overlay.color = HARMONY_FLASH_COLOR
+	flash_overlay.size = card_display.panel.size
+	flash_overlay.position = Vector2.ZERO
+	flash_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flash_overlay.modulate.a = 0.0
+	
+	card_display.panel.add_child(flash_overlay)
+	flash_overlay.z_index = 120  # Higher than other effects
+	
+	# Animate harmony flash with a gentle, musical pulsing
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Gentle harmonic pulse - in and out like a musical note
+	tween.tween_property(flash_overlay, "modulate:a", 0.8, 0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(flash_overlay, "modulate:a", 0.4, 0.3).set_delay(0.2).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(flash_overlay, "modulate:a", 0.7, 0.2).set_delay(0.5).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(flash_overlay, "modulate:a", 0.0, 0.4).set_delay(0.7).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+	
+	# Clean up
+	tween.tween_callback(func(): flash_overlay.queue_free()).set_delay(1.1)

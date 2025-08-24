@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="HarmonyAbility" load_steps=2 format=3 uid="uid://bb38ac4fnjwen"]
+
+[ext_resource type="Script" uid="uid://cs8jo68kos2c6" path="res://Resources/Abilities/harmony_ability.gd" id="1_bce4m"]
+
+[resource]
+script = ExtResource("1_bce4m")
+ability_name = "Harmony"
+description = "If at least two defending enemies have the same stats as me they are both captured"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://cs8jo68kos2c6"
