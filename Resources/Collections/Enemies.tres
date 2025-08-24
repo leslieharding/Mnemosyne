@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=140 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=147 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="7_oovod"]
 [ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="8_m5w2u"]
 [ext_resource type="Script" uid="uid://dyur10e6s3lah" path="res://Resources/Abilities/toxic_ability.gd" id="8_oovod"]
+[ext_resource type="Script" uid="uid://dh1ykxl2k5ank" path="res://Resources/Abilities/infighting_ability.gd" id="8_sygum"]
 [ext_resource type="Script" uid="uid://cjryt268c8rko" path="res://Resources/Abilities/chaos_ability.gd" id="8_vfgb0"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
@@ -245,12 +246,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_y7i8f"]
+script = ExtResource("8_sygum")
+ability_name = "Infighting"
+description = "Hesitant family members could be swayed... with the right incentive."
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
+
 [sub_resource type="Resource" id="Resource_xcqsp"]
 script = ExtResource("2_xcqsp")
 card_name = "Cleodoxa"
 values = Array[int]([3, 2, 3, 2])
 description = "Oh mother just say sorry would you, this all could have been avoided"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_y7i8f")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -275,12 +284,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_ti8cg"]
+script = ExtResource("8_sygum")
+ability_name = "Infighting"
+description = "Hesitant family members could be swayed... with the right incentive."
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
+
 [sub_resource type="Resource" id="Resource_5025t"]
 script = ExtResource("2_xcqsp")
 card_name = "Damasichthon"
 values = Array[int]([4, 3, 2, 1])
 description = "You brought this ruin upon our house, must we suffer again for your hubris"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ti8cg")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -295,12 +312,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_nbgbv"]
+script = ExtResource("8_sygum")
+ability_name = "Infighting"
+description = "Hesitant family members could be swayed... with the right incentive."
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
+
 [sub_resource type="Resource" id="Resource_m0fay"]
 script = ExtResource("2_xcqsp")
 card_name = "Cleodoxa"
 values = Array[int]([3, 2, 4, 3])
 description = "Oh mother just say sorry would you, this all could have been avoided"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_nbgbv")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -325,12 +350,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_annky"]
+script = ExtResource("8_sygum")
+ability_name = "Infighting"
+description = "Hesitant family members could be swayed... with the right incentive."
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
+
 [sub_resource type="Resource" id="Resource_1v88n"]
 script = ExtResource("2_xcqsp")
 card_name = "Damasichthon"
 values = Array[int]([5, 4, 3, 2])
 description = "You brought this ruin upon our house, must we suffer again for your hubris"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_annky")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -345,12 +378,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_dj7db"]
+script = ExtResource("8_sygum")
+ability_name = "Infighting"
+description = "Hesitant family members could be swayed... with the right incentive."
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
+
 [sub_resource type="Resource" id="Resource_2v1mv"]
 script = ExtResource("2_xcqsp")
 card_name = "Cleodoxa"
 values = Array[int]([4, 3, 5, 4])
 description = "Oh mother just say sorry would you, this all could have been avoided"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_dj7db")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -375,12 +416,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_pdb1u"]
+script = ExtResource("8_sygum")
+ability_name = "Infighting"
+description = "Hesitant family members could be swayed... with the right incentive."
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
+
 [sub_resource type="Resource" id="Resource_5pa5w"]
 script = ExtResource("2_xcqsp")
 card_name = "Damasichthon"
 values = Array[int]([6, 5, 4, 3])
 description = "You brought this ruin upon our house, must we suffer again for your hubris"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_pdb1u")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

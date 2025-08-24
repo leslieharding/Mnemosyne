@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="InfightingAbility" load_steps=2 format=3 uid="uid://cfw34nj8hm3sj"]
+
+[ext_resource type="Script" uid="uid://dh1ykxl2k5ank" path="res://Resources/Abilities/infighting_ability.gd" id="1_1yyk3"]
+
+[resource]
+script = ExtResource("1_1yyk3")
+ability_name = "Infighting"
+description = "Hesitant family members could be swayed... with the right incentive."
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
