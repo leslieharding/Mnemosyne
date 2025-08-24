@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SymmetryAbility" load_steps=2 format=3 uid="uid://bj1m33c18fg6v"]
+
+[ext_resource type="Script" uid="uid://btx30eg0dkxdt" path="res://Resources/Abilities/symmetry_ability.gd" id="1_duhol"]
+
+[resource]
+script = ExtResource("1_duhol")
+ability_name = "Symmetry"
+description = "If you are fighting atleast two enemies and the sum of the attacking stats versus defending stats is exactly the same, they are captured"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://btx30eg0dkxdt"

@@ -27,6 +27,9 @@ var tremor_shake_effects: Dictionary = {}  # position -> shake_tween
 const HUNT_FLASH_COLOR: Color = Color("#FF8800")  # Orange for hunt attacks
 const HUNT_TRAP_FLASH_COLOR: Color = Color("#FFAA44")  # Lighter orange for trap triggers
 
+const HARMONY_FLASH_COLOR: Color = Color("#FFD700")  # Gold color for harmony
+const SYMMETRY_FLASH_COLOR: Color = Color("#00FFFF")  # Cyan color for symmetry
+
 
 func _ready():
 	pass
@@ -540,7 +543,7 @@ func clear_all_hunt_effects(grid_slots: Array):
 	print("All hunt visual effects cleared")
 
 
-const HARMONY_FLASH_COLOR: Color = Color("#FFD700")  # Gold color for harmony
+
 
 # Show harmony capture flash effect
 func show_harmony_capture_flash(card_display: CardDisplay):
@@ -570,3 +573,34 @@ func show_harmony_capture_flash(card_display: CardDisplay):
 	
 	# Clean up
 	tween.tween_callback(func(): flash_overlay.queue_free()).set_delay(1.1)
+
+
+# Show symmetry capture flash effect
+func show_symmetry_capture_flash(card_display: CardDisplay):
+	if not card_display or not card_display.panel:
+		return
+	
+	# Create a cyan symmetry flash effect
+	var flash_overlay = ColorRect.new()
+	flash_overlay.color = SYMMETRY_FLASH_COLOR
+	flash_overlay.size = card_display.panel.size
+	flash_overlay.position = Vector2.ZERO
+	flash_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	flash_overlay.modulate.a = 0.0
+	
+	card_display.panel.add_child(flash_overlay)
+	flash_overlay.z_index = 120  # Higher than other effects
+	
+	# Animate symmetry flash with a balanced, mathematical pulsing
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	# Perfect symmetrical pulse - mathematical precision
+	tween.tween_property(flash_overlay, "modulate:a", 0.9, 0.15).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(flash_overlay, "modulate:a", 0.3, 0.25).set_delay(0.15).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(flash_overlay, "modulate:a", 0.9, 0.15).set_delay(0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(flash_overlay, "modulate:a", 0.3, 0.25).set_delay(0.55).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(flash_overlay, "modulate:a", 0.0, 0.2).set_delay(0.8).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+	
+	# Clean up
+	tween.tween_callback(func(): flash_overlay.queue_free()).set_delay(1.0)
