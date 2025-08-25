@@ -7,6 +7,8 @@ func _init():
 	description = "When this card is captured, it also captures the card that captured it"
 	trigger_condition = TriggerType.ON_CAPTURE
 
+# Replace the entire execute function in Resources/Abilities/toxic_ability.gd
+
 func execute(context: Dictionary) -> bool:
 	if not can_execute(context):
 		return false
@@ -54,9 +56,10 @@ func execute(context: Dictionary) -> bool:
 		var progress_tracker = game_manager.get_node("/root/GlobalProgressTrackerAutoload")
 		if progress_tracker:
 			progress_tracker.record_trap_fallen_for("toxic", "Player's card poisoned by toxic counter-capture")
-		
-		if game_manager.notification_manager:
-			game_manager.notification_manager.show_notification("Artemis observes your trap encounter")
+			
+			# FIXED: Only show notification if Artemis isn't unlocked yet
+			if progress_tracker.should_show_artemis_notification() and game_manager.notification_manager:
+				game_manager.notification_manager.show_notification("Artemis observes your trap encounter")
 	
 	# FIXED: The capturing card should be captured by the OPPOSITE owner of who originally captured the toxic card
 	# If player captured toxic (toxic_new_owner = PLAYER), then opponent should get the capturing card

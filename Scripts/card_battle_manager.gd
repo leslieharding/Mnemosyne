@@ -2651,8 +2651,11 @@ func place_card_on_grid():
 			print("BOSS PREDICTION HIT! The boss anticipated your move!")
 			
 			# NEW: Record trap encounter
-			get_node("/root/GlobalProgressTrackerAutoload").record_trap_fallen_for("boss_prediction", "Fell into boss's prediction trap")
-			if notification_manager:
+			var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+			progress_tracker.record_trap_fallen_for("boss_prediction", "Fell into boss's prediction trap")
+			
+			# FIXED: Only show notification if Artemis isn't unlocked yet
+			if progress_tracker.should_show_artemis_notification() and notification_manager:
 				notification_manager.show_notification("Artemis observes your trap encounter")
 			
 			# Apply the stat reduction - weakens the card but doesn't change ownership
@@ -3268,7 +3271,7 @@ func process_tremors_for_player(player_owner: Owner):
 func process_single_tremor(tremor_id: int, tremor_data: Dictionary):
 	var source_position = tremor_data.source_position
 	var tremor_zones = tremor_data.tremor_zones
-	var tremor_owner = tremor_data.owner
+	var tremor_owner = tremor_data.tremor_owner
 	
 	# Get the source card's current stats
 	var source_card = get_card_at_position(source_position)
@@ -3309,8 +3312,11 @@ func process_single_tremor(tremor_id: int, tremor_data: Dictionary):
 			
 			# FIXED: Only record trap encounter if PLAYER card was captured by ENEMY tremor
 			if target_owner == Owner.PLAYER and tremor_owner == Owner.OPPONENT:
-				get_node("/root/GlobalProgressTrackerAutoload").record_trap_fallen_for("tremor", "Player's card captured by earthquake tremors")
-				if notification_manager:
+				var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+				progress_tracker.record_trap_fallen_for("tremor", "Player's card captured by earthquake tremors")
+				
+				# FIXED: Only show notification if Artemis isn't unlocked yet
+				if progress_tracker.should_show_artemis_notification() and notification_manager:
 					notification_manager.show_notification("Artemis observes your trap encounter")
 			
 			# Show tremor capture visual effect
@@ -3600,8 +3606,11 @@ func execute_trap_hunt_combat(target_position: int, hunted_card: CardResource, h
 		
 		# FIXED: Only record trap encounter if PLAYER walked into ENEMY hunt trap
 		if hunted_owner == Owner.PLAYER and hunt_data.hunter_owner == Owner.OPPONENT:
-			get_node("/root/GlobalProgressTrackerAutoload").record_trap_fallen_for("hunt_trap", "Player's card caught in enemy hunting snare")
-			if notification_manager:
+			var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+			progress_tracker.record_trap_fallen_for("hunt_trap", "Player's card caught in enemy hunting snare")
+			
+			# FIXED: Only show notification if Artemis isn't unlocked yet
+			if progress_tracker.should_show_artemis_notification() and notification_manager:
 				notification_manager.show_notification("Artemis observes your trap encounter")
 		
 		# Capture the hunted card

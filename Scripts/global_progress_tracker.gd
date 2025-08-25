@@ -371,6 +371,11 @@ func record_trap_fallen_for(trap_type: String, details: String = ""):
 			var conv_manager = get_node("/root/ConversationManagerAutoload")
 			conv_manager.trigger_conversation("artemis_unlocked")
 
+# NEW: Separate function to check if we should show the Artemis watching notification
+func should_show_artemis_notification() -> bool:
+	return not is_god_unlocked("Artemis")
+
+
 
 func record_couple_union(card1_name: String, card2_name: String):
 	# Create a consistent couple identifier (alphabetical order)
