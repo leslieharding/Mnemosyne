@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="GrowAbility" load_steps=2 format=3 uid="uid://8bww2iv0h834"]
+
+[ext_resource type="Script" uid="uid://u1ucm0sox8pa" path="res://Resources/Abilities/grow_ability.gd" id="1_64nou"]
+
+[resource]
+script = ExtResource("1_64nou")
+ability_name = "Grow"
+description = "On play, this card gains +1 to all stats for the entire run"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://u1ucm0sox8pa"

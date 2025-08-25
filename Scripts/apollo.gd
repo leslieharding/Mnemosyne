@@ -194,12 +194,18 @@ func _on_start_game_button_pressed() -> void:
 		if not deck_def.is_unlocked("Apollo", god_progress):
 			print("Cannot start game - deck is locked!")
 			return
-			
+		
+		# Clear stat growth tracker for new run
+		if has_node("/root/RunStatGrowthTrackerAutoload"):
+			var growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
+			growth_tracker.clear_run()
+			print("Cleared stat growth data for new run")
+		
 		# Initialize the experience tracker for this new run
 		get_node("/root/RunExperienceTrackerAutoload").start_new_run(deck_def.card_indices)
 		print("Initialized experience tracker for new run with deck: ", deck_def.deck_name)
 		
-		# Add this line after initializing the experience tracker:
+		# Initialize boss prediction tracker
 		get_node("/root/BossPredictionTrackerAutoload").clear_patterns()
 		print("Initialized boss prediction tracker for new run")
 		

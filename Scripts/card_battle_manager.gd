@@ -611,6 +611,12 @@ func start_game():
 	# Reset consecutive draws counter for new battle
 	consecutive_draws = 0
 	
+	# Initialize run stat growth tracker
+	if has_node("/root/RunStatGrowthTrackerAutoload"):
+		var growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
+		growth_tracker.start_new_run(deck_card_indices)
+		print("Initialized run stat growth tracking")
+	
 	# MOVE enemy deck power initialization HERE - before player deck power effects
 	var params = get_scene_params()
 	if not is_tutorial_mode and params.has("current_node"):
@@ -2344,16 +2350,21 @@ func display_player_hand():
 		
 		print("Setting up hand card ", i, ": ", card.card_name, " at level ", current_level, " (collection index: ", card_collection_index, ")")
 		
-		# FOR HAND DISPLAY: Create a copy of the card with level-appropriate values
+		# FOR HAND DISPLAY: Create a copy of the card with level-appropriate values AND growth
 		var hand_card_data = card.duplicate()
 		var effective_values = card.get_effective_values(current_level)
 		var effective_abilities = card.get_effective_abilities(current_level)
 		
-		# Apply the level-appropriate values to the hand display copy
+		# Apply stat growth from the run tracker
+		if has_node("/root/RunStatGrowthTrackerAutoload"):
+			var growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
+			effective_values = growth_tracker.apply_growth_to_card_values(effective_values, card_collection_index)
+		
+		# Apply the level-appropriate values AND growth to the hand display copy
 		hand_card_data.values = effective_values.duplicate()
 		hand_card_data.abilities = effective_abilities.duplicate()
 		
-		print("Hand card effective values: ", effective_values)
+		print("Hand card effective values (with growth): ", effective_values)
 		print("Hand card effective abilities count: ", effective_abilities.size())
 		
 		# Setup the card with the level-appropriate data for hand display
@@ -2630,11 +2641,16 @@ func place_card_on_grid():
 	var effective_values = original_card_data.get_effective_values(card_level)
 	var effective_abilities = original_card_data.get_effective_abilities(card_level)
 	
-	# Apply the level-appropriate values and abilities to the grid copy
+	# Apply stat growth from the run tracker BEFORE other modifications
+	if has_node("/root/RunStatGrowthTrackerAutoload"):
+		var growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
+		effective_values = growth_tracker.apply_growth_to_card_values(effective_values, card_collection_index)
+	
+	# Apply the level-appropriate values and abilities AND growth to the grid copy
 	card_data.values = effective_values.duplicate()
 	card_data.abilities = effective_abilities.duplicate()
 	
-	print("Grid placement effective values: ", card_data.values)
+	print("Grid placement effective values (with growth): ", card_data.values)
 	print("Grid placement effective abilities count: ", card_data.abilities.size())
 	
 	# Record this play for pattern tracking (if not boss battle)
