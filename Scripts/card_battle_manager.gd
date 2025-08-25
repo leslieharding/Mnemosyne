@@ -611,11 +611,13 @@ func start_game():
 	# Reset consecutive draws counter for new battle
 	consecutive_draws = 0
 	
-	# Initialize run stat growth tracker
+	# DO NOT clear run stat growth tracker - we want to preserve growth across battles
+	# Only ensure the tracker knows about the current deck indices
 	if has_node("/root/RunStatGrowthTrackerAutoload"):
 		var growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
-		growth_tracker.start_new_run(deck_card_indices)
-		print("Initialized run stat growth tracking")
+		# Update current deck indices but preserve existing growth data
+		growth_tracker.update_deck_indices(deck_card_indices)
+		print("Updated run stat growth tracker with current deck indices (preserving growth)")
 	
 	# MOVE enemy deck power initialization HERE - before player deck power effects
 	var params = get_scene_params()

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=44 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=46 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="8_xjxyc"]
 [ext_resource type="Script" uid="uid://cs8jo68kos2c6" path="res://Resources/Abilities/harmony_ability.gd" id="9_p7jhq"]
 [ext_resource type="Script" uid="uid://btx30eg0dkxdt" path="res://Resources/Abilities/symmetry_ability.gd" id="10_2h7tk"]
+[ext_resource type="Script" uid="uid://u1ucm0sox8pa" path="res://Resources/Abilities/grow_ability.gd" id="10_bufwg"]
 
 [sub_resource type="Resource" id="Resource_gowu1"]
 script = ExtResource("3_p7jhq")
@@ -184,12 +185,20 @@ level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_xjxyc"]
+script = ExtResource("10_bufwg")
+ability_name = "Grow"
+description = "On play this cards stats are increased by 1 for the run"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://u1ucm0sox8pa"
+
 [sub_resource type="Resource" id="Resource_tl28v"]
 script = ExtResource("1_vqrrp")
 card_name = "Eurydice"
 values = Array[int]([4, 6, 5, 5])
 description = "I'll be right behind you, have faith "
-abilities = Array[ExtResource("2_gowu1")]([])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_xjxyc")])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

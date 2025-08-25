@@ -74,6 +74,17 @@ func get_total_stat_growth() -> int:
 		total += growth
 	return total
 
+# Update deck indices for current battle (preserves existing growth data)
+func update_deck_indices(deck_indices: Array[int]):
+	current_deck_indices = deck_indices
+	
+	# Ensure all deck cards are initialized in growth tracking (but don't reset existing growth)
+	for index in deck_indices:
+		if not index in run_stat_growth:
+			run_stat_growth[index] = 0
+	
+	print("RunStatGrowthTracker: Updated deck indices while preserving growth data")
+
 # Clear run data (call when run ends or is abandoned)
 func clear_run():
 	run_stat_growth.clear()
