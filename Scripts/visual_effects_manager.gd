@@ -276,24 +276,20 @@ func start_passive_pulse(card_display: CardDisplay):
 	# Start the pulsing animation
 	start_pulse_animation(pulse_container)
 
-# Stop passive ability pulse effect on a card
 func stop_passive_pulse(card_display: CardDisplay):
 	if not card_display in active_passive_pulses:
-		return
+		return	
 	
 	var pulse_container = active_passive_pulses[card_display]
 	
-	# Fade out before removing
+	# Immediately remove the pulse container to stop any visual interference
 	if is_instance_valid(pulse_container):
-		var fade_tween = create_tween()
-		fade_tween.tween_property(pulse_container, "modulate:a", 0.0, 0.3)
-		fade_tween.tween_callback(func():
-			if is_instance_valid(pulse_container):
-				pulse_container.queue_free()
-		)
+		pulse_container.queue_free()
 	
-	# Remove from tracking
+	# Remove from tracking immediately
 	active_passive_pulses.erase(card_display)
+	
+	print("VisualEffectsManager: Stopped passive pulse and cleared tracking for card")
 
 # Create overlay rectangles for all four edges
 func create_all_edge_overlays(card_size: Vector2) -> Array[ColorRect]:

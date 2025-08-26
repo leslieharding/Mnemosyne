@@ -992,23 +992,48 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 					var ability = captured_card_data.abilities[i]
 					print("  Ability ", i, ": ", ability.ability_name, " (trigger: ", ability.trigger_condition, ")")
 		
-		# Check if the newly captured card has passive abilities and restart pulse effect
+		# FIXED: Check if the newly captured card has passive abilities that should be active for new owner
 		if captured_card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
-			print("Restarting passive abilities for captured card at position ", captured_index)
+			print("Checking if passive abilities should restart for captured card at position ", captured_index)
 			
-			# Re-add to passive abilities tracking
-			if not captured_index in active_passive_abilities:
-				active_passive_abilities[captured_index] = []
-			
+			var new_owner = attacking_owner  # The card now belongs to the attacker
 			var available_abilities = captured_card_data.get_available_abilities(card_level)
+			var active_abilities_for_new_owner = []
+			
 			for ability in available_abilities:
 				if ability.trigger_condition == CardAbility.TriggerType.PASSIVE:
-					active_passive_abilities[captured_index].append(ability)
+					# Check if this ability should be active for the new owner
+					if should_passive_ability_be_active(ability, new_owner, captured_index):
+						print("Passive ability ", ability.ability_name, " will be active for new owner")
+						active_abilities_for_new_owner.append(ability)
+					else:
+						print("Passive ability ", ability.ability_name, " will NOT be active for new owner")
 			
-			# Restart visual pulse effect for the captured card
-			var card_display = get_card_display_at_position(captured_index)
-			if card_display and visual_effects_manager:
-				visual_effects_manager.start_passive_pulse(card_display)
+			# Only restart pulse and tracking if there are active abilities
+			if active_abilities_for_new_owner.size() > 0:
+				# Re-add to passive abilities tracking
+				if not captured_index in active_passive_abilities:
+					active_passive_abilities[captured_index] = []
+				
+				for ability in active_abilities_for_new_owner:
+					active_passive_abilities[captured_index].append(ability)
+				
+				# Check if any active abilities should show visual pulse
+				var should_show_pulse = false
+				for ability in active_abilities_for_new_owner:
+					if should_passive_ability_show_pulse(ability, new_owner, captured_index):
+						should_show_pulse = true
+						break
+				
+				# Only restart visual pulse if needed
+				if should_show_pulse:
+					var card_display = get_card_display_at_position(captured_index)
+					if card_display and visual_effects_manager:
+						visual_effects_manager.start_passive_pulse(card_display)
+				
+				print("Restarted ", active_abilities_for_new_owner.size(), " passive abilities for captured card")
+			else:
+				print("No passive abilities active for new owner - no pulse effect")
 	
 	# Refresh all passive abilities to account for ownership changes
 	if captures.size() > 0:
@@ -1139,18 +1164,24 @@ func get_card_collection_index(grid_index: int) -> int:
 		return grid_to_collection_index[grid_index]
 	return -1
 
-# Update all card visuals based on current ownership
 func update_board_visuals():
 	for i in range(grid_slots.size()):
 		if grid_occupied[i]:
 			var slot = grid_slots[i]
-			var card_display = slot.get_child(0)  # The card display should be the first child
+			var card_display = get_card_display_at_position(i)
 			
-			# Apply styling based on current ownership
-			if grid_ownership[i] == Owner.PLAYER:
-				card_display.panel.add_theme_stylebox_override("panel", player_card_style)
-			elif grid_ownership[i] == Owner.OPPONENT:
-				card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+			if card_display and card_display.panel:
+				# Force apply the correct ownership styling
+				if grid_ownership[i] == Owner.PLAYER:
+					card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+					print("Applied PLAYER styling to card at position ", i)
+				elif grid_ownership[i] == Owner.OPPONENT:
+					card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+					print("Applied OPPONENT styling to card at position ", i)
+				else:
+					print("Warning: Card at position ", i, " has no clear owner")
+			else:
+				print("Warning: No valid card display at position ", i)
 
 func _on_opponent_card_placed(grid_index: int):
 	print("Opponent card placed signal received for slot: ", grid_index)
@@ -1228,22 +1259,41 @@ func _on_opponent_card_placed(grid_index: int):
 	card_display.card_hovered.connect(_on_card_hovered)
 	card_display.card_unhovered.connect(_on_card_unhovered)
 	
-	# Check for passive abilities on opponent cards and start pulse effect
+	# FIXED: Check for passive abilities on opponent cards and start pulse effect
 	var opponent_card_level = get_card_level(0)  # Opponent cards use level 0 for now
 	if opponent_card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, opponent_card_level):
-		print("Opponent card has passive abilities - starting pulse effect")
+		print("Opponent card has passive abilities - checking if should be active")
 		
-		# Store passive abilities for opponent card
+		# Store passive abilities for opponent card (only if they should be active)
 		if not grid_index in active_passive_abilities:
 			active_passive_abilities[grid_index] = []
 		
 		var available_abilities = opponent_card_data.get_available_abilities(opponent_card_level)
+		var active_abilities_for_opponent = []
+		
 		for ability in available_abilities:
 			if ability.trigger_condition == CardAbility.TriggerType.PASSIVE:
-				active_passive_abilities[grid_index].append(ability)
+				# Check if this ability should be active for opponent
+				if should_passive_ability_be_active(ability, Owner.OPPONENT, grid_index):
+					print("Opponent ability ", ability.ability_name, " is active")
+					active_passive_abilities[grid_index].append(ability)
+					active_abilities_for_opponent.append(ability)
+				else:
+					print("Opponent ability ", ability.ability_name, " is not active")
 		
-		# Start visual pulse effect
-		visual_effects_manager.start_passive_pulse(card_display)
+		# Check if any of the active abilities should show visual pulse
+		var should_show_pulse = false
+		for ability in active_abilities_for_opponent:
+			if should_passive_ability_show_pulse(ability, Owner.OPPONENT, grid_index):
+				should_show_pulse = true
+				break
+		
+		# Only start visual pulse if needed
+		if should_show_pulse:
+			visual_effects_manager.start_passive_pulse(card_display)
+			print("Started visual pulse for opponent card ", opponent_card_data.card_name)
+		else:
+			print("No visual pulse needed for opponent card ", opponent_card_data.card_name)
 	
 	print("Opponent placed card: ", opponent_card_data.card_name, " at slot ", grid_index)
 	print("Card abilities: ", opponent_card_data.abilities.size())
@@ -2809,36 +2859,59 @@ func place_card_on_grid():
 
 	
 
-# Handle passive abilities when a card is placed
+# In Scripts/card_battle_manager.gd - replace the handle_passive_abilities_on_place function (around lines 1790-1830)
+
 func handle_passive_abilities_on_place(grid_position: int, card_data: CardResource, card_level: int):
 	# Check if this card has passive abilities
 	if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
 		print("Handling passive abilities for ", card_data.card_name, " at position ", grid_position)
 		
-		# Store reference to this card's passive abilities
+		# Get card owner
+		var card_owner = get_owner_at_position(grid_position)
+		
+		# Store reference to this card's passive abilities (only if they should be active)
 		if not grid_position in active_passive_abilities:
 			active_passive_abilities[grid_position] = []
 		
 		var available_abilities = card_data.get_available_abilities(card_level)
+		var active_abilities_for_card = []
+		
 		for ability in available_abilities:
 			if ability.trigger_condition == CardAbility.TriggerType.PASSIVE:
-				active_passive_abilities[grid_position].append(ability)
-				
-				# Execute the passive ability with "apply" action
-				var passive_context = {
-					"passive_action": "apply",
-					"boosting_card": card_data,
-					"boosting_position": grid_position,
-					"game_manager": self,
-					"card_level": card_level
-				}
-				
-				ability.execute(passive_context)
+				# Check if this ability should be active for the current owner
+				if should_passive_ability_be_active(ability, card_owner, grid_position):
+					print("Adding active passive ability: ", ability.ability_name)
+					active_passive_abilities[grid_position].append(ability)
+					active_abilities_for_card.append(ability)
+					
+					# Execute the passive ability with "apply" action
+					var passive_context = {
+						"passive_action": "apply",
+						"boosting_card": card_data,
+						"boosting_position": grid_position,
+						"game_manager": self,
+						"card_level": card_level
+					}
+					
+					ability.execute(passive_context)
+				else:
+					print("Passive ability ", ability.ability_name, " not active for current owner")
 		
-		# Start visual pulse effect for passive abilities
-		var card_display = get_card_display_at_position(grid_position)
-		if card_display and visual_effects_manager:
-			visual_effects_manager.start_passive_pulse(card_display)
+		# Check if any of the active abilities should show visual pulse
+		var should_show_pulse = false
+		for ability in active_abilities_for_card:
+			if should_passive_ability_show_pulse(ability, card_owner, grid_position):
+				should_show_pulse = true
+				break
+		
+		# Only start visual pulse if needed
+		if should_show_pulse:
+			var card_display = get_card_display_at_position(grid_position)
+			if card_display and visual_effects_manager:
+				visual_effects_manager.start_passive_pulse(card_display)
+				print("Started visual pulse for ", card_data.card_name)
+		else:
+			print("No visual pulse needed for ", card_data.card_name, " (Cultivate has its own arrow effect)")
 	
 	# Also trigger passive abilities of existing cards (in case they need to affect the new card)
 	refresh_all_passive_abilities()
@@ -2898,7 +2971,15 @@ func refresh_all_passive_abilities():
 	# Clear all tracking
 	active_passive_abilities.clear()
 	
-	# Then re-apply all boosts based on current ownership
+	# Stop all visual pulse effects before re-applying
+	if visual_effects_manager:
+		for position in range(grid_slots.size()):
+			if grid_occupied[position]:
+				var card_display = get_card_display_at_position(position)
+				if card_display:
+					visual_effects_manager.stop_passive_pulse(card_display)
+	
+	# Then re-apply all boosts based on current ownership AND ability functionality
 	for position in range(grid_slots.size()):
 		if not grid_occupied[position]:
 			continue
@@ -2909,29 +2990,84 @@ func refresh_all_passive_abilities():
 		
 		var card_collection_index = get_card_collection_index(position)
 		var card_level = get_card_level(card_collection_index)
+		var card_owner = get_owner_at_position(position)
 		
 		# Check if this card has passive abilities
 		if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
-			print("Re-adding passive abilities for ", card_data.card_name, " at position ", position)
-			
-			# Add to tracking
-			if not position in active_passive_abilities:
-				active_passive_abilities[position] = []
+			print("Checking passive abilities for ", card_data.card_name, " at position ", position, " owned by ", "Player" if card_owner == Owner.PLAYER else "Opponent")
 			
 			var available_abilities = card_data.get_available_abilities(card_level)
+			var active_abilities_for_card = []
+			
 			for ability in available_abilities:
 				if ability.trigger_condition == CardAbility.TriggerType.PASSIVE:
-					active_passive_abilities[position].append(ability)
+					# Check if this ability should be active for the current owner
+					var should_be_active = should_passive_ability_be_active(ability, card_owner, position)
 					
-					# Execute "apply" action
-					var passive_context = {
-						"passive_action": "apply",
-						"boosting_card": card_data,
-						"boosting_position": position,
-						"game_manager": self,
-						"card_level": card_level
-					}
-					ability.execute(passive_context)
+					if should_be_active:
+						print("Re-adding passive ability ", ability.ability_name, " for ", card_data.card_name)
+						active_abilities_for_card.append(ability)
+						
+						# Execute "apply" action
+						var passive_context = {
+							"passive_action": "apply",
+							"boosting_card": card_data,
+							"boosting_position": position,
+							"game_manager": self,
+							"card_level": card_level
+						}
+						ability.execute(passive_context)
+					else:
+						print("Passive ability ", ability.ability_name, " not active for current owner")
+			
+			# Add to tracking if there are active abilities
+			if active_abilities_for_card.size() > 0:
+				active_passive_abilities[position] = active_abilities_for_card
+			
+			# Check if any of the active abilities should show visual pulse
+			var should_show_pulse = false
+			for ability in active_abilities_for_card:
+				if should_passive_ability_show_pulse(ability, card_owner, position):
+					should_show_pulse = true
+					break
+			
+			# Only start visual pulse if needed
+			if should_show_pulse:
+				var card_display = get_card_display_at_position(position)
+				if card_display and visual_effects_manager:
+					visual_effects_manager.start_passive_pulse(card_display)
+
+# Helper function to determine if a passive ability should be active for the current owner
+func should_passive_ability_be_active(ability: CardAbility, card_owner: Owner, position: int) -> bool:
+	match ability.ability_name:
+		"Cultivate":
+			# Cultivation only works for player-owned cards
+			return card_owner == Owner.PLAYER
+		"Adaptive Defense":
+			# Adaptive defense works for both owners
+			return true
+		"Divine Inspiration", "Passive Boost":
+			# Boost abilities work for both owners (boost friendly cards)
+			return true
+		_:
+			# Default: most passive abilities work for both owners
+			return true
+
+# NEW: Helper function to determine if a passive ability should show visual pulse
+func should_passive_ability_show_pulse(ability: CardAbility, card_owner: Owner, position: int) -> bool:
+	match ability.ability_name:
+		"Cultivate":
+			# Cultivation has its own green arrow visual - no need for pulse
+			return false
+		"Adaptive Defense":
+			# Show pulse for adaptive defense
+			return true
+		"Divine Inspiration", "Passive Boost":
+			# Show pulse for boost abilities
+			return true
+		_:
+			# Default: show pulse for most passive abilities
+			return true
 
 # Remove a card from the player's hand after it's played
 func remove_card_from_hand(card_index: int):
