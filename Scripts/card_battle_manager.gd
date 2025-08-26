@@ -3289,7 +3289,7 @@ func process_tremors_for_player(player_owner: Owner):
 func process_single_tremor(tremor_id: int, tremor_data: Dictionary):
 	var source_position = tremor_data.source_position
 	var tremor_zones = tremor_data.tremor_zones
-	var tremor_owner = tremor_data.tremor_owner
+	var tremor_owner = tremor_data.owner
 	
 	# Get the source card's current stats
 	var source_card = get_card_at_position(source_position)

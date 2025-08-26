@@ -329,14 +329,29 @@ func create_card_displays_sync(god_name: String):
 			if global_tracker:
 				current_level = global_tracker.get_card_level(god_name, card_index)
 		
+		# Create card data with effective values including growth
+		var display_card_data = card.duplicate()
+		var effective_values = card.get_effective_values(current_level)
+		
+		var growth_tracker = get_node_or_null("/root/RunStatGrowthTrackerAutoload")
+		if growth_tracker:
+			effective_values = growth_tracker.apply_growth_to_card_values(effective_values, card_index)
+			print("Applied growth to card ", card.card_name, " - values with growth: ", effective_values)
+		
+		# Apply the values with growth to the display card
+		display_card_data.values = effective_values.duplicate()
+		display_card_data.abilities = card.get_effective_abilities(current_level).duplicate()
+		
 		# Debug: Print what we're setting up
 		print("Setting up card display with:")
 		print("  Card: ", card.card_name)
 		print("  Level: ", current_level)
 		print("  God: ", god_name)
 		print("  Index: ", card_index)
+		print("  Final values (with growth): ", display_card_data.values)
 		
-		card_display.setup(card, current_level, god_name, card_index)
+		# Setup with the modified card data
+		card_display.setup(display_card_data, current_level, god_name, card_index)
 		
 		# Double-check the setup worked
 		if card_display.card_data:
