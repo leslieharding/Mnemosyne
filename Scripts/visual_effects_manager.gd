@@ -604,3 +604,64 @@ func show_symmetry_capture_flash(card_display: CardDisplay):
 	
 	# Clean up
 	tween.tween_callback(func(): flash_overlay.queue_free()).set_delay(1.0)
+
+# Show cultivation experience arrow effect
+func show_cultivation_arrow(affected_card_display: CardDisplay):
+	if not affected_card_display:
+		print("VisualEffectsManager: No card display provided for cultivation arrow")
+		return
+	
+	if not affected_card_display.panel:
+		print("VisualEffectsManager: Card display has no panel")
+		return
+	
+	print("VisualEffectsManager: Showing cultivation arrow on card")
+	
+	# Wait one frame to ensure the card is fully rendered
+	await get_tree().process_frame
+	
+	# Create the arrow label
+	var arrow_label = Label.new()
+	arrow_label.text = "↑"  # Upward arrow unicode
+	arrow_label.add_theme_font_size_override("font_size", 18)
+	arrow_label.add_theme_color_override("font_color", Color("#44FF44"))  # Bright green
+	arrow_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	arrow_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	arrow_label.name = "CultivationArrow"
+	
+	# Position in top-left corner of the card
+	var card_size = affected_card_display.panel.size
+	arrow_label.position = Vector2(5, 5)  # 5px from left edge, 5px from top
+	arrow_label.size = Vector2(20, 20)  # Small square area for the arrow
+	
+	# Start invisible
+	arrow_label.modulate.a = 0.0
+	
+	print("VisualEffectsManager: Creating cultivation arrow at ", arrow_label.position, " with size ", arrow_label.size)
+	
+	# Add to the card panel
+	affected_card_display.panel.add_child(arrow_label)
+	arrow_label.z_index = 110  # Higher than flash effects
+	
+	# Force an immediate redraw
+	arrow_label.queue_redraw()
+	
+	# Animate the arrow: fade in quickly, pulse, fade out
+	var tween = create_tween()
+	
+	# Quick fade in
+	tween.tween_property(arrow_label, "modulate:a", 1.0, 0.15)
+	# Brief pulse effect - grow and shrink
+	tween.parallel().tween_property(arrow_label, "scale", Vector2(1.2, 1.2), 0.15)
+	tween.tween_property(arrow_label, "scale", Vector2(1.0, 1.0), 0.15)
+	# Hold visible
+	tween.tween_property(arrow_label, "modulate:a", 1.0, 0.3)
+	# Fade out
+	tween.tween_property(arrow_label, "modulate:a", 0.0, 0.25)
+	
+	# Clean up when done
+	tween.tween_callback(func(): 
+		print("VisualEffectsManager: Cleaning up cultivation arrow")
+		if is_instance_valid(arrow_label):
+			arrow_label.queue_free()
+	)

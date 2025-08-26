@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CultivateAbility" load_steps=2 format=3 uid="uid://24olcjt8yfxy"]
+
+[ext_resource type="Script" uid="uid://bsyjru6fxhmp5" path="res://Resources/Abilities/cultivate_ability.gd" id="1_e0dj7"]
+
+[resource]
+script = ExtResource("1_e0dj7")
+ability_name = "Cultivate"
+description = "If still owned, this card gains 10 experience at the start of each of your turns"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://bsyjru6fxhmp5"

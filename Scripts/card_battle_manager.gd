@@ -711,6 +711,10 @@ func _on_turn_changed(is_player_turn: bool):
 	# Process adaptive defense abilities on turn change
 	handle_adaptive_defense_turn_change(is_player_turn)
 	
+	# Process cultivation abilities at the start of player's turn
+	if is_player_turn:
+		process_cultivation_turn_start()
+	
 	# Process tremors at the start of each player's turn
 	if is_player_turn:
 		process_tremors_for_player(Owner.PLAYER)
@@ -2858,6 +2862,11 @@ func handle_passive_abilities_on_capture(grid_position: int, card_data: CardReso
 			}
 			
 			ability.execute(passive_context)
+			
+			# Special handling for cultivation - ensure it's marked as inactive
+			if ability.ability_name == "Cultivate":
+				card_data.set_meta("cultivation_active", false)
+				print("CultivateAbility: Marked cultivation as inactive due to capture")
 		
 		# Remove from tracking
 		active_passive_abilities.erase(grid_position)
@@ -2868,9 +2877,6 @@ func handle_passive_abilities_on_capture(grid_position: int, card_data: CardReso
 		if hunt_data.hunter_position == grid_position:
 			print("Removing hunt trap due to hunter capture")
 			remove_hunt_trap(target_pos)
-	
-	# Refresh remaining passive abilities
-	refresh_all_passive_abilities()
 
 # Refresh all passive abilities (useful when ownership changes)
 func refresh_all_passive_abilities():
@@ -2889,18 +2895,43 @@ func refresh_all_passive_abilities():
 				}
 				ability.execute(passive_context)
 	
-	# Then re-apply all boosts
-	for position in active_passive_abilities:
+	# Clear all tracking
+	active_passive_abilities.clear()
+	
+	# Then re-apply all boosts based on current ownership
+	for position in range(grid_slots.size()):
+		if not grid_occupied[position]:
+			continue
+		
 		var card_data = get_card_at_position(position)
-		if card_data:
-			for ability in active_passive_abilities[position]:
-				var passive_context = {
-					"passive_action": "apply",
-					"boosting_card": card_data,
-					"boosting_position": position,
-					"game_manager": self
-				}
-				ability.execute(passive_context)
+		if not card_data:
+			continue
+		
+		var card_collection_index = get_card_collection_index(position)
+		var card_level = get_card_level(card_collection_index)
+		
+		# Check if this card has passive abilities
+		if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			print("Re-adding passive abilities for ", card_data.card_name, " at position ", position)
+			
+			# Add to tracking
+			if not position in active_passive_abilities:
+				active_passive_abilities[position] = []
+			
+			var available_abilities = card_data.get_available_abilities(card_level)
+			for ability in available_abilities:
+				if ability.trigger_condition == CardAbility.TriggerType.PASSIVE:
+					active_passive_abilities[position].append(ability)
+					
+					# Execute "apply" action
+					var passive_context = {
+						"passive_action": "apply",
+						"boosting_card": card_data,
+						"boosting_position": position,
+						"game_manager": self,
+						"card_level": card_level
+					}
+					ability.execute(passive_context)
 
 # Remove a card from the player's hand after it's played
 func remove_card_from_hand(card_index: int):
@@ -3823,3 +3854,53 @@ func get_weakest_stat_value(card_values: Array[int]) -> int:
 		if card_values[i] < weakest:
 			weakest = card_values[i]
 	return weakest
+
+
+# Process cultivation abilities at the start of player's turn
+func process_cultivation_turn_start():
+	print("Processing cultivation abilities for player turn start")
+	
+	# Check all cards on the board for cultivation abilities
+	for position in range(grid_slots.size()):
+		if not grid_occupied[position]:
+			continue
+		
+		# Only process player-owned cards
+		var card_owner = get_owner_at_position(position)
+		if card_owner != Owner.PLAYER:
+			continue
+		
+		var card_data = get_card_at_position(position)
+		if not card_data:
+			continue
+		
+		# Get card level for ability checks
+		var card_collection_index = get_card_collection_index(position)
+		var card_level = get_card_level(card_collection_index)
+		
+		# Check if this card has cultivation ability
+		var has_cultivation = false
+		var cultivation_ability = null
+		
+		if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			for ability in card_data.get_available_abilities(card_level):
+				if ability.ability_name == "Cultivate":
+					has_cultivation = true
+					cultivation_ability = ability
+					break
+		
+		if not has_cultivation or not cultivation_ability:
+			continue
+		
+		print("Found cultivation card at position ", position, ": ", card_data.card_name)
+		
+		# Execute cultivation turn processing
+		var context = {
+			"passive_action": "turn_start",
+			"boosting_card": card_data,
+			"boosting_position": position,
+			"game_manager": self,
+			"card_level": card_level
+		}
+		
+		cultivation_ability.execute(context)
