@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="OrdainAbility" load_steps=2 format=3 uid="uid://bjv21lcxypw8a"]
+
+[ext_resource type="Script" uid="uid://b7w3v4k1roxv1" path="res://Resources/Abilities/ordain_ability.gd" id="1_mjkgx"]
+
+[resource]
+script = ExtResource("1_mjkgx")
+ability_name = "Ordain"
+description = "On play, choose an empty slot. If you play a card in that slot next turn it gains +2 to all stats."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://b7w3v4k1roxv1"

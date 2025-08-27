@@ -34,6 +34,13 @@ var current_compeller_card: CardResource = null
 var active_compel_slot: int = -1  # The slot that opponent must play in
 var compel_target_style: StyleBoxFlat
 
+var ordain_mode_active: bool = false
+var current_ordainer_position: int = -1
+var current_ordainer_owner: Owner = Owner.NONE
+var current_ordainer_card: CardResource = null
+var active_ordain_slot: int = -1
+var ordain_target_style: StyleBoxFlat
+
 var couple_definitions = {
 	"Phaeton": "Cygnus",
 	"Cygnus": "Phaeton", 
@@ -716,6 +723,9 @@ func _on_turn_changed(is_player_turn: bool):
 	print("Turn changed - is_player_turn: ", is_player_turn, " | opponent_is_thinking: ", opponent_is_thinking)
 	update_game_status()
 	
+	# Handle ordain effect expiration - expires after one turn
+	handle_ordain_turn_expiration()
+	
 	# Process adaptive defense abilities on turn change
 	handle_adaptive_defense_turn_change(is_player_turn)
 	
@@ -734,10 +744,8 @@ func _on_turn_changed(is_player_turn: bool):
 		disable_player_input()
 		# Only start opponent turn if they're not already thinking
 		if not opponent_is_thinking:
-			print("Starting opponent turn via turn change")
-			call_deferred("opponent_take_turn")  # Use call_deferred to avoid async issues
-		else:
-			print("Opponent already thinking, skipping turn start")
+			print("Starting opponent turn")
+			call_deferred("opponent_take_turn")
 
 func get_card_display_at_position(grid_index: int) -> CardDisplay:
 	if grid_index < 0 or grid_index >= grid_slots.size():
@@ -1263,6 +1271,9 @@ func _on_opponent_card_placed(grid_index: int):
 		opponent_is_thinking = false
 		return
 	
+	# Check if opponent card should trigger ordain effect removal (no bonus for opponent)
+	apply_ordain_bonus_if_applicable(grid_index, opponent_card_data, Owner.OPPONENT)
+	
 	# Get opponent card level using existing pattern
 	var opponent_card_level = get_card_level(0)  # Follow existing implementation pattern
 	
@@ -1376,6 +1387,7 @@ func end_game():
 	
 	clear_all_hunt_traps()
 	clear_all_compel_constraints()
+	clear_all_ordain_effects()
 	
 	var tracker = get_node("/root/BossPredictionTrackerAutoload")
 	if tracker:
@@ -1391,155 +1403,37 @@ func end_game():
 		if scores.opponent > scores.player:
 			game_status_label.text = "Chronos crushes you! But you're learning..."
 		else:
-			game_status_label.text = "You did well! Time to learn more..."
+			game_status_label.text = "You did well! The basics are yours."
 		
-		disable_player_input()
-		opponent_is_thinking = false
-		turn_manager.end_game()
+		# Show tutorial completion message for a moment
+		await get_tree().create_timer(3.0).timeout
 		
-		# Wait a moment to show the result
-		await get_tree().create_timer(2.0).timeout
+		# Mark tutorial as completed and go to god selection
+		if has_node("/root/TutorialManagerAutoload"):
+			get_node("/root/TutorialManagerAutoload").mark_tutorial_completed()
 		
-		# Trigger the post-tutorial cutscene (opening_awakening)
-		if has_node("/root/CutsceneManagerAutoload"):
-			get_node("/root/CutsceneManagerAutoload").play_cutscene("opening_awakening")
-		else:
-			# Fallback if cutscene manager isn't available
-			TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
-		
-		return  # Exit early for tutorial mode
+		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+		return
 	
-	# NORMAL GAME MODE - Continue with regular end game logic
+	# Calculate final scores for normal games
 	var scores = get_current_scores()
 	var winner = ""
-	var victory = false
 	
 	if scores.player > scores.opponent:
-		# Check for perfect victory - player owns all 9 cards on the board
-		var total_board_cards = 0
-		var player_owned_cards = 0
-		
-		for i in range(grid_ownership.size()):
-			if grid_occupied[i]:  # If there's a card in this slot
-				total_board_cards += 1
-				if grid_ownership[i] == Owner.PLAYER:
-					player_owned_cards += 1
-		
-		print("=== PERFECT VICTORY CHECK ===")
-		print("Total cards on board: ", total_board_cards)
-		print("Player owned cards: ", player_owned_cards)
-		print("Grid occupied: ", grid_occupied)
-		print("Grid ownership: ", grid_ownership)
-		print("============================")
-		
-		# Perfect victory = board is full (9 cards) and player owns ALL of them
-		var is_perfect_victory = (total_board_cards == 9 and player_owned_cards == 9)
-		
-		print("Perfect victory achieved: ", is_perfect_victory)
-		
-		if is_perfect_victory:
-			winner = "🏆 Perfect Victory! 🏆"
-			# Show special notification for perfect victory
-			if notification_manager:
-				notification_manager.show_notification("🏆 PERFECT VICTORY ACHIEVED! 🏆")
-			# Make the text gold colored
-			game_status_label.add_theme_color_override("font_color", Color("#FFD700"))
-		else:
-			winner = "You win!"
-		
-		victory = true
-		consecutive_draws = 0  # Reset draw counter on victory
+		winner = "Player Wins!"
 	elif scores.opponent > scores.player:
-		winner = "You lose!"
-		victory = false
-		consecutive_draws = 0  # Reset draw counter on loss
+		winner = "Opponent Wins!"
 	else:
-		# Handle draw
-		consecutive_draws += 1
-		
-		if consecutive_draws >= 2:
-			# Second consecutive draw counts as a loss
-			winner = "Second draw in a row - You lose!"
-			victory = false
-			consecutive_draws = 0  # Reset for next encounter
-			
-			# Record the enemy encounter as a loss
-			record_enemy_encounter(false)
-			
-			# Record god experience (you used this god in battle)
-			record_god_experience()
-			
-			# Trigger conversation flags based on battle outcome
-			if has_node("/root/ConversationManagerAutoload"):
-				var conv_manager = get_node("/root/ConversationManagerAutoload")
-				
-				# Check if this was a boss battle
-				if is_boss_battle:
-					print("Triggering first_boss_loss conversation")
-					conv_manager.trigger_conversation("first_boss_loss")
-				else:
-					print("Recording defeat (from consecutive draws) for conversation tracking")
-					conv_manager.increment_defeat_count()
-			
-			# Show defeat message and go to summary
-			game_status_label.text = "Defeat! " + winner
-			disable_player_input()
-			opponent_is_thinking = false
-			turn_manager.end_game()
-			
-			# Add a delay then go to run summary
-			await get_tree().create_timer(3.0).timeout
-			
-			# Pass data to summary screen
-			var params = get_scene_params()
-			get_tree().set_meta("scene_params", {
-				"god": params.get("god", current_god),
-				"deck_index": params.get("deck_index", 0),
-				"victory": false
-			})
-			TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
-			return
-		else:
-			# First draw - restart the round with improved error handling
-			winner = "It's a draw! Restarting round... (Warning: Second draw will count as defeat)"
-			game_status_label.text = winner
-			
-			print("=== DRAW DETECTED - RESTARTING ROUND ===")
-			print("Consecutive draws: ", consecutive_draws)
-			
-			# Disable input during restart
-			disable_player_input()
-			opponent_is_thinking = false
-			turn_manager.end_game()
-			
-			# Reset the game state for a new round
-			restart_round()
-			return  # Exit early, don't proceed with normal end game logic
+		winner = "It's a Draw!"
 	
-	# Record the enemy encounter in memory journal
-	record_enemy_encounter(victory)
+	print("=== GAME ENDED ===")
+	print("Final Score - Player: ", scores.player, " | Opponent: ", scores.opponent)
+	print("Result: ", winner)
+	print("==================")
 	
-	# Record god experience (you used this god in battle)
-	record_god_experience()
-	
-	# Check for god unlocks after recording the encounter
-	check_god_unlocks()
-	
-	# Trigger conversation flags based on battle outcome
-	if has_node("/root/ConversationManagerAutoload"):
-		var conv_manager = get_node("/root/ConversationManagerAutoload")
-		
-		if not victory:
-			# Check if this was a boss battle
-			if is_boss_battle:
-				print("Triggering first_boss_loss conversation")
-				conv_manager.trigger_conversation("first_boss_loss")
-			else:
-				print("Recording defeat for conversation tracking")
-				conv_manager.increment_defeat_count()
-	
-	if not victory:
-		# If player loses, show run summary before ending
+	# Check for loss condition
+	if scores.opponent > scores.player:
+		# Player lost
 		game_status_label.text = "Defeat! " + winner
 		disable_player_input()
 		opponent_is_thinking = false
@@ -2015,6 +1909,17 @@ func create_grid_styles():
 	compel_target_style.border_width_right = 3
 	compel_target_style.border_width_bottom = 3
 	compel_target_style.border_color = Color("#AA44FF")  # Purple border for compel
+	
+	# Ordain target style (golden border for ordained slots)
+	ordain_target_style = StyleBoxFlat.new()
+	ordain_target_style.bg_color = Color("#444444")
+	ordain_target_style.border_width_left = 3
+	ordain_target_style.border_width_top = 3
+	ordain_target_style.border_width_right = 3
+	ordain_target_style.border_width_bottom = 3
+	ordain_target_style.border_color = Color("#FFD700")  # Golden border for ordain
+
+
 
 # Helper to get passed parameters from previous scene
 func get_scene_params() -> Dictionary:
@@ -2606,8 +2511,12 @@ func restore_slot_original_styling(grid_index: int):
 	
 	var slot = grid_slots[grid_index]
 	
-	# Check for compel constraint first
-	if grid_index == active_compel_slot:
+	# Check for ordain effect first
+	if grid_index == active_ordain_slot:
+		# Restore ordain styling
+		apply_ordain_target_styling(grid_index)
+	# Check for compel constraint
+	elif grid_index == active_compel_slot:
 		# Restore compel styling
 		apply_compel_target_styling(grid_index)
 	# Then check for hunt trap
@@ -2627,8 +2536,11 @@ func apply_selection_highlight(grid_index: int):
 	
 	var slot = grid_slots[grid_index]
 	
+	# Don't override ordain styling with selection highlight
+	if grid_index == active_ordain_slot:
+		return
 	# Don't override compel styling with selection highlight
-	if grid_index == active_compel_slot:
+	elif grid_index == active_compel_slot:
 		return
 	# Don't override hunt trap styling with selection highlight
 	elif grid_index in active_hunts:
@@ -2650,7 +2562,6 @@ func apply_selection_highlight(grid_index: int):
 	else:
 		# Regular selection styling for non-special slots
 		slot.add_theme_stylebox_override("panel", selected_grid_style)
-
 
 func _on_grid_gui_input(event, grid_index):
 	# Handle hunt target selection FIRST (but only during hunt mode setup)
@@ -2674,6 +2585,17 @@ func _on_grid_gui_input(event, grid_index):
 				else:
 					print("Cannot compel occupied slot - can only compel empty slots")
 				return  # Don't process normal card placement during compel mode
+	
+	# Handle ordain target selection (only during ordain mode setup)
+	if ordain_mode_active and current_ordainer_owner == Owner.PLAYER:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				# Only allow ordain on empty slots
+				if not grid_occupied[grid_index]:
+					select_ordain_target(grid_index)
+				else:
+					print("Cannot ordain occupied slot - can only ordain empty slots")
+				return  # Don't process normal card placement during ordain mode
 	
 	if not turn_manager.is_player_turn():
 		return
@@ -2750,7 +2672,11 @@ func place_card_on_grid():
 	card_data.values = effective_values.duplicate()
 	card_data.abilities = effective_abilities.duplicate()
 	
-	print("Grid placement effective values (with growth): ", card_data.values)
+	# FIXED: Apply ordain bonus to the card copy that will be placed on the grid
+	var placing_owner = Owner.PLAYER
+	apply_ordain_bonus_if_applicable(current_grid_index, card_data, placing_owner)
+	
+	print("Grid placement effective values (with growth and ordain): ", card_data.values)
 	print("Grid placement effective abilities count: ", card_data.abilities.size())
 	
 	# Record this play for pattern tracking (if not boss battle)
@@ -2765,58 +2691,30 @@ func place_card_on_grid():
 		if current_boss_prediction["card"] == card_collection_index and current_boss_prediction["position"] == current_grid_index:
 			boss_prediction_hit = true
 			print("BOSS PREDICTION HIT! The boss anticipated your move!")
-			
-			# NEW: Record trap encounter
-			var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-			progress_tracker.record_trap_fallen_for("boss_prediction", "Fell into boss's prediction trap")
-			
-			# FIXED: Only show notification if Artemis isn't unlocked yet
-			if progress_tracker.should_show_artemis_notification() and notification_manager:
-				notification_manager.show_notification("Artemis observes your trap encounter")
-			
-			# Apply the stat reduction - weakens the card but doesn't change ownership
-			card_data.values[0] = 1  # North
-			card_data.values[1] = 1  # East
-			card_data.values[2] = 1  # South
-			card_data.values[3] = 1  # West
-			
-			# Show feedback to player
-			game_status_label.text = "The boss anticipated your move! Your card's power is weakened!"
-			
-			# Show notification
-			if notification_manager:
-				notification_manager.show_notification("I knew you would go there")
 	
-	# NEW: Apply deck power effects before combat
-	var sun_boosted = apply_deck_power_effects(card_data, current_grid_index)
+	# Check for deck power boosts and apply them to the card
+	var sun_boosted = false
+	if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER and current_grid_index in sunlit_positions and not darkness_shroud_active:
+		print("Sun Power boost activated for card in sunlit position!")
+		for i in range(card_data.values.size()):
+			card_data.values[i] += 2
+		sun_boosted = true
+		print("Card boosted to: ", card_data.values)
 	
-	# Mark the slot as occupied and set ownership (always PLAYER - prediction hits don't change ownership)
+	# Store the card data
+	grid_card_data[current_grid_index] = card_data
 	grid_occupied[current_grid_index] = true
 	grid_ownership[current_grid_index] = Owner.PLAYER
-	grid_card_data[current_grid_index] = card_data
-	
-	# Track which collection index this card is from
 	grid_to_collection_index[current_grid_index] = card_collection_index
 	
-	# Get the current slot
+	# Get the slot
 	var slot = grid_slots[current_grid_index]
-
-	# Create a card display for the grid
-	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 	
-	# Add the card as a child of the slot panel
+	# Create and add the card display
+	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
 	slot.add_child(card_display)
 	
-	# Center the card within the slot
-	card_display.position = Vector2(
-		(slot.custom_minimum_size.x - 100) / 2,  # Assuming card width is 100
-		(slot.custom_minimum_size.y - 140) / 2   # Assuming card height is 140
-	)
-	
-	# Set higher z-index so the card appears on top
-	card_display.z_index = 1
-	
-	# Wait one frame to ensure _ready() is called and @onready variables are initialized
+	# Wait one frame to ensure @onready variables are initialized
 	await get_tree().process_frame
 	
 	# NOW setup the card display with the actual card data and level
@@ -2874,7 +2772,7 @@ func place_card_on_grid():
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 	if captures > 0:
 		print("Player captured ", captures, " cards!")
-
+	
 	# Update the score display immediately after combat
 	update_game_status()
 
@@ -2893,7 +2791,7 @@ func place_card_on_grid():
 		end_game()
 		return
 
-	# HUNT FIX: DON'T switch turns if hunt mode is active - player needs to select hunt target first
+	# DON'T switch turns if any special modes are active
 	if hunt_mode_active:
 		print("Hunt mode active - staying on player turn for target selection")
 		return
@@ -2902,12 +2800,14 @@ func place_card_on_grid():
 		print("Compel mode active - staying on player turn for target selection")
 		return
 	
-	# Switch turns only if hunt mode is not active
+	if ordain_mode_active:
+		print("Ordain mode active - staying on player turn for target selection")
+		return
+	
+	# Switch turns only if no special modes are active
 	turn_manager.next_turn()
 
-	
 
-# In Scripts/card_battle_manager.gd - replace the handle_passive_abilities_on_place function (around lines 1790-1830)
 
 func handle_passive_abilities_on_place(grid_position: int, card_data: CardResource, card_level: int):
 	# Check if this card has passive abilities
@@ -4200,3 +4100,136 @@ func get_available_slots_for_opponent() -> Array[int]:
 		if is_slot_available_for_opponent(i):
 			available_slots.append(i)
 	return available_slots
+
+
+func start_ordain_mode(ordainer_position: int, ordainer_owner: Owner, ordainer_card: CardResource):
+	ordain_mode_active = true
+	current_ordainer_position = ordainer_position
+	current_ordainer_owner = ordainer_owner
+	current_ordainer_card = ordainer_card
+	
+	# Update game status
+	if ordainer_owner == Owner.PLAYER:
+		game_status_label.text = "✨ ORDAIN MODE: Select an empty slot to ordain"
+	else:
+		game_status_label.text = "✨ " + opponent_manager.get_opponent_info().name + " is ordaining..."
+		# Auto-select target for opponent
+		call_deferred("opponent_select_ordain_target")
+	
+	print("Ordain mode activated for ", ordainer_card.card_name, " at position ", ordainer_position)
+
+# FIXED select_ordain_target function
+# Replace your select_ordain_target function with this corrected version:
+
+func select_ordain_target(target_position: int):
+	if not ordain_mode_active:
+		return
+	
+	print("Ordain target selected: position ", target_position)
+	
+	# Set the ordain effect
+	active_ordain_slot = target_position
+	
+	# Apply visual styling to show this slot is ordained
+	apply_ordain_target_styling(target_position)
+	
+	# Store the owner who created the ordain effect
+	var ordainer_owner = current_ordainer_owner  # FIX: Use the stored current_ordainer_owner
+	
+	# End ordain mode
+	ordain_mode_active = false
+	current_ordainer_position = -1
+	current_ordainer_owner = Owner.NONE  # Reset AFTER storing it above
+	current_ordainer_card = null
+	
+	# Update game status based on who ordained
+	if ordainer_owner == Owner.PLAYER:
+		game_status_label.text = "Ordain set! Next card in that slot gets +2 to all stats."
+	else:
+		game_status_label.text = "Opponent ordained a slot."
+	
+	# Switch turns - ordain action completes the turn
+	print("Ordain target selected - switching turns")
+	turn_manager.next_turn()
+
+func apply_ordain_target_styling(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	var slot = grid_slots[grid_index]
+	slot.add_theme_stylebox_override("panel", ordain_target_style)
+	
+	print("Applied ordain target styling (golden border) to slot ", grid_index)
+
+func remove_ordain_effect():
+	if active_ordain_slot == -1:
+		return
+	
+	print("Removing ordain effect from position ", active_ordain_slot)
+	
+	# Remove visual styling
+	restore_slot_original_styling(active_ordain_slot)
+	
+	# Clear tracking
+	active_ordain_slot = -1
+
+# Opponent AI ordain target selection
+func opponent_select_ordain_target():
+	if not ordain_mode_active:
+		return
+	
+	# Simple AI: pick a random empty slot
+	var possible_targets = []
+	
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:  # Only empty slots
+			possible_targets.append(i)
+	
+	var target_position = -1
+	if possible_targets.size() > 0:
+		target_position = possible_targets[randi() % possible_targets.size()]
+	
+	if target_position != -1:
+		select_ordain_target(target_position)
+
+# Clear ordain effects (for game end or reset)
+func clear_all_ordain_effects():
+	if active_ordain_slot != -1:
+		remove_ordain_effect()
+	ordain_mode_active = false
+	current_ordainer_position = -1
+	current_ordainer_owner = Owner.NONE
+	current_ordainer_card = null
+	print("All ordain effects cleared")
+
+# Check if a card being placed should get the ordain bonus
+func apply_ordain_bonus_if_applicable(grid_position: int, card_data: CardResource, placing_owner: Owner):
+	# Only apply bonus if:
+	# 1. There's an active ordain slot
+	# 2. The card is being placed in the ordained slot  
+	# 3. The player who ordained the slot is the one placing the card
+	if active_ordain_slot != -1 and grid_position == active_ordain_slot and placing_owner == current_ordainer_owner:
+		print("Applying ordain bonus (+2 to all stats) to ", card_data.card_name)
+		
+		# Apply +2 to all stats
+		for i in range(card_data.values.size()):
+			card_data.values[i] += 2
+		
+		print("Card stats after ordain bonus: ", card_data.values)
+		
+		# Remove the ordain effect after use
+		remove_ordain_effect()
+		
+		return true
+	elif active_ordain_slot != -1 and grid_position == active_ordain_slot:
+		# Enemy used ordained slot - just remove effect silently
+		print("Enemy used ordained slot - removing effect without bonus")
+		remove_ordain_effect()
+	
+	return false
+
+func handle_ordain_turn_expiration():
+	# Ordain effects expire after one turn
+	if active_ordain_slot != -1:
+		print("Ordain effect expired after turn completion")
+		remove_ordain_effect()
