@@ -40,6 +40,9 @@ var current_ordainer_owner: Owner = Owner.NONE
 var current_ordainer_card: CardResource = null
 var active_ordain_slot: int = -1
 var ordain_target_style: StyleBoxFlat
+var active_ordain_owner: Owner = Owner.NONE  # Track who created the ordain effect
+var active_ordain_turns_remaining: int = 0  # Track how many turns until ordain expires
+
 
 var couple_definitions = {
 	"Phaeton": "Cygnus",
@@ -4130,20 +4133,23 @@ func select_ordain_target(target_position: int):
 	# Set the ordain effect
 	active_ordain_slot = target_position
 	
+	# CRITICAL: Store the owner who created the ordain effect BEFORE resetting variables
+	active_ordain_owner = current_ordainer_owner
+	
+	# Set turn counter - ordain lasts for 3 turns
+	active_ordain_turns_remaining = 3
+	
 	# Apply visual styling to show this slot is ordained
 	apply_ordain_target_styling(target_position)
-	
-	# Store the owner who created the ordain effect
-	var ordainer_owner = current_ordainer_owner  # FIX: Use the stored current_ordainer_owner
 	
 	# End ordain mode
 	ordain_mode_active = false
 	current_ordainer_position = -1
-	current_ordainer_owner = Owner.NONE  # Reset AFTER storing it above
+	current_ordainer_owner = Owner.NONE
 	current_ordainer_card = null
 	
 	# Update game status based on who ordained
-	if ordainer_owner == Owner.PLAYER:
+	if active_ordain_owner == Owner.PLAYER:
 		game_status_label.text = "Ordain set! Next card in that slot gets +2 to all stats."
 	else:
 		game_status_label.text = "Opponent ordained a slot."
@@ -4167,11 +4173,13 @@ func remove_ordain_effect():
 	
 	print("Removing ordain effect from position ", active_ordain_slot)
 	
-	# Remove visual styling
-	restore_slot_original_styling(active_ordain_slot)
-	
-	# Clear tracking
+	var slot_to_restore = active_ordain_slot
 	active_ordain_slot = -1
+	active_ordain_owner = Owner.NONE
+	active_ordain_turns_remaining = 0
+	
+	# Now restore the visual styling to default (after clearing tracking)
+	restore_slot_original_styling(slot_to_restore)
 
 # Opponent AI ordain target selection
 func opponent_select_ordain_target():
@@ -4192,7 +4200,6 @@ func opponent_select_ordain_target():
 	if target_position != -1:
 		select_ordain_target(target_position)
 
-# Clear ordain effects (for game end or reset)
 func clear_all_ordain_effects():
 	if active_ordain_slot != -1:
 		remove_ordain_effect()
@@ -4200,22 +4207,31 @@ func clear_all_ordain_effects():
 	current_ordainer_position = -1
 	current_ordainer_owner = Owner.NONE
 	current_ordainer_card = null
+	active_ordain_owner = Owner.NONE
+	active_ordain_turns_remaining = 0  # Reset turn counter
 	print("All ordain effects cleared")
 
 # Check if a card being placed should get the ordain bonus
 func apply_ordain_bonus_if_applicable(grid_position: int, card_data: CardResource, placing_owner: Owner):
+	print("=== ORDAIN BONUS CHECK ===")
+	print("Active ordain slot: ", active_ordain_slot)
+	print("Grid position: ", grid_position)
+	print("Active ordain owner: ", active_ordain_owner)
+	print("Placing owner: ", placing_owner)
+	
 	# Only apply bonus if:
 	# 1. There's an active ordain slot
 	# 2. The card is being placed in the ordained slot  
 	# 3. The player who ordained the slot is the one placing the card
-	if active_ordain_slot != -1 and grid_position == active_ordain_slot and placing_owner == current_ordainer_owner:
-		print("Applying ordain bonus (+2 to all stats) to ", card_data.card_name)
+	if active_ordain_slot != -1 and grid_position == active_ordain_slot and placing_owner == active_ordain_owner:
+		print("CONDITIONS MET - Applying ordain bonus (+2 to all stats) to ", card_data.card_name)
+		print("Card stats BEFORE ordain bonus: ", card_data.values)
 		
 		# Apply +2 to all stats
 		for i in range(card_data.values.size()):
 			card_data.values[i] += 2
 		
-		print("Card stats after ordain bonus: ", card_data.values)
+		print("Card stats AFTER ordain bonus: ", card_data.values)
 		
 		# Remove the ordain effect after use
 		remove_ordain_effect()
@@ -4225,11 +4241,17 @@ func apply_ordain_bonus_if_applicable(grid_position: int, card_data: CardResourc
 		# Enemy used ordained slot - just remove effect silently
 		print("Enemy used ordained slot - removing effect without bonus")
 		remove_ordain_effect()
+	else:
+		print("Ordain bonus conditions NOT met")
 	
 	return false
 
 func handle_ordain_turn_expiration():
-	# Ordain effects expire after one turn
-	if active_ordain_slot != -1:
-		print("Ordain effect expired after turn completion")
-		remove_ordain_effect()
+	# Count down ordain turns and expire when reaches 0
+	if active_ordain_slot != -1 and active_ordain_turns_remaining > 0:
+		active_ordain_turns_remaining -= 1
+		print("Ordain turns remaining: ", active_ordain_turns_remaining)
+		
+		if active_ordain_turns_remaining <= 0:
+			print("Ordain effect expired after 3 turns")
+			remove_ordain_effect()
