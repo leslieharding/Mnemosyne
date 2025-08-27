@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CompelAbility" load_steps=2 format=3 uid="uid://ce2x3jsn3nadt"]
+
+[ext_resource type="Script" uid="uid://c25iupuskk6vd" path="res://Resources/Abilities/compel_ability.gd" id="1_03p5s"]
+
+[resource]
+script = ExtResource("1_03p5s")
+ability_name = "Compel"
+description = "On play, pick a slot. The opponent must play their next card there."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://c25iupuskk6vd"

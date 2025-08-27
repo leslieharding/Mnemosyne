@@ -26,6 +26,14 @@ var darkness_shroud_active: bool = false
 var active_tremors: Dictionary = {}  # tremor_id -> tremor_data
 var tremor_id_counter: int = 0
 
+# Compel tracking system
+var compel_mode_active: bool = false
+var current_compeller_position: int = -1
+var current_compeller_owner: Owner = Owner.NONE
+var current_compeller_card: CardResource = null
+var active_compel_slot: int = -1  # The slot that opponent must play in
+var compel_target_style: StyleBoxFlat
+
 var couple_definitions = {
 	"Phaeton": "Cygnus",
 	"Cygnus": "Phaeton", 
@@ -857,7 +865,6 @@ func disable_player_input():
 		grid_slots[current_grid_index].add_theme_stylebox_override("panel", default_grid_style)
 		current_grid_index = -1
 
-# Let opponent take their turn
 func opponent_take_turn():
 	# Double-check that it's actually the opponent's turn to prevent multiple calls
 	if not turn_manager.is_opponent_turn():
@@ -873,11 +880,8 @@ func opponent_take_turn():
 	opponent_is_thinking = true
 	print("Opponent starting turn - setting thinking flag to true")
 	
-	# Get list of available slots
-	var available_slots: Array[int] = []
-	for i in range(grid_occupied.size()):
-		if not grid_occupied[i]:
-			available_slots.append(i)
+	# Get available slots considering compel constraints - FIXED: Use new helper function
+	var available_slots: Array[int] = get_available_slots_for_opponent()
 	
 	# Check if game should end
 	if available_slots.is_empty() or not opponent_manager.has_cards():
@@ -889,6 +893,7 @@ func opponent_take_turn():
 	
 	# Let opponent make their move
 	opponent_manager.take_turn(available_slots)
+
 
 # helper method to set card ownership
 func set_card_ownership(grid_index: int, new_owner: Owner):
@@ -1242,6 +1247,15 @@ func _on_opponent_card_placed(grid_index: int):
 		opponent_is_thinking = false  # Reset thinking flag on error
 		return
 	
+	# Check if opponent is respecting compel constraint
+	if active_compel_slot != -1:
+		if grid_index == active_compel_slot:
+			print("Opponent correctly placed card in compelled slot ", grid_index)
+			remove_compel_constraint()  # Remove the constraint after it's fulfilled
+		else:
+			print("ERROR: Opponent should have been forced to play in slot ", active_compel_slot, " but played in ", grid_index)
+			# For now, just log the error and continue
+	
 	# Get the card data that the opponent just played
 	var opponent_card_data = opponent_manager.get_last_played_card()
 	if not opponent_card_data:
@@ -1249,9 +1263,13 @@ func _on_opponent_card_placed(grid_index: int):
 		opponent_is_thinking = false
 		return
 	
+	# Get opponent card level using existing pattern
+	var opponent_card_level = get_card_level(0)  # Follow existing implementation pattern
+	
 	# DEBUG: Check the opponent card data
 	print("=== OPPONENT CARD DEBUG ===")
 	print("Card name: ", opponent_card_data.card_name)
+	print("Card level: ", opponent_card_level)
 	print("Card abilities count: ", opponent_card_data.abilities.size())
 	if opponent_card_data.abilities.size() > 0:
 		for i in range(opponent_card_data.abilities.size()):
@@ -1288,61 +1306,10 @@ func _on_opponent_card_placed(grid_index: int):
 		print("ERROR: Card display card_data is null!")
 	print("===========================")
 	
-	# Center the card within the slot (same as player cards)
-	card_display.position = Vector2(
-		(slot.custom_minimum_size.x - 100) / 2,  # Assuming card width is 100
-		(slot.custom_minimum_size.y - 140) / 2   # Assuming card height is 140
-	)
+	# Apply opponent card styling to the slot (not the card display)
+	slot.add_theme_stylebox_override("panel", opponent_card_style)
 	
-	# Set higher z-index so the card appears on top
-	card_display.z_index = 1
-	
-	# Apply opponent styling
-	card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
-	
-	# Connect hover signals AFTER setup - THIS IS THE KEY FIX
-	# This ensures the card_data is properly set before hover events can fire
-	card_display.card_hovered.connect(_on_card_hovered)
-	card_display.card_unhovered.connect(_on_card_unhovered)
-	
-	# FIXED: Check for passive abilities on opponent cards and start pulse effect
-	var opponent_card_level = get_card_level(0)  # Opponent cards use level 0 for now
-	if opponent_card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, opponent_card_level):
-		print("Opponent card has passive abilities - checking if should be active")
-		
-		# Store passive abilities for opponent card (only if they should be active)
-		if not grid_index in active_passive_abilities:
-			active_passive_abilities[grid_index] = []
-		
-		var available_abilities = opponent_card_data.get_available_abilities(opponent_card_level)
-		var active_abilities_for_opponent = []
-		
-		for ability in available_abilities:
-			if ability.trigger_condition == CardAbility.TriggerType.PASSIVE:
-				# Check if this ability should be active for opponent
-				if should_passive_ability_be_active(ability, Owner.OPPONENT, grid_index):
-					print("Opponent ability ", ability.ability_name, " is active")
-					active_passive_abilities[grid_index].append(ability)
-					active_abilities_for_opponent.append(ability)
-				else:
-					print("Opponent ability ", ability.ability_name, " is not active")
-		
-		# Check if any of the active abilities should show visual pulse
-		var should_show_pulse = false
-		for ability in active_abilities_for_opponent:
-			if should_passive_ability_show_pulse(ability, Owner.OPPONENT, grid_index):
-				should_show_pulse = true
-				break
-		
-		# Only start visual pulse if needed
-		if should_show_pulse:
-			visual_effects_manager.start_passive_pulse(card_display)
-			print("Started visual pulse for opponent card ", opponent_card_data.card_name)
-		else:
-			print("No visual pulse needed for opponent card ", opponent_card_data.card_name)
-	
-	print("Opponent placed card: ", opponent_card_data.card_name, " at slot ", grid_index)
-	print("Card abilities: ", opponent_card_data.abilities.size())
+	print("Opponent card abilities: ", opponent_card_data.abilities.size())
 	for i in range(opponent_card_data.abilities.size()):
 		var ability = opponent_card_data.abilities[i]
 		print("  Ability ", i, ": ", ability.ability_name, " - ", ability.description)
@@ -1408,6 +1375,7 @@ func end_game():
 		visual_effects_manager.clear_all_hunt_effects(grid_slots)
 	
 	clear_all_hunt_traps()
+	clear_all_compel_constraints()
 	
 	var tracker = get_node("/root/BossPredictionTrackerAutoload")
 	if tracker:
@@ -2038,6 +2006,15 @@ func create_grid_styles():
 	hunt_target_style.border_width_right = 3
 	hunt_target_style.border_width_bottom = 3
 	hunt_target_style.border_color = Color("#FF8800")  # Orange for hunt targets
+	
+	# Compel target style (purple border for compelled slots)
+	compel_target_style = StyleBoxFlat.new()
+	compel_target_style.bg_color = Color("#444444")
+	compel_target_style.border_width_left = 3
+	compel_target_style.border_width_top = 3
+	compel_target_style.border_width_right = 3
+	compel_target_style.border_width_bottom = 3
+	compel_target_style.border_color = Color("#AA44FF")  # Purple border for compel
 
 # Helper to get passed parameters from previous scene
 func get_scene_params() -> Dictionary:
@@ -2629,8 +2606,12 @@ func restore_slot_original_styling(grid_index: int):
 	
 	var slot = grid_slots[grid_index]
 	
-	# FIXED: Check for hunt trap first, then sunlit position
-	if grid_index in active_hunts:
+	# Check for compel constraint first
+	if grid_index == active_compel_slot:
+		# Restore compel styling
+		apply_compel_target_styling(grid_index)
+	# Then check for hunt trap
+	elif grid_index in active_hunts:
 		# Restore hunt trap styling
 		apply_hunt_target_styling(grid_index)
 	elif grid_index in sunlit_positions:
@@ -2646,9 +2627,11 @@ func apply_selection_highlight(grid_index: int):
 	
 	var slot = grid_slots[grid_index]
 	
-	# FIXED: Check for hunt trap first, then sunlit position
-	if grid_index in active_hunts:
-		# Don't override hunt trap styling with selection highlight
+	# Don't override compel styling with selection highlight
+	if grid_index == active_compel_slot:
+		return
+	# Don't override hunt trap styling with selection highlight
+	elif grid_index in active_hunts:
 		return
 	elif grid_index in sunlit_positions:
 		# Create a combined sunlit + selected style
@@ -2669,7 +2652,6 @@ func apply_selection_highlight(grid_index: int):
 		slot.add_theme_stylebox_override("panel", selected_grid_style)
 
 
-# Grid click handler (only during player's turn)
 func _on_grid_gui_input(event, grid_index):
 	# Handle hunt target selection FIRST (but only during hunt mode setup)
 	if hunt_mode_active and current_hunter_owner == Owner.PLAYER:
@@ -2681,6 +2663,17 @@ func _on_grid_gui_input(event, grid_index):
 				else:
 					print("Direct hunt combat disabled - can only set traps on empty slots")
 				return  # Don't process normal card placement during hunt mode
+	
+	# Handle compel target selection (only during compel mode setup)
+	if compel_mode_active and current_compeller_owner == Owner.PLAYER:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				# Only allow compel on empty slots
+				if not grid_occupied[grid_index]:
+					select_compel_target(grid_index)
+				else:
+					print("Cannot compel occupied slot - can only compel empty slots")
+				return  # Don't process normal card placement during compel mode
 	
 	if not turn_manager.is_player_turn():
 		return
@@ -2719,7 +2712,12 @@ func place_card_on_grid():
 		else:
 			print("Cannot place on enemy hunt trap!")
 			return
-	
+			
+	# Handle compel constraint removal when player places card in compelled slot
+	if current_grid_index == active_compel_slot:
+		print("Player placing card in compelled slot - removing compel constraint")
+		remove_compel_constraint()
+		
 	if grid_occupied[current_grid_index]:
 		print("Grid slot is already occupied!")
 		return
@@ -2898,6 +2896,10 @@ func place_card_on_grid():
 	# HUNT FIX: DON'T switch turns if hunt mode is active - player needs to select hunt target first
 	if hunt_mode_active:
 		print("Hunt mode active - staying on player turn for target selection")
+		return
+	
+	if compel_mode_active:
+		print("Compel mode active - staying on player turn for target selection")
 		return
 	
 	# Switch turns only if hunt mode is not active
@@ -4086,3 +4088,115 @@ func process_cultivation_turn_start():
 		}
 		
 		cultivation_ability.execute(context)
+
+func start_compel_mode(compeller_position: int, compeller_owner: Owner, compeller_card: CardResource):
+	compel_mode_active = true
+	current_compeller_position = compeller_position
+	current_compeller_owner = compeller_owner
+	current_compeller_card = compeller_card
+	
+	# Update game status
+	if compeller_owner == Owner.PLAYER:
+		game_status_label.text = "🎯 COMPEL MODE: Select a slot to compel the opponent"
+	else:
+		game_status_label.text = "🎯 " + opponent_manager.get_opponent_info().name + " is compelling..."
+		# Auto-select target for opponent
+		call_deferred("opponent_select_compel_target")
+	
+	print("Compel mode activated for ", compeller_card.card_name, " at position ", compeller_position)
+
+func select_compel_target(target_position: int):
+	if not compel_mode_active:
+		return
+	
+	print("Compel target selected: position ", target_position)
+	
+	# Set the compel constraint
+	active_compel_slot = target_position
+	
+	# Apply visual styling to show this slot is compelled
+	apply_compel_target_styling(target_position)
+	
+	# End compel mode
+	compel_mode_active = false
+	current_compeller_position = -1
+	current_compeller_owner = Owner.NONE
+	current_compeller_card = null
+	
+	# Update game status
+	if current_compeller_owner == Owner.PLAYER:
+		game_status_label.text = "Compel set! Opponent must play in the marked slot."
+	
+	# Switch turns - compel action completes the turn
+	print("Compel target selected - switching turns")
+	turn_manager.next_turn()
+
+func apply_compel_target_styling(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	var slot = grid_slots[grid_index]
+	slot.add_theme_stylebox_override("panel", compel_target_style)
+	
+	print("Applied compel target styling (purple border) to slot ", grid_index)
+
+func remove_compel_constraint():
+	if active_compel_slot == -1:
+		return
+	
+	print("Removing compel constraint from position ", active_compel_slot)
+	
+	# Remove visual styling
+	restore_slot_original_styling(active_compel_slot)
+	
+	# Clear tracking
+	active_compel_slot = -1
+
+# Check if a slot is available for opponent considering compel constraint
+func is_slot_available_for_opponent(slot_index: int) -> bool:
+	# If slot is occupied, it's not available
+	if grid_occupied[slot_index]:
+		return false
+	
+	# If there's an active compel constraint, only the compelled slot is available
+	if active_compel_slot != -1:
+		return slot_index == active_compel_slot
+	
+	# Otherwise, any empty slot is available
+	return true
+
+# Opponent AI compel target selection
+func opponent_select_compel_target():
+	if not compel_mode_active:
+		return
+	
+	# Simple AI: pick a random empty slot for now
+	var possible_targets = []
+	
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:  # Only empty slots
+			possible_targets.append(i)
+	
+	var target_position = -1
+	if possible_targets.size() > 0:
+		target_position = possible_targets[randi() % possible_targets.size()]
+	
+	if target_position != -1:
+		select_compel_target(target_position)
+
+# Clear compel constraints (for game end or reset)
+func clear_all_compel_constraints():
+	if active_compel_slot != -1:
+		remove_compel_constraint()
+	compel_mode_active = false
+	current_compeller_position = -1
+	current_compeller_owner = Owner.NONE
+	current_compeller_card = null
+	print("All compel constraints cleared")
+
+func get_available_slots_for_opponent() -> Array[int]:
+	var available_slots: Array[int] = []
+	for i in range(grid_slots.size()):
+		if is_slot_available_for_opponent(i):
+			available_slots.append(i)
+	return available_slots

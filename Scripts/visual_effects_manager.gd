@@ -661,3 +661,13 @@ func show_cultivation_arrow(affected_card_display: CardDisplay):
 		if is_instance_valid(arrow_label):
 			arrow_label.queue_free()
 	)
+
+
+# Clear all compel effects
+func clear_all_compel_effects(grid_slots: Array):
+	# Remove compel icons from all slots
+	for slot in grid_slots:
+		var compel_icon = slot.get_node_or_null("CompelIcon")
+		if compel_icon:
+			compel_icon.queue_free()
+	print("All compel effects cleared from visual effects manager")
