@@ -944,21 +944,43 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 					ability.execute(bolster_context)
 				break  # Only execute Bolster Confidence once per attacking card
 	
-	# Apply all captures and handle passive abilities (existing code)
+	# Apply all captures and handle passive abilities - WITH CHEAT DEATH CHECK
+	var successful_captures = []
+	
 	for captured_index in captures:
-		print("=== PROCESSING CAPTURE AT POSITION ", captured_index, " ===")
+		print("=== PROCESSING POTENTIAL CAPTURE AT POSITION ", captured_index, " ===")
 		
-		# Store the card data before changing ownership (for passive ability removal)
+		# Store the card data before any changes
 		var captured_card_data = grid_card_data[captured_index]
 		
-		print("DEBUG: Captured card is: ", captured_card_data.card_name if captured_card_data else "NULL")
+		print("DEBUG: Potential capture of: ", captured_card_data.card_name if captured_card_data else "NULL")
 		
-		# Remove passive abilities of the captured card BEFORE changing ownership
+		# NEW: Check for cheat death before applying capture
+		var capture_prevented = check_for_cheat_death(captured_index, captured_card_data, grid_index, attacking_card)
+		
+		if capture_prevented:
+			print("CHEAT DEATH! Capture of ", captured_card_data.card_name, " at position ", captured_index, " was prevented!")
+			
+			# Award reduced experience for successful attack even though capture was prevented
+			if attacking_owner == Owner.PLAYER:
+				var card_collection_index = get_card_collection_index(grid_index)
+				if card_collection_index != -1:
+					var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
+					if exp_tracker:
+						exp_tracker.add_capture_exp(card_collection_index, 5)  # Reduced exp
+						print("Player gained 5 exp for attack (capture prevented by cheat death)")
+			
+			continue  # Skip the actual capture for this card
+		
+		# Normal capture processing - Remove passive abilities of the captured card BEFORE changing ownership
 		handle_passive_abilities_on_capture(captured_index, captured_card_data)
 		
 		# Change ownership
 		grid_ownership[captured_index] = attacking_owner
 		print("Card at slot ", captured_index, " is now owned by ", "Player" if attacking_owner == Owner.PLAYER else "Opponent")
+		
+		# Track this as a successful capture
+		successful_captures.append(captured_index)
 		
 		# DEBUG: Check for ON_CAPTURE abilities
 		var card_collection_index = get_card_collection_index(captured_index)
@@ -1036,13 +1058,13 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 				print("No passive abilities active for new owner - no pulse effect")
 	
 	# Refresh all passive abilities to account for ownership changes
-	if captures.size() > 0:
+	if successful_captures.size() > 0:
 		refresh_all_passive_abilities()
 	
 	# Update visuals for all affected cards
 	update_board_visuals()
 	
-	return captures.size()
+	return successful_captures.size()
 
 func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource) -> Array[int]:
 	var captures: Array[int] = []
@@ -1102,6 +1124,32 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 	
 	return captures
 
+func check_for_cheat_death(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource) -> bool:
+	# Clear any previous cheat death flags for this position
+	remove_meta("cheat_death_prevented_" + str(defender_pos))
+	
+	# Execute defend abilities to see if any prevent capture
+	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, "capture_attempt")
+	
+	# Check if cheat death was triggered
+	var was_prevented = has_meta("cheat_death_prevented_" + str(defender_pos)) and get_meta("cheat_death_prevented_" + str(defender_pos))
+	
+	# Clean up the flag
+	if was_prevented:
+		remove_meta("cheat_death_prevented_" + str(defender_pos))
+	
+	return was_prevented
+
+# NEW FUNCTION - Award experience for successful attack even when capture is prevented
+func award_attack_experience(attacker_pos: int, attacking_owner: Owner, attacking_card: CardResource):
+	if attacking_owner == Owner.PLAYER:
+		var card_collection_index = get_card_collection_index(attacker_pos)
+		if card_collection_index != -1:
+			var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
+			if exp_tracker:
+				exp_tracker.add_capture_exp(card_collection_index, 5)  # Reduced exp since capture was prevented
+				print("Player card at position ", attacker_pos, " gained 5 exp for successful attack (capture prevented)")
+
 func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource) -> Array[int]:
 	var captures: Array[int] = []
 	
@@ -1155,8 +1203,6 @@ func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, atta
 					handle_extended_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
 	
 	return captures
-
-
 
 # Add helper function to get collection index from grid position
 func get_card_collection_index(grid_index: int) -> int:
