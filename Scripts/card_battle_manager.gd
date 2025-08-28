@@ -1311,6 +1311,11 @@ func _on_opponent_card_placed(grid_index: int):
 	# NOW setup the card display with the actual card data
 	card_display.setup(opponent_card_data)
 	
+	# Connect hover signals for opponent cards too
+	card_display.card_hovered.connect(_on_card_hovered)
+	card_display.card_unhovered.connect(_on_card_unhovered)
+	print("Connected hover signals for opponent card: ", opponent_card_data.card_name)
+	
 	# DEBUG: Verify the card display has the data
 	print("=== CARD DISPLAY DEBUG ===")
 	print("Card display card_data: ", card_display.card_data)
@@ -1432,7 +1437,49 @@ func end_game():
 	print("=== GAME ENDED ===")
 	print("Final Score - Player: ", scores.player, " | Opponent: ", scores.opponent)
 	print("Result: ", winner)
+	print("Consecutive draws: ", consecutive_draws)
 	print("==================")
+	
+	# NEW: Check for draw condition FIRST
+	if scores.player == scores.opponent:
+		consecutive_draws += 1
+		print("DRAW detected! Consecutive draws: ", consecutive_draws)
+		
+		if consecutive_draws >= 2:
+			# Two draws in a row = automatic loss
+			print("Two draws in a row - treating as loss")
+			game_status_label.text = "Defeat! Two draws count as a loss!"
+			disable_player_input()
+			opponent_is_thinking = false
+			turn_manager.end_game()
+			
+			# Add a delay then go to run summary as loss
+			await get_tree().create_timer(3.0).timeout
+			
+			# Pass data to summary screen
+			var params = get_scene_params()
+			get_tree().set_meta("scene_params", {
+				"god": params.get("god", current_god),
+				"deck_index": params.get("deck_index", 0),
+				"victory": false
+			})
+			TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
+			return
+		else:
+			# First draw - restart the round
+			print("First draw - restarting round")
+			game_status_label.text = "Draw! Restarting round..."
+			disable_player_input()
+			opponent_is_thinking = false
+			turn_manager.end_game()
+			
+			# Show draw message briefly then restart
+			await get_tree().create_timer(2.0).timeout
+			restart_round()
+			return
+	
+	# Reset consecutive draws counter on non-draw result
+	consecutive_draws = 0
 	
 	# Check for loss condition
 	if scores.opponent > scores.player:
