@@ -37,8 +37,8 @@ var god_unlock_conditions: Dictionary = {
 var couple_definitions = {
 	"Phaeton": "Cygnus",
 	"Cygnus": "Phaeton", 
-	"Orpheus": "Euridyce",
-	"Euridyce": "Orpheus"
+	"Orpheus": "Eurydice",
+	"Eurydice": "Orpheus"
 }
 
 var couples_united: Array = []  # Track which couples have been united
