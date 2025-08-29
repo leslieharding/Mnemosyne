@@ -3035,7 +3035,6 @@ func refresh_all_passive_abilities():
 				if card_display and visual_effects_manager:
 					visual_effects_manager.start_passive_pulse(card_display)
 
-# Helper function to determine if a passive ability should be active for the current owner
 func should_passive_ability_be_active(ability: CardAbility, card_owner: Owner, position: int) -> bool:
 	match ability.ability_name:
 		"Cultivate":
@@ -3044,6 +3043,9 @@ func should_passive_ability_be_active(ability: CardAbility, card_owner: Owner, p
 		"Adaptive Defense":
 			# Adaptive defense works for both owners
 			return true
+		"Fortify":
+			# Fortify works for both owners, but only in corner positions
+			return is_corner_position(position)
 		"Divine Inspiration", "Passive Boost":
 			# Boost abilities work for both owners (boost friendly cards)
 			return true
@@ -3066,6 +3068,12 @@ func should_passive_ability_show_pulse(ability: CardAbility, card_owner: Owner, 
 		_:
 			# Default: show pulse for most passive abilities
 			return true
+
+# Helper function to check if a position is a corner slot
+func is_corner_position(position: int) -> bool:
+	# In a 3x3 grid, corner positions are: 0, 2, 6, 8
+	# Top-left: 0, Top-right: 2, Bottom-left: 6, Bottom-right: 8
+	return position in [0, 2, 6, 8]
 
 # Remove a card from the player's hand after it's played
 func remove_card_from_hand(card_index: int):

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=54 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=56 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
@@ -17,6 +17,7 @@
 [ext_resource type="Script" uid="uid://bsyjru6fxhmp5" path="res://Resources/Abilities/cultivate_ability.gd" id="12_ca26u"]
 [ext_resource type="Script" uid="uid://c25iupuskk6vd" path="res://Resources/Abilities/compel_ability.gd" id="14_xjxyc"]
 [ext_resource type="Script" uid="uid://b7w3v4k1roxv1" path="res://Resources/Abilities/ordain_ability.gd" id="15_b0n1o"]
+[ext_resource type="Script" uid="uid://ntyy1yqk7iga" path="res://Resources/Abilities/fortify_ability.gd" id="16_tn03x"]
 
 [sub_resource type="Resource" id="Resource_gowu1"]
 script = ExtResource("3_p7jhq")
@@ -307,12 +308,20 @@ level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_4h8a3"]
+script = ExtResource("16_tn03x")
+ability_name = "Fortify"
+description = "When this card is in a corner slot it has +2 stats."
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://ntyy1yqk7iga"
+
 [sub_resource type="Resource" id="Resource_vqeif"]
 script = ExtResource("1_vqrrp")
 card_name = "The Fates"
 values = Array[int]([1, 1, 1, 1])
 description = "What these scissors? Don't you worry my dear just close your eyes"
-abilities = Array[ExtResource("2_gowu1")]([])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_4h8a3")])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

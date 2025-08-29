@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FortifyAbility" load_steps=2 format=3 uid="uid://dg55uadkl5ke4"]
+
+[ext_resource type="Script" uid="uid://ntyy1yqk7iga" path="res://Resources/Abilities/fortify_ability.gd" id="1_gbkct"]
+
+[resource]
+script = ExtResource("1_gbkct")
+ability_name = "Fortify"
+description = "When this card is in a corner slot it has +2 stats."
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://ntyy1yqk7iga"
