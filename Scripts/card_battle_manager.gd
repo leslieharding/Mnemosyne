@@ -1429,7 +1429,7 @@ func end_game():
 		if has_node("/root/TutorialManagerAutoload"):
 			get_node("/root/TutorialManagerAutoload").mark_tutorial_completed()
 		
-		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+		_on_tutorial_finished()
 		return
 	
 	# Calculate final scores for normal games
