@@ -304,7 +304,7 @@ script = ExtResource("16_cknfu")
 ability_name = "Pursuit"
 description = "If this card can capture, it attacks cards played in the same row/column and moves adjacent to them."
 unlock_level = 0
-trigger_condition = 0
+trigger_condition = 3
 metadata/_custom_type_script = "uid://cgrjfouc2qnld"
 
 [sub_resource type="Resource" id="Resource_i5ydv"]
