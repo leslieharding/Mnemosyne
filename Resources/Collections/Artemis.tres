@@ -1,0 +1,76 @@
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=12 format=3 uid="uid://dwrds6g3whmsq"]
+
+[ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_ttyo6"]
+[ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_nyy1t"]
+[ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_swqiw"]
+[ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_021ek"]
+[ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_nyy1t"]
+
+[sub_resource type="Resource" id="Resource_lnj4m"]
+script = ExtResource("1_ttyo6")
+card_name = "Atalanta"
+values = Array[int]([5, 5, 5, 5])
+description = ""
+abilities = Array[ExtResource("2_nyy1t")]([])
+level_data = Array[ExtResource("3_021ek")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_xpt5f"]
+script = ExtResource("1_ttyo6")
+card_name = "Meleager"
+values = Array[int]([5, 5, 5, 5])
+description = ""
+abilities = Array[ExtResource("2_nyy1t")]([])
+level_data = Array[ExtResource("3_021ek")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_wiuqi"]
+script = ExtResource("1_ttyo6")
+card_name = "Hippolytus"
+values = Array[int]([5, 5, 5, 5])
+description = ""
+abilities = Array[ExtResource("2_nyy1t")]([])
+level_data = Array[ExtResource("3_021ek")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_cynoy"]
+script = ExtResource("1_ttyo6")
+card_name = "Orion"
+values = Array[int]([5, 5, 5, 5])
+description = ""
+abilities = Array[ExtResource("2_nyy1t")]([])
+level_data = Array[ExtResource("3_021ek")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_vobqy"]
+script = ExtResource("1_ttyo6")
+card_name = "Callisto "
+values = Array[int]([5, 5, 5, 5])
+description = ""
+abilities = Array[ExtResource("2_nyy1t")]([])
+level_data = Array[ExtResource("3_021ek")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ttyo6"]
+script = ExtResource("2_swqiw")
+deck_name = "The Hunt"
+deck_description = "The beauty and precision of the singular killing blow."
+card_indices = Array[int]([0, 1, 2, 3, 4])
+is_starter_deck = true
+required_capture_exp = 0
+required_defense_exp = 0
+deck_power_type = 0
+power_config = {}
+metadata/_custom_type_script = "uid://c4u8pww3jsm12"
+
+[resource]
+script = ExtResource("3_nyy1t")
+god_name = ""
+cards = Array[ExtResource("1_ttyo6")]([SubResource("Resource_lnj4m"), SubResource("Resource_xpt5f"), SubResource("Resource_wiuqi"), SubResource("Resource_cynoy"), SubResource("Resource_vobqy")])
+decks = Array[ExtResource("2_swqiw")]([SubResource("Resource_ttyo6")])
+metadata/_custom_type_script = "uid://bdwr18g3ouvfo"
