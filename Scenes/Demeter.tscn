@@ -1,9 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://7j18kdk8kkcw"]
+[gd_scene load_steps=2 format=3 uid="uid://csmtjht0d2y6q"]
 
-[ext_resource type="Script" uid="uid://bewnkj8rlflex" path="res://Scripts/artemis.gd" id="1_e5tj5"]
+[ext_resource type="Script" uid="uid://cogwgelggo54s" path="res://Scripts/demeter.gd" id="1_8nwuq"]
 
-[node name="Artemis" type="Node2D"]
-script = ExtResource("1_e5tj5")
+[node name="Demeter" type="Node2D"]
+script = ExtResource("1_8nwuq")
 
 [node name="MainContainer" type="HBoxContainer" parent="."]
 offset_left = 165.0
@@ -21,7 +21,7 @@ text = "Apollo"
 
 [node name="Deck1Button" type="Button" parent="MainContainer/LeftPanel"]
 layout_mode = 2
-text = "The Hunt"
+text = "Natures Bounty"
 
 [node name="Button" type="Button" parent="MainContainer/LeftPanel"]
 layout_mode = 2

@@ -1,7 +1,7 @@
 extends Node2D
 
-# Reference to the Artemis card collection
-var artemis_collection: GodCardCollection
+# Reference to the Demeter card collection
+var demeter_collection: GodCardCollection
 var selected_deck_index: int = -1  # -1 means no deck selected
 var journal_button: JournalButton
 
@@ -16,35 +16,35 @@ var journal_button: JournalButton
 @onready var card_container = $MainContainer/RightPanel/CardsContainer/CardContainer
 
 func _ready():
-	print("=== ARTEMIS SCENE STARTING ===")
+	print("=== DEMETER SCENE STARTING ===")
 	
-	# Load the Artemis card collection
-	artemis_collection = load("res://Resources/Collections/Artemis.tres")
+	# Load the Demeter card collection
+	demeter_collection = load("res://Resources/Collections/Demeter.tres")
 	
-	if not artemis_collection:
-		print("ERROR: Failed to load Artemis collection!")
+	if not demeter_collection:
+		print("ERROR: Failed to load Demeter collection!")
 		# Try alternative loading method
-		var collection_path = "res://Resources/Collections/Artemis.tres"
+		var collection_path = "res://Resources/Collections/Demeter.tres"
 		if ResourceLoader.exists(collection_path):
-			artemis_collection = ResourceLoader.load(collection_path)
-			if artemis_collection:
-				print("Artemis collection loaded with ResourceLoader")
+			demeter_collection = ResourceLoader.load(collection_path)
+			if demeter_collection:
+				print("Demeter collection loaded with ResourceLoader")
 			else:
 				print("ResourceLoader also failed")
 				return
 		else:
-			print("Artemis.tres file does not exist!")
+			print("Demeter.tres file does not exist!")
 			return
 	
-	print("Artemis collection loaded successfully")
-	print("Cards: ", artemis_collection.cards.size())
-	print("Decks: ", artemis_collection.decks.size())
+	print("Demeter collection loaded successfully")
+	print("Cards: ", demeter_collection.cards.size())
+	print("Decks: ", demeter_collection.decks.size())
 	
 	# Wait a frame to ensure all nodes are ready
 	await get_tree().process_frame
 	
 	# Update the deck button labels and unlock states
-	if artemis_collection:
+	if demeter_collection:
 		setup_deck_buttons()
 	
 	# The StartGameButton should start disabled until a deck is selected
@@ -55,17 +55,13 @@ func _ready():
 	
 	setup_journal_button()
 
-
-
-
-
 func _on_start_game_button_pressed() -> void:
 	if selected_deck_index >= 0:
 		# Only allow starting if deck is unlocked
-		var deck_def = artemis_collection.decks[selected_deck_index]
+		var deck_def = demeter_collection.decks[selected_deck_index]
 		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-		var god_progress = progress_tracker.get_god_progress("Artemis")
-		if not deck_def.is_unlocked("Artemis", god_progress):
+		var god_progress = progress_tracker.get_god_progress("Demeter")
+		if not deck_def.is_unlocked("Demeter", god_progress):
 			print("Cannot start game - deck is locked!")
 			return
 		
@@ -85,7 +81,7 @@ func _on_start_game_button_pressed() -> void:
 		
 		# Pass the selected god and deck index to the map scene
 		get_tree().set_meta("scene_params", {
-			"god": "Artemis",
+			"god": "Demeter",
 			"deck_index": selected_deck_index
 		})
 		
@@ -93,12 +89,14 @@ func _on_start_game_button_pressed() -> void:
 		TransitionManagerAutoload.change_scene_to("res://Scenes/RunMap.tscn")
 
 
+func _on_button_pressed() -> void:
+	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+
+
 func _on_deck_1_button_pressed() -> void:
 	select_deck(0)
 
 
-func _on_button_pressed() -> void:
-	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 func setup_journal_button():
 	if not journal_button:
@@ -115,18 +113,18 @@ func setup_journal_button():
 		journal_button.position = Vector2(20, get_viewport().get_visible_rect().size.y - 80)
 		journal_button.size = Vector2(60, 60)
 		
-		print("Artemis: Journal button added with CanvasLayer")
+		print("Demeter: Journal button added with CanvasLayer")
 
 # Set up deck buttons with unlock conditions
 func setup_deck_buttons():
 	print("=== SETTING UP DECK BUTTONS ===")
 	
-	if not artemis_collection:
-		print("ERROR: Artemis collection is null in setup_deck_buttons!")
+	if not demeter_collection:
+		print("ERROR: Demeter collection is null in setup_deck_buttons!")
 		return
 	
-	if artemis_collection.decks.size() == 0:
-		print("ERROR: Artemis collection has no decks!")
+	if demeter_collection.decks.size() == 0:
+		print("ERROR: Demeter collection has no decks!")
 		return
 	
 	var deck_buttons = [deck1_button, deck2_button, deck3_button]
@@ -137,7 +135,7 @@ func setup_deck_buttons():
 			print("ERROR: Button ", i, " is null!")
 			return
 	
-	print("Artemis collection has ", artemis_collection.decks.size(), " decks")
+	print("Demeter collection has ", demeter_collection.decks.size(), " decks")
 	
 	# Get progress tracker
 	var progress_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
@@ -145,7 +143,7 @@ func setup_deck_buttons():
 	
 	if progress_tracker:
 		print("GlobalProgressTrackerAutoload found")
-		god_progress = progress_tracker.get_god_progress("Artemis")
+		god_progress = progress_tracker.get_god_progress("Demeter")
 		print("God progress entries: ", god_progress.size())
 	else:
 		print("WARNING: GlobalProgressTrackerAutoload not found!")
@@ -154,9 +152,9 @@ func setup_deck_buttons():
 	for i in range(deck_buttons.size()):
 		var button = deck_buttons[i]
 		
-		if i < artemis_collection.decks.size():
+		if i < demeter_collection.decks.size():
 			# We have a deck for this button
-			var deck_def = artemis_collection.decks[i]
+			var deck_def = demeter_collection.decks[i]
 			
 			print("=== DECK ", i, " SETUP ===")
 			print("Deck name: ", deck_def.deck_name)
@@ -167,7 +165,7 @@ func setup_deck_buttons():
 			print("Button text set to: ", button.text)
 			
 			# Check unlock status
-			var is_unlocked = deck_def.is_unlocked("Artemis", god_progress)
+			var is_unlocked = deck_def.is_unlocked("Demeter", god_progress)
 			
 			# Apply button styling
 			if not is_unlocked:
@@ -193,15 +191,15 @@ func setup_deck_buttons():
 
 
 func select_deck(index: int) -> void:
-	var deck_def = artemis_collection.decks[index]
+	var deck_def = demeter_collection.decks[index]
 	var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-	var god_progress = progress_tracker.get_god_progress("Artemis")
-	var is_unlocked = deck_def.is_unlocked("Artemis", god_progress)
+	var god_progress = progress_tracker.get_god_progress("Demeter")
+	var is_unlocked = deck_def.is_unlocked("Demeter", god_progress)
 	
 	selected_deck_index = index
 	
 	# Reset all buttons to normal appearance (only for unlocked decks)
-	for i in range(artemis_collection.decks.size()):  # Only loop through actual decks
+	for i in range(demeter_collection.decks.size()):  # Only loop through actual decks
 		if i >= 3:  # Safety check - don't access buttons that don't exist
 			break
 			
@@ -209,8 +207,8 @@ func select_deck(index: int) -> void:
 		if not button or not button.visible:  # Skip hidden buttons
 			continue
 			
-		var deck = artemis_collection.decks[i]
-		if deck.is_unlocked("Artemis", god_progress):
+		var deck = demeter_collection.decks[i]
+		if deck.is_unlocked("Demeter", god_progress):
 			button.disabled = false
 			button.modulate = Color.WHITE
 			# Keep the original deck name, don't reset to generic text
@@ -241,18 +239,18 @@ func select_deck(index: int) -> void:
 	# Show the right panel
 	right_panel.visible = true
 	
-	print("Selected deck: ", artemis_collection.decks[index].deck_name)
+	print("Selected deck: ", demeter_collection.decks[index].deck_name)
 	if is_unlocked:
-		print("Description: ", artemis_collection.decks[index].deck_description)
+		print("Description: ", demeter_collection.decks[index].deck_description)
 	else:
 		print("Deck is locked - showing unlock requirements")
 
 # Display unlock requirements for locked decks
 func display_unlock_requirements(deck_index: int) -> void:
-	if not artemis_collection or deck_index < 0 or deck_index >= artemis_collection.decks.size():
+	if not demeter_collection or deck_index < 0 or deck_index >= demeter_collection.decks.size():
 		return
 	
-	var deck_def = artemis_collection.decks[deck_index]
+	var deck_def = demeter_collection.decks[deck_index]
 	
 	# Update deck title and description
 	selected_deck_title.text = deck_def.deck_name + " (LOCKED)"
@@ -304,7 +302,7 @@ func create_unlock_requirements_panel(deck_def: DeckDefinition) -> Control:
 	if deck_def.required_capture_exp > 0 or deck_def.required_defense_exp > 0:
 		# Get current progress data
 		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-		var god_progress = progress_tracker.get_god_progress("Artemis")
+		var god_progress = progress_tracker.get_god_progress("Demeter")
 		
 		# Calculate current totals using unified experience
 		var current_total_exp = 0
@@ -389,10 +387,10 @@ func create_requirement_display(title: String, current: int, required: int, colo
 
 # Display the cards for the selected deck with experience info
 func display_deck_cards(deck_index: int) -> void:
-	if not artemis_collection or deck_index < 0 or deck_index >= artemis_collection.decks.size():
+	if not demeter_collection or deck_index < 0 or deck_index >= demeter_collection.decks.size():
 		return
 	
-	var deck_def = artemis_collection.decks[deck_index]
+	var deck_def = demeter_collection.decks[deck_index]
 	
 	# Update deck title and description
 	selected_deck_title.text = deck_def.deck_name
@@ -416,8 +414,8 @@ func display_deck_cards(deck_index: int) -> void:
 	# Create card displays for each card in the deck
 	for i in range(deck_def.card_indices.size()):
 		var card_index = deck_def.card_indices[i]
-		if card_index < artemis_collection.cards.size():
-			var card = artemis_collection.cards[card_index]
+		if card_index < demeter_collection.cards.size():
+			var card = demeter_collection.cards[card_index]
 			var card_display = create_deck_card_display(card, card_index)
 			card_container.add_child(card_display)
 
@@ -462,7 +460,7 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	var current_level = 1
 	if has_node("/root/GlobalProgressTrackerAutoload"):
 		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-		current_level = progress_tracker.get_card_level("Artemis", card_index)
+		current_level = progress_tracker.get_card_level("Demeter", card_index)
 	
 	# Card name with level indicator
 	var name_label = Label.new()
@@ -514,7 +512,7 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	
 	if has_node("/root/GlobalProgressTrackerAutoload"):
 		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-		var exp_data = progress_tracker.get_card_total_experience("Artemis", card_index)
+		var exp_data = progress_tracker.get_card_total_experience("Demeter", card_index)
 		total_exp = exp_data.get("total_exp", 0)
 	
 	# Show unified experience and level

@@ -1,0 +1,76 @@
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=12 format=3 uid="uid://dgxi7oww6yrg0"]
+
+[ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_stdfb"]
+[ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_0nxk6"]
+[ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_60vm0"]
+[ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_0nxk6"]
+[ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_34bjj"]
+
+[sub_resource type="Resource" id="Resource_5rr7c"]
+script = ExtResource("1_stdfb")
+card_name = "Persephone"
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_0nxk6")]([])
+level_data = Array[ExtResource("3_34bjj")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_rjcyb"]
+script = ExtResource("1_stdfb")
+card_name = "Triptolemus"
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_0nxk6")]([])
+level_data = Array[ExtResource("3_34bjj")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_0ni4c"]
+script = ExtResource("1_stdfb")
+card_name = "Iasion"
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_0nxk6")]([])
+level_data = Array[ExtResource("3_34bjj")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_wun1n"]
+script = ExtResource("1_stdfb")
+card_name = "Metanira"
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_0nxk6")]([])
+level_data = Array[ExtResource("3_34bjj")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_f4d4a"]
+script = ExtResource("1_stdfb")
+card_name = "Cyane"
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_0nxk6")]([])
+level_data = Array[ExtResource("3_34bjj")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_dqtp2"]
+script = ExtResource("2_60vm0")
+deck_name = "Natures Bounty"
+deck_description = "Tend the soil so and it will pay you back threefold"
+card_indices = Array[int]([0, 1, 2, 3, 4])
+is_starter_deck = true
+required_capture_exp = 0
+required_defense_exp = 0
+deck_power_type = 0
+power_config = {}
+metadata/_custom_type_script = "uid://c4u8pww3jsm12"
+
+[resource]
+script = ExtResource("3_0nxk6")
+god_name = ""
+cards = Array[ExtResource("1_stdfb")]([SubResource("Resource_5rr7c"), SubResource("Resource_rjcyb"), SubResource("Resource_0ni4c"), SubResource("Resource_wun1n"), SubResource("Resource_f4d4a")])
+decks = Array[ExtResource("2_60vm0")]([SubResource("Resource_dqtp2")])
+metadata/_custom_type_script = "uid://bdwr18g3ouvfo"
