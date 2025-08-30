@@ -711,7 +711,6 @@ func _on_coin_flip_result(player_goes_first: bool):
 	# Brief pause to show result
 	await get_tree().create_timer(2.0).timeout
 	
-# Handle game start after coin flip
 func _on_game_started():
 	print("Game started - current player is: ", "Player" if turn_manager.is_player_turn() else "Opponent")
 	update_game_status()
@@ -726,6 +725,7 @@ func _on_game_started():
 	if turn_manager.is_opponent_turn():
 		print("Starting opponent's first turn")
 		call_deferred("opponent_take_turn")
+		
 
 func _on_turn_changed(is_player_turn: bool):
 	print("Turn changed - is_player_turn: ", is_player_turn, " | opponent_is_thinking: ", opponent_is_thinking)
