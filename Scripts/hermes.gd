@@ -55,6 +55,48 @@ func _ready():
 	
 	setup_journal_button()
 
+
+func _on_start_game_button_pressed() -> void:
+	if selected_deck_index >= 0:
+		# Only allow starting if deck is unlocked
+		var deck_def = hermes_collection.decks[selected_deck_index]
+		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		var god_progress = progress_tracker.get_god_progress("Hermes")
+		if not deck_def.is_unlocked("Hermes", god_progress):
+			print("Cannot start game - deck is locked!")
+			return
+		
+		# Clear stat growth tracker for new run
+		if has_node("/root/RunStatGrowthTrackerAutoload"):
+			var growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
+			growth_tracker.clear_run()
+			print("Cleared stat growth data for new run")
+		
+		# Initialize the experience tracker for this new run
+		get_node("/root/RunExperienceTrackerAutoload").start_new_run(deck_def.card_indices)
+		print("Initialized experience tracker for new run with deck: ", deck_def.deck_name)
+		
+		# Initialize boss prediction tracker
+		get_node("/root/BossPredictionTrackerAutoload").clear_patterns()
+		print("Initialized boss prediction tracker for new run")
+		
+		# Pass the selected god and deck index to the map scene
+		get_tree().set_meta("scene_params", {
+			"god": "Hermes",
+			"deck_index": selected_deck_index
+		})
+		
+		# Change to the map scene instead of directly to game
+		TransitionManagerAutoload.change_scene_to("res://Scenes/RunMap.tscn")
+
+func _on_button_pressed() -> void:
+	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+
+
+func _on_deck_1_button_pressed() -> void:
+	select_deck(0)
+
+
 func setup_journal_button():
 	if not journal_button:
 		# Create a CanvasLayer to ensure it's always on top, especially for Node2D scenes
@@ -94,7 +136,7 @@ func setup_deck_buttons():
 	
 	print("Hermes collection has ", hermes_collection.decks.size(), " decks")
 	
-	# Get progress tracker with more robust checking
+	# Get progress tracker
 	var progress_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
 	var god_progress = {}
 	
@@ -102,100 +144,50 @@ func setup_deck_buttons():
 		print("GlobalProgressTrackerAutoload found")
 		god_progress = progress_tracker.get_god_progress("Hermes")
 		print("God progress entries: ", god_progress.size())
-		
-		# DEBUG: Show experience data
-		for card_index in god_progress:
-			var card_exp = god_progress[card_index]
-			print("Card ", card_index, ": Total=", card_exp.get("total_exp", 0))
 	else:
 		print("WARNING: GlobalProgressTrackerAutoload not found!")
 	
-	# Set up each button
-	for i in range(hermes_collection.decks.size()):
-		if i >= deck_buttons.size():
-			print("Warning: More decks than buttons - skipping deck ", i)
-			continue
-			
-		var deck_def = hermes_collection.decks[i]
+	# Set up each button - but only for available decks
+	for i in range(deck_buttons.size()):
 		var button = deck_buttons[i]
 		
-		print("=== DECK ", i, " SETUP ===")
-		print("Deck name: ", deck_def.deck_name)
-		print("Required capture exp: ", deck_def.required_capture_exp)
-		print("Required defense exp: ", deck_def.required_defense_exp)
-		
-		# Set button text
-		button.text = deck_def.deck_name
-		print("Button text set to: ", button.text)
-		
-		# Check unlock status
-		var is_unlocked = deck_def.is_unlocked("Hermes", god_progress)
-		
-		print("Final unlock status: ", is_unlocked)
-		
-		# Apply button styling
-		if not is_unlocked:
-			button.modulate = Color(0.6, 0.6, 0.6)
-			button.disabled = false  # Keep clickable for requirement display
-			print("Button styled as LOCKED")
+		if i < hermes_collection.decks.size():
+			# We have a deck for this button
+			var deck_def = hermes_collection.decks[i]
+			
+			print("=== DECK ", i, " SETUP ===")
+			print("Deck name: ", deck_def.deck_name)
+			
+			# Set button text to the actual deck name
+			button.text = deck_def.deck_name
+			button.visible = true
+			print("Button text set to: ", button.text)
+			
+			# Check unlock status
+			var is_unlocked = deck_def.is_unlocked("Hermes", god_progress)
+			
+			# Apply button styling
+			if not is_unlocked:
+				button.modulate = Color(0.6, 0.6, 0.6)
+				button.disabled = false  # Keep clickable for requirement display
+				print("Button styled as LOCKED")
+			else:
+				button.modulate = Color.WHITE
+				button.disabled = false
+				print("Button styled as UNLOCKED")
+			
+			print("Button ", i, " setup complete")
 		else:
-			button.modulate = Color.WHITE
-			button.disabled = false
-			print("Button styled as UNLOCKED")
+			# No deck for this button - hide it
+			button.visible = false
+			button.disabled = true
+			print("Button ", i, " hidden (no corresponding deck)")
 		
-		print("Button ", i, " setup complete")
 		print("=======================")
 	
 	print("=== DECK BUTTONS SETUP COMPLETE ===")
 
-# Back button
-func _on_button_pressed() -> void:
-	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
-# Connect these in the editor or use the existing connections
-func _on_deck_1_button_pressed() -> void:
-	select_deck(0)
-
-func _on_deck_2_button_pressed() -> void:
-	select_deck(1)
-
-func _on_deck_3_button_pressed() -> void:
-	select_deck(2)
-	
-func _on_start_game_button_pressed() -> void:
-	if selected_deck_index >= 0:
-		# Only allow starting if deck is unlocked
-		var deck_def = hermes_collection.decks[selected_deck_index]
-		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-		var god_progress = progress_tracker.get_god_progress("Hermes")
-		if not deck_def.is_unlocked("Hermes", god_progress):
-			print("Cannot start game - deck is locked!")
-			return
-		
-		# Clear stat growth tracker for new run
-		if has_node("/root/RunStatGrowthTrackerAutoload"):
-			var growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
-			growth_tracker.clear_run()
-			print("Cleared stat growth data for new run")
-		
-		# Initialize the experience tracker for this new run
-		get_node("/root/RunExperienceTrackerAutoload").start_new_run(deck_def.card_indices)
-		print("Initialized experience tracker for new run with deck: ", deck_def.deck_name)
-		
-		# Initialize boss prediction tracker
-		get_node("/root/BossPredictionTrackerAutoload").clear_patterns()
-		print("Initialized boss prediction tracker for new run")
-		
-		# Pass the selected god and deck index to the map scene
-		get_tree().set_meta("scene_params", {
-			"god": "Hermes",
-			"deck_index": selected_deck_index
-		})
-		
-		# Change to the map scene instead of directly to game
-		TransitionManagerAutoload.change_scene_to("res://Scenes/RunMap.tscn")
-
-# Helper function to handle deck selection - handles both locked and unlocked decks
 func select_deck(index: int) -> void:
 	var deck_def = hermes_collection.decks[index]
 	var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
@@ -205,20 +197,33 @@ func select_deck(index: int) -> void:
 	selected_deck_index = index
 	
 	# Reset all buttons to normal appearance (only for unlocked decks)
-	for i in range(hermes_collection.decks.size()):
+	for i in range(hermes_collection.decks.size()):  # CHANGED: only loop through actual decks
+		if i >= 3:  # Safety check - don't access buttons that don't exist
+			break
+			
 		var button = [deck1_button, deck2_button, deck3_button][i]
+		if not button or not button.visible:  # Skip hidden buttons
+			continue
+			
 		var deck = hermes_collection.decks[i]
 		if deck.is_unlocked("Hermes", god_progress):
 			button.disabled = false
 			button.modulate = Color.WHITE
+			# IMPORTANT: Keep the original deck name, don't reset to generic text
+			button.text = deck.deck_name  # This was missing!
 		else:
 			# Keep locked decks grayed out but clickable
 			button.modulate = Color(0.6, 0.6, 0.6)
 			button.disabled = false
+			button.text = deck.deck_name  # This was missing!
 	
 	# Disable the selected button to show which is selected
-	var selected_button = [deck1_button, deck2_button, deck3_button][index]
-	selected_button.disabled = true
+	var button_array = [deck1_button, deck2_button, deck3_button]
+	if index < button_array.size() and button_array[index].visible:
+		var selected_button = button_array[index]
+		selected_button.disabled = true
+		# Make sure the selected button keeps its deck name too
+		selected_button.text = deck_def.deck_name
 	
 	# Enable/disable start button based on whether deck is unlocked
 	start_game_button.disabled = not is_unlocked
@@ -538,3 +543,4 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 		exp_container.add_child(next_level_label)
 	
 	return card_panel
+	

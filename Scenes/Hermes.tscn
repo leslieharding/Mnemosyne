@@ -21,15 +21,7 @@ text = "Hermes"
 
 [node name="Deck1Button" type="Button" parent="MainContainer/LeftPanel"]
 layout_mode = 2
-text = "Deck 1"
-
-[node name="Deck2Button" type="Button" parent="MainContainer/LeftPanel"]
-layout_mode = 2
-text = "Deck 2"
-
-[node name="Deck3Button" type="Button" parent="MainContainer/LeftPanel"]
-layout_mode = 2
-text = "Deck 3"
+text = "Tricksters"
 
 [node name="Button" type="Button" parent="MainContainer/LeftPanel"]
 layout_mode = 2
@@ -76,3 +68,7 @@ text = "Cards in Deck"
 
 [node name="CardContainer" type="VBoxContainer" parent="MainContainer/RightPanel/CardsContainer"]
 layout_mode = 2
+
+[connection signal="pressed" from="MainContainer/LeftPanel/Deck1Button" to="." method="_on_deck_1_button_pressed"]
+[connection signal="pressed" from="MainContainer/LeftPanel/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="MainContainer/LeftPanel/StartGameButton" to="." method="_on_start_game_button_pressed"]
