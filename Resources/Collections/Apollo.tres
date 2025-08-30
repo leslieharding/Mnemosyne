@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=58 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=54 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
@@ -17,8 +17,6 @@
 [ext_resource type="Script" uid="uid://bsyjru6fxhmp5" path="res://Resources/Abilities/cultivate_ability.gd" id="12_ca26u"]
 [ext_resource type="Script" uid="uid://c25iupuskk6vd" path="res://Resources/Abilities/compel_ability.gd" id="14_xjxyc"]
 [ext_resource type="Script" uid="uid://b7w3v4k1roxv1" path="res://Resources/Abilities/ordain_ability.gd" id="15_b0n1o"]
-[ext_resource type="Script" uid="uid://cgrjfouc2qnld" path="res://Resources/Abilities/pursuit_ability.gd" id="16_cknfu"]
-[ext_resource type="Script" uid="uid://fgbji7hao84c" path="res://Resources/Abilities/dancer_ability.gd" id="17_cknfu"]
 
 [sub_resource type="Resource" id="Resource_gowu1"]
 script = ExtResource("3_p7jhq")
@@ -299,38 +297,22 @@ level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
-[sub_resource type="Resource" id="Resource_4qshc"]
-script = ExtResource("16_cknfu")
-ability_name = "Pursuit"
-description = "If this card can capture, it attacks cards played in the same row/column and moves adjacent to them."
-unlock_level = 0
-trigger_condition = 3
-metadata/_custom_type_script = "uid://cgrjfouc2qnld"
-
 [sub_resource type="Resource" id="Resource_i5ydv"]
 script = ExtResource("1_vqrrp")
 card_name = "The Oracle At Delphi"
 values = Array[int]([9, 9, 9, 9])
 description = "Nothing good will come of asking me, but by all means ask away"
-abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_4qshc")])
+abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
-
-[sub_resource type="Resource" id="Resource_4h8a3"]
-script = ExtResource("17_cknfu")
-ability_name = "Dancer"
-description = "After first playing this, dance to another slot."
-unlock_level = 0
-trigger_condition = 0
-metadata/_custom_type_script = "uid://fgbji7hao84c"
 
 [sub_resource type="Resource" id="Resource_vqeif"]
 script = ExtResource("1_vqrrp")
 card_name = "The Fates"
 values = Array[int]([5, 5, 5, 5])
 description = "What these scissors? Don't you worry my dear just close your eyes"
-abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_4h8a3")])
+abilities = Array[ExtResource("2_gowu1")]([])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
