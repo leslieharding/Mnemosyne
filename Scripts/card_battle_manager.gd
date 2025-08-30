@@ -2694,7 +2694,12 @@ func place_card_on_grid():
 	if selected_card_index == -1 or current_grid_index == -1:
 		return
 	
-	# FIXED: Handle hunt trap removal BEFORE checking if slot is occupied
+	# Handle dance target selection FIRST (but only during dance mode setup)
+	if dance_mode_active and current_dancer_owner == Owner.PLAYER:
+		select_dance_target(current_grid_index)
+		return
+	
+	# Handle hunt trap removal BEFORE checking if slot is occupied
 	if current_grid_index in active_hunts:
 		var hunt_data = active_hunts[current_grid_index]
 		# Only remove if it's our own hunt trap
@@ -2713,11 +2718,63 @@ func place_card_on_grid():
 	if grid_occupied[current_grid_index]:
 		print("Grid slot is already occupied!")
 		return
-
-	# Get the selected card and its collection index
-	var card_data = player_deck[selected_card_index]
+		
+	# Make sure the selected card index is valid
+	if selected_card_index >= player_deck.size():
+		print("Invalid card index: ", selected_card_index)
+		selected_card_index = -1
+		return
+	
+	# Store a reference to the original card data
+	var original_card_data = player_deck[selected_card_index]
 	var card_collection_index = deck_card_indices[selected_card_index]
+	
+	# Get card level for ability checks - UNIFIED VERSION
 	var card_level = get_card_level(card_collection_index)
+	print("Card level for ", original_card_data.card_name, " (index ", card_collection_index, "): ", card_level)
+	
+	# IMPORTANT: Create effective card data for the current level for grid placement
+	var card_data = original_card_data.duplicate(true)  # DEEP COPY
+	var effective_values = original_card_data.get_effective_values(card_level)
+	var effective_abilities = original_card_data.get_effective_abilities(card_level)
+	
+	# Apply stat growth from the run tracker BEFORE other modifications
+	if has_node("/root/RunStatGrowthTrackerAutoload"):
+		var growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
+		effective_values = growth_tracker.apply_growth_to_card_values(effective_values, card_collection_index)
+	
+	# Apply the level-appropriate values and abilities AND growth to the grid copy
+	card_data.values = effective_values.duplicate()
+	card_data.abilities = effective_abilities.duplicate()
+	
+	# FIXED: Apply ordain bonus to the card copy that will be placed on the grid
+	var placing_owner = Owner.PLAYER
+	apply_ordain_bonus_if_applicable(current_grid_index, card_data, placing_owner)
+	
+	print("Grid placement effective values (with growth and ordain): ", card_data.values)
+	print("Grid placement effective abilities count: ", card_data.abilities.size())
+	
+	# Record this play for pattern tracking (if not boss battle)
+	if not is_boss_battle:
+		var tracker = get_node("/root/BossPredictionTrackerAutoload")
+		if tracker:
+			tracker.record_card_play(card_collection_index, current_grid_index)
+	
+	# Check boss prediction if this is a boss battle
+	var boss_prediction_hit = false
+	if is_boss_battle and current_boss_prediction.has("card") and current_boss_prediction.has("position"):
+		if current_boss_prediction["card"] == card_collection_index and current_boss_prediction["position"] == current_grid_index:
+			boss_prediction_hit = true
+			print("BOSS PREDICTION HIT! The boss anticipated your move!")
+	
+	# Check for deck power boosts and apply them to the card
+	var sun_boosted = false
+	if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER and current_grid_index in sunlit_positions and not darkness_shroud_active:
+		print("Sun Power boost activated for card in sunlit position!")
+		for i in range(card_data.values.size()):
+			card_data.values[i] += 2
+		sun_boosted = true
+		print("Card boosted to: ", card_data.values)
 	
 	# Check if this is a Hunt trap trigger (enemy trap)
 	if current_grid_index in active_hunts:
@@ -2741,8 +2798,35 @@ func place_card_on_grid():
 	# Create a card display for the player's card
 	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
 	var card_display = card_display_scene.instantiate()
-	card_display.setup(card_data)
+	
+	# Add the card as a child of the slot panel FIRST
 	slot.add_child(card_display)
+	
+	# Wait one frame to ensure @onready variables are initialized
+	await get_tree().process_frame
+	
+	# NOW setup the card display with the actual card data and level
+	card_display.setup(card_data, card_level, current_god, card_collection_index)
+	
+	# Wait another frame to ensure setup is complete
+	await get_tree().process_frame
+	
+	# Apply special styling for sun-boosted cards
+	if sun_boosted:
+		# Wait to ensure the card display is fully ready before applying styling
+		await get_tree().process_frame
+		apply_sun_boosted_card_styling(card_display)
+	elif boss_prediction_hit:
+		# Create a special style for predicted cards
+		var prediction_hit_style = player_card_style.duplicate()
+		prediction_hit_style.border_color = Color("#FF6B6B")  # Red border for prediction hits
+		prediction_hit_style.border_width_left = 4
+		prediction_hit_style.border_width_top = 4
+		prediction_hit_style.border_width_right = 4
+		prediction_hit_style.border_width_bottom = 4
+		card_display.panel.add_theme_stylebox_override("panel", prediction_hit_style)
+	else:
+		card_display.panel.add_theme_stylebox_override("panel", player_card_style)
 
 	# Connect hover signals for player cards
 	card_display.card_hovered.connect(_on_card_hovered)
