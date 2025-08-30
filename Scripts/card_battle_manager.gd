@@ -2766,6 +2766,17 @@ func place_card_on_grid():
 		if current_boss_prediction["card"] == card_collection_index and current_boss_prediction["position"] == current_grid_index:
 			boss_prediction_hit = true
 			print("BOSS PREDICTION HIT! The boss anticipated your move!")
+			
+			# BOSS EFFECT: Reduce card stats to 1,1,1,1
+			print("Boss effect: Reducing card stats from ", card_data.values, " to [1,1,1,1]")
+			card_data.values[0] = 1  # North
+			card_data.values[1] = 1  # East  
+			card_data.values[2] = 1  # South
+			card_data.values[3] = 1  # West
+			
+			# Trigger the notification
+			if notification_manager:
+				notification_manager.show_notification("I knew you would go there")
 	
 	# Check for deck power boosts and apply them to the card
 	var sun_boosted = false
@@ -2835,29 +2846,33 @@ func place_card_on_grid():
 	print("Player placed ", card_data.card_name, " at slot ", current_grid_index)
 	
 	# Check if the card should get ordain bonus BEFORE executing abilities
-	apply_ordain_bonus_if_applicable(current_grid_index, card_data, Owner.PLAYER)
+	apply_ordain_bonus_if_applicable(current_grid_index, card_data, placing_owner)
 	
-	# EXECUTE ON-PLAY ABILITIES BEFORE COMBAT (but after potential stat changes)
+	print("Final card values after all bonuses: ", card_data.values)
+	
+	# Execute ON_PLAY abilities
 	if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
-		print("Executing on-play abilities for ", card_data.card_name, " at level ", card_level)
+		print("Executing on-play abilities for ", card_data.card_name)
+		
 		var ability_context = {
 			"placed_card": card_data,
 			"grid_position": current_grid_index,
 			"game_manager": self,
-			"card_level": card_level,
-			"placing_owner": Owner.PLAYER
+			"placing_owner": Owner.PLAYER,
+			"card_level": card_level
 		}
 		card_data.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, card_level)
 		
-		# Update the visual display after abilities execute
+		# Update the visual display after abilities execute (in case stats changed)
 		update_card_display(current_grid_index, card_data)
 	
-	# HANDLE PASSIVE ABILITIES
+	# Handle passive abilities when player places card
 	handle_passive_abilities_on_place(current_grid_index, card_data, card_level)
 	
+	# Check for couple union
 	check_for_couple_union(card_data, current_grid_index)
 	
-	# Resolve combat (abilities may have modified stats, and deck powers may have boosted the card)
+	# Resolve combat
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 	if captures > 0:
 		print("Player captured ", captures, " cards!")
@@ -2899,8 +2914,6 @@ func place_card_on_grid():
 	
 	# Switch turns only if no special modes are active
 	turn_manager.next_turn()
-
-
 func handle_passive_abilities_on_place(grid_position: int, card_data: CardResource, card_level: int):
 	# Check if this card has passive abilities
 	if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
