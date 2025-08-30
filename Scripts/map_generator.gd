@@ -10,7 +10,7 @@ static var MAP_HEIGHT: float = 600.0
 static var LAYER_SPACING: float = MAP_HEIGHT / (LAYER_COUNT - 1)
 
 # Generate a complete map
-static func generate_map() -> MapData:
+static func generate_map(god_name: String = "Apollo") -> MapData:
 	var map_data = MapData.new()
 	map_data.total_layers = LAYER_COUNT
 	map_data.layer_node_counts = NODES_PER_LAYER
@@ -42,7 +42,7 @@ static func generate_map() -> MapData:
 	return map_data
 
 # Pre-assign enemies to tiers to ensure each enemy is used exactly once
-static func assign_enemies_to_tiers() -> Dictionary:
+static func assign_enemies_to_tiers(god_name: String = "Apollo") -> Dictionary:
 	var enemies_collection: EnemiesCollection = load("res://Resources/Collections/Enemies.tres")
 	if not enemies_collection:
 		print("ERROR: Could not load enemies collection")
@@ -50,22 +50,41 @@ static func assign_enemies_to_tiers() -> Dictionary:
 	
 	var all_enemies = enemies_collection.get_enemy_names()
 	
-	# Get the first 5 enemies for Apollo runs
-	var apollo_enemies = []
-	for i in range(min(5, all_enemies.size())):
-		apollo_enemies.append(all_enemies[i])
+	# Define god-specific enemy pools
+	var god_enemy_pools = {
+		"Apollo": ["Pythons Gang", "Niobes Brood", "Cultists of Nyx", "The Wrong Note", "The Plague"],
+		"Hermes": ["Rival Merchants", "Crossroads Bandits", "Divine Messengers", "Underworld Gatekeepers", "Olympian Rivals"]
+	}
 	
-	print("Apollo enemies available: ", apollo_enemies)
+	# Get enemies for the current god, fallback to Apollo's enemies if god not found
+	var god_enemies = god_enemy_pools.get(god_name, god_enemy_pools["Apollo"])
+	
+	# Filter to only use enemies that actually exist in the collection
+	var available_enemies = []
+	for enemy_name in god_enemies:
+		if enemy_name in all_enemies:
+			available_enemies.append(enemy_name)
+		else:
+			print("WARNING: Enemy '", enemy_name, "' not found in collection for god ", god_name)
+	
+	# Fallback to first 5 available enemies if we don't have enough god-specific ones
+	if available_enemies.size() < 5:
+		print("Not enough god-specific enemies for ", god_name, ", using general pool")
+		available_enemies = []
+		for i in range(min(5, all_enemies.size())):
+			available_enemies.append(all_enemies[i])
+	
+	print(god_name, " enemies available: ", available_enemies)
 	
 	# Shuffle the enemies randomly
-	apollo_enemies.shuffle()
+	available_enemies.shuffle()
 	
 	# Assign one enemy to each tier (0-4)
 	var tier_assignments = {}
 	for tier in range(5):
-		if tier < apollo_enemies.size():
-			tier_assignments[tier] = apollo_enemies[tier]
-			print("Tier ", tier, " assigned enemy: ", apollo_enemies[tier])
+		if tier < available_enemies.size():
+			tier_assignments[tier] = available_enemies[tier]
+			print("Tier ", tier, " assigned enemy: ", available_enemies[tier])
 		else:
 			# Fallback if we somehow don't have enough enemies
 			tier_assignments[tier] = "Shadow Acolyte"

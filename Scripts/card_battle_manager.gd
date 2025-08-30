@@ -1530,6 +1530,11 @@ func end_game():
 		if current_node.node_type == MapNode.NodeType.BOSS:
 			print("Boss defeated! Run is complete - going directly to run summary")
 			
+			# IMPORTANT: Record the boss encounter BEFORE going to run summary
+			record_enemy_encounter(true)  # true = victory
+			record_god_experience()
+			check_god_unlocks()
+			
 			# Pass data to summary screen with victory
 			get_tree().set_meta("scene_params", {
 				"god": params.get("god", current_god),
@@ -3183,7 +3188,6 @@ func show_reward_screen():
 	})
 	TransitionManagerAutoload.change_scene_to("res://Scenes/RewardScreen.tscn")
 
-# Record memory functions - updated to use current god
 func record_enemy_encounter(victory: bool):
 	if not has_node("/root/MemoryJournalManagerAutoload"):
 		return
@@ -3191,18 +3195,57 @@ func record_enemy_encounter(victory: bool):
 	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
 	var params = get_scene_params()
 	
+	print("=== DEBUG ENEMY ENCOUNTER RECORDING ===")
+	print("Victory: ", victory)
+	print("Scene params: ", params)
+	
 	# Get enemy info from current node
 	var enemy_name = "Shadow Acolyte"  # Default
 	var enemy_difficulty = 0
+	var is_boss = false
 	
 	if params.has("current_node"):
 		var current_node = params["current_node"]
+		print("Current node data:")
+		print("  display_name: '", current_node.display_name, "'")
+		print("  enemy_name: '", current_node.enemy_name, "'")
+		print("  enemy_difficulty: ", current_node.enemy_difficulty)
+		print("  node_type: ", current_node.node_type)
+		print("  NodeType.BOSS constant: ", MapNode.NodeType.BOSS)
+		
 		enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
 		enemy_difficulty = current_node.enemy_difficulty
+		is_boss = current_node.node_type == MapNode.NodeType.BOSS
+		
+		print("Determined values:")
+		print("  enemy_name: '", enemy_name, "'")
+		print("  is_boss: ", is_boss)
 	
-	# Record the encounter with the simplified experience system
+	# Record the encounter
 	memory_manager.record_enemy_encounter(enemy_name, victory, enemy_difficulty)
-	print("Recorded enemy encounter: ", enemy_name, " (victory: ", victory, ", difficulty: ", enemy_difficulty, ")")
+	print("Recorded enemy encounter: '", enemy_name, "' (victory: ", victory, ")")
+	
+	# Check current memory state
+	var enemy_memories = memory_manager.get_all_enemy_memories()
+	print("All enemy memories after recording: ", enemy_memories.keys())
+	if enemy_name in enemy_memories:
+		print("Data for '", enemy_name, "': ", enemy_memories[enemy_name])
+	
+	# Immediately check for god unlocks if this was a victory
+	if victory and has_node("/root/GlobalProgressTrackerAutoload"):
+		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		
+		print("Checking god unlocks...")
+		print("Current unlocked gods: ", progress_tracker.get_unlocked_gods())
+		print("Hermes already unlocked? ", progress_tracker.is_god_unlocked("Hermes"))
+		
+		var newly_unlocked = progress_tracker.check_god_unlocks()
+		print("Newly unlocked gods: ", newly_unlocked)
+		
+		if newly_unlocked.size() > 0:
+			print("Gods unlocked from this victory: ", newly_unlocked)
+	
+	print("=== END DEBUG ===")
 
 func record_god_experience():
 	if not has_node("/root/MemoryJournalManagerAutoload"):

@@ -1,0 +1,76 @@
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=12 format=3 uid="uid://bohl4fgw1kxqu"]
+
+[ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_36081"]
+[ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_kjwo2"]
+[ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_yru28"]
+[ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_82qut"]
+[ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_kjwo2"]
+
+[sub_resource type="Resource" id="Resource_py8us"]
+script = ExtResource("1_36081")
+card_name = "Autolycus"
+values = Array[int]([3, 3, 3, 3])
+description = ""
+abilities = Array[ExtResource("2_kjwo2")]([])
+level_data = Array[ExtResource("3_82qut")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_da35i"]
+script = ExtResource("1_36081")
+card_name = "Odysseus"
+values = Array[int]([4, 4, 4, 4])
+description = ""
+abilities = Array[ExtResource("2_kjwo2")]([])
+level_data = Array[ExtResource("3_82qut")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ayhf2"]
+script = ExtResource("1_36081")
+card_name = "Theseus"
+values = Array[int]([5, 5, 5, 5])
+description = ""
+abilities = Array[ExtResource("2_kjwo2")]([])
+level_data = Array[ExtResource("3_82qut")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_fmj61"]
+script = ExtResource("1_36081")
+card_name = "Pan"
+values = Array[int]([6, 6, 5, 5])
+description = ""
+abilities = Array[ExtResource("2_kjwo2")]([])
+level_data = Array[ExtResource("3_82qut")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_xo81a"]
+script = ExtResource("1_36081")
+card_name = "Eudorus"
+values = Array[int]([2, 7, 3, 6])
+description = ""
+abilities = Array[ExtResource("2_kjwo2")]([])
+level_data = Array[ExtResource("3_82qut")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_cbhf8"]
+script = ExtResource("2_yru28")
+deck_name = "Tricksters"
+deck_description = "Loveable rouges using the power of deception for (usually) honorable means"
+card_indices = Array[int]([0, 1, 2, 3, 4])
+is_starter_deck = false
+required_capture_exp = 0
+required_defense_exp = 0
+deck_power_type = 0
+power_config = {}
+metadata/_custom_type_script = "uid://c4u8pww3jsm12"
+
+[resource]
+script = ExtResource("3_kjwo2")
+god_name = "Hermes"
+cards = Array[ExtResource("1_36081")]([SubResource("Resource_py8us"), SubResource("Resource_da35i"), SubResource("Resource_ayhf2"), SubResource("Resource_fmj61"), SubResource("Resource_xo81a")])
+decks = Array[ExtResource("2_yru28")]([SubResource("Resource_cbhf8")])
+metadata/_custom_type_script = "uid://bdwr18g3ouvfo"

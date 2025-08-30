@@ -94,7 +94,7 @@ func setup_experience_panel():
 
 # Generate a new map for this run
 func generate_new_map():
-	current_map = MapGenerator.generate_map()
+	current_map = MapGenerator.generate_map(selected_god)
 	display_map()
 
 # Display the map visually
