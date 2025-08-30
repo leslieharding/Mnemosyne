@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DancerAbility" load_steps=2 format=3 uid="uid://bwmu42ftacqb6"]
+
+[ext_resource type="Script" uid="uid://fgbji7hao84c" path="res://Resources/Abilities/dancer_ability.gd" id="1_qb67c"]
+
+[resource]
+script = ExtResource("1_qb67c")
+ability_name = "Dancer"
+description = "After first playing this, dance to another slot."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://fgbji7hao84c"

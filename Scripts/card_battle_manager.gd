@@ -34,6 +34,11 @@ var current_compeller_card: CardResource = null
 var active_compel_slot: int = -1  # The slot that opponent must play in
 var compel_target_style: StyleBoxFlat
 
+var dance_mode_active: bool = false
+var current_dancer_position: int = -1
+var current_dancer_owner: Owner = Owner.NONE
+var current_dancer_card: CardResource = null
+
 var ordain_mode_active: bool = false
 var current_ordainer_position: int = -1
 var current_ordainer_owner: Owner = Owner.NONE
@@ -2618,6 +2623,17 @@ func apply_selection_highlight(grid_index: int):
 		slot.add_theme_stylebox_override("panel", selected_grid_style)
 
 func _on_grid_gui_input(event, grid_index):
+	# Handle dance target selection FIRST (but only during dance mode setup)
+	if dance_mode_active and current_dancer_owner == Owner.PLAYER:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				# Only allow dance to empty slots
+				if not grid_occupied[grid_index]:
+					select_dance_target(grid_index)
+				else:
+					print("Cannot dance to occupied slot - can only dance to empty slots")
+				return  # Don't process normal card placement during dance mode
+	
 	# Handle hunt target selection FIRST (but only during hunt mode setup)
 	if hunt_mode_active and current_hunter_owner == Owner.PLAYER:
 		if event is InputEventMouseButton:
@@ -2697,111 +2713,45 @@ func place_card_on_grid():
 	if grid_occupied[current_grid_index]:
 		print("Grid slot is already occupied!")
 		return
-		
-	# Make sure the selected card index is valid
-	if selected_card_index >= player_deck.size():
-		print("Invalid card index: ", selected_card_index)
-		selected_card_index = -1
-		return
-	
-	# Store a reference to the original card data
-	var original_card_data = player_deck[selected_card_index]
+
+	# Get the selected card and its collection index
+	var card_data = player_deck[selected_card_index]
 	var card_collection_index = deck_card_indices[selected_card_index]
-	
-	# Get card level for ability checks - UNIFIED VERSION
 	var card_level = get_card_level(card_collection_index)
-	print("Card level for ", original_card_data.card_name, " (index ", card_collection_index, "): ", card_level)
 	
-	# IMPORTANT: Create effective card data for the current level for grid placement
-	var card_data = original_card_data.duplicate()
-	var effective_values = original_card_data.get_effective_values(card_level)
-	var effective_abilities = original_card_data.get_effective_abilities(card_level)
-	
-	# Apply stat growth from the run tracker BEFORE other modifications
-	if has_node("/root/RunStatGrowthTrackerAutoload"):
-		var growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
-		effective_values = growth_tracker.apply_growth_to_card_values(effective_values, card_collection_index)
-	
-	# Apply the level-appropriate values and abilities AND growth to the grid copy
-	card_data.values = effective_values.duplicate()
-	card_data.abilities = effective_abilities.duplicate()
-	
-	# FIXED: Apply ordain bonus to the card copy that will be placed on the grid
-	var placing_owner = Owner.PLAYER
-	apply_ordain_bonus_if_applicable(current_grid_index, card_data, placing_owner)
-	
-	print("Grid placement effective values (with growth and ordain): ", card_data.values)
-	print("Grid placement effective abilities count: ", card_data.abilities.size())
-	
-	# Record this play for pattern tracking (if not boss battle)
-	if not is_boss_battle:
-		var tracker = get_node("/root/BossPredictionTrackerAutoload")
-		if tracker:
-			tracker.record_card_play(card_collection_index, current_grid_index)
-	
-	# Check boss prediction if this is a boss battle
-	var boss_prediction_hit = false
-	if is_boss_battle and current_boss_prediction.has("card") and current_boss_prediction.has("position"):
-		if current_boss_prediction["card"] == card_collection_index and current_boss_prediction["position"] == current_grid_index:
-			boss_prediction_hit = true
-			print("BOSS PREDICTION HIT! The boss anticipated your move!")
-	
-	# Check for deck power boosts and apply them to the card
-	var sun_boosted = false
-	if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER and current_grid_index in sunlit_positions and not darkness_shroud_active:
-		print("Sun Power boost activated for card in sunlit position!")
-		for i in range(card_data.values.size()):
-			card_data.values[i] += 2
-		sun_boosted = true
-		print("Card boosted to: ", card_data.values)
-	
-	# Store the card data
-	grid_card_data[current_grid_index] = card_data
+	# Check if this is a Hunt trap trigger (enemy trap)
+	if current_grid_index in active_hunts:
+		var hunt_data = active_hunts[current_grid_index]
+		if hunt_data.hunter_owner != Owner.PLAYER:
+			print("Player triggered enemy hunt trap!")
+			check_hunt_trap_trigger(current_grid_index, card_data, Owner.PLAYER)
+			return
+
+	# Mark the slot as occupied and set ownership
 	grid_occupied[current_grid_index] = true
 	grid_ownership[current_grid_index] = Owner.PLAYER
-	grid_to_collection_index[current_grid_index] = card_collection_index
+	grid_card_data[current_grid_index] = card_data
 	
+	# Track this card's collection index for experience
+	grid_to_collection_index[current_grid_index] = card_collection_index
+
 	# Get the slot
 	var slot = grid_slots[current_grid_index]
 	
-	# Create and add the card display
-	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
+	# Create a card display for the player's card
+	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+	var card_display = card_display_scene.instantiate()
+	card_display.setup(card_data)
 	slot.add_child(card_display)
-	
-	# Wait one frame to ensure @onready variables are initialized
-	await get_tree().process_frame
-	
-	# NOW setup the card display with the actual card data and level
-	card_display.setup(card_data, card_level, current_god, card_collection_index)
-	
-	# Wait another frame to ensure setup is complete
-	await get_tree().process_frame
-	
-	# Apply special styling for sun-boosted cards
-	if sun_boosted:
-		# Wait to ensure the card display is fully ready before applying styling
-		await get_tree().process_frame
-		apply_sun_boosted_card_styling(card_display)
-	elif boss_prediction_hit:
-		# Create a special style for predicted cards
-		var prediction_hit_style = player_card_style.duplicate()
-		prediction_hit_style.border_color = Color("#FF6B6B")  # Red border for prediction hits
-		prediction_hit_style.border_width_left = 4
-		prediction_hit_style.border_width_top = 4
-		prediction_hit_style.border_width_right = 4
-		prediction_hit_style.border_width_bottom = 4
-		card_display.panel.add_theme_stylebox_override("panel", prediction_hit_style)
-	else:
-		card_display.panel.add_theme_stylebox_override("panel", player_card_style)
-	
-	# Connect hover signals for grid cards too
+
+	# Connect hover signals for player cards
 	card_display.card_hovered.connect(_on_card_hovered)
 	card_display.card_unhovered.connect(_on_card_unhovered)
+
+	print("Player placed ", card_data.card_name, " at slot ", current_grid_index)
 	
-	print("Card placed on grid at position", current_grid_index)
-	
-	# Check for hunt traps before normal combat (this will only affect enemy hunt traps now)
-	check_hunt_trap_trigger(current_grid_index, card_data, Owner.PLAYER)
+	# Check if the card should get ordain bonus BEFORE executing abilities
+	apply_ordain_bonus_if_applicable(current_grid_index, card_data, Owner.PLAYER)
 	
 	# EXECUTE ON-PLAY ABILITIES BEFORE COMBAT (but after potential stat changes)
 	if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
@@ -2810,7 +2760,8 @@ func place_card_on_grid():
 			"placed_card": card_data,
 			"grid_position": current_grid_index,
 			"game_manager": self,
-			"card_level": card_level
+			"card_level": card_level,
+			"placing_owner": Owner.PLAYER
 		}
 		card_data.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, card_level)
 		
@@ -2826,7 +2777,7 @@ func place_card_on_grid():
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 	if captures > 0:
 		print("Player captured ", captures, " cards!")
-	
+
 	# Update the score display immediately after combat
 	update_game_status()
 
@@ -2858,9 +2809,12 @@ func place_card_on_grid():
 		print("Ordain mode active - staying on player turn for target selection")
 		return
 	
+	if dance_mode_active:
+		print("Dance mode active - staying on turn for target selection")
+		return
+	
 	# Switch turns only if no special modes are active
 	turn_manager.next_turn()
-
 
 
 func handle_passive_abilities_on_place(grid_position: int, card_data: CardResource, card_level: int):
@@ -4546,3 +4500,138 @@ func get_card_level_for_position(grid_index: int) -> int:
 		return get_card_level(collection_index)
 	else:
 		return 1  # Default level for opponent cards or cards without collection mapping
+
+
+func start_dance_mode(dancer_position: int, dancer_owner: Owner, dancer_card: CardResource):
+	dance_mode_active = true
+	current_dancer_position = dancer_position
+	current_dancer_owner = dancer_owner
+	current_dancer_card = dancer_card
+	
+	# Update game status
+	if dancer_owner == Owner.PLAYER:
+		game_status_label.text = "💃 DANCE MODE: Select an empty slot to dance to"
+	else:
+		game_status_label.text = "💃 " + opponent_manager.get_opponent_info().name + " is dancing..."
+		# Auto-select target for opponent
+		call_deferred("opponent_select_dance_target")
+	
+	print("Dance mode activated for ", dancer_card.card_name, " at position ", dancer_position)
+
+func select_dance_target(target_position: int):
+	if not dance_mode_active:
+		return
+	
+	print("Dance target selected: position ", target_position)
+	
+	# Get the dancer card data from the original position
+	var dancer_card = current_dancer_card
+	var original_position = current_dancer_position
+	var dancing_owner = current_dancer_owner
+	
+	# End dance mode first
+	dance_mode_active = false
+	current_dancer_position = -1
+	current_dancer_owner = Owner.NONE
+	current_dancer_card = null
+	
+	# Move the card from original position to target position
+	execute_dance_move(original_position, target_position, dancer_card, dancing_owner)
+
+func execute_dance_move(from_position: int, to_position: int, dancer_card: CardResource, dancing_owner: Owner):
+	print("Executing dance move from position ", from_position, " to position ", to_position)
+	
+	# Get card collection info before clearing original position
+	var card_collection_index = get_card_collection_index_for_dance(from_position)
+	var card_level = get_card_level(card_collection_index)
+	
+	# Clear the original position
+	clear_grid_slot(from_position)
+	
+	# Place the card at the new position
+	grid_occupied[to_position] = true
+	grid_ownership[to_position] = dancing_owner
+	grid_card_data[to_position] = dancer_card
+	
+	# Update grid to collection mapping for the new position
+	if card_collection_index != -1:
+		grid_to_collection_index[to_position] = card_collection_index
+		grid_to_collection_index.erase(from_position)
+	
+	# Create the visual card display at the new position
+	var slot = grid_slots[to_position]
+	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+	var card_display = card_display_scene.instantiate()
+	card_display.setup(dancer_card)
+	slot.add_child(card_display)
+	
+	# Execute placement effects at new location (like ordain bonus)
+	if dancing_owner == Owner.PLAYER:
+		apply_ordain_bonus_if_applicable(to_position, dancer_card, dancing_owner)
+	
+	# Handle passive abilities at new position
+	handle_passive_abilities_on_place(to_position, dancer_card, card_level)
+	
+	# Check for couple union at new position
+	check_for_couple_union(dancer_card, to_position)
+	
+	# Resolve combat at the new position
+	var captures = resolve_combat(to_position, dancing_owner, dancer_card)
+	if captures > 0:
+		print("Dancer captured ", captures, " cards after dancing!")
+	
+	# Update displays
+	update_card_display(to_position, dancer_card)
+	update_game_status()
+	
+	# Check if game should end
+	if should_game_end():
+		end_game()
+		return
+	
+	# Switch turns after dance is complete
+	print("Dance complete - switching turns")
+	turn_manager.next_turn()
+
+func get_card_collection_index_for_dance(original_position: int) -> int:
+	return grid_to_collection_index.get(original_position, -1)
+
+func clear_grid_slot(position: int):
+	grid_occupied[position] = false
+	grid_ownership[position] = Owner.NONE
+	grid_card_data[position] = null
+	
+	# Remove visual display
+	var slot = grid_slots[position]
+	for child in slot.get_children():
+		child.queue_free()
+	
+	# Clear passive abilities
+	if position in active_passive_abilities:
+		active_passive_abilities.erase(position)
+
+func opponent_select_dance_target():
+	if not dance_mode_active:
+		return
+	
+	# Simple AI: pick a random empty slot
+	var possible_targets = []
+	
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:  # Only empty slots
+			possible_targets.append(i)
+	
+	var target_position = -1
+	if possible_targets.size() > 0:
+		target_position = possible_targets[randi() % possible_targets.size()]
+	
+	if target_position != -1:
+		select_dance_target(target_position)
+
+func clear_all_dance_constraints():
+	if dance_mode_active:
+		dance_mode_active = false
+		current_dancer_position = -1
+		current_dancer_owner = Owner.NONE
+		current_dancer_card = null
+		print("All dance constraints cleared")

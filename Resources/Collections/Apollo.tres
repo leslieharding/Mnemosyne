@@ -18,7 +18,7 @@
 [ext_resource type="Script" uid="uid://c25iupuskk6vd" path="res://Resources/Abilities/compel_ability.gd" id="14_xjxyc"]
 [ext_resource type="Script" uid="uid://b7w3v4k1roxv1" path="res://Resources/Abilities/ordain_ability.gd" id="15_b0n1o"]
 [ext_resource type="Script" uid="uid://cgrjfouc2qnld" path="res://Resources/Abilities/pursuit_ability.gd" id="16_cknfu"]
-[ext_resource type="Script" uid="uid://ntyy1yqk7iga" path="res://Resources/Abilities/fortify_ability.gd" id="16_tn03x"]
+[ext_resource type="Script" uid="uid://fgbji7hao84c" path="res://Resources/Abilities/dancer_ability.gd" id="17_cknfu"]
 
 [sub_resource type="Resource" id="Resource_gowu1"]
 script = ExtResource("3_p7jhq")
@@ -318,17 +318,17 @@ uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4h8a3"]
-script = ExtResource("16_tn03x")
-ability_name = "Fortify"
-description = "When this card is in a corner slot it has +2 stats."
+script = ExtResource("17_cknfu")
+ability_name = "Dancer"
+description = "After first playing this, dance to another slot."
 unlock_level = 0
-trigger_condition = 3
-metadata/_custom_type_script = "uid://ntyy1yqk7iga"
+trigger_condition = 0
+metadata/_custom_type_script = "uid://fgbji7hao84c"
 
 [sub_resource type="Resource" id="Resource_vqeif"]
 script = ExtResource("1_vqrrp")
 card_name = "The Fates"
-values = Array[int]([1, 1, 1, 1])
+values = Array[int]([5, 5, 5, 5])
 description = "What these scissors? Don't you worry my dear just close your eyes"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_4h8a3")])
 level_data = Array[ExtResource("4_2h7tk")]([])
