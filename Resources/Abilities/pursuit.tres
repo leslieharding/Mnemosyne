@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PursuitAbility" load_steps=2 format=3 uid="uid://bd2qug4182mkm"]
+
+[ext_resource type="Script" uid="uid://cgrjfouc2qnld" path="res://Resources/Abilities/pursuit_ability.gd" id="1_c0rl0"]
+
+[resource]
+script = ExtResource("1_c0rl0")
+ability_name = "Pursuit"
+description = "If this card can capture, it attacks cards played in the same row/column and moves adjacent to them."
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cgrjfouc2qnld"

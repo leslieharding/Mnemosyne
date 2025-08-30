@@ -1362,6 +1362,10 @@ func _on_opponent_card_placed(grid_index: int):
 	# Update the score display immediately after combat
 	update_game_status()
 	
+	# NEW: CHECK FOR PURSUIT TRIGGERS AFTER OPPONENT'S TURN IS COMPLETE
+	print("Checking for Pursuit ability triggers...")
+	check_pursuit_triggers(grid_index, opponent_card_data)
+	
 	# Clear the thinking flag since opponent finished their turn
 	opponent_is_thinking = false
 	print("Opponent finished turn - setting thinking flag to false")
@@ -4310,3 +4314,235 @@ func handle_ordain_turn_expiration():
 		if active_ordain_turns_remaining <= 0:
 			print("Ordain effect expired after 3 turns")
 			remove_ordain_effect()
+
+
+# Check for Pursuit ability triggers when opponent plays a card
+func check_pursuit_triggers(opponent_position: int, opponent_card: CardResource):
+	print("Checking for Pursuit triggers after opponent played at position ", opponent_position)
+	
+	var pursuit_candidates = []
+	
+	# Check all occupied positions for cards with Pursuit ability
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:
+			continue
+			
+		var card = get_card_at_position(i)
+		var owner = get_owner_at_position(i)
+		
+		# Only check player's cards (pursuit against opponent)
+		if owner != Owner.PLAYER:
+			continue
+		
+		var card_level = get_card_level_for_position(i)
+		if not card.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			continue
+		
+		# Check if this card has Pursuit ability
+		var has_pursuit = false
+		for ability in card.get_available_abilities(card_level):
+			if ability.ability_name == "Pursuit":
+				has_pursuit = true
+				break
+		
+		if not has_pursuit:
+			continue
+		
+		print("Found Pursuit card: ", card.card_name, " at position ", i)
+		
+		# Check if this Pursuit card can target the opponent's new card
+		var pursuit_data = check_pursuit_conditions(i, card, opponent_position, opponent_card)
+		if pursuit_data != null:
+			pursuit_candidates.append(pursuit_data)
+	
+	# If we have multiple candidates, only activate the lowest slot number
+	if pursuit_candidates.size() > 1:
+		print("Multiple Pursuit triggers found - selecting lowest slot number")
+		pursuit_candidates.sort_custom(func(a, b): return a.pursuit_position < b.pursuit_position)
+		
+		# Only keep the first (lowest slot) candidate
+		var selected_candidate = pursuit_candidates[0]
+		print("Selected Pursuit candidate at position ", selected_candidate.pursuit_position)
+		pursuit_candidates = [selected_candidate]
+	
+	# Execute Pursuit if we have a valid candidate
+	if pursuit_candidates.size() == 1:
+		execute_pursuit(pursuit_candidates[0])
+
+func check_pursuit_conditions(pursuit_position: int, pursuit_card: CardResource, target_position: int, target_card: CardResource):
+	"""Check if a Pursuit card can target the given opponent card. Returns pursuit data Dictionary if valid, null if not."""
+	
+	print("Checking Pursuit conditions: position ", pursuit_position, " targeting position ", target_position)
+	
+	# Check if pursuit and target are in same row or column
+	var same_row_column = are_in_same_row_or_column(pursuit_position, target_position)
+	if not same_row_column.is_valid:
+		print("  Not in same row/column - Pursuit cannot trigger")
+		return null
+	
+	print("  Same ", same_row_column.type, " - checking for empty slot between")
+	
+	# Check if there's exactly one empty slot between them
+	var empty_slot = find_empty_slot_between(pursuit_position, target_position)
+	if empty_slot == -1:
+		print("  No empty slot between positions - Pursuit cannot trigger")
+		return null
+	
+	print("  Found empty slot at position ", empty_slot)
+	
+	# Determine attack direction from pursuit to target
+	var attack_direction = get_attack_direction(empty_slot, target_position)
+	if attack_direction == -1:
+		print("  Could not determine attack direction - Pursuit cannot trigger")
+		return null
+	
+	print("  Attack direction: ", get_direction_name_from_index(attack_direction))
+	
+	# Simulate combat to see if Pursuit would win
+	var pursuit_value = pursuit_card.values[attack_direction]
+	var defense_direction = get_opposite_direction(attack_direction)
+	var target_value = target_card.values[defense_direction]
+	
+	print("  Combat simulation: Pursuit ", pursuit_value, " vs Target ", target_value)
+	
+	if pursuit_value <= target_value:
+		print("  Pursuit would not win combat - cannot trigger")
+		return null
+	
+	print("  Pursuit would win combat - trigger valid!")
+	
+	return {
+		"pursuit_position": pursuit_position,
+		"pursuit_card": pursuit_card,
+		"target_position": target_position,
+		"target_card": target_card,
+		"move_to_position": empty_slot,
+		"attack_direction": attack_direction,
+		"row_or_column": same_row_column.type
+	}
+
+func are_in_same_row_or_column(pos1: int, pos2: int) -> Dictionary:
+	"""Check if two positions are in same row or column. Returns {is_valid: bool, type: String}"""
+	
+	var x1 = pos1 % grid_size
+	var y1 = pos1 / grid_size
+	var x2 = pos2 % grid_size
+	var y2 = pos2 / grid_size
+	
+	if y1 == y2:
+		return {"is_valid": true, "type": "row"}
+	elif x1 == x2:
+		return {"is_valid": true, "type": "column"}
+	else:
+		return {"is_valid": false, "type": ""}
+
+func find_empty_slot_between(pos1: int, pos2: int) -> int:
+	"""Find empty slot between two positions. Returns position index or -1 if none/multiple."""
+	
+	var x1 = pos1 % grid_size
+	var y1 = pos1 / grid_size
+	var x2 = pos2 % grid_size
+	var y2 = pos2 / grid_size
+	
+	var empty_positions = []
+	
+	if y1 == y2:  # Same row
+		var min_x = min(x1, x2)
+		var max_x = max(x1, x2)
+		
+		for x in range(min_x + 1, max_x):
+			var check_pos = y1 * grid_size + x
+			if not grid_occupied[check_pos]:
+				empty_positions.append(check_pos)
+	
+	elif x1 == x2:  # Same column
+		var min_y = min(y1, y2)
+		var max_y = max(y1, y2)
+		
+		for y in range(min_y + 1, max_y):
+			var check_pos = y * grid_size + x1
+			if not grid_occupied[check_pos]:
+				empty_positions.append(check_pos)
+	
+	# Return position if exactly one empty slot, otherwise -1
+	if empty_positions.size() == 1:
+		return empty_positions[0]
+	else:
+		return -1
+
+func get_attack_direction(attacker_pos: int, defender_pos: int) -> int:
+	"""Get the direction from attacker to defender position"""
+	
+	var x1 = attacker_pos % grid_size
+	var y1 = attacker_pos / grid_size
+	var x2 = defender_pos % grid_size
+	var y2 = defender_pos / grid_size
+	
+	# Determine direction
+	if y2 < y1:  # Target is north
+		return 0
+	elif x2 > x1:  # Target is east
+		return 1
+	elif y2 > y1:  # Target is south
+		return 2
+	elif x2 < x1:  # Target is west
+		return 3
+	else:
+		return -1  # Same position (shouldn't happen)
+
+
+
+func get_direction_name_from_index(direction: int) -> String:
+	"""Get direction name for debugging"""
+	match direction:
+		0: return "North"
+		1: return "East"
+		2: return "South"
+		3: return "West"
+		_: return "Unknown"
+
+func execute_pursuit(pursuit_data: Dictionary):
+	"""Execute a Pursuit ability with the given data"""
+	
+	print("EXECUTING PURSUIT ABILITY")
+	print("  Pursuit card: ", pursuit_data.pursuit_card.card_name, " at position ", pursuit_data.pursuit_position)
+	print("  Target card: ", pursuit_data.target_card.card_name, " at position ", pursuit_data.target_position)
+	print("  Moving to position: ", pursuit_data.move_to_position)
+	print("  Attack direction: ", get_direction_name_from_index(pursuit_data.attack_direction))
+	
+	# Find the Pursuit ability instance
+	var pursuit_position = pursuit_data.pursuit_position
+	var pursuit_card = pursuit_data.pursuit_card
+	var card_level = get_card_level_for_position(pursuit_position)
+	
+	var pursuit_ability = null
+	for ability in pursuit_card.get_available_abilities(card_level):
+		if ability.ability_name == "Pursuit":
+			pursuit_ability = ability
+			break
+	
+	if not pursuit_ability:
+		print("ERROR: Could not find Pursuit ability on card")
+		return
+	
+	# Create context for the ability execution
+	var context = {
+		"pursuit_card": pursuit_data.pursuit_card,
+		"pursuit_position": pursuit_data.pursuit_position,
+		"target_card": pursuit_data.target_card,
+		"target_position": pursuit_data.target_position,
+		"move_to_position": pursuit_data.move_to_position,
+		"direction": pursuit_data.attack_direction,
+		"game_manager": self
+	}
+	
+	# Execute the Pursuit ability
+	pursuit_ability.execute(context)
+
+func get_card_level_for_position(grid_index: int) -> int:
+	"""Get the card level for a card at a specific grid position"""
+	var collection_index = get_card_collection_index(grid_index)
+	if collection_index != -1:
+		return get_card_level(collection_index)
+	else:
+		return 1  # Default level for opponent cards or cards without collection mapping
