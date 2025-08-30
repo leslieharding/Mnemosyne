@@ -1,0 +1,76 @@
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=12 format=3 uid="uid://dge036mhxwgf3"]
+
+[ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_tlqne"]
+[ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_u83m1"]
+[ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_yuo20"]
+[ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_0jfb3"]
+[ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_u83m1"]
+
+[sub_resource type="Resource" id="Resource_n8857"]
+script = ExtResource("1_tlqne")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_u83m1")]([])
+level_data = Array[ExtResource("3_0jfb3")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_rpmeo"]
+script = ExtResource("1_tlqne")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_u83m1")]([])
+level_data = Array[ExtResource("3_0jfb3")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_botxv"]
+script = ExtResource("1_tlqne")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_u83m1")]([])
+level_data = Array[ExtResource("3_0jfb3")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_388jm"]
+script = ExtResource("1_tlqne")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_u83m1")]([])
+level_data = Array[ExtResource("3_0jfb3")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_8m3l0"]
+script = ExtResource("1_tlqne")
+card_name = ""
+values = Array[int]([1, 1, 1, 1])
+description = ""
+abilities = Array[ExtResource("2_u83m1")]([])
+level_data = Array[ExtResource("3_0jfb3")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ew5s6"]
+script = ExtResource("2_yuo20")
+deck_name = "Libertas"
+deck_description = "In vino veritas"
+card_indices = Array[int]([])
+is_starter_deck = true
+required_capture_exp = 0
+required_defense_exp = 0
+deck_power_type = 0
+power_config = {}
+metadata/_custom_type_script = "uid://c4u8pww3jsm12"
+
+[resource]
+script = ExtResource("3_u83m1")
+god_name = ""
+cards = Array[ExtResource("1_tlqne")]([SubResource("Resource_n8857"), SubResource("Resource_rpmeo"), SubResource("Resource_botxv"), SubResource("Resource_388jm"), SubResource("Resource_8m3l0")])
+decks = Array[ExtResource("2_yuo20")]([SubResource("Resource_ew5s6")])
+metadata/_custom_type_script = "uid://bdwr18g3ouvfo"
