@@ -7,7 +7,6 @@ func _init():
 	description = "When this card is captured, it also captures the card that captured it"
 	trigger_condition = TriggerType.ON_CAPTURE
 
-# Replace the entire execute function in Resources/Abilities/toxic_ability.gd
 
 func execute(context: Dictionary) -> bool:
 	if not can_execute(context):
@@ -41,6 +40,17 @@ func execute(context: Dictionary) -> bool:
 	
 	if not game_manager:
 		print("ToxicAbility: No game manager provided")
+		return false
+	
+	# NEW: Check if the capturing card is a Trojan Horse - if so, skip toxic effect
+	if capturing_card.card_name == "Trojan Horse":
+		print("ToxicAbility: Capturing card is a Trojan Horse - skipping toxic counter-capture to prevent interaction issues")
+		return false
+	
+	# Check if the capturing card's direction indicates this is a trojan reversal
+	var direction = context.get("direction", "")
+	if direction == "trojan_reversal":
+		print("ToxicAbility: This is a trojan reversal scenario - skipping toxic counter-capture")
 		return false
 	
 	# FIXED: Get the owner of the toxic card AFTER it was captured (the new owner)

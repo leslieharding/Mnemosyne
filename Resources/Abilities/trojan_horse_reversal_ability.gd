@@ -3,7 +3,7 @@ class_name TrojanHorseReversalAbility
 extends CardAbility
 
 func _init():
-	ability_name = "Trojan Horse Trap"
+	ability_name = "Its just a horse"
 	description = "When this horse would be captured, capture the attacking card instead, then remove the horse."
 	trigger_condition = TriggerType.ON_CAPTURE
 
@@ -18,11 +18,19 @@ func execute(context: Dictionary) -> bool:
 	var game_manager = context.get("game_manager")
 	var attacking_owner = context.get("attacking_owner")
 	
+	# Add null checks to prevent crashes
+	if not defending_card:
+		print("TrojanHorseReversalAbility: defending_card is null!")
+		return false
+	if not attacking_card:
+		print("TrojanHorseReversalAbility: attacking_card is null!")
+		return false
+	
 	print("TrojanHorseReversalAbility: Trap triggered!")
 	print("  Attacking card: ", attacking_card.card_name, " at position ", attacking_position)
 	print("  Defending horse: ", defending_card.card_name, " at position ", defending_position)
 	
-	if not attacking_card or not defending_card or attacking_position == -1 or defending_position == -1 or not game_manager:
+	if attacking_position == -1 or defending_position == -1 or not game_manager:
 		print("TrojanHorseReversalAbility: Missing required context data")
 		return false
 	
@@ -65,7 +73,5 @@ func execute(context: Dictionary) -> bool:
 	return true
 
 func can_execute(context: Dictionary) -> bool:
-	# This ability should only execute if the horse would normally be captured
-	# The context should contain combat information showing the horse is being defeated
-	var would_be_captured = context.get("would_be_captured", false)
-	return would_be_captured
+	# Remove the would_be_captured check since we'll handle this in the battle manager
+	return true

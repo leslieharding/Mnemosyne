@@ -5001,20 +5001,24 @@ func clear_all_trojan_horses():
 	current_trojan_summoner_card = null
 	print("All trojan horses cleared")
 
-# Check if a card has trojan horse reversal ability (called before normal capture)
 func check_trojan_horse_reversal(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource, attacking_owner: Owner) -> bool:
+	# Add null checks first to prevent crashes
+	if not defending_card or not attacking_card:
+		print("check_trojan_horse_reversal: Null card detected - defending_card: ", defending_card, ", attacking_card: ", attacking_card)
+		return false
+	
 	# Check if the defending card is a Trojan Horse with reversal ability
 	if defending_card.card_name != "Trojan Horse":
 		return false
 	
-	# Check if it has the reversal ability
-	var has_reversal = false
+	# Check if it has the reversal ability and get the specific ability instance
+	var reversal_ability = null
 	for ability in defending_card.abilities:
-		if ability.ability_name == "Trojan Horse Trap":
-			has_reversal = true
+		if ability.ability_name == "Its just a horse":  # Match the actual ability name in the collection
+			reversal_ability = ability
 			break
 	
-	if not has_reversal:
+	if not reversal_ability:
 		return false
 	
 	print("=== TROJAN HORSE TRAP ACTIVATED ===")
@@ -5022,37 +5026,23 @@ func check_trojan_horse_reversal(defender_pos: int, defending_card: CardResource
 	print("  Trojan Horse at position: ", defender_pos)
 	print("  Reversing capture - attacking card will be captured instead!")
 	
-	# REVERSE THE CAPTURE: Instead of horse being captured, capture the attacking card
-	var horse_owner = get_owner_at_position(defender_pos)  # Should be PLAYER
-	set_card_ownership(attacker_pos, horse_owner)
+	# Create the proper context for the reversal ability
+	var reversal_context = {
+		"defending_card": defending_card,
+		"attacking_card": attacking_card,
+		"defending_position": defender_pos,
+		"attacking_position": attacker_pos,
+		"game_manager": self,
+		"attacking_owner": attacking_owner,
+		"would_be_captured": true  # This indicates the horse would normally be captured
+	}
 	
-	# Execute ON_CAPTURE abilities on the captured attacking card
-	var attacking_card_collection_index = get_card_collection_index(attacker_pos)
-	var attacking_card_level = 1  # Default level for enemy cards
-	if attacking_owner == Owner.PLAYER and attacking_card_collection_index != -1:
-		attacking_card_level = get_card_level(attacking_card_collection_index)
+	# Execute the actual reversal ability instead of handling it manually
+	var reversal_successful = reversal_ability.execute(reversal_context)
 	
-	if attacking_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, attacking_card_level):
-		print("TrojanHorse: Executing ON_CAPTURE abilities for captured attacking card: ", attacking_card.card_name)
-		
-		var capture_context = {
-			"capturing_card": defending_card,  # The horse "captures" the attacker
-			"capturing_position": defender_pos,
-			"captured_card": attacking_card,
-			"captured_position": attacker_pos,
-			"game_manager": self,
-			"direction": "trojan_reversal",
-			"card_level": attacking_card_level
-		}
-		
-		attacking_card.execute_abilities(CardAbility.TriggerType.ON_CAPTURE, capture_context, attacking_card_level)
+	if reversal_successful:
+		print("=== TROJAN HORSE TRAP COMPLETED ===")
+	else:
+		print("=== TROJAN HORSE TRAP FAILED ===")
 	
-	# Remove the trojan horse from the board after the reversal
-	print("TrojanHorse: Removing trojan horse from board position ", defender_pos)
-	remove_trojan_horse(defender_pos)
-	
-	# Update board visuals
-	update_board_visuals()
-	
-	print("=== TROJAN HORSE TRAP COMPLETED ===")
-	return true  # Return true to indicate the reversal happened
+	return reversal_successful
