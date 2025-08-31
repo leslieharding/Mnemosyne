@@ -99,6 +99,20 @@ func _on_demeter_button_pressed() -> void:
 	else:
 		show_unlock_requirements("Demeter")
 
+func _on_dionysus_button_pressed() -> void:
+	if is_god_available("Dionysus"):
+		TransitionManagerAutoload.change_scene_to("res://Scenes/Dionysus.tscn")
+	else:
+		show_unlock_requirements("Dionysus")
+
+
+func _on_athena_button_pressed() -> void:
+	if is_god_available("Athena"):
+		TransitionManagerAutoload.change_scene_to("res://Scenes/Athena.tscn")
+	else:
+		show_unlock_requirements("Athena")
+
+
 func is_god_available(god_name: String) -> bool:
 	if not has_node("/root/GlobalProgressTrackerAutoload"):
 		return god_name == "Apollo"  # Fallback

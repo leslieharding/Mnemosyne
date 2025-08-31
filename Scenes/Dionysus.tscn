@@ -68,3 +68,7 @@ text = "Cards in Deck"
 
 [node name="CardContainer" type="VBoxContainer" parent="MainContainer/RightPanel/CardsContainer"]
 layout_mode = 2
+
+[connection signal="pressed" from="MainContainer/LeftPanel/Deck1Button" to="." method="_on_deck_1_button_pressed"]
+[connection signal="pressed" from="MainContainer/LeftPanel/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="MainContainer/LeftPanel/StartGameButton" to="." method="_on_start_game_button_pressed"]

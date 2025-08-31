@@ -101,3 +101,5 @@ script = ExtResource("2_1fq1s")
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/ArtemisButton" to="." method="_on_artemis_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/DemeterButton" to="." method="_on_demeter_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/AphroditeButton" to="." method="_on_aphrodite_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/DionysusButton" to="." method="_on_dionysus_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/AthenaButton" to="." method="_on_athena_button_pressed"]
