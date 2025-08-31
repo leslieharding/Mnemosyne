@@ -48,6 +48,12 @@ var ordain_target_style: StyleBoxFlat
 var active_ordain_owner: Owner = Owner.NONE  # Track who created the ordain effect
 var active_ordain_turns_remaining: int = 0  # Track how many turns until ordain expires
 
+# Trojan horse mode tracking
+var trojan_horse_mode_active: bool = false
+var current_trojan_summoner_position: int = -1
+var current_trojan_summoner_owner: Owner = Owner.NONE
+var current_trojan_summoner_card: CardResource = null
+var active_trojan_horses: Array[int] = []  # Track positions of active trojan horses
 
 var couple_definitions = {
 	"Phaeton": "Cygnus",
@@ -1141,10 +1147,16 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 					
 					if my_value > their_value:
 						print("Captured card at slot ", adj_index, "!")
-						captures.append(adj_index)
 						
-						# Execute abilities and award experience (existing logic)
-						handle_standard_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction)
+						# NEW: Check for Trojan Horse reversal BEFORE adding to captures
+						var trojan_reversal_occurred = check_trojan_horse_reversal(adj_index, adjacent_card, grid_index, attacking_card, attacking_owner)
+						
+						if not trojan_reversal_occurred:
+							# Normal capture - only add to captures if trojan reversal didn't happen
+							captures.append(adj_index)
+							
+							# Execute abilities and award experience (existing logic)
+							handle_standard_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction)
 					else:
 						# Defense successful
 						handle_standard_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction)
@@ -1228,10 +1240,16 @@ func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, atta
 				
 				if my_attack_value > their_defense_value:
 					print("Extended range captured card at slot ", adj_index, "!")
-					captures.append(adj_index)
 					
-					# Handle combat effects
-					handle_extended_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
+					# NEW: Check for Trojan Horse reversal BEFORE adding to captures
+					var trojan_reversal_occurred = check_trojan_horse_reversal(adj_index, adjacent_card, grid_index, attacking_card, attacking_owner)
+					
+					if not trojan_reversal_occurred:
+						# Normal capture - only add to captures if trojan reversal didn't happen
+						captures.append(adj_index)
+						
+						# Handle combat effects
+						handle_extended_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
 				else:
 					# Defense successful
 					handle_extended_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
@@ -1398,14 +1416,23 @@ func _on_opponent_card_placed(grid_index: int):
 	# Switch turns - this should make it the player's turn
 	turn_manager.next_turn()
 
-# Check if the game should end
 func should_game_end() -> bool:
-	# Game ends if board is full or both players are out of cards
+	# Check board fullness
 	var available_slots = 0
 	for occupied in grid_occupied:
 		if not occupied:
 			available_slots += 1
 	
+	# If board is full, clean up trojan horses first
+	if available_slots == 0:
+		check_trojan_horse_cleanup()
+		# Re-check after cleanup
+		available_slots = 0
+		for occupied in grid_occupied:
+			if not occupied:
+				available_slots += 1
+	
+	# Game ends if board is full or both players are out of cards
 	return available_slots == 0 or (player_deck.is_empty() and not opponent_manager.has_cards())
 
 
@@ -1418,6 +1445,7 @@ func end_game():
 	clear_all_hunt_traps()
 	clear_all_compel_constraints()
 	clear_all_ordain_effects()
+	clear_all_trojan_horses()
 	
 	var tracker = get_node("/root/BossPredictionTrackerAutoload")
 	if tracker:
@@ -2685,6 +2713,17 @@ func _on_grid_gui_input(event, grid_index):
 					print("Cannot ordain occupied slot - can only ordain empty slots")
 				return  # Don't process normal card placement during ordain mode
 	
+	# Handle trojan horse target selection (only during trojan horse mode setup)
+	if trojan_horse_mode_active and current_trojan_summoner_owner == Owner.PLAYER:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				# Only allow trojan horse on empty slots
+				if not grid_occupied[grid_index]:
+					select_trojan_horse_target(grid_index)
+				else:
+					print("Cannot deploy trojan horse on occupied slot - can only deploy on empty slots")
+				return  # Don't process normal card placement during trojan horse mode
+	
 	if not turn_manager.is_player_turn():
 		return
 		
@@ -2928,6 +2967,10 @@ func place_card_on_grid():
 	
 	if dance_mode_active:
 		print("Dance mode active - staying on turn for target selection")
+		return
+	
+	if trojan_horse_mode_active:
+		print("Trojan Horse mode active - staying on player turn for target selection")
 		return
 	
 	# Switch turns only if no special modes are active
@@ -4804,3 +4847,212 @@ func clear_all_dance_constraints():
 		current_dancer_owner = Owner.NONE
 		current_dancer_card = null
 		print("All dance constraints cleared")
+
+
+# Start trojan horse deployment mode
+func start_trojan_horse_mode(summoner_position: int, summoner_owner: Owner, summoner_card: CardResource):
+	trojan_horse_mode_active = true
+	current_trojan_summoner_position = summoner_position
+	current_trojan_summoner_owner = summoner_owner
+	current_trojan_summoner_card = summoner_card
+	
+	# Update game status
+	if summoner_owner == Owner.PLAYER:
+		game_status_label.text = "🐴 TROJAN HORSE: Select a slot to deploy the trojan horse"
+	else:
+		# This shouldn't happen since it's player-only, but just in case
+		game_status_label.text = "🐴 " + opponent_manager.get_opponent_info().name + " is deploying a trojan horse..."
+	
+	print("Trojan Horse mode activated for ", summoner_card.card_name, " at position ", summoner_position)
+
+# Select target slot for trojan horse deployment
+func select_trojan_horse_target(target_position: int):
+	if not trojan_horse_mode_active:
+		return
+	
+	print("Trojan Horse target selected: position ", target_position)
+	
+	# Deploy the trojan horse card at the selected position
+	deploy_trojan_horse(target_position)
+	
+	# End trojan horse mode
+	trojan_horse_mode_active = false
+	current_trojan_summoner_position = -1
+	current_trojan_summoner_owner = Owner.NONE
+	current_trojan_summoner_card = null
+	
+	# Update game status
+	game_status_label.text = "Trojan Horse deployed! The trap is set..."
+	
+	# Switch turns - trojan horse deployment completes the turn
+	print("Trojan Horse deployed - switching turns")
+	turn_manager.next_turn()
+
+# Deploy the actual trojan horse card
+func deploy_trojan_horse(target_position: int):
+	print("Deploying Trojan Horse at position ", target_position)
+	
+	# Get the Trojan Horse card from Hermes collection (index 5)
+	var hermes_collection = load("res://Resources/Collections/Hermes.tres") as GodCardCollection
+	if not hermes_collection:
+		print("ERROR: Could not load Hermes collection")
+		return
+	
+	print("Hermes collection loaded. Cards count: ", hermes_collection.cards.size())
+	
+	if hermes_collection.cards.size() <= 5:
+		print("ERROR: Hermes collection doesn't have enough cards (needs at least 6 for index 5)")
+		print("Available cards:")
+		for i in range(hermes_collection.cards.size()):
+			print("  Index ", i, ": ", hermes_collection.cards[i].card_name)
+		return
+	
+	var trojan_horse_card = hermes_collection.cards[5]  # Trojan Horse at index 5
+	
+	print("Retrieved Trojan Horse card:")
+	print("  Name: ", trojan_horse_card.card_name)
+	print("  Values: ", trojan_horse_card.values)
+	print("  Description: ", trojan_horse_card.description)
+	
+	# Validate the card data
+	if trojan_horse_card.card_name != "Trojan Horse":
+		print("WARNING: Expected 'Trojan Horse' but got '", trojan_horse_card.card_name, "'")
+	
+	if trojan_horse_card.values != [0, 0, 0, 0]:
+		print("WARNING: Expected [0,0,0,0] values but got ", trojan_horse_card.values)
+	
+	# Set up the card data structures
+	grid_card_data[target_position] = trojan_horse_card
+	grid_occupied[target_position] = true
+	grid_ownership[target_position] = Owner.PLAYER  # Always owned by player
+	
+	# Track this as an active trojan horse
+	active_trojan_horses.append(target_position)
+	
+	# Create and display the card visually
+	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
+	
+	var slot = grid_slots[target_position]
+	# Clear any existing content
+	for child in slot.get_children():
+		child.queue_free()
+	slot.add_child(card_display)
+	
+	# Wait one frame to ensure @onready variables are initialized
+	await get_tree().process_frame
+	
+	# Setup the card display with proper parameters
+	# Use level 1, current god name, and index 5 (trojan horse index)
+	card_display.setup(trojan_horse_card, 1, current_god, 5)
+	
+	# Apply player card styling
+	slot.add_theme_stylebox_override("panel", player_card_style)
+	
+	print("Trojan Horse successfully deployed at position ", target_position)
+
+# Check if board is full for trojan horse cleanup
+func check_trojan_horse_cleanup():
+	if active_trojan_horses.is_empty():
+		return
+	
+	# Check if board is full
+	var empty_slots = 0
+	for occupied in grid_occupied:
+		if not occupied:
+			empty_slots += 1
+	
+	if empty_slots == 0:
+		print("Board is full - removing all trojan horses")
+		for horse_position in active_trojan_horses:
+			remove_trojan_horse(horse_position)
+		active_trojan_horses.clear()
+
+# Remove a trojan horse from the board
+func remove_trojan_horse(horse_position: int):
+	if horse_position < 0 or horse_position >= grid_slots.size():
+		return
+	
+	print("Removing Trojan Horse from position ", horse_position)
+	
+	# Clear the card data
+	grid_card_data[horse_position] = null
+	grid_occupied[horse_position] = false
+	grid_ownership[horse_position] = Owner.NONE
+	
+	# Clear the visual display
+	var slot = grid_slots[horse_position]
+	for child in slot.get_children():
+		child.queue_free()
+	
+	# Restore default slot styling
+	slot.add_theme_stylebox_override("panel", default_grid_style)
+	
+	# Remove from active trojan horses list
+	active_trojan_horses.erase(horse_position)
+
+# Clear all trojan horses (for game end or reset)
+func clear_all_trojan_horses():
+	for horse_position in active_trojan_horses:
+		remove_trojan_horse(horse_position)
+	active_trojan_horses.clear()
+	trojan_horse_mode_active = false
+	current_trojan_summoner_position = -1
+	current_trojan_summoner_owner = Owner.NONE
+	current_trojan_summoner_card = null
+	print("All trojan horses cleared")
+
+# Check if a card has trojan horse reversal ability (called before normal capture)
+func check_trojan_horse_reversal(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource, attacking_owner: Owner) -> bool:
+	# Check if the defending card is a Trojan Horse with reversal ability
+	if defending_card.card_name != "Trojan Horse":
+		return false
+	
+	# Check if it has the reversal ability
+	var has_reversal = false
+	for ability in defending_card.abilities:
+		if ability.ability_name == "Trojan Horse Trap":
+			has_reversal = true
+			break
+	
+	if not has_reversal:
+		return false
+	
+	print("=== TROJAN HORSE TRAP ACTIVATED ===")
+	print("  Attacking card: ", attacking_card.card_name, " at position ", attacker_pos)
+	print("  Trojan Horse at position: ", defender_pos)
+	print("  Reversing capture - attacking card will be captured instead!")
+	
+	# REVERSE THE CAPTURE: Instead of horse being captured, capture the attacking card
+	var horse_owner = get_owner_at_position(defender_pos)  # Should be PLAYER
+	set_card_ownership(attacker_pos, horse_owner)
+	
+	# Execute ON_CAPTURE abilities on the captured attacking card
+	var attacking_card_collection_index = get_card_collection_index(attacker_pos)
+	var attacking_card_level = 1  # Default level for enemy cards
+	if attacking_owner == Owner.PLAYER and attacking_card_collection_index != -1:
+		attacking_card_level = get_card_level(attacking_card_collection_index)
+	
+	if attacking_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, attacking_card_level):
+		print("TrojanHorse: Executing ON_CAPTURE abilities for captured attacking card: ", attacking_card.card_name)
+		
+		var capture_context = {
+			"capturing_card": defending_card,  # The horse "captures" the attacker
+			"capturing_position": defender_pos,
+			"captured_card": attacking_card,
+			"captured_position": attacker_pos,
+			"game_manager": self,
+			"direction": "trojan_reversal",
+			"card_level": attacking_card_level
+		}
+		
+		attacking_card.execute_abilities(CardAbility.TriggerType.ON_CAPTURE, capture_context, attacking_card_level)
+	
+	# Remove the trojan horse from the board after the reversal
+	print("TrojanHorse: Removing trojan horse from board position ", defender_pos)
+	remove_trojan_horse(defender_pos)
+	
+	# Update board visuals
+	update_board_visuals()
+	
+	print("=== TROJAN HORSE TRAP COMPLETED ===")
+	return true  # Return true to indicate the reversal happened

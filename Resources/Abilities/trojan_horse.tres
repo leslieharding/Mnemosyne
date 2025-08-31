@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TrojanHorseAbility" load_steps=2 format=3 uid="uid://bxt6ofnsyersk"]
+
+[ext_resource type="Script" uid="uid://btc6badlhckoc" path="res://Resources/Abilities/trojan_horse_ability.gd" id="1_iieo0"]
+
+[resource]
+script = ExtResource("1_iieo0")
+ability_name = "Trojan Horse"
+description = "Choose a slot to deploy a trojan horse."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://btc6badlhckoc"
