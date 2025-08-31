@@ -1118,8 +1118,8 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 					
 					var my_value = attacking_card.values[direction.my_value_index]
 					var their_value: int
-					
-					# Check for critical strike
+
+					# Check for critical strike first
 					if should_apply_critical_strike(attacking_card, grid_index):
 						# Use the defending card's weakest stat instead of directional stat
 						their_value = get_weakest_stat_value(adjacent_card.values)
@@ -1127,6 +1127,12 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 						
 						# Mark critical strike as used
 						CriticalStrikeAbility.mark_critical_strike_used(attacking_card)
+					elif should_apply_backstab(attacking_card, grid_index):
+						# Use the backstab defense value (opposing stat instead of adjacent)
+						their_value = BackstabAbility.get_backstab_defense_value(adjacent_card, direction.their_value_index)
+						
+						# Mark backstab as used
+						BackstabAbility.mark_backstab_used(attacking_card)
 					else:
 						# Normal combat - use directional stat
 						their_value = adjacent_card.values[direction.their_value_index]
@@ -1199,7 +1205,7 @@ func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, atta
 				var my_attack_value = ExtendedRangeAbility.get_attack_value_for_direction(attacking_card.values, direction)
 				var their_defense_value: int
 				
-				# Check for critical strike
+				## Check for critical strike first
 				if should_apply_critical_strike(attacking_card, grid_index):
 					# Use the defending card's weakest stat instead of calculated defense
 					their_defense_value = get_weakest_stat_value(adjacent_card.values)
@@ -1207,6 +1213,13 @@ func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, atta
 					
 					# Mark critical strike as used
 					CriticalStrikeAbility.mark_critical_strike_used(attacking_card)
+				elif should_apply_backstab(attacking_card, grid_index):
+					# Use the extended backstab calculation which handles both orthogonal and diagonal attacks
+					their_defense_value = BackstabAbility.get_extended_backstab_defense_value(adjacent_card, direction)
+					print("BACKSTAB (Extended)! Using backstab defense instead of normal extended defense")
+					
+					# Mark backstab as used
+					BackstabAbility.mark_backstab_used(attacking_card)
 				else:
 					# Normal extended combat - use calculated defense value
 					their_defense_value = ExtendedRangeAbility.get_defense_value_for_direction(adjacent_card.values, direction)
@@ -4069,6 +4082,22 @@ func handle_adaptive_defense_ownership_change(grid_index: int):
 	
 	adaptive_defense_ability.execute(context)
 
+func should_apply_backstab(attacking_card: CardResource, attacker_position: int) -> bool:
+	if not attacking_card:
+		return false
+	
+	# Get the card level for ability checks
+	var card_collection_index = get_card_collection_index(attacker_position)
+	var card_level = get_card_level(card_collection_index)
+	
+	# Check if the card has backstab ability and can still use it
+	if attacking_card.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+		var abilities = attacking_card.get_available_abilities(card_level)
+		for ability in abilities:
+			if ability.ability_name == "Backstab":
+				return BackstabAbility.can_use_backstab(attacking_card)
+	
+	return false
 
 func should_apply_critical_strike(attacking_card: CardResource, attacker_position: int) -> bool:
 	if not attacking_card:

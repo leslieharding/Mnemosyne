@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="BackstabAbility" load_steps=2 format=3 uid="uid://dfnfdharjba6v"]
+
+[ext_resource type="Script" uid="uid://dsvr5f8l038ip" path="res://Resources/Abilities/backstab_ability.gd" id="1_etf8h"]
+
+[resource]
+script = ExtResource("1_etf8h")
+ability_name = "Backstab"
+description = "This card attacks the defenders opposing stat instead of its adjacent one"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://dsvr5f8l038ip"
