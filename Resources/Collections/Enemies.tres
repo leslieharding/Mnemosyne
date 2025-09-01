@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=157 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=161 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" uid="uid://dh1ykxl2k5ank" path="res://Resources/Abilities/infighting_ability.gd" id="8_sygum"]
 [ext_resource type="Script" uid="uid://bskifvkjo5blo" path="res://Resources/Abilities/bolster_confidence_ability.gd" id="8_upckc"]
 [ext_resource type="Script" uid="uid://cjryt268c8rko" path="res://Resources/Abilities/chaos_ability.gd" id="8_vfgb0"]
+[ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="12_r05oc"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -963,12 +964,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_v6hvw"]
+script = ExtResource("12_r05oc")
+ability_name = "Corruption"
+description = "Decreases the stats of adjacent enemies by 1 at the start of each turn if still owned by the enemy"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://btwpyhndpjg0p"
+
 [sub_resource type="Resource" id="Resource_hipqu"]
 script = ExtResource("2_xcqsp")
 card_name = "Limos"
 values = Array[int]([3, 5, 6, 2])
 description = "Here, eat. Surely now the hunger will go away"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_v6hvw")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -1021,12 +1030,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_ydelp"]
+script = ExtResource("12_r05oc")
+ability_name = "Corruption"
+description = "Decreases the stats of adjacent enemies by 1 at the start of each turn if still owned by the enemy"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://btwpyhndpjg0p"
+
 [sub_resource type="Resource" id="Resource_rorqn"]
 script = ExtResource("2_xcqsp")
 card_name = "Limos"
 values = Array[int]([4, 6, 7, 3])
 description = "Here, eat. Surely now the hunger will go away"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ydelp")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -1079,12 +1096,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_ehyfs"]
+script = ExtResource("12_r05oc")
+ability_name = "Corruption"
+description = "Decreases the stats of adjacent enemies by 1 at the start of each turn if still owned by the enemy"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://btwpyhndpjg0p"
+
 [sub_resource type="Resource" id="Resource_myuly"]
 script = ExtResource("2_xcqsp")
 card_name = "Limos"
 values = Array[int]([5, 8, 5, 6])
 description = "Here, eat. Surely now the hunger will go away"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ehyfs")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

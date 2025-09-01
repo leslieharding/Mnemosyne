@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CorruptionAbility" load_steps=2 format=3 uid="uid://geh0kudamfi7"]
+
+[ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="1_6q8i4"]
+
+[resource]
+script = ExtResource("1_6q8i4")
+ability_name = "Corruption"
+description = "Decreases the stats of adjacent enemies by 1 if still owned by the opponent."
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://btwpyhndpjg0p"

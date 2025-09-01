@@ -746,6 +746,9 @@ func _on_turn_changed(is_player_turn: bool):
 	# Process cultivation abilities at the start of player's turn
 	if is_player_turn:
 		process_cultivation_turn_start()
+	else:
+		# Process corruption abilities at the start of opponent's turn
+		process_corruption_turn_start()
 	
 	# Process tremors at the start of each player's turn
 	if is_player_turn:
@@ -756,9 +759,8 @@ func _on_turn_changed(is_player_turn: bool):
 	else:
 		process_tremors_for_player(Owner.OPPONENT)
 		disable_player_input()
-		# Only start opponent turn if they're not already thinking
-		if not opponent_is_thinking:
-			print("Starting opponent turn")
+		# Only start opponent turn if not already thinking
+		if not opponent_is_thinking and not is_tutorial_mode:
 			call_deferred("opponent_take_turn")
 
 func get_card_display_at_position(grid_index: int) -> CardDisplay:
@@ -4216,6 +4218,57 @@ func process_cultivation_turn_start():
 		}
 		
 		cultivation_ability.execute(context)
+
+# Process corruption abilities at the start of opponent's turn
+func process_corruption_turn_start():
+	print("Processing corruption abilities for opponent turn start")
+	
+	# Check all cards on the board for corruption abilities
+	for position in range(grid_slots.size()):
+		if not grid_occupied[position]:
+			continue
+		
+		# Only process opponent-owned cards
+		var card_owner = get_owner_at_position(position)
+		if card_owner != Owner.OPPONENT:
+			continue
+		
+		var card_data = get_card_at_position(position)
+		if not card_data:
+			continue
+		
+		# Get card level for ability checks
+		var card_collection_index = get_card_collection_index(position)
+		var card_level = get_card_level(card_collection_index)
+		
+		# Check if this card has corruption ability
+		var has_corruption = false
+		var corruption_ability = null
+		
+		if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			for ability in card_data.get_available_abilities(card_level):
+				if ability.ability_name == "Corruption":
+					has_corruption = true
+					corruption_ability = ability
+					break
+		
+		if not has_corruption or not corruption_ability:
+			continue
+		
+		print("Found corruption card at position ", position, ": ", card_data.card_name)
+		
+		# Execute corruption turn processing
+		var context = {
+			"passive_action": "turn_start",
+			"boosting_card": card_data,
+			"boosting_position": position,
+			"game_manager": self,
+			"card_level": card_level
+		}
+		
+		corruption_ability.execute(context)
+
+
 
 func start_compel_mode(compeller_position: int, compeller_owner: Owner, compeller_card: CardResource):
 	compel_mode_active = true
