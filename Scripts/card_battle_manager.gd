@@ -48,6 +48,14 @@ var ordain_target_style: StyleBoxFlat
 var active_ordain_owner: Owner = Owner.NONE  # Track who created the ordain effect
 var active_ordain_turns_remaining: int = 0  # Track how many turns until ordain expires
 
+# Sanctuary tracking system
+var sanctuary_mode_active: bool = false
+var current_sanctuary_position: int = -1
+var current_sanctuary_owner: Owner = Owner.NONE
+var current_sanctuary_card: CardResource = null
+var active_sanctuary_slot: int = -1  # The slot that will grant cheat death to next friendly card
+var sanctuary_target_style: StyleBoxFlat
+
 # Trojan horse mode tracking
 var trojan_horse_mode_active: bool = false
 var current_trojan_summoner_position: int = -1
@@ -1169,10 +1177,25 @@ func check_for_cheat_death(defender_pos: int, defending_card: CardResource, atta
 	# Clear any previous cheat death flags for this position
 	remove_meta("cheat_death_prevented_" + str(defender_pos))
 	
-	# Execute defend abilities to see if any prevent capture
+	# Check for sanctuary-granted cheat death first
+	var has_sanctuary_cheat_death = defending_card.has_meta("sanctuary_cheat_death") and defending_card.get_meta("sanctuary_cheat_death")
+	
+	if has_sanctuary_cheat_death:
+		print("SANCTUARY CHEAT DEATH! ", defending_card.card_name, " has sanctuary protection!")
+		
+		# Remove the sanctuary cheat death after use (one-time use)
+		defending_card.set_meta("sanctuary_cheat_death", false)
+		
+		# Set the prevention flag
+		set_meta("cheat_death_prevented_" + str(defender_pos), true)
+		
+		print("Sanctuary cheat death activated for ", defending_card.card_name, "!")
+		return true
+	
+	# Execute normal defend abilities to see if any prevent capture
 	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, "capture_attempt")
 	
-	# Check if cheat death was triggered
+	# Check if normal cheat death was triggered
 	var was_prevented = has_meta("cheat_death_prevented_" + str(defender_pos)) and get_meta("cheat_death_prevented_" + str(defender_pos))
 	
 	# Clean up the flag
@@ -1447,6 +1470,7 @@ func end_game():
 	clear_all_hunt_traps()
 	clear_all_compel_constraints()
 	clear_all_ordain_effects()
+	clear_all_sanctuary_effects()
 	clear_all_trojan_horses()
 	
 	var tracker = get_node("/root/BossPredictionTrackerAutoload")
@@ -1610,6 +1634,7 @@ func restart_round():
 	active_passive_abilities.clear()
 	active_tremors.clear()
 	grid_to_collection_index.clear()
+	clear_all_sanctuary_effects()
 	
 	# Clear the grid completely
 	for i in range(grid_slots.size()):
@@ -2026,7 +2051,14 @@ func create_grid_styles():
 	ordain_target_style.border_width_bottom = 3
 	ordain_target_style.border_color = Color("#FFD700")  # Golden border for ordain
 
-
+	# Sanctuary target style (cyan/teal border to distinguish from other effects)
+	sanctuary_target_style = StyleBoxFlat.new()
+	sanctuary_target_style.bg_color = Color("#444444")
+	sanctuary_target_style.border_width_left = 3
+	sanctuary_target_style.border_width_top = 3
+	sanctuary_target_style.border_width_right = 3
+	sanctuary_target_style.border_width_bottom = 3
+	sanctuary_target_style.border_color = Color("#00FFAA")  # Cyan/teal border
 
 # Helper to get passed parameters from previous scene
 func get_scene_params() -> Dictionary:
@@ -2622,6 +2654,10 @@ func restore_slot_original_styling(grid_index: int):
 	if grid_index == active_ordain_slot:
 		# Restore ordain styling
 		apply_ordain_target_styling(grid_index)
+	# Check for sanctuary effect 
+	elif grid_index == active_sanctuary_slot:
+		# Restore sanctuary styling
+		apply_sanctuary_target_styling(grid_index)	
 	# Check for compel constraint
 	elif grid_index == active_compel_slot:
 		# Restore compel styling
@@ -2714,6 +2750,18 @@ func _on_grid_gui_input(event, grid_index):
 				else:
 					print("Cannot ordain occupied slot - can only ordain empty slots")
 				return  # Don't process normal card placement during ordain mode
+	
+	# Handle sanctuary target selection (only during sanctuary mode setup)
+	if sanctuary_mode_active and current_sanctuary_owner == Owner.PLAYER:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				# Only allow sanctuary on empty slots
+				if not grid_occupied[grid_index]:
+					select_sanctuary_target(grid_index)
+				else:
+					print("Cannot sanctuary occupied slot - can only sanctuary empty slots")
+				return  # Don't process normal card placement during sanctuary mode
+	
 	
 	# Handle trojan horse target selection (only during trojan horse mode setup)
 	if trojan_horse_mode_active and current_trojan_summoner_owner == Owner.PLAYER:
@@ -2969,6 +3017,10 @@ func place_card_on_grid():
 	
 	if dance_mode_active:
 		print("Dance mode active - staying on turn for target selection")
+		return
+	
+	if sanctuary_mode_active:
+		print("Sanctuary mode active - staying on player turn for target selection")
 		return
 	
 	if trojan_horse_mode_active:
@@ -5099,3 +5151,139 @@ func check_trojan_horse_reversal(defender_pos: int, defending_card: CardResource
 		print("=== TROJAN HORSE TRAP FAILED ===")
 	
 	return reversal_successful
+
+
+func start_sanctuary_mode(sanctuary_position: int, sanctuary_owner: Owner, sanctuary_card: CardResource):
+	sanctuary_mode_active = true
+	current_sanctuary_position = sanctuary_position
+	current_sanctuary_owner = sanctuary_owner
+	current_sanctuary_card = sanctuary_card
+	
+	# Update game status
+	if sanctuary_owner == Owner.PLAYER:
+		game_status_label.text = "🛡️ SANCTUARY MODE: Select an empty slot to sanctuary"
+	else:
+		game_status_label.text = "🛡️ " + opponent_manager.get_opponent_info().name + " is sanctuaring..."
+		# Auto-select target for opponent
+		call_deferred("opponent_select_sanctuary_target")
+	
+	print("Sanctuary mode activated for ", sanctuary_card.card_name, " at position ", sanctuary_position)
+
+# Add this function with the other target selection functions (around line 1000-1100)
+func select_sanctuary_target(target_position: int):
+	if not sanctuary_mode_active:
+		return
+	
+	print("Sanctuary target selected: position ", target_position)
+	
+	# Set the sanctuary effect
+	active_sanctuary_slot = target_position
+	
+	# Apply visual styling to show this slot is sanctuaried
+	apply_sanctuary_target_styling(target_position)
+	
+	# End sanctuary mode
+	sanctuary_mode_active = false
+	current_sanctuary_position = -1
+	current_sanctuary_owner = Owner.NONE
+	current_sanctuary_card = null
+	
+	# Update game status
+	if current_sanctuary_owner == Owner.PLAYER:
+		game_status_label.text = "Sanctuary set! Next friendly card in that slot gets cheat death."
+	else:
+		game_status_label.text = "Opponent sanctuaried a slot."
+	
+	# Switch turns - sanctuary action completes the turn
+	print("Sanctuary target selected - switching turns")
+	turn_manager.next_turn()
+
+# Add this styling function with the other styling functions (around line 1200-1300)
+func apply_sanctuary_target_styling(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	var slot = grid_slots[grid_index]
+	slot.add_theme_stylebox_override("panel", sanctuary_target_style)
+	
+	print("Applied sanctuary target styling (cyan border) to slot ", grid_index)
+
+# Add this function with the other removal functions (around line 1300-1400)
+func remove_sanctuary_effect():
+	if active_sanctuary_slot == -1:
+		return
+	
+	print("Removing sanctuary effect from position ", active_sanctuary_slot)
+	
+	var slot_to_restore = active_sanctuary_slot
+	active_sanctuary_slot = -1
+	
+	# Restore visual styling to default (after clearing tracking)
+	restore_slot_original_styling(slot_to_restore)
+
+# Add this AI function with the other opponent AI functions (around line 1400-1500)
+func opponent_select_sanctuary_target():
+	if not sanctuary_mode_active:
+		return
+	
+	# Simple AI: pick a random empty slot
+	var possible_targets = []
+	
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:  # Only empty slots
+			possible_targets.append(i)
+	
+	var target_position = -1
+	if possible_targets.size() > 0:
+		target_position = possible_targets[randi() % possible_targets.size()]
+	
+	if target_position != -1:
+		select_sanctuary_target(target_position)
+
+# Add this clear function with the other clear functions (around line 1500-1600)
+func clear_all_sanctuary_effects():
+	if active_sanctuary_slot != -1:
+		remove_sanctuary_effect()
+	sanctuary_mode_active = false
+	current_sanctuary_position = -1
+	current_sanctuary_owner = Owner.NONE
+	current_sanctuary_card = null
+	print("All sanctuary effects cleared")
+
+
+func apply_sanctuary_cheat_death_if_applicable(grid_position: int, card_data: CardResource, placing_owner: Owner):
+	print("=== SANCTUARY CHEAT DEATH CHECK ===")
+	print("Active sanctuary slot: ", active_sanctuary_slot)
+	print("Grid position: ", grid_position)
+	print("Placing owner: ", placing_owner)
+	
+	# Only apply sanctuary cheat death if:
+	# 1. There's an active sanctuary slot
+	# 2. The card is being placed in the sanctuaried slot  
+	# 3. The placing owner is the player (friendly card)
+	if active_sanctuary_slot != -1 and grid_position == active_sanctuary_slot and placing_owner == Owner.PLAYER:
+		print("CONDITIONS MET - Granting sanctuary cheat death to ", card_data.card_name)
+		
+		# Grant cheat death by setting metadata on the card
+		card_data.set_meta("sanctuary_cheat_death", true)
+		
+		print("Sanctuary cheat death granted to ", card_data.card_name, "!")
+		
+		# Remove the sanctuary effect after use
+		remove_sanctuary_effect()
+		
+		return true
+	elif active_sanctuary_slot != -1 and grid_position == active_sanctuary_slot:
+		# Enemy used sanctuaried slot - just remove effect silently
+		print("Enemy used sanctuaried slot - removing effect without granting cheat death")
+		remove_sanctuary_effect()
+	else:
+		print("Sanctuary cheat death conditions NOT met")
+	
+	return false
+
+# Add this call to the place_card_on_grid function 
+# (around line 650-750, after apply_ordain_bonus_if_applicable)
+
+	# Apply sanctuary cheat death effect if applicable
+	apply_sanctuary_cheat_death_if_applicable(current_grid_index, card_data, placing_owner)

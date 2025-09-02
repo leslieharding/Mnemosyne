@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SanctuaryAbility" load_steps=2 format=3 uid="uid://c2kovkii7ndh8"]
+
+[ext_resource type="Script" uid="uid://cweupqsy4ivxc" path="res://Resources/Abilities/sanctuary_ability.gd" id="1_5f43e"]
+
+[resource]
+script = ExtResource("1_5f43e")
+ability_name = "Sanctuary"
+description = "On play, select a slot, playing a friendly card there will grant it cheat death."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://cweupqsy4ivxc"
