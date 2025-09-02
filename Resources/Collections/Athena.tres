@@ -28,7 +28,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_k33q7"]
 script = ExtResource("1_7jwg8")
-card_name = ""
+card_name = "Erichthonius"
 values = Array[int]([1, 1, 1, 1])
 description = ""
 abilities = Array[ExtResource("2_3heas")]([])
@@ -38,7 +38,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_gu5ms"]
 script = ExtResource("1_7jwg8")
-card_name = ""
+card_name = "Diomedes"
 values = Array[int]([1, 1, 1, 1])
 description = ""
 abilities = Array[ExtResource("2_3heas")]([])
@@ -48,7 +48,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fylbm"]
 script = ExtResource("1_7jwg8")
-card_name = ""
+card_name = "Perseus"
 values = Array[int]([1, 1, 1, 1])
 description = ""
 abilities = Array[ExtResource("2_3heas")]([])

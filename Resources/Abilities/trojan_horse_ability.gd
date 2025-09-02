@@ -23,14 +23,13 @@ func execute(context: Dictionary) -> bool:
 		return false
 	
 	# Check for empty slots first (edge case handling)
-	var has_empty_slots = false
+	var empty_slot_count = 0
 	for i in range(game_manager.grid_slots.size()):
 		if not game_manager.grid_occupied[i]:
-			has_empty_slots = true
-			break
-	
-	if not has_empty_slots:
-		print("TrojanHorseAbility: No empty slots available - skipping slot selection phase")
+			empty_slot_count += 1
+
+	if empty_slot_count <= 1:
+		print("TrojanHorseAbility: Only ", empty_slot_count, " empty slot(s) available - skipping slot selection phase")
 		return false
 	
 	# Get the owner of the card that played the ability

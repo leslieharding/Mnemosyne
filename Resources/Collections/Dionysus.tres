@@ -8,7 +8,7 @@
 
 [sub_resource type="Resource" id="Resource_n8857"]
 script = ExtResource("1_tlqne")
-card_name = ""
+card_name = "Silenus"
 values = Array[int]([1, 1, 1, 1])
 description = ""
 abilities = Array[ExtResource("2_u83m1")]([])
@@ -18,7 +18,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_rpmeo"]
 script = ExtResource("1_tlqne")
-card_name = ""
+card_name = "Midas"
 values = Array[int]([1, 1, 1, 1])
 description = ""
 abilities = Array[ExtResource("2_u83m1")]([])
@@ -28,7 +28,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_botxv"]
 script = ExtResource("1_tlqne")
-card_name = ""
+card_name = "Semele"
 values = Array[int]([1, 1, 1, 1])
 description = ""
 abilities = Array[ExtResource("2_u83m1")]([])
@@ -38,7 +38,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_388jm"]
 script = ExtResource("1_tlqne")
-card_name = ""
+card_name = "Ampelos"
 values = Array[int]([1, 1, 1, 1])
 description = ""
 abilities = Array[ExtResource("2_u83m1")]([])
@@ -48,7 +48,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8m3l0"]
 script = ExtResource("1_tlqne")
-card_name = ""
+card_name = "Ariadne"
 values = Array[int]([1, 1, 1, 1])
 description = ""
 abilities = Array[ExtResource("2_u83m1")]([])
