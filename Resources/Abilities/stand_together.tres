@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StandTogetherAbility" load_steps=2 format=3 uid="uid://blxm5n0w6vuik"]
+
+[ext_resource type="Script" uid="uid://pdcxuxfesjrk" path="res://Resources/Abilities/stand_together_ability.gd" id="1_4jahc"]
+
+[resource]
+script = ExtResource("1_4jahc")
+ability_name = "Stand Together"
+description = "On play this card gains +1 stats for each friendly card in the same row or column."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://pdcxuxfesjrk"

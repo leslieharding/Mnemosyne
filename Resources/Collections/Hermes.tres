@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=19 format=3 uid="uid://bohl4fgw1kxqu"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=21 format=3 uid="uid://bohl4fgw1kxqu"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_36081"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_kjwo2"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_kjwo2"]
 [ext_resource type="Script" uid="uid://dsvr5f8l038ip" path="res://Resources/Abilities/backstab_ability.gd" id="3_py8us"]
 [ext_resource type="Script" uid="uid://btc6badlhckoc" path="res://Resources/Abilities/trojan_horse_ability.gd" id="5_py8us"]
+[ext_resource type="Script" uid="uid://pdcxuxfesjrk" path="res://Resources/Abilities/stand_together_ability.gd" id="6_ayhf2"]
 [ext_resource type="Script" uid="uid://dkf8lottce2c5" path="res://Resources/Abilities/trojan_horse_reversal_ability.gd" id="6_da35i"]
 
 [sub_resource type="Resource" id="Resource_iq3w0"]
@@ -45,12 +46,20 @@ level_data = Array[ExtResource("3_82qut")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_08ug4"]
+script = ExtResource("6_ayhf2")
+ability_name = "Stand Together"
+description = "On play this card gains +1 stats for each friendly card in the same row or column."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://pdcxuxfesjrk"
+
 [sub_resource type="Resource" id="Resource_ayhf2"]
 script = ExtResource("1_36081")
 card_name = "Theseus"
 values = Array[int]([5, 5, 5, 5])
 description = ""
-abilities = Array[ExtResource("2_kjwo2")]([])
+abilities = Array[ExtResource("2_kjwo2")]([SubResource("Resource_08ug4")])
 level_data = Array[ExtResource("3_82qut")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
