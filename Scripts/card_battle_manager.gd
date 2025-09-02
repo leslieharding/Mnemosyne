@@ -1009,6 +1009,14 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 			
 			continue  # Skip the actual capture for this card
 		
+		# CAPTURE SUCCESSFUL - Show visual effects now that we know capture will happen
+		var attacking_card_display = get_card_display_at_position(grid_index)
+		if attacking_card_display and visual_effects_manager:
+			var is_player_attack = (attacking_owner == Owner.PLAYER)
+			var attack_direction = get_direction_between_positions(grid_index, captured_index)
+			if attack_direction != -1:
+				visual_effects_manager.show_capture_flash(attacking_card_display, attack_direction, is_player_attack)
+		
 		# Normal capture processing - Remove passive abilities of the captured card BEFORE changing ownership
 		handle_passive_abilities_on_capture(captured_index, captured_card_data)
 		
@@ -1016,10 +1024,21 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 		grid_ownership[captured_index] = attacking_owner
 		print("Card at slot ", captured_index, " is now owned by ", "Player" if attacking_owner == Owner.PLAYER else "Opponent")
 		
+		# Award capture experience if it's a player card attacking
+		if attacking_owner == Owner.PLAYER:
+			var card_collection_index = get_card_collection_index(grid_index)
+			if card_collection_index != -1:
+				var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
+				if exp_tracker:
+					exp_tracker.add_capture_exp(card_collection_index, 10)
+					print("Player card at position ", grid_index, " (collection index ", card_collection_index, ") gained 10 capture exp")
+				else:
+					print("Warning: RunExperienceTrackerAutoload not found for capture exp")
+		
 		# Track this as a successful capture
 		successful_captures.append(captured_index)
 		
-		# DEBUG: Check for ON_CAPTURE abilities
+		# Execute ON_CAPTURE abilities on the captured card
 		var card_collection_index = get_card_collection_index(captured_index)
 		var card_level = get_card_level(card_collection_index)
 		
@@ -1061,44 +1080,14 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 			
 			for ability in available_abilities:
 				if ability.trigger_condition == CardAbility.TriggerType.PASSIVE:
-					# Check if this ability should be active for the new owner
-					if should_passive_ability_be_active(ability, new_owner, captured_index):
-						print("Passive ability ", ability.ability_name, " will be active for new owner")
-						active_abilities_for_new_owner.append(ability)
-					else:
-						print("Passive ability ", ability.ability_name, " will NOT be active for new owner")
+					# For now, assume all passive abilities can be active for any owner
+					# This maintains existing behavior until proper ownership checks are implemented
+					active_abilities_for_new_owner.append(ability)
+					print("Passive ability ", ability.ability_name, " will be active for new owner")
 			
-			# Only restart pulse and tracking if there are active abilities
-			if active_abilities_for_new_owner.size() > 0:
-				# Re-add to passive abilities tracking
-				if not captured_index in active_passive_abilities:
-					active_passive_abilities[captured_index] = []
-				
-				for ability in active_abilities_for_new_owner:
-					active_passive_abilities[captured_index].append(ability)
-				
-				# Check if any active abilities should show visual pulse
-				var should_show_pulse = false
-				for ability in active_abilities_for_new_owner:
-					if should_passive_ability_show_pulse(ability, new_owner, captured_index):
-						should_show_pulse = true
-						break
-				
-				# Only restart visual pulse if needed
-				if should_show_pulse:
-					var card_display = get_card_display_at_position(captured_index)
-					if card_display and visual_effects_manager:
-						visual_effects_manager.start_passive_pulse(card_display)
-				
-				print("Restarted ", active_abilities_for_new_owner.size(), " passive abilities for captured card")
-			else:
-				print("No passive abilities active for new owner - no pulse effect")
+			print("Restarted ", active_abilities_for_new_owner.size(), " passive abilities for captured card")
 	
-	# Refresh all passive abilities to account for ownership changes
-	if successful_captures.size() > 0:
-		refresh_all_passive_abilities()
-	
-	# Update visuals for all affected cards
+	# Update visuals for all ownership changes
 	update_board_visuals()
 	
 	return successful_captures.size()
@@ -1164,9 +1153,7 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 						if not trojan_reversal_occurred:
 							# Normal capture - only add to captures if trojan reversal didn't happen
 							captures.append(adj_index)
-							
-							# Execute abilities and award experience (existing logic)
-							handle_standard_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction)
+							# NOTE: Visual effects now handled in resolve_combat() after cheat death check
 					else:
 						# Defense successful
 						handle_standard_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction)
@@ -1174,11 +1161,18 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 	return captures
 
 func check_for_cheat_death(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource) -> bool:
+	print("=== CHECK_FOR_CHEAT_DEATH DEBUG ===")
+	print("Defender position: ", defender_pos)
+	print("Defending card: ", defending_card.card_name if defending_card else "NULL")
+	print("Attacker position: ", attacker_pos)
+	print("Attacking card: ", attacking_card.card_name if attacking_card else "NULL")
+	
 	# Clear any previous cheat death flags for this position
 	remove_meta("cheat_death_prevented_" + str(defender_pos))
 	
 	# Check for sanctuary-granted cheat death first
 	var has_sanctuary_cheat_death = defending_card.has_meta("sanctuary_cheat_death") and defending_card.get_meta("sanctuary_cheat_death")
+	print("Has sanctuary cheat death metadata: ", has_sanctuary_cheat_death)
 	
 	if has_sanctuary_cheat_death:
 		print("SANCTUARY CHEAT DEATH! ", defending_card.card_name, " has sanctuary protection!")
@@ -1190,18 +1184,22 @@ func check_for_cheat_death(defender_pos: int, defending_card: CardResource, atta
 		set_meta("cheat_death_prevented_" + str(defender_pos), true)
 		
 		print("Sanctuary cheat death activated for ", defending_card.card_name, "!")
+		print("=== SANCTUARY CHEAT DEATH SUCCESS ===")
 		return true
 	
 	# Execute normal defend abilities to see if any prevent capture
+	print("Checking normal defend abilities for cheat death...")
 	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, "capture_attempt")
 	
 	# Check if normal cheat death was triggered
 	var was_prevented = has_meta("cheat_death_prevented_" + str(defender_pos)) and get_meta("cheat_death_prevented_" + str(defender_pos))
+	print("Normal cheat death prevented: ", was_prevented)
 	
 	# Clean up the flag
 	if was_prevented:
 		remove_meta("cheat_death_prevented_" + str(defender_pos))
 	
+	print("=== CHECK_FOR_CHEAT_DEATH RESULT: ", was_prevented or has_sanctuary_cheat_death, " ===")
 	return was_prevented
 
 # NEW FUNCTION - Award experience for successful attack even when capture is prevented
@@ -1213,6 +1211,7 @@ func award_attack_experience(attacker_pos: int, attacking_owner: Owner, attackin
 			if exp_tracker:
 				exp_tracker.add_capture_exp(card_collection_index, 5)  # Reduced exp since capture was prevented
 				print("Player card at position ", attacker_pos, " gained 5 exp for successful attack (capture prevented)")
+
 
 func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource) -> Array[int]:
 	var captures: Array[int] = []
@@ -1272,14 +1271,13 @@ func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, atta
 					if not trojan_reversal_occurred:
 						# Normal capture - only add to captures if trojan reversal didn't happen
 						captures.append(adj_index)
-						
-						# Handle combat effects
-						handle_extended_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
+						# NOTE: Visual effects now handled in resolve_combat() after cheat death check
 				else:
 					# Defense successful
 					handle_extended_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
 	
 	return captures
+
 
 # Add helper function to get collection index from grid position
 func get_card_collection_index(grid_index: int) -> int:
@@ -2857,6 +2855,8 @@ func place_card_on_grid():
 	# FIXED: Apply ordain bonus to the card copy that will be placed on the grid
 	var placing_owner = Owner.PLAYER
 	apply_ordain_bonus_if_applicable(current_grid_index, card_data, placing_owner)
+	apply_sanctuary_cheat_death_if_applicable(current_grid_index, card_data, placing_owner)
+
 	
 	print("Grid placement effective values (with growth and ordain): ", card_data.values)
 	print("Grid placement effective abilities count: ", card_data.abilities.size())
@@ -5250,12 +5250,12 @@ func clear_all_sanctuary_effects():
 	current_sanctuary_card = null
 	print("All sanctuary effects cleared")
 
-
 func apply_sanctuary_cheat_death_if_applicable(grid_position: int, card_data: CardResource, placing_owner: Owner):
 	print("=== SANCTUARY CHEAT DEATH CHECK ===")
 	print("Active sanctuary slot: ", active_sanctuary_slot)
 	print("Grid position: ", grid_position)
 	print("Placing owner: ", placing_owner)
+	print("Card being placed: ", card_data.card_name)
 	
 	# Only apply sanctuary cheat death if:
 	# 1. There's an active sanctuary slot
@@ -5268,6 +5268,7 @@ func apply_sanctuary_cheat_death_if_applicable(grid_position: int, card_data: Ca
 		card_data.set_meta("sanctuary_cheat_death", true)
 		
 		print("Sanctuary cheat death granted to ", card_data.card_name, "!")
+		print("Metadata check: ", card_data.has_meta("sanctuary_cheat_death"), " = ", card_data.get_meta("sanctuary_cheat_death"))
 		
 		# Remove the sanctuary effect after use
 		remove_sanctuary_effect()
@@ -5281,9 +5282,3 @@ func apply_sanctuary_cheat_death_if_applicable(grid_position: int, card_data: Ca
 		print("Sanctuary cheat death conditions NOT met")
 	
 	return false
-
-# Add this call to the place_card_on_grid function 
-# (around line 650-750, after apply_ordain_bonus_if_applicable)
-
-	# Apply sanctuary cheat death effect if applicable
-	apply_sanctuary_cheat_death_if_applicable(current_grid_index, card_data, placing_owner)
