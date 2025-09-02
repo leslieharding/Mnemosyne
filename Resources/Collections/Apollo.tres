@@ -265,7 +265,7 @@ metadata/_custom_type_script = "uid://c25iupuskk6vd"
 script = ExtResource("1_vqrrp")
 card_name = "Cassandra"
 values = Array[int]([3, 4, 3, 4])
-description = "Burn the horse, burn it now!"
+description = "Do not let that boy into the city, he will be the death of us all, yes you too!"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_pwyti")])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
@@ -327,9 +327,9 @@ metadata/_custom_type_script = "uid://fgbji7hao84c"
 
 [sub_resource type="Resource" id="Resource_vqeif"]
 script = ExtResource("1_vqrrp")
-card_name = "The Fates"
+card_name = "Laocoön"
 values = Array[int]([5, 5, 5, 5])
-description = "What these scissors? Don't you worry my dear just close your eyes"
+description = "Burn it my lord, I fear the Greeks even when they offer gifts"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_4qshc")])
 level_data = Array[ExtResource("4_2h7tk")]([])
 uses_level_progression = false
