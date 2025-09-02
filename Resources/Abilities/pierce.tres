@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PierceAbility" load_steps=2 format=3 uid="uid://b4q6tu45klp7e"]
+
+[ext_resource type="Script" uid="uid://8hwwassnaxkb" path="res://Resources/Abilities/pierce_ability.gd" id="1_3wdhu"]
+
+[resource]
+script = ExtResource("1_3wdhu")
+ability_name = "Pierce"
+description = "This unit's attack range is 2, but can only attack through occupied squares."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://8hwwassnaxkb"
