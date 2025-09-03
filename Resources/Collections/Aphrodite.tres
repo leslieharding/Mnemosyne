@@ -48,7 +48,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ps1t5"]
 script = ExtResource("1_w3v8q")
-card_name = "Psyche"
+card_name = "Eurypylus"
 values = Array[int]([1, 1, 1, 1])
 description = ""
 abilities = Array[ExtResource("2_7roea")]([])

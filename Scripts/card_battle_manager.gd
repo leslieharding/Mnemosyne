@@ -1378,6 +1378,10 @@ func _on_opponent_card_placed(grid_index: int):
 	card_display.card_unhovered.connect(_on_card_unhovered)
 	print("Connected hover signals for opponent card: ", opponent_card_data.card_name)
 	
+	if card_display and card_display.panel:
+		card_display.panel.gui_input.connect(_on_grid_card_right_click.bind(grid_index))
+		print("Connected right-click handler for opponent card at grid position ", grid_index)
+	
 	# DEBUG: Verify the card display has the data
 	print("=== CARD DISPLAY DEBUG ===")
 	print("Card display card_data: ", card_display.card_data)
@@ -1838,7 +1842,11 @@ func return_to_map():
 
 # Set up input processing for keyboard navigation (only when player's turn)
 func _input(event):
-	# Only process input if it's the player's turn and a card is selected
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		print("DEBUG: Right-click detected in _input(), allowing it to pass through")
+		return  # Don't consume right-clicks, let them reach the grid slots
+	
+	# Only process keyboard input if it's the player's turn and a card is selected
 	if not turn_manager.is_player_turn() or selected_card_index == -1 or current_grid_index == -1:
 		return
 	
@@ -1855,7 +1863,6 @@ func _input(event):
 	# Confirm placement with Enter/Space
 	if event.is_action_pressed("ui_accept"):
 		place_card_on_grid()
-
 # Helper to move grid selection based on direction
 func move_grid_selection(dx: int, dy: int):
 	# Calculate current position
@@ -2090,6 +2097,8 @@ func setup_empty_board():
 		# Increase the slot size to better fit cards
 		slot.custom_minimum_size = Vector2(100, 140)  # Larger size to accommodate cards
 		slot.name = "Slot" + str(i)
+		
+		slot.mouse_filter = Control.MOUSE_FILTER_PASS
 		
 		# Add some margin to the grid container
 		board_container.add_theme_constant_override("h_separation", 10)  # Horizontal space between slots
@@ -2716,6 +2725,22 @@ func apply_selection_highlight(grid_index: int):
 		slot.add_theme_stylebox_override("panel", selected_grid_style)
 
 func _on_grid_gui_input(event, grid_index):
+	
+	print("=== GRID INPUT RECEIVED ===")
+	print("Grid index: ", grid_index)
+	print("Event type: ", event.get_class())
+	print("Event: ", event)
+	
+	if event is InputEventMouseButton:
+		print("Mouse button event detected!")
+		print("  Button index: ", event.button_index)
+		print("  Pressed: ", event.pressed)
+		print("  RIGHT MOUSE CONSTANT: ", MOUSE_BUTTON_RIGHT)
+		print("  Is right click: ", event.button_index == MOUSE_BUTTON_RIGHT)
+		print("  Is pressed: ", event.pressed)
+		print("  Right click + pressed: ", event.button_index == MOUSE_BUTTON_RIGHT and event.pressed)
+	
+	
 	# Handle dance target selection FIRST (but only during dance mode setup)
 	if dance_mode_active and current_dancer_owner == Owner.PLAYER:
 		if event is InputEventMouseButton:
@@ -2771,7 +2796,6 @@ func _on_grid_gui_input(event, grid_index):
 					print("Cannot sanctuary occupied slot - can only sanctuary empty slots")
 				return  # Don't process normal card placement during sanctuary mode
 	
-	
 	# Handle trojan horse target selection (only during trojan horse mode setup)
 	if trojan_horse_mode_active and current_trojan_summoner_owner == Owner.PLAYER:
 		if event is InputEventMouseButton:
@@ -2783,12 +2807,13 @@ func _on_grid_gui_input(event, grid_index):
 					print("Cannot deploy trojan horse on occupied slot - can only deploy on empty slots")
 				return  # Don't process normal card placement during trojan horse mode
 	
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-		handle_misdirection_activation(grid_index)
+	# Check if it's the player's turn before processing any further input
+	if not turn_manager.is_player_turn():
 		return
 	
-	
-	if not turn_manager.is_player_turn():
+	# Handle misdirection right-click AFTER turn validation
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		handle_misdirection_activation(grid_index)
 		return
 		
 	if event is InputEventMouseButton:
@@ -2967,6 +2992,10 @@ func place_card_on_grid():
 	card_display.card_unhovered.connect(_on_card_unhovered)
 
 	print("Player placed ", card_data.card_name, " at slot ", current_grid_index)
+	# Connect right-click handling for cards placed on the grid
+	if card_display and card_display.panel:
+		card_display.panel.gui_input.connect(_on_grid_card_right_click.bind(current_grid_index))
+		print("Connected right-click handler for player card at grid position ", current_grid_index)
 	
 	# Check if the card should get ordain bonus BEFORE executing abilities
 	apply_ordain_bonus_if_applicable(current_grid_index, card_data, placing_owner)
@@ -3045,6 +3074,8 @@ func place_card_on_grid():
 	
 	# Switch turns only if no special modes are active
 	turn_manager.next_turn()
+	
+	
 func handle_passive_abilities_on_place(grid_position: int, card_data: CardResource, card_level: int):
 	# Check if this card has passive abilities
 	if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
@@ -3099,6 +3130,15 @@ func handle_passive_abilities_on_place(grid_position: int, card_data: CardResour
 	
 	# Also trigger passive abilities of existing cards (in case they need to affect the new card)
 	refresh_all_passive_abilities()
+
+func _on_grid_card_right_click(event, grid_index: int):
+	print("=== GRID CARD RIGHT-CLICK RECEIVED ===")
+	print("Grid index: ", grid_index)
+	print("Event: ", event)
+	
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		print("Right-click confirmed on grid card at position ", grid_index)
+		handle_misdirection_activation(grid_index)
 
 func handle_passive_abilities_on_capture(grid_position: int, card_data: CardResource):
 	if grid_position in active_passive_abilities:
