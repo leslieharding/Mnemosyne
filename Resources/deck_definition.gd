@@ -6,7 +6,8 @@ extends Resource
 enum DeckPowerType {
 	NONE,
 	SUN_POWER,
-	PROPHECY_POWER
+	PROPHECY_POWER,
+	MISDIRECTION_POWER
 }
 
 @export var deck_name: String
@@ -74,13 +75,14 @@ func get_unlock_description(god_name: String) -> String:
 	
 	return "Requires: " + " & ".join(requirements) if requirements.size() > 0 else "No requirements"
 
-# Get deck power description for UI
 func get_power_description() -> String:
 	match deck_power_type:
 		DeckPowerType.SUN_POWER:
 			return "☀️ Solar Blessing: 3 random grid spaces are bathed in sunlight, granting +1 to all stats for your cards placed there"
 		DeckPowerType.PROPHECY_POWER:
 			return "🔮 Divine Prophecy: You always go first in battle"
+		DeckPowerType.MISDIRECTION_POWER:
+			return "🃏 Misdirection: Once per battle, right-click an enemy card to invert its stat values"
 		DeckPowerType.NONE:
 			return ""
 		_:

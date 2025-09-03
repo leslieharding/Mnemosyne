@@ -22,6 +22,9 @@ var grid_to_collection_index: Dictionary = {}  # grid_index -> collection_index
 var active_enemy_deck_power: EnemyDeckDefinition.EnemyDeckPowerType = EnemyDeckDefinition.EnemyDeckPowerType.NONE
 var darkness_shroud_active: bool = false
 
+var misdirection_used: bool = false
+
+
 # Tremor tracking system
 var active_tremors: Dictionary = {}  # tremor_id -> tremor_data
 var tremor_id_counter: int = 0
@@ -1470,6 +1473,7 @@ func end_game():
 	clear_all_ordain_effects()
 	clear_all_sanctuary_effects()
 	clear_all_trojan_horses()
+	misdirection_used = false
 	
 	var tracker = get_node("/root/BossPredictionTrackerAutoload")
 	if tracker:
@@ -2223,10 +2227,17 @@ func initialize_deck_power(deck_def: DeckDefinition):
 			setup_sun_power()
 		DeckDefinition.DeckPowerType.PROPHECY_POWER:
 			setup_prophecy_power()
+		DeckDefinition.DeckPowerType.MISDIRECTION_POWER:
+			setup_misdirection_power()
 		DeckDefinition.DeckPowerType.NONE:
 			print("No deck power for this deck")
 		_:
 			print("Unknown deck power type: ", active_deck_power)
+
+func setup_misdirection_power():
+	print("=== SETTING UP MISDIRECTION POWER ===")
+	misdirection_used = false
+	print("Misdirection power ready - right-click enemy cards to invert their stats")
 
 func setup_prophecy_power():
 	print("=== SETTING UP PROPHECY POWER ===")
@@ -2771,6 +2782,11 @@ func _on_grid_gui_input(event, grid_index):
 				else:
 					print("Cannot deploy trojan horse on occupied slot - can only deploy on empty slots")
 				return  # Don't process normal card placement during trojan horse mode
+	
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+		handle_misdirection_activation(grid_index)
+		return
+	
 	
 	if not turn_manager.is_player_turn():
 		return
@@ -5282,3 +5298,74 @@ func apply_sanctuary_cheat_death_if_applicable(grid_position: int, card_data: Ca
 		print("Sanctuary cheat death conditions NOT met")
 	
 	return false
+
+
+func handle_misdirection_activation(grid_index: int):
+	print("=== MISDIRECTION ACTIVATION ATTEMPT ===")
+	print("Grid index: ", grid_index)
+	print("Misdirection power active: ", active_deck_power == DeckDefinition.DeckPowerType.MISDIRECTION_POWER)
+	print("Misdirection already used: ", misdirection_used)
+	print("Slot occupied: ", grid_occupied[grid_index])
+	print("Slot owner: ", grid_ownership[grid_index] if grid_occupied[grid_index] else "NONE")
+	
+	# Check if misdirection power is available
+	if active_deck_power != DeckDefinition.DeckPowerType.MISDIRECTION_POWER:
+		print("Misdirection power not active for this deck")
+		return
+	
+	if misdirection_used:
+		print("Misdirection already used this battle")
+		if notification_manager:
+			notification_manager.show_notification("Misdirection already used this battle")
+		return
+	
+	# Check if the target is an enemy card
+	if not grid_occupied[grid_index]:
+		print("No card at target position")
+		if notification_manager:
+			notification_manager.show_notification("No target found")
+		return
+	
+	if grid_ownership[grid_index] != Owner.OPPONENT:
+		print("Target is not an enemy card")
+		if notification_manager:
+			notification_manager.show_notification("Can only target enemy cards")
+		return
+	
+	# Get the enemy card data
+	var enemy_card = grid_card_data[grid_index]
+	if not enemy_card:
+		print("No card data found at position")
+		return
+	
+	# Apply misdirection - invert N↔S and E↔W
+	print("MISDIRECTION ACTIVATED! Inverting stats for: ", enemy_card.card_name)
+	print("Original stats: ", enemy_card.values)
+	
+	# Store original values for logging
+	var original_north = enemy_card.values[0]
+	var original_east = enemy_card.values[1]
+	var original_south = enemy_card.values[2]
+	var original_west = enemy_card.values[3]
+	
+	# Perform the inversion: N↔S, E↔W
+	enemy_card.values[0] = original_south  # North becomes South
+	enemy_card.values[1] = original_west   # East becomes West
+	enemy_card.values[2] = original_north  # South becomes North
+	enemy_card.values[3] = original_east   # West becomes East
+	
+	print("Inverted stats: ", enemy_card.values)
+	print("N:", original_north, "→", enemy_card.values[0], " | E:", original_east, "→", enemy_card.values[1])
+	print("S:", original_south, "→", enemy_card.values[2], " | W:", original_west, "→", enemy_card.values[3])
+	
+	# Mark misdirection as used
+	misdirection_used = true
+	
+	# Update the visual display
+	update_card_display(grid_index, enemy_card)
+	
+	# Show notification
+	if notification_manager:
+		notification_manager.show_notification("🃏 Misdirection! " + enemy_card.card_name + "'s stats inverted!")
+	
+	print("Misdirection power used successfully!")

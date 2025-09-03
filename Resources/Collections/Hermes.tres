@@ -128,7 +128,7 @@ card_indices = Array[int]([0, 1, 2, 3, 4])
 is_starter_deck = true
 required_capture_exp = 0
 required_defense_exp = 0
-deck_power_type = 0
+deck_power_type = 3
 power_config = {}
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
