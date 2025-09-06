@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ChargeAbility" load_steps=2 format=3 uid="uid://crftkte5ybpgb"]
+
+[ext_resource type="Script" uid="uid://dh4c5feb2eu1v" path="res://Resources/Abilities/charge_ability.gd" id="1_0aihb"]
+
+[resource]
+script = ExtResource("1_0aihb")
+ability_name = "Charge"
+description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at them and capture."
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://dh4c5feb2eu1v"

@@ -761,6 +761,9 @@ func _on_turn_changed(is_player_turn: bool):
 		# Process corruption abilities at the start of opponent's turn
 		process_corruption_turn_start()
 	
+	# Process charge abilities at the start of each turn
+	process_charge_turn_start(is_player_turn)
+	
 	# Process tremors at the start of each player's turn
 	if is_player_turn:
 		process_tremors_for_player(Owner.PLAYER)
@@ -5409,3 +5412,163 @@ func handle_misdirection_activation(grid_index: int):
 		notification_manager.show_notification("🃏 Misdirection! " + enemy_card.card_name + "'s stats inverted!")
 	
 	print("Misdirection power used successfully!")
+
+func process_charge_turn_start(is_player_turn: bool):
+	if is_player_turn:
+		print("Processing charge abilities for player turn start")
+		# Check opponent-owned cards for charge against player targets
+		check_charge_triggers_for_owner(Owner.OPPONENT, Owner.PLAYER)
+	else:
+		print("Processing charge abilities for opponent turn start")
+		# Check player-owned cards for charge against opponent targets
+		check_charge_triggers_for_owner(Owner.PLAYER, Owner.OPPONENT)
+
+# Check for charge ability triggers for cards owned by charging_owner against target_owner
+func check_charge_triggers_for_owner(charging_owner: Owner, target_owner: Owner):
+	print("Checking charge triggers for ", get_owner_name(charging_owner), " against ", get_owner_name(target_owner))
+	
+	var charge_candidates = []
+	
+	# Check all occupied positions for cards with Charge ability
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:
+			continue
+			
+		var card = get_card_at_position(i)
+		var owner = get_owner_at_position(i)
+		
+		# Only check cards owned by the charging owner
+		if owner != charging_owner:
+			continue
+		
+		var card_level = get_card_level_for_position(i)
+		if not card.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			continue
+		
+		# Check if this card has Charge ability
+		var has_charge = false
+		for ability in card.get_available_abilities(card_level):
+			if ability.ability_name == "Charge":
+				has_charge = true
+				break
+		
+		if not has_charge:
+			continue
+		
+		print("Found Charge card: ", card.card_name, " at position ", i)
+		
+		# Check all enemy cards as potential targets
+		for j in range(grid_slots.size()):
+			if not grid_occupied[j]:
+				continue
+			
+			var target_card = get_card_at_position(j)
+			var target_owner_at_pos = get_owner_at_position(j)
+			
+			# Only target cards owned by the target owner
+			if target_owner_at_pos != target_owner:
+				continue
+			
+			# Check if this Charge card can target this enemy card
+			var charge_data = check_charge_conditions(i, card, j, target_card)
+			if charge_data != null:
+				charge_candidates.append(charge_data)
+	
+	# If we have multiple candidates, only activate the lowest slot number
+	if charge_candidates.size() > 1:
+		print("Multiple Charge triggers found - selecting lowest slot number")
+		charge_candidates.sort_custom(func(a, b): return a.charge_position < b.charge_position)
+		
+		# Only keep the first (lowest slot) candidate
+		var selected_candidate = charge_candidates[0]
+		print("Selected Charge candidate at position ", selected_candidate.charge_position)
+		charge_candidates = [selected_candidate]
+	
+	# Execute Charge if we have a valid candidate
+	if charge_candidates.size() == 1:
+		execute_charge(charge_candidates[0])
+
+func check_charge_conditions(charge_position: int, charge_card: CardResource, target_position: int, target_card: CardResource):
+	"""Check if a Charge card can target the given enemy card. Returns charge data Dictionary if valid, null if not."""
+	
+	print("Checking Charge conditions: position ", charge_position, " targeting position ", target_position)
+	
+	# Check if charge and target are in same row or column
+	var same_row_column = are_in_same_row_or_column(charge_position, target_position)
+	if not same_row_column.is_valid:
+		print("  Not in same row/column - Charge cannot trigger")
+		return null
+	
+	print("  Same ", same_row_column.type, " - checking for empty slot between")
+	
+	# Check if there's exactly one empty slot between them
+	var empty_slot = find_empty_slot_between(charge_position, target_position)
+	if empty_slot == -1:
+		print("  No empty slot between positions - Charge cannot trigger")
+		return null
+	
+	print("  Found empty slot at position ", empty_slot)
+	
+	# Determine attack direction from charge to target
+	var attack_direction = get_attack_direction(empty_slot, target_position)
+	if attack_direction == -1:
+		print("  Could not determine attack direction - Charge cannot trigger")
+		return null
+	
+	print("  Attack direction: ", get_direction_name_from_index(attack_direction))
+	print("  Charge trigger valid - charge always captures!")
+	
+	# Return charge data
+	return {
+		"charge_card": charge_card,
+		"charge_position": charge_position,
+		"target_card": target_card,
+		"target_position": target_position,
+		"move_to_position": empty_slot,
+		"attack_direction": attack_direction
+	}
+
+func execute_charge(charge_data: Dictionary):
+	"""Execute a charge ability with the given data"""
+	
+	print("EXECUTING CHARGE ABILITY")
+	print("  Charge card: ", charge_data.charge_card.card_name, " at position ", charge_data.charge_position)
+	print("  Target card: ", charge_data.target_card.card_name, " at position ", charge_data.target_position)
+	print("  Moving to position: ", charge_data.move_to_position)
+	print("  Attack direction: ", get_direction_name_from_index(charge_data.attack_direction))
+	
+	# Find the Charge ability instance
+	var charge_position = charge_data.charge_position
+	var charge_card = charge_data.charge_card
+	var card_level = get_card_level_for_position(charge_position)
+	
+	var charge_ability = null
+	for ability in charge_card.get_available_abilities(card_level):
+		if ability.ability_name == "Charge":
+			charge_ability = ability
+			break
+	
+	if not charge_ability:
+		print("ERROR: Could not find Charge ability on card")
+		return
+	
+	# Create context for the ability execution
+	var context = {
+		"charge_card": charge_data.charge_card,
+		"charge_position": charge_data.charge_position,
+		"target_card": charge_data.target_card,
+		"target_position": charge_data.target_position,
+		"move_to_position": charge_data.move_to_position,
+		"direction": charge_data.attack_direction,
+		"game_manager": self
+	}
+	
+	# Execute the Charge ability
+	charge_ability.execute(context)
+
+func get_owner_name(owner: Owner) -> String:
+	"""Get owner name for debugging"""
+	match owner:
+		Owner.PLAYER: return "Player"
+		Owner.OPPONENT: return "Opponent"
+		_: return "Neutral"
