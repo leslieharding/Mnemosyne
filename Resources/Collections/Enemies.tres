@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=161 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=165 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" uid="uid://dh1ykxl2k5ank" path="res://Resources/Abilities/infighting_ability.gd" id="8_sygum"]
 [ext_resource type="Script" uid="uid://bskifvkjo5blo" path="res://Resources/Abilities/bolster_confidence_ability.gd" id="8_upckc"]
 [ext_resource type="Script" uid="uid://cjryt268c8rko" path="res://Resources/Abilities/chaos_ability.gd" id="8_vfgb0"]
+[ext_resource type="Script" uid="uid://dh4c5feb2eu1v" path="res://Resources/Abilities/charge_ability.gd" id="11_cakw3"]
 [ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="12_r05oc"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
@@ -758,12 +759,20 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_svebx"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_x1kcy"), SubResource("Resource_wg2k6"), SubResource("Resource_mvnyh")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_hjvcs"]
+script = ExtResource("11_cakw3")
+ability_name = "Charge"
+description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
+
 [sub_resource type="Resource" id="Resource_61b1n"]
 script = ExtResource("2_xcqsp")
 card_name = "Marsyas Flayed"
 values = Array[int]([5, 6, 8, 2])
 description = "How can those judges be fair? they are your Aunts are they not?"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_hjvcs")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -808,12 +817,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_q75w4"]
+script = ExtResource("11_cakw3")
+ability_name = "Charge"
+description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
+
 [sub_resource type="Resource" id="Resource_i860w"]
 script = ExtResource("2_xcqsp")
 card_name = "Marsyas Flayed"
 values = Array[int]([6, 7, 9, 3])
 description = "How can those judges be fair? they are your Aunts are they not?"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_q75w4")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -858,12 +875,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_igddo"]
+script = ExtResource("11_cakw3")
+ability_name = "Charge"
+description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
+
 [sub_resource type="Resource" id="Resource_eoqwl"]
 script = ExtResource("2_xcqsp")
 card_name = "Marsyas Flayed"
 values = Array[int]([7, 8, 8, 5])
 description = "How can those judges be fair? they are your Aunts are they not?"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_igddo")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -1177,7 +1202,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_bsikd"]
 script = ExtResource("1_e7ref")
 enemy_name = "The Plague"
-enemy_description = "Atone, Consult, Dose, Rest - but ultimately Pray"
+enemy_description = "Atone, Consult, Dose, Rest - But ultimately Pray"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_wesbp"), SubResource("Resource_hipqu"), SubResource("Resource_qxjpb"), SubResource("Resource_fl83v"), SubResource("Resource_dftyx"), SubResource("Resource_ylk1d"), SubResource("Resource_rorqn"), SubResource("Resource_kv21b"), SubResource("Resource_6ktpb"), SubResource("Resource_xwhr2"), SubResource("Resource_gimv3"), SubResource("Resource_myuly"), SubResource("Resource_xhuqv"), SubResource("Resource_0vwsy"), SubResource("Resource_3mdct")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_5m6f6"), SubResource("Resource_ctnn8"), SubResource("Resource_c4kby")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"

@@ -4,7 +4,7 @@ extends CardAbility
 
 func _init():
 	ability_name = "Charge"
-	description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at them and capture."
+	description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
 	trigger_condition = TriggerType.PASSIVE  # We'll use PASSIVE since we need custom triggering
 
 func execute(context: Dictionary) -> bool:
