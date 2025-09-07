@@ -13,9 +13,33 @@ func execute(context: Dictionary) -> bool:
 	
 	# Check if this is a passive ability setup call (when card is first placed)
 	var passive_action = context.get("passive_action", "")
-	if passive_action == "apply" or passive_action == "remove":
-		# This is just passive ability management - Charge doesn't need to do anything here
-		print("ChargeAbility: Passive ability setup - no action needed")
+	if passive_action == "apply":
+		# Only mark as "just placed" if this is a fresh placement, not a reactivation after movement
+		var charge_card = context.get("boosting_card")
+		var game_manager = context.get("game_manager")
+		if charge_card and game_manager:
+			# Check if this card already has placement metadata - if so, preserve it
+			if not charge_card.has_meta("charge_placed_turn"):
+				# This is a fresh placement - mark it as unable to charge this turn
+				charge_card.set_meta("charge_placed_turn", game_manager.get_current_turn_number())
+				print("ChargeAbility: Card freshly placed on turn ", game_manager.get_current_turn_number(), " - charging disabled for this turn")
+			else:
+				# This card already has placement metadata - keep the original placement turn
+				var original_placement_turn = charge_card.get_meta("charge_placed_turn")
+				print("ChargeAbility: Card already has placement metadata from turn ", original_placement_turn, " - preserving original placement turn")
+		return true
+	elif passive_action == "remove":
+		# Only clean up metadata if this is a real removal (capture/destruction), not a refresh
+		var charge_card = context.get("boosting_card")
+		if charge_card:
+			# Check if this is a refresh (re-applying abilities) vs real removal
+			# During refresh, we want to keep the placement turn metadata
+			var is_refresh = context.get("is_refresh", false)
+			if not is_refresh:
+				charge_card.remove_meta("charge_placed_turn")
+				print("ChargeAbility: Charge metadata cleaned up (real removal)")
+			else:
+				print("ChargeAbility: Refresh detected - keeping charge placement metadata")
 		return true
 	
 	var charge_card = context.get("charge_card")

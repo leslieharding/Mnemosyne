@@ -745,6 +745,7 @@ func _on_game_started():
 		
 
 func _on_turn_changed(is_player_turn: bool):
+	print("*** TURN CHANGED EVENT FIRED: is_player_turn=", is_player_turn, " ***")
 	print("Turn changed - is_player_turn: ", is_player_turn, " | opponent_is_thinking: ", opponent_is_thinking)
 	update_game_status()
 	
@@ -762,7 +763,7 @@ func _on_turn_changed(is_player_turn: bool):
 		process_corruption_turn_start()
 	
 	# Process charge abilities at the start of each turn
-	process_charge_turn_start(is_player_turn)
+	await process_charge_turn_start(is_player_turn)
 	
 	# Process tremors at the start of each player's turn
 	if is_player_turn:
@@ -2601,13 +2602,7 @@ func handle_card_selection(card_display, card_index):
 
 # Handle card input events
 func _on_card_gui_input(event, card_display, card_index):
-	print("=== CARD INPUT RECEIVED ===")
-	print("Event: ", event)
-	print("Card index: ", card_index)
-	print("Input processing enabled: ", is_processing_input())
-	print("Tutorial mode: ", is_tutorial_mode)
-	print("Turn manager active: ", turn_manager.is_game_active)
-	print("Is player turn: ", turn_manager.is_player_turn())
+	
 	
 	# In tutorial mode, FORCE allow card selection regardless of turn state
 	if is_tutorial_mode:
@@ -2729,19 +2724,7 @@ func apply_selection_highlight(grid_index: int):
 
 func _on_grid_gui_input(event, grid_index):
 	
-	print("=== GRID INPUT RECEIVED ===")
-	print("Grid index: ", grid_index)
-	print("Event type: ", event.get_class())
-	print("Event: ", event)
 	
-	if event is InputEventMouseButton:
-		print("Mouse button event detected!")
-		print("  Button index: ", event.button_index)
-		print("  Pressed: ", event.pressed)
-		print("  RIGHT MOUSE CONSTANT: ", MOUSE_BUTTON_RIGHT)
-		print("  Is right click: ", event.button_index == MOUSE_BUTTON_RIGHT)
-		print("  Is pressed: ", event.pressed)
-		print("  Right click + pressed: ", event.button_index == MOUSE_BUTTON_RIGHT and event.pressed)
 	
 	
 	# Handle dance target selection FIRST (but only during dance mode setup)
@@ -3135,9 +3118,7 @@ func handle_passive_abilities_on_place(grid_position: int, card_data: CardResour
 	refresh_all_passive_abilities()
 
 func _on_grid_card_right_click(event, grid_index: int):
-	print("=== GRID CARD RIGHT-CLICK RECEIVED ===")
-	print("Grid index: ", grid_index)
-	print("Event: ", event)
+	
 	
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		print("Right-click confirmed on grid card at position ", grid_index)
@@ -3191,7 +3172,8 @@ func refresh_all_passive_abilities():
 					"passive_action": "remove",
 					"boosting_card": card_data,
 					"boosting_position": position,
-					"game_manager": self
+					"game_manager": self,
+					"is_refresh": true  # Mark this as a refresh, not a real removal
 				}
 				ability.execute(passive_context)
 	
@@ -3263,7 +3245,6 @@ func refresh_all_passive_abilities():
 				var card_display = get_card_display_at_position(position)
 				if card_display and visual_effects_manager:
 					visual_effects_manager.start_passive_pulse(card_display)
-
 func should_passive_ability_be_active(ability: CardAbility, card_owner: Owner, position: int) -> bool:
 	match ability.ability_name:
 		"Cultivate":
@@ -5416,63 +5397,96 @@ func handle_misdirection_activation(grid_index: int):
 func process_charge_turn_start(is_player_turn: bool):
 	if is_player_turn:
 		print("Processing charge abilities for player turn start")
-		# Check opponent-owned cards for charge against player targets
-		check_charge_triggers_for_owner(Owner.OPPONENT, Owner.PLAYER)
-	else:
-		print("Processing charge abilities for opponent turn start")
 		# Check player-owned cards for charge against opponent targets
 		check_charge_triggers_for_owner(Owner.PLAYER, Owner.OPPONENT)
+	else:
+		print("Processing charge abilities for opponent turn start")
+		# Check opponent-owned cards for charge against player targets
+		check_charge_triggers_for_owner(Owner.OPPONENT, Owner.PLAYER)
 
 # Check for charge ability triggers for cards owned by charging_owner against target_owner
 func check_charge_triggers_for_owner(charging_owner: Owner, target_owner: Owner):
+	print("=== CHARGE CHECK DEBUG ===")
 	print("Checking charge triggers for ", get_owner_name(charging_owner), " against ", get_owner_name(target_owner))
 	
 	var charge_candidates = []
+	var current_turn = get_current_turn_number()
+	print("Current turn number: ", current_turn)
 	
 	# Check all occupied positions for cards with Charge ability
 	for i in range(grid_slots.size()):
+		print("Checking position ", i, " - occupied: ", grid_occupied[i])
 		if not grid_occupied[i]:
 			continue
 			
 		var card = get_card_at_position(i)
 		var owner = get_owner_at_position(i)
 		
+		print("  Position ", i, " has card: ", card.card_name if card else "none", " owned by: ", get_owner_name(owner))
+		
 		# Only check cards owned by the charging owner
 		if owner != charging_owner:
+			print("  Wrong owner - skipping")
 			continue
 		
 		var card_level = get_card_level_for_position(i)
 		if not card.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			print("  No passive abilities - skipping")
 			continue
 		
 		# Check if this card has Charge ability
 		var has_charge = false
-		for ability in card.get_available_abilities(card_level):
+		var available_abilities = card.get_available_abilities(card_level)
+		print("  Card has ", available_abilities.size(), " available abilities:")
+		for ability in available_abilities:
+			print("    - ", ability.ability_name, " (trigger: ", ability.trigger_condition, ")")
 			if ability.ability_name == "Charge":
 				has_charge = true
-				break
 		
 		if not has_charge:
+			print("  No Charge ability - skipping")
 			continue
 		
-		print("Found Charge card: ", card.card_name, " at position ", i)
+		print("  *** FOUND CHARGE CARD: ", card.card_name, " at position ", i, " ***")
+		
+		# NEW: Check if this card was placed this turn (if so, skip it)
+		if card.has_meta("charge_placed_turn"):
+			var placed_turn = card.get_meta("charge_placed_turn")
+			print("  Charge card placed on turn: ", placed_turn, " (current turn: ", current_turn, ")")
+			if placed_turn == current_turn:
+				print("  *** CHARGE CARD PLACED THIS TURN - SKIPPING ***")
+				continue
+			else:
+				print("  Charge card placed on previous turn - can charge")
+		else:
+			print("  No placement turn metadata - can charge")
 		
 		# Check all enemy cards as potential targets
 		for j in range(grid_slots.size()):
+			print("    Checking target position ", j, " - occupied: ", grid_occupied[j])
 			if not grid_occupied[j]:
 				continue
 			
 			var target_card = get_card_at_position(j)
 			var target_owner_at_pos = get_owner_at_position(j)
 			
+			print("      Target position ", j, " has card: ", target_card.card_name if target_card else "none", " owned by: ", get_owner_name(target_owner_at_pos))
+			
 			# Only target cards owned by the target owner
 			if target_owner_at_pos != target_owner:
+				print("      Wrong target owner - skipping")
 				continue
 			
+			print("      *** CHECKING CHARGE CONDITIONS: position ", i, " vs position ", j, " ***")
 			# Check if this Charge card can target this enemy card
 			var charge_data = check_charge_conditions(i, card, j, target_card)
 			if charge_data != null:
+				print("      *** CHARGE TRIGGER VALID! ***")
 				charge_candidates.append(charge_data)
+			else:
+				print("      Charge conditions not met")
+	
+	print("Found ", charge_candidates.size(), " charge candidates")
 	
 	# If we have multiple candidates, only activate the lowest slot number
 	if charge_candidates.size() > 1:
@@ -5486,37 +5500,62 @@ func check_charge_triggers_for_owner(charging_owner: Owner, target_owner: Owner)
 	
 	# Execute Charge if we have a valid candidate
 	if charge_candidates.size() == 1:
+		print("*** EXECUTING CHARGE! ***")
 		execute_charge(charge_candidates[0])
+	else:
+		print("*** NO VALID CHARGE TRIGGERS FOUND ***")
+	
+	print("=== END CHARGE CHECK ===")
 
 func check_charge_conditions(charge_position: int, charge_card: CardResource, target_position: int, target_card: CardResource):
 	"""Check if a Charge card can target the given enemy card. Returns charge data Dictionary if valid, null if not."""
 	
-	print("Checking Charge conditions: position ", charge_position, " targeting position ", target_position)
+	print("      Checking Charge conditions: position ", charge_position, " targeting position ", target_position)
 	
 	# Check if charge and target are in same row or column
 	var same_row_column = are_in_same_row_or_column(charge_position, target_position)
 	if not same_row_column.is_valid:
-		print("  Not in same row/column - Charge cannot trigger")
+		print("        Not in same row/column - Charge cannot trigger")
 		return null
 	
-	print("  Same ", same_row_column.type, " - checking for empty slot between")
+	print("        Same ", same_row_column.type, " - checking for empty slot between")
 	
 	# Check if there's exactly one empty slot between them
 	var empty_slot = find_empty_slot_between(charge_position, target_position)
 	if empty_slot == -1:
-		print("  No empty slot between positions - Charge cannot trigger")
+		print("        No single empty slot between positions - Charge cannot trigger")
+		# Let's also debug what slots are between them
+		var x1 = charge_position % grid_size
+		var y1 = charge_position / grid_size
+		var x2 = target_position % grid_size
+		var y2 = target_position / grid_size
+		
+		if y1 == y2:  # Same row
+			print("        Same row debug - positions between ", charge_position, " and ", target_position, ":")
+			var min_x = min(x1, x2)
+			var max_x = max(x1, x2)
+			for x in range(min_x + 1, max_x):
+				var check_pos = y1 * grid_size + x
+				print("          Position ", check_pos, " occupied: ", grid_occupied[check_pos])
+		elif x1 == x2:  # Same column
+			print("        Same column debug - positions between ", charge_position, " and ", target_position, ":")
+			var min_y = min(y1, y2)
+			var max_y = max(y1, y2)
+			for y in range(min_y + 1, max_y):
+				var check_pos = y * grid_size + x1
+				print("          Position ", check_pos, " occupied: ", grid_occupied[check_pos])
 		return null
 	
-	print("  Found empty slot at position ", empty_slot)
+	print("        Found empty slot at position ", empty_slot)
 	
 	# Determine attack direction from charge to target
 	var attack_direction = get_attack_direction(empty_slot, target_position)
 	if attack_direction == -1:
-		print("  Could not determine attack direction - Charge cannot trigger")
+		print("        Could not determine attack direction - Charge cannot trigger")
 		return null
 	
-	print("  Attack direction: ", get_direction_name_from_index(attack_direction))
-	print("  Charge trigger valid - charge always captures!")
+	print("        Attack direction: ", get_direction_name_from_index(attack_direction))
+	print("        Charge trigger valid - charge always captures!")
 	
 	# Return charge data
 	return {
@@ -5527,7 +5566,6 @@ func check_charge_conditions(charge_position: int, charge_card: CardResource, ta
 		"move_to_position": empty_slot,
 		"attack_direction": attack_direction
 	}
-
 func execute_charge(charge_data: Dictionary):
 	"""Execute a charge ability with the given data"""
 	
