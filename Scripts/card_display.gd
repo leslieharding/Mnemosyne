@@ -57,19 +57,18 @@ func create_selection_styles():
 	
 
 
-# Replace the setup and update_display functions in Scripts/card_display.gd (around lines 45-70)
 
-func setup(card: CardResource, level: int = 1, god: String = "", index: int = -1):
+func setup(card: CardResource, level: int = 1, god: String = "", index: int = -1, is_opponent_card: bool = false):
 	card_data = card
 	card_level = level
 	god_name = god
 	card_index = index
 	
-	print("CardDisplay setup - Card: ", card.card_name, " Level: ", level, " God: ", god, " Index: ", index)
-	print("CardDisplay setup - Card values: ", card.values)
+	print("CardDisplay setup - Card: ", card.card_name, " Level: ", level, " God: ", god, " Index: ", index, " Opponent: ", is_opponent_card)
 	
-	# Always use the values from the card data that was passed in
-	# This card data should already have the correct level-appropriate values applied
+	# Store whether this is an opponent card for display purposes
+	set_meta("is_opponent_card", is_opponent_card)
+	
 	update_display()
 
 func update_display():
@@ -77,9 +76,17 @@ func update_display():
 		print("CardDisplay: No card data available")
 		return
 	
-	# Use the values directly from the card data
-	# The card data should already have the correct values applied when it was created
-	var values_to_use = card_data.values
+	var values_to_use = card_data.values.duplicate()
+	
+	# Apply Hermes visual inversion if this is an opponent card
+	var is_opponent_card = get_meta("is_opponent_card", false)
+	if is_opponent_card:
+		# Get the battle manager to check if visual inversion is active
+		var battle_manager = get_tree().get_first_node_in_group("battle_manager")
+		if battle_manager and battle_manager.has_method("get_display_value_for_opponent_card"):
+			for i in range(values_to_use.size()):
+				values_to_use[i] = battle_manager.get_display_value_for_opponent_card(values_to_use[i])
+			print("Applied Hermes visual inversion to opponent card: ", card_data.card_name, " - display values: ", values_to_use)
 	
 	print("CardDisplay: Using card values: ", values_to_use)
 	

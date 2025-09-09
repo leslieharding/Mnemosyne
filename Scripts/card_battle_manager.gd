@@ -24,6 +24,9 @@ var darkness_shroud_active: bool = false
 
 var misdirection_used: bool = false
 
+# Hermes boss visual inversion system
+var is_hermes_boss_battle: bool = false
+var visual_stat_inversion_active: bool = false
 
 # Tremor tracking system
 var active_tremors: Dictionary = {}  # tremor_id -> tremor_data
@@ -215,6 +218,9 @@ func _ready():
 	# Add journal button (unless tutorial mode)
 	setup_journal_button()
 	
+	# Add to battle manager group for cross-script communication
+	add_to_group("battle_manager")
+	
 	if params.has("deck_index"):
 		selected_deck_index = params.deck_index
 		load_player_deck(selected_deck_index)
@@ -341,7 +347,19 @@ func setup_boss_prediction_tracker():
 	var params = get_scene_params()
 	if params.has("current_node"):
 		var current_node = params["current_node"]
-		is_boss_battle = (current_node.enemy_name == "?????")
+		is_boss_battle = current_node.node_type == MapNode.NodeType.BOSS
+		
+		# Check for specific boss types using centralized config
+		if is_boss_battle:
+			if current_node.enemy_name == BossConfig.APOLLO_BOSS_NAME:
+				print("Apollo boss battle detected - prediction system activated!")
+				game_status_label.text = "The oracle's gaze pierces through time..."
+			elif current_node.enemy_name == BossConfig.HERMES_BOSS_NAME:
+				is_hermes_boss_battle = true
+				visual_stat_inversion_active = true
+				print("Hermes boss battle detected - visual stat inversion activated!")
+				game_status_label.text = "The trickster's illusions warp your perception..."
+		
 		print("Boss battle detected: ", is_boss_battle)
 	
 	print("Boss prediction tracker initialized")
@@ -721,7 +739,17 @@ func _on_coin_flip_result(player_goes_first: bool):
 		game_status_label.text = "Opponent won the coin flip! They go first."
 		# Add this new section:
 		if is_boss_battle:
-			game_status_label.text = "The boss allows you to go first... 'I know what you will do.'"
+			var params = get_scene_params()
+			if params.has("current_node"):
+				var current_node = params["current_node"]
+				if current_node.enemy_name == BossConfig.APOLLO_BOSS_NAME:
+					game_status_label.text = "The boss allows you to go first... 'I know what you will do.'"
+				elif current_node.enemy_name == BossConfig.HERMES_BOSS_NAME:
+					game_status_label.text = "The trickster grins... 'After you, mortal.'"
+				else:
+					game_status_label.text = "The boss allows you to go first..."
+			else:
+				game_status_label.text = "The boss allows you to go first..."
 			turn_manager.current_player = TurnManager.Player.HUMAN
 			player_goes_first = true
 	
@@ -1375,7 +1403,7 @@ func _on_opponent_card_placed(grid_index: int):
 	await get_tree().process_frame
 	
 	# NOW setup the card display with the actual card data
-	card_display.setup(opponent_card_data)
+	card_display.setup(opponent_card_data, opponent_card_level, current_god, 0, true)  # true = is_opponent_card
 	
 	# Connect hover signals for opponent cards too
 	card_display.card_hovered.connect(_on_card_hovered)
@@ -5610,3 +5638,21 @@ func get_owner_name(owner: Owner) -> String:
 		Owner.PLAYER: return "Player"
 		Owner.OPPONENT: return "Opponent"
 		_: return "Neutral"
+
+# Helper function for Hermes visual trickery - inverts OPPONENT card display values only
+func get_display_value_for_opponent_card(actual_value: int) -> int:
+	if not visual_stat_inversion_active:
+		return actual_value
+	
+	# Invert values: 1<->9, 2<->8, 3<->7, 4<->6, 5 stays 5
+	match actual_value:
+		1: return 9
+		2: return 8
+		3: return 7
+		4: return 6
+		5: return 5
+		6: return 4
+		7: return 3
+		8: return 2
+		9: return 1
+		_: return actual_value
