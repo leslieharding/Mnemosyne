@@ -16,7 +16,7 @@ static func generate_map(god_name: String = "Apollo") -> MapData:
 	map_data.layer_node_counts = NODES_PER_LAYER
 	
 	# PRE-ASSIGN ENEMIES TO TIERS
-	var tier_enemy_assignments = assign_enemies_to_tiers()
+	var tier_enemy_assignments = assign_enemies_to_tiers(god_name)
 	print("Tier enemy assignments: ", tier_enemy_assignments)
 	
 	# Generate nodes for each layer
@@ -24,7 +24,7 @@ static func generate_map(god_name: String = "Apollo") -> MapData:
 	var nodes_by_layer: Array = []
 	
 	for layer in range(LAYER_COUNT):
-		var layer_nodes = generate_layer_nodes(layer, node_id_counter, tier_enemy_assignments)
+		var layer_nodes = generate_layer_nodes(layer, node_id_counter, tier_enemy_assignments, god_name)
 		nodes_by_layer.append(layer_nodes)
 		
 		# Add nodes to the main array
@@ -93,7 +93,7 @@ static func assign_enemies_to_tiers(god_name: String = "Apollo") -> Dictionary:
 	return tier_assignments
 
 # Generate nodes for a specific layer
-static func generate_layer_nodes(layer: int, starting_id: int, tier_enemy_assignments: Dictionary) -> Array[MapNode]:
+static func generate_layer_nodes(layer: int, starting_id: int, tier_enemy_assignments: Dictionary, god_name: String = "Apollo") -> Array[MapNode]:
 	var layer_nodes: Array[MapNode] = []
 	var node_count = NODES_PER_LAYER[layer]
 	
@@ -124,7 +124,7 @@ static func generate_layer_nodes(layer: int, starting_id: int, tier_enemy_assign
 		var node = MapNode.new(starting_id + i, node_type, position)
 		
 		# Assign enemy to this node using the pre-assigned tier enemies
-		assign_enemy_to_node_with_tier_assignments(node, layer, tier_enemy_assignments)
+		assign_enemy_to_node_with_tier_assignments(node, layer, tier_enemy_assignments, god_name)
 		
 		layer_nodes.append(node)
 	
@@ -138,7 +138,7 @@ static func determine_node_type(layer: int, index_in_layer: int) -> MapNode.Node
 	else:
 		return MapNode.NodeType.BATTLE
 
-static func assign_enemy_to_node_with_tier_assignments(node: MapNode, layer: int, tier_assignments: Dictionary):
+static func assign_enemy_to_node_with_tier_assignments(node: MapNode, layer: int, tier_assignments: Dictionary, god_name: String = "Apollo"):
 	var enemies_collection: EnemiesCollection = load("res://Resources/Collections/Enemies.tres")
 	if not enemies_collection:
 		# Fallback if enemies collection not found
@@ -148,10 +148,10 @@ static func assign_enemy_to_node_with_tier_assignments(node: MapNode, layer: int
 	
 	# Assign enemy based on node type
 	if node.node_type == MapNode.NodeType.BOSS:
-		# Always assign the boss to boss nodes
-		node.enemy_name = "?????"
+		# Use the god-specific boss
+		node.enemy_name = BossConfig.get_boss_name_for_god(god_name)
 		node.enemy_difficulty = 2  # Master difficulty for boss
-		print("Assigned boss: ????? to boss node")
+		print("Assigned boss: ", node.enemy_name, " for god: ", god_name)
 	else:
 		# Get the pre-assigned enemy for this tier
 		var assigned_enemy = tier_assignments.get(layer, "Shadow Acolyte")
