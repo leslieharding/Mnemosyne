@@ -707,12 +707,6 @@ func start_game():
 func get_tutorial_status_message() -> String:
 	return "Select a card and place it on the grid"
 
-
-
-
-
-
-# Handle coin flip result
 func _on_coin_flip_result(player_goes_first: bool):
 	# Override coin flip result if prophecy power is active
 	if active_deck_power == DeckDefinition.DeckPowerType.PROPHECY_POWER:
@@ -721,23 +715,23 @@ func _on_coin_flip_result(player_goes_first: bool):
 		# Force the turn manager to recognize player goes first
 		turn_manager.current_player = TurnManager.Player.HUMAN
 		
-		# Still activate boss prediction tracking if not a boss battle
-		if not is_boss_battle:
+		# Activate boss prediction tracking for Apollo decks (but not during boss battles)
+		if current_god == "Apollo" and not is_boss_battle:
 			get_node("/root/BossPredictionTrackerAutoload").start_recording_battle()
 			# Show atmospheric notification
 			if notification_manager:
 				notification_manager.show_notification("You know you are being watched")
 	elif player_goes_first:
 		game_status_label.text = "You won the coin flip! You go first."
-		# Add this new section:
-		if not is_boss_battle:
+		# Only start boss prediction tracking when player is using Apollo deck (but not during boss battles)
+		if current_god == "Apollo" and not is_boss_battle:
 			get_node("/root/BossPredictionTrackerAutoload").start_recording_battle()
 			# Show atmospheric notification
 			if notification_manager:
 				notification_manager.show_notification("You get the feeling you are being watched")
 	else:
 		game_status_label.text = "Opponent won the coin flip! They go first."
-		# Add this new section:
+		# Handle boss-specific dialogue
 		if is_boss_battle:
 			var params = get_scene_params()
 			if params.has("current_node"):

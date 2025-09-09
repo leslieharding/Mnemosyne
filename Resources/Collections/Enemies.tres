@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=171 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=172 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -1454,12 +1454,22 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_gbksv"]
+script = ExtResource("3_601pn")
+deck_name = "Hermes Boss"
+deck_description = "test hermes boss"
+difficulty_level = 0
+card_indices = Array[int]([0, 1, 2, 3, 4])
+deck_power_type = 0
+power_config = {}
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
 [sub_resource type="Resource" id="Resource_go2fa"]
 script = ExtResource("1_e7ref")
 enemy_name = "Hermes Boss"
 enemy_description = "The hermes boss for testing"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_lasla"), SubResource("Resource_vsd4h"), SubResource("Resource_hybsk"), SubResource("Resource_pcu0e"), SubResource("Resource_8yysy")])
-decks = Array[ExtResource("3_601pn")]([])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_gbksv")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
 [resource]
