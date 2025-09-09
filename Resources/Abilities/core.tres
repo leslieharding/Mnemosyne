@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CoreAbility" load_steps=2 format=3 uid="uid://dr2wcjx3afd4j"]
+
+[ext_resource type="Script" uid="uid://ch8hny3xbynvi" path="res://Resources/Abilities/core_ability.gd" id="1_ri0lp"]
+
+[resource]
+script = ExtResource("1_ri0lp")
+ability_name = "Core"
+description = "If played in the central slot it gains +2 stats"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://ch8hny3xbynvi"
