@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CharmAbility" load_steps=2 format=3 uid="uid://bufn8f7prtrtv"]
+
+[ext_resource type="Script" uid="uid://buhjtyfib4g6b" path="res://Resources/Abilities/charm_ability.gd" id="1_qusxe"]
+
+[resource]
+script = ExtResource("1_qusxe")
+ability_name = "Charm"
+description = "On play this card draws in distant enemies then attacks them."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://buhjtyfib4g6b"

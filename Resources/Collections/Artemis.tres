@@ -1,17 +1,26 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=12 format=3 uid="uid://dwrds6g3whmsq"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=14 format=3 uid="uid://dwrds6g3whmsq"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_ttyo6"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_nyy1t"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_swqiw"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_021ek"]
+[ext_resource type="Script" uid="uid://buhjtyfib4g6b" path="res://Resources/Abilities/charm_ability.gd" id="3_lnj4m"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_nyy1t"]
+
+[sub_resource type="Resource" id="Resource_8h57p"]
+script = ExtResource("3_lnj4m")
+ability_name = "Charm"
+description = "On play this card draws in distant enemies then attacks them."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://buhjtyfib4g6b"
 
 [sub_resource type="Resource" id="Resource_lnj4m"]
 script = ExtResource("1_ttyo6")
 card_name = "Atalanta"
 values = Array[int]([5, 5, 5, 5])
 description = ""
-abilities = Array[ExtResource("2_nyy1t")]([])
+abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_8h57p")])
 level_data = Array[ExtResource("3_021ek")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
