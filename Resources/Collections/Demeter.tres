@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=12 format=3 uid="uid://dgxi7oww6yrg0"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=17 format=3 uid="uid://dgxi7oww6yrg0"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_stdfb"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_0nxk6"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_60vm0"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_0nxk6"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_34bjj"]
+[ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="4_34bjj"]
 
 [sub_resource type="Resource" id="Resource_5rr7c"]
 script = ExtResource("1_stdfb")
@@ -56,6 +57,44 @@ level_data = Array[ExtResource("3_34bjj")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_k8dqu"]
+script = ExtResource("4_34bjj")
+ability_name = "Extended Range"
+description = "Attacks in all directions"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://43v8bwokc47i"
+
+[sub_resource type="Resource" id="Resource_5fthg"]
+script = ExtResource("1_stdfb")
+card_name = "Cerberus"
+values = Array[int]([7, 7, 7, 7])
+description = "The hound of Hell "
+abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_k8dqu")])
+level_data = Array[ExtResource("3_34bjj")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_w2mmm"]
+script = ExtResource("1_stdfb")
+card_name = "Hades"
+values = Array[int]([6, 8, 8, 6])
+description = "The King of the Underworld"
+abilities = Array[ExtResource("2_0nxk6")]([])
+level_data = Array[ExtResource("3_34bjj")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_4cibv"]
+script = ExtResource("1_stdfb")
+card_name = "Hecate"
+values = Array[int]([5, 5, 5, 5])
+description = "A torch to reveal any darkness"
+abilities = Array[ExtResource("2_0nxk6")]([])
+level_data = Array[ExtResource("3_34bjj")]([])
+uses_level_progression = false
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
 [sub_resource type="Resource" id="Resource_dqtp2"]
 script = ExtResource("2_60vm0")
 deck_name = "Natures Bounty"
@@ -71,6 +110,6 @@ metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 [resource]
 script = ExtResource("3_0nxk6")
 god_name = ""
-cards = Array[ExtResource("1_stdfb")]([SubResource("Resource_5rr7c"), SubResource("Resource_rjcyb"), SubResource("Resource_0ni4c"), SubResource("Resource_wun1n"), SubResource("Resource_f4d4a")])
+cards = Array[ExtResource("1_stdfb")]([SubResource("Resource_5rr7c"), SubResource("Resource_rjcyb"), SubResource("Resource_0ni4c"), SubResource("Resource_wun1n"), SubResource("Resource_f4d4a"), SubResource("Resource_5fthg"), SubResource("Resource_w2mmm"), SubResource("Resource_4cibv")])
 decks = Array[ExtResource("2_60vm0")]([SubResource("Resource_dqtp2")])
 metadata/_custom_type_script = "uid://bdwr18g3ouvfo"
