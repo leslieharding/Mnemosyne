@@ -32,6 +32,8 @@ var visual_stat_inversion_active: bool = false
 var active_tremors: Dictionary = {}  # tremor_id -> tremor_data
 var tremor_id_counter: int = 0
 
+var soothe_active: bool = false
+
 # Compel tracking system
 var compel_mode_active: bool = false
 var current_compeller_position: int = -1
@@ -1357,6 +1359,28 @@ func _on_opponent_card_placed(grid_index: int):
 	
 	# Get the card data that the opponent just played
 	var opponent_card_data = opponent_manager.get_last_played_card()
+	if not opponent_card_data:
+		print("Warning: Could not get opponent card data!")
+		opponent_is_thinking = false
+		return
+	
+	# : Create a deep copy of the card data to avoid modifying the original
+	opponent_card_data = opponent_card_data.duplicate(true)
+	
+	# Apply Soothe effect if active - MUST be done BEFORE other modifications
+	if soothe_active:
+		print("Applying Soothe effect to opponent card: ", opponent_card_data.card_name)
+		print("Original stats: ", opponent_card_data.values)
+		
+		# Reduce all stats by 1, minimum 0
+		for i in range(opponent_card_data.values.size()):
+			opponent_card_data.values[i] = max(0, opponent_card_data.values[i] - 1)
+		
+		print("Soothed stats: ", opponent_card_data.values)
+		
+		# Deactivate soothe after use
+		soothe_active = false
+		print("Soothe effect has been consumed")
 	if not opponent_card_data:
 		print("Warning: Could not get opponent card data!")
 		opponent_is_thinking = false
@@ -5650,3 +5674,10 @@ func get_display_value_for_opponent_card(actual_value: int) -> int:
 		8: return 2
 		9: return 1
 		_: return actual_value
+
+func set_soothe_active(active: bool):
+	soothe_active = active
+	if active:
+		print("Soothe effect activated - next opponent card will be weakened")
+	else:
+		print("Soothe effect deactivated")

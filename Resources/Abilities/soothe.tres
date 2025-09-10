@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SootheAbility" load_steps=2 format=3 uid="uid://d1r0prldr6axp"]
+
+[ext_resource type="Script" uid="uid://c4aeeb6pohv6k" path="res://Resources/Abilities/soothe_ability.gd" id="1_p47g1"]
+
+[resource]
+script = ExtResource("1_p47g1")
+ability_name = "Soothe"
+description = "Reduces the strength of the next card played by your opponent by 1."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://c4aeeb6pohv6k"
