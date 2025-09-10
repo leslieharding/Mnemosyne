@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="QueenUnderworldAbility" load_steps=2 format=3 uid="uid://bvdjjjjety115"]
+
+[ext_resource type="Script" uid="uid://pi7ejymr8slf" path="res://Resources/Abilities/queen_underworld_ability.gd" id="1_rs8de"]
+
+[resource]
+script = ExtResource("1_rs8de")
+ability_name = "Queen Of The Underworld"
+description = "On play summon a random ally from the underworld."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://pi7ejymr8slf"

@@ -1,19 +1,68 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=17 format=3 uid="uid://dgxi7oww6yrg0"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=24 format=3 uid="uid://dgxi7oww6yrg0"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_stdfb"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_0nxk6"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_60vm0"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_0nxk6"]
+[ext_resource type="Script" uid="uid://pi7ejymr8slf" path="res://Resources/Abilities/queen_underworld_ability.gd" id="3_5rr7c"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_34bjj"]
 [ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="4_34bjj"]
+
+[sub_resource type="Resource" id="Resource_xcclb"]
+script = ExtResource("3_5rr7c")
+ability_name = "Queen Of The Underworld"
+description = "On play summon a random ally from the underworld."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://pi7ejymr8slf"
+
+[sub_resource type="Resource" id="Resource_sf7va"]
+script = ExtResource("3_5rr7c")
+ability_name = "Queen Of The Underworld"
+description = "On play summon a random ally from the underworld."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://pi7ejymr8slf"
+
+[sub_resource type="Resource" id="Resource_44pn2"]
+script = ExtResource("3_34bjj")
+level = 1
+values = Array[int]([1, 1, 1, 1])
+abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_sf7va")])
+description = ""
+metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
+
+[sub_resource type="Resource" id="Resource_0o55e"]
+script = ExtResource("3_5rr7c")
+ability_name = "Queen Of The Underworld"
+description = "On play choose an ally from the underworld to summon."
+unlock_level = 2
+trigger_condition = 0
+metadata/_custom_type_script = "uid://pi7ejymr8slf"
+
+[sub_resource type="Resource" id="Resource_58xlt"]
+script = ExtResource("3_34bjj")
+level = 2
+values = Array[int]([1, 1, 1, 1])
+abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_0o55e")])
+description = ""
+metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
+
+[sub_resource type="Resource" id="Resource_uk8b8"]
+script = ExtResource("3_34bjj")
+level = 1
+values = Array[int]([1, 1, 1, 1])
+abilities = Array[ExtResource("2_0nxk6")]([])
+description = ""
+metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 
 [sub_resource type="Resource" id="Resource_5rr7c"]
 script = ExtResource("1_stdfb")
 card_name = "Persephone"
 values = Array[int]([1, 1, 1, 1])
 description = ""
-abilities = Array[ExtResource("2_0nxk6")]([])
-level_data = Array[ExtResource("3_34bjj")]([])
+abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_xcclb")])
+level_data = Array[ExtResource("3_34bjj")]([SubResource("Resource_44pn2"), SubResource("Resource_58xlt"), SubResource("Resource_uk8b8")])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 

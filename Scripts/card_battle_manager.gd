@@ -2490,12 +2490,17 @@ func get_owner_at_position(position: int) -> Owner:
 		return grid_ownership[position]
 	return Owner.NONE
 
-# Helper method to get card level from experience system
-func get_card_level(card_index: int) -> int:
+func get_card_level(card_collection_index: int) -> int:
+	# Check if this is Persephone (index 0 in Demeter collection)
+	if current_god == "Demeter" and card_collection_index == 0:
+		return get_persephone_level()
+	
+	# For all other cards, use the normal system
 	if has_node("/root/GlobalProgressTrackerAutoload"):
 		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
-		return progress_tracker.get_card_level(current_god, card_index)
-	return 0  
+		return progress_tracker.get_card_level(current_god, card_collection_index)
+	
+	return 1  # Default level
 
 func display_player_hand():
 	# First, clear existing cards
@@ -5681,3 +5686,113 @@ func set_soothe_active(active: bool):
 		print("Soothe effect activated - next opponent card will be weakened")
 	else:
 		print("Soothe effect deactivated")
+
+
+# Method to let player choose from underworld allies (for tier 2 ability)
+func let_player_choose_underworld_ally(underworld_allies: Array) -> CardResource:
+	print("Player choosing underworld ally from ", underworld_allies.size(), " options")
+	
+	# For now, implement a simple text-based choice
+	# TODO: Replace with proper UI later
+	
+	# Create choice text
+	var choice_text = "Choose your underworld ally:\n"
+	for i in range(underworld_allies.size()):
+		var ally = underworld_allies[i]
+		choice_text += str(i + 1) + ". " + ally.card_name + " (" + str(ally.values) + ")\n"
+	
+	# Show choice in game status (temporary implementation)
+	game_status_label.text = choice_text + "Press 1, 2, or 3 to choose"
+	
+	# Wait for player input (simplified - would need proper input handling)
+	# For now, just return random choice as placeholder
+	var chosen_index = randi() % underworld_allies.size()
+	print("Player chose: ", underworld_allies[chosen_index].card_name)
+	return underworld_allies[chosen_index]
+
+# Replace a card with a summoned ally - SIMPLIFIED VERSION
+func replace_card_with_summon(grid_position: int, summoned_ally: CardResource):
+	print("=== REPLACING CARD WITH SUMMON ===")
+	print("Position: ", grid_position)
+	print("Summoned ally: ", summoned_ally.card_name)
+	
+	if grid_position < 0 or grid_position >= grid_slots.size():
+		print("ERROR: Invalid grid position for replacement")
+		return
+	
+	if not grid_occupied[grid_position]:
+		print("ERROR: No card at position to replace")
+		return
+	
+	# Get the current owner (should be player since it's Persephone)
+	var current_owner = grid_ownership[grid_position]
+	
+	# Create a copy of the summoned ally for the grid
+	var ally_copy = summoned_ally.duplicate(true)
+	
+	# Replace the card data
+	grid_card_data[grid_position] = ally_copy
+	
+	# Update the visual display
+	update_card_display(grid_position, ally_copy)
+	
+	# Apply ownership styling
+	var slot = grid_slots[grid_position]
+	if current_owner == Owner.PLAYER:
+		var card_display = get_card_display_at_position(grid_position)
+		if card_display and card_display.panel:
+			card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+	
+	print("Card replacement complete")
+	
+	# Execute the summoned ally's ON_PLAY abilities
+	var ally_level = 1  # Summoned allies are always base level
+	if ally_copy.has_ability_type(CardAbility.TriggerType.ON_PLAY, ally_level):
+		print("Executing ON_PLAY abilities for summoned ally: ", ally_copy.card_name)
+		
+		var ability_context = {
+			"placed_card": ally_copy,
+			"grid_position": grid_position,
+			"game_manager": self,
+			"card_level": ally_level
+		}
+		ally_copy.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, ally_level)
+		
+		# Update display after abilities execute
+		update_card_display(grid_position, ally_copy)
+	
+	# Handle passive abilities for the summoned ally
+	handle_passive_abilities_on_place(grid_position, ally_copy, ally_level)
+
+func get_persephone_level() -> int:
+	if not has_node("/root/GlobalProgressTrackerAutoload"):
+		return 1
+	
+	var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	var god_progress = progress_tracker.get_god_progress("Demeter")
+	
+	# Sum experience from underworld allies (indices 5, 6, 7)
+	var total_underworld_exp = 0
+	var underworld_indices = [5, 6, 7]  # Cerberus, Hades, Hecate
+	
+	for index in underworld_indices:
+		if index in god_progress:
+			var card_exp = god_progress[index]
+			total_underworld_exp += card_exp.get("total_exp", 0)
+	
+	print("Persephone level calculation: combined underworld exp = ", total_underworld_exp)
+	
+	# Use the same level thresholds as other cards
+	# Standard progression: 50, 150, 300, 500, 750, etc.
+	if total_underworld_exp >= 750:
+		return 6
+	elif total_underworld_exp >= 500:
+		return 5
+	elif total_underworld_exp >= 300:
+		return 4
+	elif total_underworld_exp >= 150:
+		return 3
+	elif total_underworld_exp >= 50:
+		return 2
+	else:
+		return 1
