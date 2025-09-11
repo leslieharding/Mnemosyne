@@ -3039,6 +3039,20 @@ func place_card_on_grid():
 	
 	print("Final card values after all bonuses: ", card_data.values)
 	
+		# ADD THIS DEBUG CODE HERE:
+	# Debug: Check Persephone specifically
+	if card_data.card_name == "Persephone":
+		print("=== PERSEPHONE DEBUG ===")
+		print("Card level calculated: ", card_level)
+		print("Collection index: ", card_collection_index)
+		print("Has ON_PLAY ability: ", card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level))
+		print("Available abilities: ")
+		var abilities = card_data.get_available_abilities(card_level)
+		for ability in abilities:
+			print("  - ", ability.ability_name, " (trigger: ", ability.trigger_condition, ")")
+		print("======================")
+	
+	
 	# Execute ON_PLAY abilities
 	if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
 		print("Executing on-play abilities for ", card_data.card_name)
@@ -5710,7 +5724,7 @@ func let_player_choose_underworld_ally(underworld_allies: Array) -> CardResource
 	print("Player chose: ", underworld_allies[chosen_index].card_name)
 	return underworld_allies[chosen_index]
 
-# Replace a card with a summoned ally - SIMPLIFIED VERSION
+# Replace a card with a summoned ally
 func replace_card_with_summon(grid_position: int, summoned_ally: CardResource):
 	print("=== REPLACING CARD WITH SUMMON ===")
 	print("Position: ", grid_position)
@@ -5727,23 +5741,46 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource):
 	# Get the current owner (should be player since it's Persephone)
 	var current_owner = grid_ownership[grid_position]
 	
+	# FIXED: Remove the old card display first
+	var slot = grid_slots[grid_position]
+	for child in slot.get_children():
+		if child.has_method("setup"):  # This is a CardDisplay
+			print("Removing old card display: ", child.card_data.card_name if child.card_data else "Unknown")
+			child.queue_free()
+	
 	# Create a copy of the summoned ally for the grid
 	var ally_copy = summoned_ally.duplicate(true)
 	
 	# Replace the card data
 	grid_card_data[grid_position] = ally_copy
 	
-	# Update the visual display
-	update_card_display(grid_position, ally_copy)
+	# FIXED: Create new card display properly
+	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+	var card_display = card_display_scene.instantiate()
+	slot.add_child(card_display)
+	
+	# Wait one frame to ensure the card display is ready
+	await get_tree().process_frame
+	
+	# Setup the new card display
+	card_display.setup(ally_copy)
+	
+	# Connect hover signals for the summoned card
+	card_display.card_hovered.connect(_on_card_hovered)
+	card_display.card_unhovered.connect(_on_card_unhovered)
+	print("Connected hover signals for summoned card: ", ally_copy.card_name)
+	
+	# Connect right-click handling for the summoned card
+	if card_display and card_display.panel:
+		card_display.panel.gui_input.connect(_on_grid_card_right_click.bind(grid_position))
+		print("Connected right-click handler for summoned card at grid position ", grid_position)
 	
 	# Apply ownership styling
-	var slot = grid_slots[grid_position]
 	if current_owner == Owner.PLAYER:
-		var card_display = get_card_display_at_position(grid_position)
 		if card_display and card_display.panel:
 			card_display.panel.add_theme_stylebox_override("panel", player_card_style)
 	
-	print("Card replacement complete")
+	print("Card replacement complete - ", ally_copy.card_name, " now visible")
 	
 	# Execute the summoned ally's ON_PLAY abilities
 	var ally_level = 1  # Summoned allies are always base level
@@ -5763,6 +5800,13 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource):
 	
 	# Handle passive abilities for the summoned ally
 	handle_passive_abilities_on_place(grid_position, ally_copy, ally_level)
+	
+	print("Resolving combat for summoned ally: ", ally_copy.card_name)
+	var captures = resolve_combat(grid_position, current_owner, ally_copy)
+	if captures > 0:
+		print("Summoned ally captured ", captures, " cards!")
+	else:
+		print("No captures for summoned ally")
 
 func get_persephone_level() -> int:
 	if not has_node("/root/GlobalProgressTrackerAutoload"):
