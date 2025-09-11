@@ -8,14 +8,6 @@
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_34bjj"]
 [ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="4_34bjj"]
 
-[sub_resource type="Resource" id="Resource_xcclb"]
-script = ExtResource("3_5rr7c")
-ability_name = "Queen Of The Underworld"
-description = "On play summon a random ally from the underworld."
-unlock_level = 0
-trigger_condition = 0
-metadata/_custom_type_script = "uid://pi7ejymr8slf"
-
 [sub_resource type="Resource" id="Resource_sf7va"]
 script = ExtResource("3_5rr7c")
 ability_name = "Queen Of The Underworld"
@@ -48,11 +40,19 @@ abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_0o55e")])
 description = ""
 metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 
+[sub_resource type="Resource" id="Resource_xcclb"]
+script = ExtResource("3_5rr7c")
+ability_name = "Queen Of The Underworld"
+description = "On play choose an ally from the underworld to summon."
+unlock_level = 2
+trigger_condition = 0
+metadata/_custom_type_script = "uid://pi7ejymr8slf"
+
 [sub_resource type="Resource" id="Resource_uk8b8"]
 script = ExtResource("3_34bjj")
-level = 1
+level = 3
 values = Array[int]([1, 1, 1, 1])
-abilities = Array[ExtResource("2_0nxk6")]([])
+abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_xcclb")])
 description = ""
 metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 
@@ -61,9 +61,9 @@ script = ExtResource("1_stdfb")
 card_name = "Persephone"
 values = Array[int]([1, 1, 1, 1])
 description = ""
-abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_xcclb")])
+abilities = Array[ExtResource("2_0nxk6")]([])
 level_data = Array[ExtResource("3_34bjj")]([SubResource("Resource_44pn2"), SubResource("Resource_58xlt"), SubResource("Resource_uk8b8")])
-uses_level_progression = false
+uses_level_progression = true
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_rjcyb"]
