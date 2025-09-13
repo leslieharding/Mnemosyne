@@ -193,6 +193,7 @@ var tutorial_modal: AcceptDialog
 var tutorial_panel: PanelContainer
 
 var consecutive_draws: int = 0
+var current_enemy_id: String = ""
 
 # Deck power system
 var active_deck_power: DeckDefinition.DeckPowerType = DeckDefinition.DeckPowerType.NONE
@@ -695,8 +696,21 @@ func get_panel_state_name() -> String:
 
 func start_game():
 	
-	# Reset consecutive draws counter for new battle
+	# Reset consecutive draws counter for each new combat session
 	consecutive_draws = 0
+	current_enemy_id = ""
+
+	# Track which enemy we're fighting
+	var scene_params = get_scene_params()
+	if scene_params.has("current_node"):
+		var node = scene_params["current_node"]
+		current_enemy_id = node.enemy_name if node.has("enemy_name") else "Unknown"
+	elif scene_params.has("opponent"):
+		current_enemy_id = scene_params["opponent"]
+	else:
+		current_enemy_id = "Unknown"
+		
+	print("Starting new combat session against: ", current_enemy_id, " - draws reset to 0")
 	
 	# DO NOT clear run stat growth tracker - we want to preserve growth across battles
 	# Only ensure the tracker knows about the current deck indices
@@ -1599,11 +1613,27 @@ func end_game():
 	print("Result: ", winner)
 	print("Consecutive draws: ", consecutive_draws)
 	print("==================")
-	
 	# NEW: Check for draw condition FIRST
 	if scores.player == scores.opponent:
+		# Verify we're still fighting the same enemy
+		var battle_params = get_scene_params()
+		var enemy_id = ""
+		if battle_params.has("current_node"):
+			var node = battle_params["current_node"]
+			enemy_id = node.enemy_name if node.has("enemy_name") else "Unknown"
+		elif battle_params.has("opponent"):
+			enemy_id = battle_params["opponent"]
+		else:
+			enemy_id = "Unknown"
+		
+		# Reset draws if this is a different enemy
+		if enemy_id != current_enemy_id:
+			print("Different enemy detected! Resetting draws. Old: ", current_enemy_id, " New: ", enemy_id)
+			consecutive_draws = 0
+			current_enemy_id = enemy_id
+		
 		consecutive_draws += 1
-		print("DRAW detected! Consecutive draws: ", consecutive_draws)
+		print("DRAW detected against ", current_enemy_id, "! Consecutive draws: ", consecutive_draws)
 		
 		if consecutive_draws >= 2:
 			# Two draws in a row = automatic loss
