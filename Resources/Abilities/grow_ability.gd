@@ -22,6 +22,18 @@ func execute(context: Dictionary) -> bool:
 		print("GrowAbility: Missing required context data")
 		return false
 	
+	# Check for Seasons power and modify growth accordingly
+	var growth_amount = 1  # Default growth
+	if game_manager.has_method("is_seasons_power_active") and game_manager.is_seasons_power_active():
+		var current_season = game_manager.get_current_season()
+		match current_season:
+			game_manager.Season.SUMMER:
+				growth_amount = 2  # Double growth in Summer
+				print("GrowAbility: Summer season - doubling growth to +2")
+			game_manager.Season.WINTER:
+				growth_amount = -1  # Reverse growth in Winter
+				print("GrowAbility: Winter season - reversing growth to -1")
+	
 	# Get the card's collection index from the game manager
 	var card_collection_index = game_manager.get_card_collection_index(grid_position)
 	if card_collection_index == -1:
@@ -34,17 +46,20 @@ func execute(context: Dictionary) -> bool:
 		print("GrowAbility: RunStatGrowthTrackerAutoload not found!")
 		return false
 	
-	# Apply +1 growth to this card
-	growth_tracker.add_stat_growth(card_collection_index, 1)
+	# Apply the growth to this card (can be positive or negative based on season)
+	growth_tracker.add_stat_growth(card_collection_index, growth_amount)
 	
 	# Apply the growth immediately to the card that was just played
 	# This ensures the current combat uses the new grown stats
-	placed_card.values[0] += 1  # North
-	placed_card.values[1] += 1  # East
-	placed_card.values[2] += 1  # South
-	placed_card.values[3] += 1  # West
+	placed_card.values[0] += growth_amount  # North
+	placed_card.values[1] += growth_amount  # East
+	placed_card.values[2] += growth_amount  # South
+	placed_card.values[3] += growth_amount  # West
 	
-	print("GrowAbility activated! ", placed_card.card_name, " grew +1 to all stats!")
+	if growth_amount > 0:
+		print("GrowAbility activated! ", placed_card.card_name, " grew +", growth_amount, " to all stats!")
+	else:
+		print("GrowAbility activated! ", placed_card.card_name, " withered by ", abs(growth_amount), " to all stats!")
 	print("New stats: ", placed_card.values)
 	
 	# Update the visual display to show the new stats

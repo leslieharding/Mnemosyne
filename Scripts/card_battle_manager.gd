@@ -56,6 +56,15 @@ var ordain_target_style: StyleBoxFlat
 var active_ordain_owner: Owner = Owner.NONE  # Track who created the ordain effect
 var active_ordain_turns_remaining: int = 0  # Track how many turns until ordain expires
 
+# Seasons power system
+enum Season {
+	SUMMER,
+	WINTER
+}
+
+var current_season: Season = Season.SUMMER
+var seasons_status_label: Label = null  # For displaying current season
+
 # Sanctuary tracking system
 var sanctuary_mode_active: bool = false
 var current_sanctuary_position: int = -1
@@ -2288,6 +2297,8 @@ func initialize_deck_power(deck_def: DeckDefinition):
 			setup_prophecy_power()
 		DeckDefinition.DeckPowerType.MISDIRECTION_POWER:
 			setup_misdirection_power()
+		DeckDefinition.DeckPowerType.SEASONS_POWER:
+			setup_seasons_power()	
 		DeckDefinition.DeckPowerType.NONE:
 			print("No deck power for this deck")
 		_:
@@ -3036,6 +3047,10 @@ func place_card_on_grid():
 	
 	# Check if the card should get ordain bonus BEFORE executing abilities
 	apply_ordain_bonus_if_applicable(current_grid_index, card_data, placing_owner)
+	
+	# SEASONS POWER: Check if Persephone is being played (triggers Winter)
+	if is_seasons_power_active() and original_card_data.card_name == "Persephone":
+		transition_to_winter()
 	
 	print("Final card values after all bonuses: ", card_data.values)
 	
@@ -5840,3 +5855,54 @@ func get_persephone_level() -> int:
 		return 2
 	else:
 		return 1
+
+
+# Add this new function after setup_misdirection_power() function
+func setup_seasons_power():
+	print("=== SETTING UP SEASONS POWER ===")
+	current_season = Season.SUMMER  # Start in Summer (Persephone in hand)
+	
+	# Create season status display
+	create_seasons_status_label()
+	update_seasons_display()
+	
+	print("The Seasons power activated - Summer begins with Persephone in hand")
+
+func create_seasons_status_label():
+	# Create a label to show current season
+	seasons_status_label = Label.new()
+	seasons_status_label.name = "SeasonsStatusLabel"
+	seasons_status_label.add_theme_font_size_override("font_size", 18)
+	seasons_status_label.add_theme_color_override("font_color", Color.WHITE)
+	
+	# Position it near the game status label
+	seasons_status_label.position = Vector2(10, 100)
+	add_child(seasons_status_label)
+
+func update_seasons_display():
+	if not seasons_status_label:
+		return
+		
+	match current_season:
+		Season.SUMMER:
+			seasons_status_label.text = "🌞 Summer - Growth Flourishes"
+			seasons_status_label.add_theme_color_override("font_color", Color("#FFD700"))  # Gold
+		Season.WINTER:
+			seasons_status_label.text = "❄️ Winter - Growth Withers"
+			seasons_status_label.add_theme_color_override("font_color", Color("#87CEEB"))  # Sky blue
+
+func transition_to_winter():
+	if current_season == Season.SUMMER:
+		print("=== SEASON TRANSITION: SUMMER → WINTER ===")
+		current_season = Season.WINTER
+		update_seasons_display()
+		
+		# Show notification about the season change
+		if notification_manager:
+			notification_manager.show_notification("Persephone descends to the underworld. Winter falls upon the land.")
+
+func get_current_season() -> Season:
+	return current_season
+
+func is_seasons_power_active() -> bool:
+	return active_deck_power == DeckDefinition.DeckPowerType.SEASONS_POWER

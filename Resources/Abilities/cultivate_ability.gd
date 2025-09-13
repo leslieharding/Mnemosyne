@@ -70,38 +70,51 @@ func remove_cultivation(position: int, card: CardResource, game_manager) -> bool
 func process_cultivation_turn(position: int, card: CardResource, game_manager) -> bool:
 	# Check if cultivation is still active (card might have been captured)
 	if not card.has_meta("cultivation_active") or not card.get_meta("cultivation_active"):
-		print("CultivateAbility: Cultivation not active for ", card.card_name)
+		print("Cultivation not active for ", card.card_name)
 		return false
 	
-	# Double-check ownership - only works for player-owned cards
-	var card_owner = game_manager.get_owner_at_position(position)
-	if card_owner != game_manager.Owner.PLAYER:
-		print("CultivateAbility: Card no longer owned by player, ending cultivation")
-		card.set_meta("cultivation_active", false)
-		return false
-	
-	# Get the card's collection index for experience tracking
+	# Get card collection index for experience tracking
 	var card_collection_index = game_manager.get_card_collection_index(position)
 	if card_collection_index == -1:
-		print("CultivateAbility: Could not find collection index for card")
+		print("CultivateAbility: Could not find collection index for card at position ", position)
 		return false
 	
-	var exp_amount = 10
+	# Calculate experience amount based on Seasons power
+	var exp_amount = 10  # Default experience gain
+	if game_manager.has_method("is_seasons_power_active") and game_manager.is_seasons_power_active():
+		var current_season = game_manager.get_current_season()
+		match current_season:
+			game_manager.Season.SUMMER:
+				exp_amount = 20  # Double experience in Summer
+				print("CultivateAbility: Summer season - doubling experience to 20")
+			game_manager.Season.WINTER:
+				exp_amount = -10  # Negative experience in Winter
+				print("CultivateAbility: Winter season - reversing experience to -10")
 	
-	# Add experience to run tracker
-	var run_tracker = game_manager.get_node_or_null("/root/RunExperienceTrackerAutoload")
-	if run_tracker:
-		run_tracker.add_total_exp(card_collection_index, exp_amount)
-		print("CultivateAbility: Added ", exp_amount, " cultivation experience to card at collection index ", card_collection_index)
+	# Award the experience (including negative amounts in Winter)
+	var exp_tracker = game_manager.get_node_or_null("/root/RunExperienceTrackerAutoload")
+	if exp_tracker:
+		if exp_amount > 0:
+			exp_tracker.add_total_exp(card_collection_index, exp_amount)
+			print("CultivateAbility: ", card.card_name, " gained ", exp_amount, " experience")
+		elif exp_amount < 0:
+			# Winter effect: reduce experience but not below 0
+			# Get current experience for this card in the run
+			var current_exp_data = exp_tracker.get_card_experience(card_collection_index)
+			var current_total = current_exp_data.get("total_exp", 0)
+			var reduction_amount = min(abs(exp_amount), current_total)  # Don't reduce below 0
+			
+			if reduction_amount > 0:
+				# Subtract experience using negative value
+				exp_tracker.add_total_exp(card_collection_index, -reduction_amount)
+				print("CultivateAbility: ", card.card_name, " lost ", reduction_amount, " experience (Winter effect)")
+			else:
+				print("CultivateAbility: ", card.card_name, " experience already at minimum (0)")
+		else:
+			print("CultivateAbility: ", card.card_name, " gains no experience this turn")
 	else:
-		print("CultivateAbility: Warning - RunExperienceTrackerAutoload not found")
-	
-	# Show visual effect - green up arrow
-	var card_display = game_manager.get_card_display_at_position(position)
-	if card_display and game_manager.visual_effects_manager:
-		game_manager.visual_effects_manager.show_cultivation_arrow(card_display)
-	
-	print("🌱 Cultivation activated! ", card.card_name, " gained ", exp_amount, " experience from growing!")
+		print("CultivateAbility: RunExperienceTrackerAutoload not found!")
+		return false
 	
 	return true
 
