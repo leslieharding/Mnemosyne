@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=175 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=179 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -17,6 +17,7 @@
 [ext_resource type="Script" uid="uid://bskifvkjo5blo" path="res://Resources/Abilities/bolster_confidence_ability.gd" id="8_upckc"]
 [ext_resource type="Script" uid="uid://cjryt268c8rko" path="res://Resources/Abilities/chaos_ability.gd" id="8_vfgb0"]
 [ext_resource type="Script" uid="uid://dh4c5feb2eu1v" path="res://Resources/Abilities/charge_ability.gd" id="11_cakw3"]
+[ext_resource type="Script" uid="uid://cjsf2c6w6dnrf" path="res://Resources/Abilities/coerce_ability.gd" id="12_hu0wn"]
 [ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="12_r05oc"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
@@ -793,12 +794,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_bueog"]
+script = ExtResource("12_hu0wn")
+ability_name = "Coerce"
+description = "On play designates a card in your opponent's hand that they must play next turn."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://cjsf2c6w6dnrf"
+
 [sub_resource type="Resource" id="Resource_8k02u"]
 script = ExtResource("2_xcqsp")
 card_name = "Thamyris"
 values = Array[int]([1, 4, 4, 2])
 description = "Ho man, they actually agreed to this bet? Play like you have never played before boy"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_bueog")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -851,12 +860,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_ujm7o"]
+script = ExtResource("12_hu0wn")
+ability_name = "Coerce"
+description = "On play designates a card in your opponent's hand that they must play next turn."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://cjsf2c6w6dnrf"
+
 [sub_resource type="Resource" id="Resource_0fei0"]
 script = ExtResource("2_xcqsp")
 card_name = "Thamyris"
 values = Array[int]([2, 5, 5, 3])
 description = "Ho man, they actually agreed to this bet? Play like you have never played before boy"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ujm7o")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -909,12 +926,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_olaqh"]
+script = ExtResource("12_hu0wn")
+ability_name = "Coerce"
+description = "On play designates a card in your opponent's hand that they must play next turn."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://cjsf2c6w6dnrf"
+
 [sub_resource type="Resource" id="Resource_msags"]
 script = ExtResource("2_xcqsp")
 card_name = "Thamyris"
 values = Array[int]([3, 6, 6, 4])
 description = "Ho man, they actually agreed to this bet? Play like you have never played before boy"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_olaqh")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

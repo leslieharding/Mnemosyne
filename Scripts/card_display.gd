@@ -144,3 +144,12 @@ func _on_panel_mouse_exited():
 # Get the card's resource data
 func get_card_data() -> CardResource:
 	return card_data
+
+
+func apply_special_style(style: StyleBoxFlat):
+	if panel:
+		panel.add_theme_stylebox_override("panel", style)
+
+func restore_default_style():
+	if panel:
+		panel.remove_theme_stylebox_override("panel")

@@ -34,6 +34,14 @@ var tremor_id_counter: int = 0
 
 var soothe_active: bool = false
 
+# Coerce tracking system
+var coerce_mode_active: bool = false
+var current_coercer_position: int = -1
+var current_coercer_owner: Owner = Owner.NONE
+var current_coercer_card: CardResource = null
+var active_coerced_card_index: int = -1  # Index of card in player's hand that must be played
+var coerced_card_style: StyleBoxFlat
+
 # Compel tracking system
 var compel_mode_active: bool = false
 var current_compeller_position: int = -1
@@ -1533,6 +1541,7 @@ func end_game():
 	
 	clear_all_hunt_traps()
 	clear_all_compel_constraints()
+	clear_all_coerce_constraints()
 	clear_all_ordain_effects()
 	clear_all_sanctuary_effects()
 	clear_all_trojan_horses()
@@ -1700,6 +1709,7 @@ func restart_round():
 	active_tremors.clear()
 	grid_to_collection_index.clear()
 	clear_all_sanctuary_effects()
+	clear_all_coerce_constraints()
 	
 	# Clear the grid completely
 	for i in range(grid_slots.size()):
@@ -2127,6 +2137,8 @@ func create_grid_styles():
 	sanctuary_target_style.border_width_right = 3
 	sanctuary_target_style.border_width_bottom = 3
 	sanctuary_target_style.border_color = Color("#00FFAA")  # Cyan/teal border
+
+	create_coerced_card_style()
 
 # Helper to get passed parameters from previous scene
 func get_scene_params() -> Dictionary:
@@ -2602,6 +2614,9 @@ func display_player_hand():
 		if card_display.has_signal("input_event"):
 			card_display.input_event.connect(_on_card_input_event.bind(card_display, i))
 			print("Connected CardDisplay input_event for card ", i)
+		
+		if active_coerced_card_index != -1:
+			apply_coerced_card_styling(active_coerced_card_index)
 
 
 func _on_card_input_event(viewport, event, shape_idx, card_display, card_index):
@@ -2612,16 +2627,13 @@ func _on_card_input_event(viewport, event, shape_idx, card_display, card_index):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		handle_card_selection(card_display, card_index)
 
-# Extract the card selection logic into a separate function
-
-# Replace the handle_card_selection function in Scripts/card_battle_manager.gd (around lines 275-315)
-
 func handle_card_selection(card_display, card_index):
 	print("=== HANDLING CARD SELECTION ===")
 	print("Card index: ", card_index)
 	print("Tutorial mode: ", is_tutorial_mode)
 	print("Is player turn: ", turn_manager.is_player_turn())
 	print("Current selected_card_index: ", selected_card_index)
+	print("Active coerced card index: ", active_coerced_card_index)
 	
 	# In tutorial mode, FORCE allow card selection regardless of turn state
 	if is_tutorial_mode:
@@ -2633,6 +2645,13 @@ func handle_card_selection(card_display, card_index):
 	# Validate that we have a valid card index
 	if card_index >= player_deck.size():
 		print("Invalid card index: ", card_index)
+		return
+	
+	# NEW: Check coerce constraint - but DON'T remove it here
+	if not is_card_selectable(card_index):
+		print("Card selection blocked by coerce constraint - must select card index: ", active_coerced_card_index)
+		var coerced_card_name = player_deck[active_coerced_card_index].card_name if active_coerced_card_index < player_deck.size() else "Unknown"
+		game_status_label.text = "Coerce Effect: You must play " + coerced_card_name + "!"
 		return
 	
 	# FIRST: Deselect ALL cards before selecting the new one
@@ -2650,6 +2669,8 @@ func handle_card_selection(card_display, card_index):
 	card_display.select()
 	selected_card_index = card_index
 	
+	# REMOVED: Don't remove coerce constraint here - only remove when card is actually played
+	
 	# Initialize grid selection if not already set
 	if current_grid_index == -1:
 		# Find the first unoccupied grid slot
@@ -2661,7 +2682,6 @@ func handle_card_selection(card_display, card_index):
 				break
 	
 	print("Card selection complete - selected_card_index is now: ", selected_card_index)
-
 # Handle card input events
 func _on_card_gui_input(event, card_display, card_index):
 	
@@ -2887,6 +2907,8 @@ func update_card_display(grid_index: int, card_data: CardResource):
 func place_card_on_grid():
 	if selected_card_index == -1 or current_grid_index == -1:
 		return
+	
+	check_and_remove_coerce_constraint(selected_card_index)
 	
 	# Handle dance target selection FIRST (but only during dance mode setup)
 	if dance_mode_active and current_dancer_owner == Owner.PLAYER:
@@ -5906,3 +5928,148 @@ func get_current_season() -> Season:
 
 func is_seasons_power_active() -> bool:
 	return active_deck_power == DeckDefinition.DeckPowerType.SEASONS_POWER
+
+
+func start_coerce_mode(coercer_position: int, coercer_owner: Owner, coercer_card: CardResource):
+	coerce_mode_active = true
+	current_coercer_position = coercer_position
+	current_coercer_owner = coercer_owner
+	current_coercer_card = coercer_card
+	
+	print("Starting coerce mode - coercer at position ", coercer_position)
+	
+	# Only opponent can use coerce, and it targets player's hand
+	if coercer_owner == Owner.OPPONENT:
+		# Automatically select a random card from player's hand
+		opponent_select_coerce_target()
+	else:
+		print("ERROR: Only opponents should use coerce ability")
+		coerce_mode_active = false
+
+func opponent_select_coerce_target():
+	if not coerce_mode_active:
+		return
+	
+	# Simple AI: pick a random card from player's hand
+	if player_deck.size() == 0:
+		print("Player has no cards to coerce!")
+		coerce_mode_active = false
+		return
+	
+	var target_card_index = randi() % player_deck.size()
+	select_coerce_target(target_card_index)
+
+func select_coerce_target(card_index: int):
+	if card_index < 0 or card_index >= player_deck.size():
+		print("Invalid coerce target card index: ", card_index)
+		return
+	
+	active_coerced_card_index = card_index
+	var coerced_card = player_deck[card_index]
+	
+	print("Coerce target selected: ", coerced_card.card_name, " (index ", card_index, ")")
+	
+	# Apply visual styling to the coerced card
+	apply_coerced_card_styling(card_index)
+	
+	# Update game status
+	game_status_label.text = "Coerce Effect Active! You must play: " + coerced_card.card_name + " next turn."
+	
+	# End coerce selection phase
+	coerce_mode_active = false
+	
+	print("Coerce effect applied - player must play card index ", card_index)
+
+func apply_coerced_card_styling(card_index: int):
+	if card_index < 0 or card_index >= player_deck.size():
+		return
+	
+	# Find the card display in the hand
+	var cards_container = hand_container.get_node_or_null("CardsContainer")
+	if not cards_container:
+		print("No cards container found for coerced styling")
+		return
+	
+	# Apply styling to the specific card
+	var children = cards_container.get_children()
+	if card_index < children.size():
+		var card_display = children[card_index]
+		if card_display and card_display.has_method("apply_special_style"):
+			card_display.apply_special_style(coerced_card_style)
+		elif card_display and card_display.get_node_or_null("Panel"):
+			card_display.get_node("Panel").add_theme_stylebox_override("panel", coerced_card_style)
+		
+		print("Applied coerced card styling (purple border) to card index ", card_index)
+
+func remove_coerce_constraint():
+	if active_coerced_card_index == -1:
+		return
+	
+	print("Removing coerce constraint from card index ", active_coerced_card_index)
+	
+	# Remove visual styling from the previously coerced card
+	restore_card_original_styling(active_coerced_card_index)
+	
+	# Clear tracking
+	active_coerced_card_index = -1
+
+func restore_card_original_styling(card_index: int):
+	if card_index < 0:
+		return
+	
+	var cards_container = hand_container.get_node_or_null("CardsContainer")
+	if not cards_container:
+		return
+	
+	var children = cards_container.get_children()
+	if card_index < children.size():
+		var card_display = children[card_index]
+		if card_display and card_display.has_method("restore_default_style"):
+			card_display.restore_default_style()
+		elif card_display and card_display.get_node_or_null("Panel"):
+			# Remove any style override to return to default
+			card_display.get_node("Panel").remove_theme_stylebox_override("panel")
+
+# Check if a card can be selected considering coerce constraint
+func is_card_selectable(card_index: int) -> bool:
+	# If there's an active coerce constraint, only the coerced card can be selected
+	if active_coerced_card_index != -1:
+		return card_index == active_coerced_card_index
+	
+	# Otherwise, any card is selectable
+	return true
+
+# Clear coerce constraints (for game end or reset)
+func clear_all_coerce_constraints():
+	if active_coerced_card_index != -1:
+		remove_coerce_constraint()
+	coerce_mode_active = false
+	current_coercer_position = -1
+	current_coercer_owner = Owner.NONE
+	current_coercer_card = null
+	print("All coerce constraints cleared")
+
+func create_coerced_card_style():
+	coerced_card_style = StyleBoxFlat.new()
+	coerced_card_style.bg_color = Color("#2A1A4A", 0.8)
+	coerced_card_style.border_color = Color("#9A4AFF")
+	coerced_card_style.border_width_left = 4
+	coerced_card_style.border_width_top = 4
+	coerced_card_style.border_width_right = 4
+	coerced_card_style.border_width_bottom = 4
+	coerced_card_style.corner_radius_top_left = 8
+	coerced_card_style.corner_radius_top_right = 8
+	coerced_card_style.corner_radius_bottom_left = 8
+	coerced_card_style.corner_radius_bottom_right = 8
+
+func check_and_remove_coerce_constraint(played_card_index: int):
+	if active_coerced_card_index == -1:
+		return  # No active coerce constraint
+	
+	if played_card_index == active_coerced_card_index:
+		print("Player played the coerced card - removing coerce constraint")
+		remove_coerce_constraint()
+		game_status_label.text = "Coerce constraint fulfilled!"
+	else:
+		print("ERROR: Player tried to play wrong card during coerce!")
+		# This should never happen due to selection constraints, but just in case
