@@ -36,8 +36,13 @@ func execute(context: Dictionary) -> bool:
 	print("New stats: ", placed_card.values)
 	
 	# Update the visual display to show the new stats
-	if game_manager.has_method("update_card_display"):
-		game_manager.update_card_display(grid_position, placed_card)
+	var slot = game_manager.grid_slots[grid_position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = placed_card  # Update the card data reference
+			child.update_display()         # Refresh the visual display
+			print("ChaosAbility: Updated CardDisplay visual for randomized card")
+			break
 	
 	return true
 
