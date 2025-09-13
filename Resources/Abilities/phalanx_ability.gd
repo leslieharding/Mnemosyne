@@ -8,7 +8,10 @@ func _init():
 	trigger_condition = TriggerType.ON_PLAY
 
 func execute(context: Dictionary) -> bool:
+	print("=== PHALANX DEBUG START ===")
+	
 	if not can_execute(context):
+		print("PhalanxAbility: can_execute returned false")
 		return false
 	
 	# Get the card that was just placed
@@ -22,8 +25,17 @@ func execute(context: Dictionary) -> bool:
 		print("PhalanxAbility: Missing required context data")
 		return false
 	
+	# DEBUG: Check all positions
+	print("=== CURRENT GRID STATE ===")
+	for i in range(9):
+		var occupied = game_manager.grid_occupied[i]
+		var owner = game_manager.get_owner_at_position(i) if occupied else "none"
+		print("  Position ", i, ": occupied=", occupied, " owner=", owner)
+	print("===========================")
+	
 	# Get the owner of the phalanx card
 	var phalanx_owner = game_manager.get_owner_at_position(grid_position)
+	print("PhalanxAbility: phalanx_owner = ", phalanx_owner)
 	
 	# Find all complete rows and columns owned by the same player
 	var complete_formations = find_complete_formations(grid_position, phalanx_owner, game_manager)
@@ -56,8 +68,13 @@ func execute(context: Dictionary) -> bool:
 					print("PhalanxAbility: Boosted card at position ", pos, " from ", original_values, " to ", card_at_pos.values)
 					
 					# Update the visual display
-					if game_manager.has_method("update_card_display"):
-						game_manager.update_card_display(pos, card_at_pos)
+					var slot = game_manager.grid_slots[pos]
+					for child in slot.get_children():
+						if child is CardDisplay:
+							child.card_data = card_at_pos  # Update the card data reference
+							child.update_display()         # Refresh the visual display
+							print("PhalanxAbility: Updated CardDisplay visual for position ", pos)
+							break
 					
 					boosted_positions[pos] = true
 	
@@ -68,6 +85,7 @@ func execute(context: Dictionary) -> bool:
 	
 	print(ability_name, " activated! ", placed_card.card_name, " completed ", total_formations, " formation(s): ", formation_types)
 	print("Boosted ", boosted_positions.size(), " cards with +2 to all stats!")
+	print("=== PHALANX DEBUG END ===")
 	
 	return true
 
