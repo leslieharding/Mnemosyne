@@ -826,6 +826,8 @@ func _on_turn_changed(is_player_turn: bool):
 	else:
 		# Process corruption abilities at the start of opponent's turn
 		process_corruption_turn_start()
+		# Process greedy abilities at the start of opponent's turn
+		process_greedy_turn_start()
 	
 	# Process charge abilities at the start of each turn
 	await process_charge_turn_start(is_player_turn)
@@ -3454,6 +3456,12 @@ func should_passive_ability_be_active(ability: CardAbility, card_owner: Owner, p
 		"Cultivate":
 			# Cultivation only works for player-owned cards
 			return card_owner == Owner.PLAYER
+		"Corruption":
+			# Corruption only works for opponent-owned cards
+			return card_owner == Owner.OPPONENT
+		"Greedy":
+			# Greedy only works for opponent-owned cards
+			return card_owner == Owner.OPPONENT
 		"Adaptive Defense":
 			# Adaptive defense works for both owners
 			return true
@@ -3464,7 +3472,7 @@ func should_passive_ability_be_active(ability: CardAbility, card_owner: Owner, p
 			# Boost abilities work for both owners (boost friendly cards)
 			return true
 		_:
-			# Default: most passive abilities work for both owners
+			# Default: passive abilities work for both owners
 			return true
 
 # NEW: Helper function to determine if a passive ability should show visual pulse
@@ -6430,3 +6438,52 @@ func cleanup_enrich_overlays():
 	"""Remove all enrich selection overlays from the grid"""
 	for slot in grid_slots:
 		remove_enrich_card_overlay(slot)
+
+# Process greedy abilities at the start of opponent's turn
+func process_greedy_turn_start():
+	print("Processing greedy abilities for opponent turn start")
+	
+	# Check all cards on the board for greedy abilities
+	for position in range(grid_slots.size()):
+		if not grid_occupied[position]:
+			continue
+		
+		# Only process opponent-owned cards
+		var card_owner = get_owner_at_position(position)
+		if card_owner != Owner.OPPONENT:
+			continue
+		
+		var card_data = get_card_at_position(position)
+		if not card_data:
+			continue
+		
+		# Get card level for ability checks
+		var card_collection_index = get_card_collection_index(position)
+		var card_level = get_card_level(card_collection_index)
+		
+		# Check if this card has greedy ability
+		var has_greedy = false
+		var greedy_ability = null
+		
+		if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			for ability in card_data.get_available_abilities(card_level):
+				if ability.ability_name == "Greedy":
+					has_greedy = true
+					greedy_ability = ability
+					break
+		
+		if not has_greedy or not greedy_ability:
+			continue
+		
+		print("Found greedy card at position ", position, ": ", card_data.card_name)
+		
+		# Execute greedy turn processing
+		var context = {
+			"passive_action": "turn_start",
+			"boosting_card": card_data,
+			"boosting_position": position,
+			"game_manager": self,
+			"card_level": card_level
+		}
+		
+		greedy_ability.execute(context)

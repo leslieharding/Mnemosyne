@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="GreedyAbility" load_steps=2 format=3 uid="uid://feayq13hrt4o"]
+
+[ext_resource type="Script" uid="uid://cu3icvy8efjky" path="res://Resources/Abilities/greedy_ability.gd" id="1_sjpps"]
+
+[resource]
+script = ExtResource("1_sjpps")
+ability_name = "Greedy"
+description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cu3icvy8efjky"

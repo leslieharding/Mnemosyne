@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=179 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=183 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" uid="uid://dh4c5feb2eu1v" path="res://Resources/Abilities/charge_ability.gd" id="11_cakw3"]
 [ext_resource type="Script" uid="uid://cjsf2c6w6dnrf" path="res://Resources/Abilities/coerce_ability.gd" id="12_hu0wn"]
 [ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="12_r05oc"]
+[ext_resource type="Script" uid="uid://cu3icvy8efjky" path="res://Resources/Abilities/greedy_ability.gd" id="13_0vidc"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -812,12 +813,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_0g8v8"]
+script = ExtResource("13_0vidc")
+ability_name = "Greedy"
+description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cu3icvy8efjky"
+
 [sub_resource type="Resource" id="Resource_2yxw7"]
 script = ExtResource("2_xcqsp")
 card_name = "Colymbas"
 values = Array[int]([3, 3, 3, 3])
 description = "We have drunk from Pieria have we not? How could we possibly lose?"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0g8v8")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -878,12 +887,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_dn5nk"]
+script = ExtResource("13_0vidc")
+ability_name = "Greedy"
+description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cu3icvy8efjky"
+
 [sub_resource type="Resource" id="Resource_yc4hw"]
 script = ExtResource("2_xcqsp")
 card_name = "Colymbas"
 values = Array[int]([4, 4, 4, 4])
 description = "We have drunk from Pieria have we not? How could we possibly lose?"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_dn5nk")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -944,12 +961,20 @@ level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_v6mik"]
+script = ExtResource("13_0vidc")
+ability_name = "Greedy"
+description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cu3icvy8efjky"
+
 [sub_resource type="Resource" id="Resource_pugcu"]
 script = ExtResource("2_xcqsp")
 card_name = "Colymbas"
 values = Array[int]([5, 5, 5, 5])
 description = "We have drunk from Pieria have we not? How could we possibly lose?"
-abilities = Array[ExtResource("3_lm3ty")]([])
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_v6mik")])
 level_data = Array[ExtResource("5_mxtxa")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
