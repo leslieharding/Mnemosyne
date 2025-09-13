@@ -62,9 +62,15 @@ func execute(context: Dictionary) -> bool:
 		print("GrowAbility activated! ", placed_card.card_name, " withered by ", abs(growth_amount), " to all stats!")
 	print("New stats: ", placed_card.values)
 	
-	# Update the visual display to show the new stats
-	if game_manager.has_method("update_card_display"):
-		game_manager.update_card_display(grid_position, placed_card)
+	# FIXED: Update the visual display to show the new stats
+	# Find the CardDisplay in the grid slot and update it directly
+	var slot = game_manager.grid_slots[grid_position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = placed_card  # Update the card data reference
+			child.update_display()         # Refresh the visual display
+			print("GrowAbility: Updated CardDisplay visual for grown card")
+			break
 	
 	return true
 
