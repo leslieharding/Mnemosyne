@@ -6383,18 +6383,19 @@ func apply_enrichment_bonus_to_existing_card(grid_position: int, card_data: Card
 	
 	print("Card stats after enrichment: ", card_data.values)
 	
-	# Update visual display
-	update_card_display(grid_position, card_data)
+	# CRITICAL: Update the grid_card_data array so the changes persist
+	grid_card_data[grid_position] = card_data
 	
-	# Show visual effect if positive enrichment - FIXED: Use existing flash effect
-	if enrichment_amount > 0:
-		var slot = grid_slots[grid_position]
-		var card_display = slot.get_child(0) if slot.get_child_count() > 0 else null
-		if card_display and visual_effects_manager:
-			# Use existing capture flash effect in green/gold color to show positive enrichment
-			visual_effects_manager.show_capture_flash(card_display, 0, true)  # Direction doesn't matter for this effect
+	# FIXED: Find the CardDisplay and update it directly
+	var slot = grid_slots[grid_position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = card_data  # Update the card data reference
+			child.update_display()       # Refresh the visual display
+			print("Updated CardDisplay visual for enriched card")
+			break
 
-# NEW FUNCTION:
+
 func cleanup_enrich_overlays():
 	"""Remove all enrich selection overlays from the grid"""
 	for slot in grid_slots:
