@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=28 format=3 uid="uid://dgxi7oww6yrg0"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=30 format=3 uid="uid://dgxi7oww6yrg0"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_stdfb"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_0nxk6"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="4_34bjj"]
 [ext_resource type="Script" uid="uid://u1ucm0sox8pa" path="res://Resources/Abilities/grow_ability.gd" id="5_rjcyb"]
 [ext_resource type="Script" uid="uid://bsyjru6fxhmp5" path="res://Resources/Abilities/cultivate_ability.gd" id="6_0ni4c"]
+[ext_resource type="Script" uid="uid://46m7rkeu3yy6" path="res://Resources/Abilities/enrich_ability.gd" id="7_wun1n"]
 
 [sub_resource type="Resource" id="Resource_sf7va"]
 script = ExtResource("3_5rr7c")
@@ -104,12 +105,20 @@ level_data = Array[ExtResource("3_34bjj")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_o6j45"]
+script = ExtResource("7_wun1n")
+ability_name = "Enrich"
+description = "On play, choose a slot. For the remainder of the run this slot will boost the stats of friendly cards by 1"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://46m7rkeu3yy6"
+
 [sub_resource type="Resource" id="Resource_wun1n"]
 script = ExtResource("1_stdfb")
 card_name = "Metanira"
 values = Array[int]([1, 1, 1, 1])
 description = ""
-abilities = Array[ExtResource("2_0nxk6")]([])
+abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_o6j45")])
 level_data = Array[ExtResource("3_34bjj")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

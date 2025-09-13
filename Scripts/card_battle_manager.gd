@@ -2208,6 +2208,8 @@ func setup_empty_board():
 		
 		# Apply default style
 		slot.add_theme_stylebox_override("panel", default_grid_style)
+		# Initialize enrichment displays
+		call_deferred("initialize_enrichment_displays")
 
 func load_player_deck(deck_index: int):
 	print("=== LOADING PLAYER DECK ===")
@@ -2883,6 +2885,15 @@ func _on_grid_gui_input(event, grid_index):
 					print("Cannot sanctuary occupied slot - can only sanctuary empty slots")
 				return  # Don't process normal card placement during sanctuary mode
 	
+	# Handle enrich target selection (only during enrich mode setup)
+	if enrich_mode_active and current_enricher_owner == Owner.PLAYER:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				# Enrich can target any slot (occupied or empty)
+				select_enrich_target(grid_index)
+				return  # Don't process normal card placement during enrich mode
+	
+	
 	# Handle trojan horse target selection (only during trojan horse mode setup)
 	if trojan_horse_mode_active and current_trojan_summoner_owner == Owner.PLAYER:
 		if event is InputEventMouseButton:
@@ -2985,6 +2996,8 @@ func place_card_on_grid():
 	# FIXED: Apply ordain bonus to the card copy that will be placed on the grid
 	var placing_owner = Owner.PLAYER
 	apply_ordain_bonus_if_applicable(current_grid_index, card_data, placing_owner)
+	# Apply enrichment bonus if applicable
+	apply_enrichment_bonus_if_applicable(current_grid_index, card_data, placing_owner)
 	apply_sanctuary_cheat_death_if_applicable(current_grid_index, card_data, placing_owner)
 
 	
@@ -3173,6 +3186,10 @@ func place_card_on_grid():
 	
 	if sanctuary_mode_active:
 		print("Sanctuary mode active - staying on player turn for target selection")
+		return
+	
+	if enrich_mode_active:
+		print("Enrich mode active - staying on player turn for target selection")
 		return
 	
 	if trojan_horse_mode_active:

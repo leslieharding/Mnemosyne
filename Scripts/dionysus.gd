@@ -75,6 +75,14 @@ func _on_start_game_button_pressed() -> void:
 		get_node("/root/RunExperienceTrackerAutoload").start_new_run(deck_def.card_indices)
 		print("Initialized experience tracker for new run with deck: ", deck_def.deck_name)
 		
+		# Initialize enrichment tracker for new run
+		if has_node("/root/RunEnrichmentTrackerAutoload"):
+			var enrichment_tracker = get_node("/root/RunEnrichmentTrackerAutoload")
+			enrichment_tracker.start_new_run()
+			print("Initialized enrichment tracker for new run")
+		else:
+			print("Warning: RunEnrichmentTrackerAutoload not found!")
+		
 		# Initialize boss prediction tracker
 		get_node("/root/BossPredictionTrackerAutoload").clear_patterns()
 		print("Initialized boss prediction tracker for new run")

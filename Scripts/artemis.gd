@@ -83,6 +83,14 @@ func _on_start_game_button_pressed() -> void:
 		get_node("/root/BossPredictionTrackerAutoload").clear_patterns()
 		print("Initialized boss prediction tracker for new run")
 		
+		# Initialize enrichment tracker for new run
+		if has_node("/root/RunEnrichmentTrackerAutoload"):
+			var enrichment_tracker = get_node("/root/RunEnrichmentTrackerAutoload")
+			enrichment_tracker.start_new_run()
+			print("Initialized enrichment tracker for new run")
+		else:
+			print("Warning: RunEnrichmentTrackerAutoload not found!")
+		
 		# Pass the selected god and deck index to the map scene
 		get_tree().set_meta("scene_params", {
 			"god": "Artemis",
