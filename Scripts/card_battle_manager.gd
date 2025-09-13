@@ -2997,9 +2997,10 @@ func update_card_display(grid_index: int, card_data: CardResource):
 	var slot = grid_slots[grid_index]
 	var card_display = slot.get_child(0) if slot.get_child_count() > 0 else null
 	
-	if card_display and card_display.has_method("setup"):
-		# Re-setup the card display with updated values
-		card_display.setup(card_data)
+	if card_display and card_display.has_method("update_display"):
+		# Just update the display without losing the existing setup
+		card_display.card_data = card_data  # Update the card data reference
+		card_display.update_display()       # Refresh the visual display
 		print("Updated card display for ", card_data.card_name, " with new values: ", card_data.values)
 
 func place_card_on_grid():

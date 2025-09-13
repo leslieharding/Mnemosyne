@@ -99,8 +99,13 @@ func process_greedy_turn(position: int, card: CardResource, game_manager) -> boo
 			total_cards_processed += 1
 			
 			# Update the visual display to show the new stats
-			if game_manager.has_method("update_card_display"):
-				game_manager.update_card_display(target_position, target_card)
+			var target_slot = game_manager.grid_slots[target_position]
+			for child in target_slot.get_children():
+				if child is CardDisplay:
+					child.card_data = target_card  # Update the card data reference
+					child.update_display()         # Refresh the visual display
+					print("GreedyAbility: Updated CardDisplay visual for stolen card at position ", target_position)
+					break
 	
 	# Apply stolen stats to greedy card (directional gains)
 	var total_stats_gained = stats_gained[0] + stats_gained[1] + stats_gained[2] + stats_gained[3]
@@ -116,46 +121,55 @@ func process_greedy_turn(position: int, card: CardResource, game_manager) -> boo
 		print("Stats after gaining: ", card.values)
 		
 		# Update the visual display for the greedy card
-		if game_manager.has_method("update_card_display"):
-			game_manager.update_card_display(position, card)
+		var greedy_slot = game_manager.grid_slots[position]
+		for child in greedy_slot.get_children():
+			if child is CardDisplay:
+				child.card_data = card  # Update the card data reference
+				child.update_display()  # Refresh the visual display
+				print("GreedyAbility: Updated CardDisplay visual for greedy card at position ", position)
+				break
 	
 	if total_stats_gained > 0:
-		print("GreedyAbility activated! ", card.card_name, " gained ", total_stats_gained, " total stat points from ", total_cards_processed, " adjacent friendly cards")
+		print("GreedyAbility activated! ", card.card_name, " stole ", total_stats_gained, " stats from ", total_cards_processed, " adjacent cards!")
 		return true
 	else:
-		print("GreedyAbility had no effect - no stat points available to steal")
+		print("GreedyAbility: No stats to steal")
 		return false
 
-func get_adjacent_friendly_cards(grid_position: int, game_manager) -> Array[int]:
-	var adjacent_friendly_cards: Array[int] = []
-	var grid_size = game_manager.grid_size
-	var grid_x = grid_position % grid_size
-	var grid_y = grid_position / grid_size
+func get_adjacent_friendly_cards(position: int, game_manager) -> Array[int]:
+	var friendly_positions: Array[int] = []
+	var grid_size = 9  # 3x3 grid
 	
-	# Check all 4 orthogonal directions
+	# Calculate row and column for the given position
+	var row = position / 3
+	var col = position % 3
+	
+	# Check all orthogonal directions (North, East, South, West)
 	var directions = [
-		{"dx": 0, "dy": -1, "name": "North"},   # North
-		{"dx": 1, "dy": 0, "name": "East"},    # East
-		{"dx": 0, "dy": 1, "name": "South"},   # South
-		{"dx": -1, "dy": 0, "name": "West"}    # West
+		[-1, 0], # North
+		[0, 1],  # East
+		[1, 0],  # South
+		[0, -1]  # West
 	]
 	
-	for dir_info in directions:
-		var adj_x = grid_x + dir_info.dx
-		var adj_y = grid_y + dir_info.dy
-		var adj_index = adj_y * grid_size + adj_x
+	for direction in directions:
+		var new_row = row + direction[0]
+		var new_col = col + direction[1]
 		
-		# Check if adjacent position is within bounds and occupied
-		if adj_x >= 0 and adj_x < grid_size and adj_y >= 0 and adj_y < grid_size:
-			if game_manager.grid_occupied[adj_index]:
-				var adjacent_owner = game_manager.get_owner_at_position(adj_index)
+		# Check bounds
+		if new_row >= 0 and new_row < 3 and new_col >= 0 and new_col < 3:
+			var adjacent_position = new_row * 3 + new_col
+			
+			# Check if slot is occupied and owned by the same owner as the greedy card
+			if game_manager.grid_occupied[adjacent_position]:
+				var greedy_owner = game_manager.get_owner_at_position(position)
+				var adjacent_owner = game_manager.get_owner_at_position(adjacent_position)
 				
-				# Only target friendly (opponent-owned) cards
-				if adjacent_owner == game_manager.Owner.OPPONENT:
-					adjacent_friendly_cards.append(adj_index)
-					print("GreedyAbility: Found friendly card at position ", adj_index, " (", dir_info.name, ")")
+				if greedy_owner == adjacent_owner:
+					friendly_positions.append(adjacent_position)
+					print("GreedyAbility: Found friendly card at position ", adjacent_position)
 	
-	return adjacent_friendly_cards
+	return friendly_positions
 
 func can_execute(context: Dictionary) -> bool:
 	return true
