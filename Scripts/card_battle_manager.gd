@@ -2733,6 +2733,19 @@ func _on_grid_mouse_entered(grid_index):
 	if not turn_manager.is_player_turn():
 		return
 	
+	# Handle enrich mode - ALL slots should be highlightable during enrich selection
+	if enrich_mode_active and current_enricher_owner == Owner.PLAYER:
+		# Clear the previous selection highlight
+		if current_grid_index != -1:
+			# Restore the previous slot's original styling
+			restore_slot_original_styling(current_grid_index)
+		
+		current_grid_index = grid_index
+		
+		# Apply enrich highlight to ANY slot (occupied or empty)
+		apply_enrich_selection_highlight(grid_index)
+		return
+	
 	# Only apply selection highlight if a card is selected and slot is not occupied
 	if selected_card_index != -1 and not grid_occupied[grid_index]:
 		# Clear the previous selection highlight
@@ -2749,10 +2762,20 @@ func _on_grid_mouse_entered(grid_index):
 		
 		# Apply selection highlight with awareness of sun spots (for non-hunt slots)
 		apply_selection_highlight(grid_index)
-	
 
 func _on_grid_mouse_exited(grid_index):
 	if not turn_manager.is_player_turn():
+		return
+	
+	# Handle enrich mode - restore styling for ANY slot
+	if enrich_mode_active and current_enricher_owner == Owner.PLAYER:
+		# Always restore original styling when exiting during enrich mode
+		# FIXED: Always restore styling regardless of current_grid_index
+		restore_slot_original_styling(grid_index)
+		# FIXED: Also remove enrich overlay for occupied slots
+		if grid_occupied[grid_index]:
+			var slot = grid_slots[grid_index]
+			remove_enrich_card_overlay(slot)
 		return
 	
 	# If this slot is not the currently selected one, restore its original styling
@@ -2761,6 +2784,19 @@ func _on_grid_mouse_exited(grid_index):
 	# FIXED: If this IS the currently selected slot but has a hunt trap, restore hunt styling
 	elif current_grid_index == grid_index and grid_index in active_hunts:
 		apply_hunt_target_styling(grid_index)
+
+func apply_enrich_selection_highlight(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	var slot = grid_slots[grid_index]
+	
+	# Always apply enrich highlight style to the slot itself
+	slot.add_theme_stylebox_override("panel", enrich_highlight_style)
+	
+	# ISSUE #2 FIX: For occupied slots, also add a bright overlay on the card to show it's selectable
+	if grid_occupied[grid_index]:
+		add_enrich_card_overlay(slot)
 
 
 func restore_slot_original_styling(grid_index: int):
@@ -6118,6 +6154,10 @@ func start_enrich_mode(enricher_position: int, enricher_owner: Owner, enricher_c
 	current_enricher_card = enricher_card
 	pending_enrichment_amount = enrichment_amount
 	
+	# CRITICAL: Allow mouse input to pass through cards on occupied slots during enrich mode
+	if enricher_owner == Owner.PLAYER:
+		set_cards_mouse_passthrough_for_enrich_mode(true)
+	
 	# Update game status
 	if enricher_owner == Owner.PLAYER:
 		if enrichment_amount > 0:
@@ -6137,6 +6177,13 @@ func select_enrich_target(target_slot: int):
 	
 	print("Enrich target selected: slot ", target_slot)
 	
+	# CRITICAL: Restore normal mouse input handling for cards
+	if current_enricher_owner == Owner.PLAYER:
+		set_cards_mouse_passthrough_for_enrich_mode(false)
+	
+	# Remove all enrich overlays
+	cleanup_enrich_overlays()
+	
 	# Get the run enrichment tracker
 	var enrichment_tracker = get_node_or_null("/root/RunEnrichmentTrackerAutoload")
 	if not enrichment_tracker:
@@ -6148,6 +6195,13 @@ func select_enrich_target(target_slot: int):
 	
 	# Update slot visual to show enrichment level
 	update_slot_enrichment_display(target_slot)
+	
+	# ISSUE #1 FIX: Apply enrichment bonus to any card already in the slot
+	if grid_occupied[target_slot] and grid_ownership[target_slot] == Owner.PLAYER:
+		var card_in_slot = grid_card_data[target_slot]
+		if card_in_slot:
+			print("Applying immediate enrichment bonus to existing card in slot ", target_slot)
+			apply_enrichment_bonus_to_existing_card(target_slot, card_in_slot, pending_enrichment_amount)
 	
 	# Clear enrich mode
 	enrich_mode_active = false
@@ -6165,6 +6219,28 @@ func select_enrich_target(target_slot: int):
 	# Switch turns - enrich action completes the turn
 	print("Enrich target selected - switching turns")
 	turn_manager.next_turn()
+
+func set_cards_mouse_passthrough_for_enrich_mode(enable_passthrough: bool):
+	"""
+	During enrich mode, we need to allow mouse input to pass through cards on occupied slots
+	so that the underlying grid slots can receive mouse events for selection.
+	"""
+	print("Setting cards mouse passthrough for enrich mode: ", enable_passthrough)
+	
+	for i in range(grid_slots.size()):
+		if grid_occupied[i]:
+			var slot = grid_slots[i]
+			# Find the card display in the slot
+			for child in slot.get_children():
+				if child is CardDisplay and child.panel:
+					if enable_passthrough:
+						# Allow mouse input to pass through the card to the slot underneath
+						child.panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+						print("Set card at slot ", i, " to MOUSE_FILTER_IGNORE for enrich mode")
+					else:
+						# Restore normal mouse input handling
+						child.panel.mouse_filter = Control.MOUSE_FILTER_PASS
+						print("Restored card at slot ", i, " to MOUSE_FILTER_PASS after enrich mode")
 
 func opponent_select_enrich_target():
 	if not enrich_mode_active:
@@ -6267,3 +6343,59 @@ func initialize_enrichment_displays():
 	
 	for i in range(grid_slots.size()):
 		update_slot_enrichment_display(i)
+
+
+func add_enrich_card_overlay(slot: Panel):
+	# Remove any existing overlay first to prevent stacking
+	remove_enrich_card_overlay(slot)
+	
+	# Create a bright overlay to show the card is selectable during enrich mode
+	var overlay = ColorRect.new()
+	overlay.name = "EnrichSelectionOverlay"
+	overlay.color = Color("#00FF44", 0.3)  # Semi-transparent green
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 100  # High z_index to appear above the card
+	
+	slot.add_child(overlay)
+
+# NEW FUNCTION:
+func remove_enrich_card_overlay(slot: Panel):
+	var overlay = slot.get_node_or_null("EnrichSelectionOverlay")
+	if overlay:
+		overlay.queue_free()
+
+func apply_enrichment_bonus_to_existing_card(grid_position: int, card_data: CardResource, enrichment_amount: int):
+	"""
+	Apply enrichment bonus to a card that's already placed in a slot when that slot gets enriched.
+	This is different from the normal apply_enrichment_bonus_if_applicable which only works during placement.
+	"""
+	print("=== IMMEDIATE ENRICHMENT BONUS ===")
+	print("Grid position: ", grid_position)
+	print("Enrichment amount: ", enrichment_amount)
+	print("Card stats before: ", card_data.values)
+	
+	# Apply enrichment bonus to all directions
+	card_data.values[0] += enrichment_amount  # North
+	card_data.values[1] += enrichment_amount  # East
+	card_data.values[2] += enrichment_amount  # South
+	card_data.values[3] += enrichment_amount  # West
+	
+	print("Card stats after enrichment: ", card_data.values)
+	
+	# Update visual display
+	update_card_display(grid_position, card_data)
+	
+	# Show visual effect if positive enrichment - FIXED: Use existing flash effect
+	if enrichment_amount > 0:
+		var slot = grid_slots[grid_position]
+		var card_display = slot.get_child(0) if slot.get_child_count() > 0 else null
+		if card_display and visual_effects_manager:
+			# Use existing capture flash effect in green/gold color to show positive enrichment
+			visual_effects_manager.show_capture_flash(card_display, 0, true)  # Direction doesn't matter for this effect
+
+# NEW FUNCTION:
+func cleanup_enrich_overlays():
+	"""Remove all enrich selection overlays from the grid"""
+	for slot in grid_slots:
+		remove_enrich_card_overlay(slot)
