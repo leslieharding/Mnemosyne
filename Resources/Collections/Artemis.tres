@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=16 format=3 uid="uid://dwrds6g3whmsq"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=18 format=3 uid="uid://dwrds6g3whmsq"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_ttyo6"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_nyy1t"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://buhjtyfib4g6b" path="res://Resources/Abilities/charm_ability.gd" id="3_lnj4m"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_nyy1t"]
 [ext_resource type="Script" uid="uid://c4aeeb6pohv6k" path="res://Resources/Abilities/soothe_ability.gd" id="5_lnj4m"]
+[ext_resource type="Script" uid="uid://bvlqcwb0iagi4" path="res://Resources/Abilities/phalanx_ability.gd" id="6_xpt5f"]
 
 [sub_resource type="Resource" id="Resource_8h57p"]
 script = ExtResource("3_lnj4m")
@@ -44,12 +45,20 @@ level_data = Array[ExtResource("3_021ek")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_hq4qt"]
+script = ExtResource("6_xpt5f")
+ability_name = "Phalanx"
+description = "On play if you own all 3 cards in a row or column, boost the formations stats by 2"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://bvlqcwb0iagi4"
+
 [sub_resource type="Resource" id="Resource_wiuqi"]
 script = ExtResource("1_ttyo6")
 card_name = "Hippolytus"
 values = Array[int]([5, 5, 5, 5])
 description = ""
-abilities = Array[ExtResource("2_nyy1t")]([])
+abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_hq4qt")])
 level_data = Array[ExtResource("3_021ek")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

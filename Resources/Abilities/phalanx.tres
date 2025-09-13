@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PhalanxAbility" load_steps=2 format=3 uid="uid://c70567c14c5uh"]
+
+[ext_resource type="Script" uid="uid://bvlqcwb0iagi4" path="res://Resources/Abilities/phalanx_ability.gd" id="1_ejqnf"]
+
+[resource]
+script = ExtResource("1_ejqnf")
+ability_name = "Phalanx"
+description = "On play if you own all 3 cards in a row or column, boost the formations stats by 2"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://bvlqcwb0iagi4"

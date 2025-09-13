@@ -1,17 +1,26 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=12 format=3 uid="uid://o1mfh67x6jos"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=14 format=3 uid="uid://o1mfh67x6jos"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_7jwg8"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_3heas"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_fc4ui"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_3heas"]
+[ext_resource type="Script" uid="uid://bvlqcwb0iagi4" path="res://Resources/Abilities/phalanx_ability.gd" id="3_mehp5"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_uh4yu"]
+
+[sub_resource type="Resource" id="Resource_n2ake"]
+script = ExtResource("3_mehp5")
+ability_name = "Phalanx"
+description = "On play if you own all 3 cards in a row or column, boost the formations stats by 2"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://bvlqcwb0iagi4"
 
 [sub_resource type="Resource" id="Resource_mehp5"]
 script = ExtResource("1_7jwg8")
 card_name = "Pallace"
 values = Array[int]([1, 1, 1, 1])
 description = ""
-abilities = Array[ExtResource("2_3heas")]([])
+abilities = Array[ExtResource("2_3heas")]([SubResource("Resource_n2ake")])
 level_data = Array[ExtResource("3_uh4yu")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

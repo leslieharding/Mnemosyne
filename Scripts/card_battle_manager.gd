@@ -704,7 +704,7 @@ func start_game():
 	var scene_params = get_scene_params()
 	if scene_params.has("current_node"):
 		var node = scene_params["current_node"]
-		current_enemy_id = node.enemy_name if node.has("enemy_name") else "Unknown"
+		current_enemy_id = node.enemy_name if node.enemy_name != "" else "Unknown"
 	elif scene_params.has("opponent"):
 		current_enemy_id = scene_params["opponent"]
 	else:
@@ -1620,7 +1620,7 @@ func end_game():
 		var enemy_id = ""
 		if battle_params.has("current_node"):
 			var node = battle_params["current_node"]
-			enemy_id = node.enemy_name if node.has("enemy_name") else "Unknown"
+			enemy_id = node.enemy_name if node.enemy_name != "" else "Unknown"
 		elif battle_params.has("opponent"):
 			enemy_id = battle_params["opponent"]
 		else:
