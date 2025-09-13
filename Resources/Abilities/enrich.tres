@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="EnrichAbility" load_steps=2 format=3 uid="uid://xrxoiqtp66mq"]
+
+[ext_resource type="Script" uid="uid://46m7rkeu3yy6" path="res://Resources/Abilities/enrich_ability.gd" id="1_6l5ty"]
+
+[resource]
+script = ExtResource("1_6l5ty")
+ability_name = "Enrich"
+description = "On play, choose a slot. For the remainder of the run this slot will boost the stats of friendly cards by 1"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://46m7rkeu3yy6"

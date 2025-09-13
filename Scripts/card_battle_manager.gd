@@ -34,6 +34,16 @@ var tremor_id_counter: int = 0
 
 var soothe_active: bool = false
 
+# Enrich mode variables
+var enrich_mode_active = false
+var current_enricher_position = -1
+var current_enricher_owner = Owner.NONE
+var current_enricher_card: CardResource = null
+var pending_enrichment_amount = 1
+
+# Enrich visual style
+var enrich_highlight_style: StyleBoxFlat
+
 # Coerce tracking system
 var coerce_mode_active: bool = false
 var current_coercer_position: int = -1
@@ -2137,7 +2147,16 @@ func create_grid_styles():
 	sanctuary_target_style.border_width_right = 3
 	sanctuary_target_style.border_width_bottom = 3
 	sanctuary_target_style.border_color = Color("#00FFAA")  # Cyan/teal border
-
+	
+	# Enrich highlight style (green border for slot selection)
+	enrich_highlight_style = StyleBoxFlat.new()
+	enrich_highlight_style.bg_color = Color("#444444")
+	enrich_highlight_style.border_width_left = 3
+	enrich_highlight_style.border_width_top = 3
+	enrich_highlight_style.border_width_right = 3
+	enrich_highlight_style.border_width_bottom = 3
+	enrich_highlight_style.border_color = Color("#00FF44")  # Green border for enrich selection
+	
 	create_coerced_card_style()
 
 # Helper to get passed parameters from previous scene
@@ -6073,3 +6092,161 @@ func check_and_remove_coerce_constraint(played_card_index: int):
 	else:
 		print("ERROR: Player tried to play wrong card during coerce!")
 		# This should never happen due to selection constraints, but just in case
+
+
+func start_enrich_mode(enricher_position: int, enricher_owner: Owner, enricher_card: CardResource, enrichment_amount: int):
+	enrich_mode_active = true
+	current_enricher_position = enricher_position
+	current_enricher_owner = enricher_owner
+	current_enricher_card = enricher_card
+	pending_enrichment_amount = enrichment_amount
+	
+	# Update game status
+	if enricher_owner == Owner.PLAYER:
+		if enrichment_amount > 0:
+			game_status_label.text = "Choose a slot to enrich (+%d boost to friendly cards)" % enrichment_amount
+		else:
+			game_status_label.text = "Choose a slot to weaken (%d penalty to friendly cards)" % enrichment_amount
+	else:
+		game_status_label.text = "Opponent is enriching a slot."
+	
+	# AI selection for opponent
+	if enricher_owner == Owner.OPPONENT:
+		call_deferred("opponent_select_enrich_target")
+
+func select_enrich_target(target_slot: int):
+	if not enrich_mode_active:
+		return
+	
+	print("Enrich target selected: slot ", target_slot)
+	
+	# Get the run enrichment tracker
+	var enrichment_tracker = get_node_or_null("/root/RunEnrichmentTrackerAutoload")
+	if not enrichment_tracker:
+		print("EnrichAbility: RunEnrichmentTrackerAutoload not found!")
+		return
+	
+	# Apply enrichment to the selected slot
+	enrichment_tracker.add_slot_enrichment(target_slot, pending_enrichment_amount)
+	
+	# Update slot visual to show enrichment level
+	update_slot_enrichment_display(target_slot)
+	
+	# Clear enrich mode
+	enrich_mode_active = false
+	current_enricher_position = -1
+	current_enricher_owner = Owner.NONE
+	current_enricher_card = null
+	pending_enrichment_amount = 1
+	
+	# Update game status
+	if pending_enrichment_amount > 0:
+		game_status_label.text = "Slot enriched! Friendly cards in that slot get +%d to all stats." % pending_enrichment_amount
+	else:
+		game_status_label.text = "Slot weakened! Friendly cards in that slot get %d to all stats." % pending_enrichment_amount
+	
+	# Switch turns - enrich action completes the turn
+	print("Enrich target selected - switching turns")
+	turn_manager.next_turn()
+
+func opponent_select_enrich_target():
+	if not enrich_mode_active:
+		return
+	
+	# Simple AI: pick a random slot (enrichment can target any slot)
+	var target_position = randi() % grid_slots.size()
+	
+	select_enrich_target(target_position)
+
+func update_slot_enrichment_display(slot_index: int):
+	if slot_index < 0 or slot_index >= grid_slots.size():
+		return
+	
+	var enrichment_tracker = get_node_or_null("/root/RunEnrichmentTrackerAutoload")
+	if not enrichment_tracker:
+		return
+	
+	var enrichment_level = enrichment_tracker.get_slot_enrichment(slot_index)
+	var slot = grid_slots[slot_index]
+	
+	# Find or create enrichment label
+	var enrichment_label = slot.get_node_or_null("EnrichmentLabel")
+	if not enrichment_label:
+		enrichment_label = Label.new()
+		enrichment_label.name = "EnrichmentLabel"
+		enrichment_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+		enrichment_label.anchor_left = 1.0
+		enrichment_label.anchor_top = 0.0
+		enrichment_label.anchor_right = 1.0
+		enrichment_label.anchor_bottom = 0.0
+		enrichment_label.offset_left = -30
+		enrichment_label.offset_top = 5
+		enrichment_label.offset_right = -5
+		enrichment_label.offset_bottom = 25
+		enrichment_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		enrichment_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		enrichment_label.add_theme_color_override("font_color", Color.WHITE)
+		enrichment_label.add_theme_font_size_override("font_size", 12)
+		slot.add_child(enrichment_label)
+	
+	# Update label text
+	if enrichment_level > 0:
+		enrichment_label.text = "x" + str(enrichment_level)
+		enrichment_label.visible = true
+	elif enrichment_level < 0:
+		enrichment_label.text = "x" + str(enrichment_level)
+		enrichment_label.visible = true
+	else:
+		enrichment_label.text = ""
+		enrichment_label.visible = false
+
+func apply_enrichment_bonus_if_applicable(grid_position: int, card_data: CardResource, placing_owner: Owner):
+	print("=== ENRICHMENT BONUS CHECK ===")
+	print("Grid position: ", grid_position)
+	print("Placing owner: ", placing_owner)
+	
+	# Only apply enrichment bonus to player-owned cards
+	if placing_owner != Owner.PLAYER:
+		print("Enrichment bonus only applies to player cards")
+		return
+	
+	# Get the run enrichment tracker
+	var enrichment_tracker = get_node_or_null("/root/RunEnrichmentTrackerAutoload")
+	if not enrichment_tracker:
+		print("RunEnrichmentTrackerAutoload not found!")
+		return
+	
+	var enrichment_level = enrichment_tracker.get_slot_enrichment(grid_position)
+	
+	if enrichment_level != 0:
+		print("Applying enrichment bonus: +", enrichment_level, " to all stats")
+		
+		# Apply enrichment bonus to all directions
+		card_data.values[0] += enrichment_level  # North
+		card_data.values[1] += enrichment_level  # East
+		card_data.values[2] += enrichment_level  # South
+		card_data.values[3] += enrichment_level  # West
+		
+		print("Card stats after enrichment: ", card_data.values)
+		
+		# Update visual display
+		update_card_display(grid_position, card_data)
+	else:
+		print("No enrichment on this slot")
+
+func clear_all_enrich_effects():
+	enrich_mode_active = false
+	current_enricher_position = -1
+	current_enricher_owner = Owner.NONE
+	current_enricher_card = null
+	pending_enrichment_amount = 1
+	print("All enrich effects cleared")
+
+func initialize_enrichment_displays():
+	# Initialize enrichment displays for all slots at start of battle
+	var enrichment_tracker = get_node_or_null("/root/RunEnrichmentTrackerAutoload")
+	if not enrichment_tracker:
+		return
+	
+	for i in range(grid_slots.size()):
+		update_slot_enrichment_display(i)
