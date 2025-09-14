@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PropheticAbility" load_steps=2 format=3 uid="uid://cjaoo03sptbvq"]
+
+[ext_resource type="Script" uid="uid://ddbwhi0dqi1t0" path="res://Resources/Abilities/prophetic_ability.gd" id="1_ej8re"]
+
+[resource]
+script = ExtResource("1_ej8re")
+ability_name = "Prophetic"
+description = "On play glimpse your opponents hand"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://ddbwhi0dqi1t0"

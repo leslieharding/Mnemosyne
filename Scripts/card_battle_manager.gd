@@ -34,6 +34,10 @@ var tremor_id_counter: int = 0
 
 var soothe_active: bool = false
 
+# Prophetic ability modal system
+var opponent_hand_modal: OpponentHandModal = null
+var game_paused_for_modal: bool = false
+
 # Enrich mode variables
 var enrich_mode_active = false
 var current_enricher_position = -1
@@ -2690,6 +2694,12 @@ func handle_card_selection(card_display, card_index):
 	print("Is player turn: ", turn_manager.is_player_turn())
 	print("Current selected_card_index: ", selected_card_index)
 	print("Active coerced card index: ", active_coerced_card_index)
+	print("Game paused for modal: ", game_paused_for_modal)
+	
+	# Block input if modal is open
+	if game_paused_for_modal:
+		print("Game paused for modal - blocking card selection")
+		return
 	
 	# In tutorial mode, FORCE allow card selection regardless of turn state
 	if is_tutorial_mode:
@@ -2725,8 +2735,6 @@ func handle_card_selection(card_display, card_index):
 	card_display.select()
 	selected_card_index = card_index
 	
-	# REMOVED: Don't remove coerce constraint here - only remove when card is actually played
-	
 	# Initialize grid selection if not already set
 	if current_grid_index == -1:
 		# Find the first unoccupied grid slot
@@ -2738,6 +2746,8 @@ func handle_card_selection(card_display, card_index):
 				break
 	
 	print("Card selection complete - selected_card_index is now: ", selected_card_index)
+
+
 # Handle card input events
 func _on_card_gui_input(event, card_display, card_index):
 	
@@ -2898,7 +2908,10 @@ func apply_selection_highlight(grid_index: int):
 
 func _on_grid_gui_input(event, grid_index):
 	
-	
+	# Block input if modal is open
+	if game_paused_for_modal:
+		print("Game paused for modal - blocking grid input")
+		return
 	
 	
 	# Handle dance target selection FIRST (but only during dance mode setup)
@@ -6536,3 +6549,58 @@ func process_morph_turn_start():
 		}
 		
 		morph_ability.execute(context)
+
+
+func show_opponent_hand_modal():
+	"""Show the opponent's hand modal for the Prophetic ability"""
+	if opponent_hand_modal:
+		print("Opponent hand modal already open - skipping")
+		return
+	
+	# Pause game interactions
+	game_paused_for_modal = true
+	disable_player_input()
+	
+	print("Creating opponent hand modal...")
+	
+	# Create the modal
+	opponent_hand_modal = preload("res://Scripts/opponent_hand_modal.gd").new()
+	
+	# Add it to the scene tree at a high layer
+	var canvas_layer = CanvasLayer.new()
+	canvas_layer.layer = 100  # Very high layer to be on top of everything
+	canvas_layer.name = "PropheticModalLayer"
+	add_child(canvas_layer)
+	canvas_layer.add_child(opponent_hand_modal)
+	
+	# Connect the modal closed signal
+	opponent_hand_modal.modal_closed.connect(_on_opponent_hand_modal_closed)
+	
+	# Get the opponent's current hand
+	var opponent_cards = opponent_manager.opponent_deck.duplicate()
+	
+	print("Showing ", opponent_cards.size(), " opponent cards in modal")
+	
+	# Display the opponent's hand
+	opponent_hand_modal.display_opponent_hand(opponent_cards)
+
+func _on_opponent_hand_modal_closed():
+	"""Handle when the prophetic modal is closed"""
+	print("Opponent hand modal closed - resuming game")
+	
+	# Clean up modal reference
+	opponent_hand_modal = null
+	
+	# Remove the canvas layer
+	var modal_layer = get_node_or_null("PropheticModalLayer")
+	if modal_layer:
+		modal_layer.queue_free()
+	
+	# Resume game
+	game_paused_for_modal = false
+	
+	# Re-enable player input if it's still the player's turn
+	if turn_manager.current_player == TurnManager.Player.HUMAN and turn_manager.is_game_active:
+		enable_player_input()
+	
+	print("Game resumed after prophetic vision")

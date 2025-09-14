@@ -1,0 +1,81 @@
+[gd_scene load_steps=3 format=3 uid="uid://dpotagy8xm2s6"]
+
+[ext_resource type="Script" uid="uid://d3fr3hsn8thhg" path="res://Scripts/opponent_hand_modal.gd" id="1_kptpy"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hcddk"]
+bg_color = Color(0.164706, 0.164706, 0.164706, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.843137, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="OpponentHandModal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_kptpy")
+
+[node name="BackgroundPanel" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.00392157)
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(800, 400)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ModalPanel" type="PanelContainer" parent="MainContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hcddk")
+
+[node name="MarginContainer" type="MarginContainer" parent="MainContainer/ModalPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="ContentVBox" type="VBoxContainer" parent="MainContainer/ModalPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="TitleLabel" type="Label" parent="MainContainer/ModalPanel/MarginContainer/ContentVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Opponents Hand"
+horizontal_alignment = 1
+
+[node name="CardsContainer" type="HBoxContainer" parent="MainContainer/ModalPanel/MarginContainer/ContentVBox"]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="CloseButton" type="Button" parent="MainContainer/ModalPanel/MarginContainer/ContentVBox"]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 16
+text = "End Prophetic Vision"
