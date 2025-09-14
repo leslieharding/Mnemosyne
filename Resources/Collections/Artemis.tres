@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=20 format=3 uid="uid://dwrds6g3whmsq"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=22 format=3 uid="uid://dwrds6g3whmsq"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_ttyo6"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_nyy1t"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_nyy1t"]
 [ext_resource type="Script" uid="uid://c4aeeb6pohv6k" path="res://Resources/Abilities/soothe_ability.gd" id="5_lnj4m"]
 [ext_resource type="Script" uid="uid://bvlqcwb0iagi4" path="res://Resources/Abilities/phalanx_ability.gd" id="6_xpt5f"]
+[ext_resource type="Script" uid="uid://dja2ta0rb7v13" path="res://Resources/Abilities/treachery_ability.gd" id="7_cynoy"]
 [ext_resource type="Script" uid="uid://cnmf4yohj44kh" path="res://Resources/Abilities/morph_ability.gd" id="7_wiuqi"]
 
 [sub_resource type="Resource" id="Resource_8h57p"]
@@ -64,12 +65,20 @@ level_data = Array[ExtResource("3_021ek")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_mbexa"]
+script = ExtResource("7_cynoy")
+ability_name = "Treachery"
+description = "One captured enemy will try and attack an ally"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://dja2ta0rb7v13"
+
 [sub_resource type="Resource" id="Resource_cynoy"]
 script = ExtResource("1_ttyo6")
 card_name = "Orion"
 values = Array[int]([5, 5, 5, 5])
 description = ""
-abilities = Array[ExtResource("2_nyy1t")]([])
+abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_mbexa")])
 level_data = Array[ExtResource("3_021ek")]([])
 uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

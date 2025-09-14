@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TreacheryAbility" load_steps=2 format=3 uid="uid://cif1hp14cbvob"]
+
+[ext_resource type="Script" uid="uid://dja2ta0rb7v13" path="res://Resources/Abilities/treachery_ability.gd" id="1_usnda"]
+
+[resource]
+script = ExtResource("1_usnda")
+ability_name = "Treachery"
+description = "One captured enemy will try and attack an ally"
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://dja2ta0rb7v13"
