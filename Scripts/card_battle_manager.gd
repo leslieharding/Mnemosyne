@@ -820,6 +820,9 @@ func _on_turn_changed(is_player_turn: bool):
 	# Process adaptive defense abilities on turn change
 	handle_adaptive_defense_turn_change(is_player_turn)
 	
+	# Process morph abilities at the start of every turn (both owners)
+	process_morph_turn_start()
+	
 	# Process cultivation abilities at the start of player's turn
 	if is_player_turn:
 		process_cultivation_turn_start()
@@ -6488,3 +6491,48 @@ func process_greedy_turn_start():
 		}
 		
 		greedy_ability.execute(context)
+
+
+# Process morph abilities at the start of every turn (both player and opponent)
+func process_morph_turn_start():
+	print("Processing morph abilities for turn start")
+	
+	# Check all cards on the board for morph abilities
+	for position in range(grid_slots.size()):
+		if not grid_occupied[position]:
+			continue
+		
+		var card_data = get_card_at_position(position)
+		if not card_data:
+			continue
+		
+		# Get card level for ability checks
+		var card_collection_index = get_card_collection_index(position)
+		var card_level = get_card_level(card_collection_index)
+		
+		# Check if this card has morph ability
+		var has_morph = false
+		var morph_ability = null
+		
+		if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			for ability in card_data.get_available_abilities(card_level):
+				if ability.ability_name == "Morph":
+					has_morph = true
+					morph_ability = ability
+					break
+		
+		if not has_morph or not morph_ability:
+			continue
+		
+		print("Found morph card at position ", position, ": ", card_data.card_name)
+		
+		# Execute morph turn processing
+		var context = {
+			"passive_action": "turn_start",
+			"boosting_card": card_data,
+			"boosting_position": position,
+			"game_manager": self,
+			"card_level": card_level
+		}
+		
+		morph_ability.execute(context)

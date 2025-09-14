@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MorphAbility" load_steps=2 format=3 uid="uid://cyftig01oseuk"]
+
+[ext_resource type="Script" uid="uid://cnmf4yohj44kh" path="res://Resources/Abilities/morph_ability.gd" id="1_wdhew"]
+
+[resource]
+script = ExtResource("1_wdhew")
+ability_name = "Morph"
+description = "Rotate this cards stats every turn"
+unlock_level = 0
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cnmf4yohj44kh"
