@@ -69,8 +69,14 @@ func execute(context: Dictionary) -> bool:
 	if attacking_card_display and game_manager.visual_effects_manager:
 		game_manager.visual_effects_manager.show_stat_nullify_arrow(attacking_card_display)
 	
-	# Update the visual display AFTER the arrow effect to ensure it sticks
-	game_manager.call_deferred("update_board_visuals")
+	# FIXED: Update the CardDisplay visual directly to show the new stats
+	if attacking_card_display:
+		attacking_card_display.card_data = capturing_card  # Update the card data reference
+		attacking_card_display.update_display()            # Refresh the visual display
+		print("RetaliateAbility: Updated CardDisplay visual for weakened enemy card")
+	
+	# Also call the general board update for good measure
+	game_manager.update_board_visuals()
 	
 	return true
 
