@@ -849,8 +849,10 @@ func _on_turn_changed(is_player_turn: bool):
 		process_tremors_for_player(Owner.OPPONENT)
 		disable_player_input()
 		# Only start opponent turn if not already thinking
-		if not opponent_is_thinking and not is_tutorial_mode:
+		if not opponent_is_thinking and not is_tutorial_mode and not game_paused_for_modal:
 			call_deferred("opponent_take_turn")
+		elif game_paused_for_modal:
+			print("Game paused for modal - deferring opponent turn until modal closes")
 
 func get_card_display_at_position(grid_index: int) -> CardDisplay:
 	if grid_index < 0 or grid_index >= grid_slots.size():
@@ -979,6 +981,11 @@ func disable_player_input():
 		current_grid_index = -1
 
 func opponent_take_turn():
+	# Check if game is paused for modal - if so, defer the turn
+	if game_paused_for_modal:
+		print("Game paused for modal - opponent turn deferred")
+		return
+		
 	# Double-check that it's actually the opponent's turn to prevent multiple calls
 	if not turn_manager.is_opponent_turn():
 		print("Warning: opponent_take_turn called when it's not opponent's turn!")
@@ -6563,8 +6570,9 @@ func show_opponent_hand_modal():
 	
 	print("Creating opponent hand modal...")
 	
-	# Create the modal
-	opponent_hand_modal = preload("res://Scripts/opponent_hand_modal.gd").new()
+	# Create the modal from the scene file (not the script!)
+	var modal_scene = preload("res://Scenes/OpponentHandModal.tscn")
+	opponent_hand_modal = modal_scene.instantiate()
 	
 	# Add it to the scene tree at a high layer
 	var canvas_layer = CanvasLayer.new()
@@ -6602,5 +6610,10 @@ func _on_opponent_hand_modal_closed():
 	# Re-enable player input if it's still the player's turn
 	if turn_manager.current_player == TurnManager.Player.HUMAN and turn_manager.is_game_active:
 		enable_player_input()
+	
+	# If it's the opponent's turn and they haven't started thinking yet, let them take their turn
+	if turn_manager.is_opponent_turn() and not opponent_is_thinking and not is_tutorial_mode:
+		print("Modal closed - starting deferred opponent turn")
+		call_deferred("opponent_take_turn")
 	
 	print("Game resumed after prophetic vision")
