@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RetaliateAbility" load_steps=2 format=3 uid="uid://bkpgdo551ujft"]
+
+[ext_resource type="Script" uid="uid://c8h2thhm30b1n" path="res://Resources/Abilities/retaliate_ability.gd" id="1_i1exo"]
+
+[resource]
+script = ExtResource("1_i1exo")
+ability_name = "Retaliate"
+description = "When this card is captured, it weakens the attacking card"
+unlock_level = 0
+trigger_condition = 2
+metadata/_custom_type_script = "uid://c8h2thhm30b1n"
