@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RaceAbility" load_steps=2 format=3 uid="uid://bjj4ufx41wh17"]
+
+[ext_resource type="Script" uid="uid://c47tlfc0gadlo" path="res://Resources/Abilities/race_ability.gd" id="1_7tbo2"]
+
+[resource]
+script = ExtResource("1_7tbo2")
+ability_name = "Race"
+description = "When played this card races to every empty slot getting more tired with every step."
+unlock_level = 0
+trigger_condition = 0
+metadata/_custom_type_script = "uid://c47tlfc0gadlo"
