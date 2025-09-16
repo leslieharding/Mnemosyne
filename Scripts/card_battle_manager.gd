@@ -69,6 +69,12 @@ var current_dancer_position: int = -1
 var current_dancer_owner: Owner = Owner.NONE
 var current_dancer_card: CardResource = null
 
+# Race mode tracking system
+var race_mode_active: bool = false
+var current_racer_position: int = -1
+var current_racer_owner: Owner = Owner.NONE
+var current_racer_card: CardResource = null
+
 var ordain_mode_active: bool = false
 var current_ordainer_position: int = -1
 var current_ordainer_owner: Owner = Owner.NONE
@@ -3286,6 +3292,10 @@ func place_card_on_grid():
 	
 	if trojan_horse_mode_active:
 		print("Trojan Horse mode active - staying on player turn for target selection")
+		return
+	
+	if race_mode_active:
+		print("Race mode active - staying on turn until race completes")
 		return
 	
 	# Switch turns only if no special modes are active
@@ -6617,3 +6627,165 @@ func _on_opponent_hand_modal_closed():
 		call_deferred("opponent_take_turn")
 	
 	print("Game resumed after prophetic vision")
+
+
+func start_race_mode(racer_position: int, racer_owner: Owner, racer_card: CardResource):
+	race_mode_active = true
+	current_racer_position = racer_position
+	current_racer_owner = racer_owner
+	current_racer_card = racer_card
+	
+	# Update game status
+	if racer_owner == Owner.PLAYER:
+		game_status_label.text = "🏃 RACING: " + racer_card.card_name + " is racing through empty slots..."
+	else:
+		game_status_label.text = "🏃 " + opponent_manager.get_opponent_info().name + "'s " + racer_card.card_name + " is racing..."
+	
+	print("Race mode activated for ", racer_card.card_name, " at position ", racer_position)
+	
+	# Execute the race sequence
+	call_deferred("execute_race_sequence", racer_position, racer_card, racer_owner)
+
+func execute_race_sequence(starting_position: int, racing_card: CardResource, racing_owner: Owner):
+	"""Execute the race through all empty slots with movement and combat"""
+	
+	# Find all empty slots in numerical order
+	var empty_slots = find_empty_slots_in_order()
+	
+	if empty_slots.is_empty():
+		print("RaceAbility: No empty slots found to race to")
+		complete_race()
+		return
+	
+	var current_position = starting_position
+	var movements_made = 0
+	
+	print("RaceAbility: Starting race sequence from position ", starting_position)
+	print("RaceAbility: Found ", empty_slots.size(), " empty slots to race through")
+	
+	# Race through each empty slot that comes AFTER the starting position
+	for target_slot in empty_slots:
+		# Skip the starting position and any slots before it (no backtracking)
+		if target_slot <= starting_position:
+			continue
+		
+		print("RaceAbility: Moving from slot ", current_position, " to slot ", target_slot)
+		
+		# Reduce power by 1 for each movement
+		reduce_card_power_for_race(racing_card, 1)
+		movements_made += 1
+		print("RaceAbility: Card power reduced by 1 after ", movements_made, " movements")
+		
+		# Move the card with proper visual updates
+		execute_race_move(current_position, target_slot, racing_card, racing_owner)
+		current_position = target_slot
+		
+		# Update the visual display with new stats
+		update_card_display(current_position, racing_card)
+		
+		# Resolve combat at this position
+		var captures = resolve_combat(current_position, racing_owner, racing_card)
+		if captures > 0:
+			print("RaceAbility: Captured ", captures, " cards at position ", current_position)
+		
+		# Add delay between movements
+		await get_tree().create_timer(0.5).timeout
+	
+	print("RaceAbility: Race completed! Final position: ", current_position, " after ", movements_made, " movements")
+	
+	# Complete the race and switch turns
+	complete_race()
+
+func execute_race_move(from_position: int, to_position: int, racing_card: CardResource, racing_owner: Owner):
+	"""Move the racing card from one position to another with proper visual updates"""
+	
+	print("Executing race move from position ", from_position, " to position ", to_position)
+	
+	# Get card collection info before clearing original position
+	var card_collection_index = grid_to_collection_index.get(from_position, -1)
+	var card_level = get_card_level(card_collection_index) if card_collection_index != -1 else 1
+	
+	# Clear the original position
+	clear_grid_slot(from_position)
+	
+	# Place the card at the new position
+	grid_occupied[to_position] = true
+	grid_ownership[to_position] = racing_owner
+	grid_card_data[to_position] = racing_card
+	
+	# Update grid to collection mapping for the new position
+	if card_collection_index != -1:
+		grid_to_collection_index[to_position] = card_collection_index
+		grid_to_collection_index.erase(from_position)
+	
+	# Create the visual card display at the new position
+	var slot = grid_slots[to_position]
+	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+	var card_display = card_display_scene.instantiate()
+	card_display.setup(racing_card)
+	slot.add_child(card_display)
+	
+	# Apply styling to target slot
+	if racing_owner == Owner.PLAYER:
+		slot.add_theme_stylebox_override("panel", player_card_style)
+	else:
+		slot.add_theme_stylebox_override("panel", opponent_card_style)
+	
+	# Execute placement effects at new location (like ordain bonus)
+	if racing_owner == Owner.PLAYER:
+		apply_ordain_bonus_if_applicable(to_position, racing_card, racing_owner)
+	
+	# Handle passive abilities at new position
+	handle_passive_abilities_on_place(to_position, racing_card, card_level)
+	
+	# Check for couple union at new position
+	check_for_couple_union(racing_card, to_position)
+	
+	print("Race move completed from slot ", from_position, " to slot ", to_position)
+
+func find_empty_slots_in_order() -> Array[int]:
+	"""Find all empty slots in numerical order (0, 1, 2, 3, 4, 5, 6, 7, 8)"""
+	var empty_slots: Array[int] = []
+	
+	# Check all 9 grid positions in order
+	for i in range(9):
+		if not grid_occupied[i]:
+			empty_slots.append(i)
+	
+	return empty_slots
+
+func reduce_card_power_for_race(card_data: CardResource, reduction_amount: int):
+	"""Reduce all directional stats by the specified amount"""
+	for i in range(card_data.values.size()):
+		card_data.values[i] = max(0, card_data.values[i] - reduction_amount)
+	
+	print("RaceAbility: Reduced card stats by ", reduction_amount, ". New values: ", card_data.values)
+
+func complete_race():
+	"""Complete the race sequence and switch turns"""
+	
+	# End race mode
+	race_mode_active = false
+	current_racer_position = -1
+	current_racer_owner = Owner.NONE
+	current_racer_card = null
+	
+	# Update displays
+	update_game_status()
+	
+	# Check if game should end
+	if should_game_end():
+		end_game()
+		return
+	
+	# Switch turns after race is complete
+	print("Race complete - switching turns")
+	turn_manager.next_turn()
+
+func clear_all_race_constraints():
+	if race_mode_active:
+		race_mode_active = false
+		current_racer_position = -1
+		current_racer_owner = Owner.NONE
+		current_racer_card = null
+		print("All race constraints cleared")

@@ -42,16 +42,16 @@ func execute(context: Dictionary) -> bool:
 		
 		if grid_position != lowest_empty_slot:
 			print("RaceAbility: Moving AI card from slot ", grid_position, " to lowest empty slot ", lowest_empty_slot)
-			# Simple move using existing game manager methods
-			simple_move_card(grid_position, lowest_empty_slot, placed_card, game_manager)
+			# Use the game manager's proper move function
+			game_manager.execute_race_move(grid_position, lowest_empty_slot, placed_card, card_owner)
 			actual_starting_position = lowest_empty_slot
 			# Update the empty slots list since we just occupied the lowest one
 			empty_slots = find_empty_slots_in_order(game_manager)
 	
 	print("RaceAbility: Found ", empty_slots.size(), " empty slots to race through")
 	
-	# Execute the racing sequence
-	await execute_race_sequence(actual_starting_position, empty_slots, placed_card, game_manager)
+	# Start race mode to prevent turn switching and execute the sequence
+	game_manager.start_race_mode(actual_starting_position, card_owner, placed_card)
 	
 	return true
 
@@ -89,8 +89,8 @@ func execute_race_sequence(starting_position: int, empty_slots: Array[int], raci
 		movements_made += 1
 		print("RaceAbility: Card power reduced by 1 after ", movements_made, " movements")
 		
-		# Simple move using existing game manager methods
-		simple_move_card(current_position, target_slot, racing_card, game_manager)
+		# Use the game manager's proper move function instead of simple_move_card
+		game_manager.execute_race_move(current_position, target_slot, racing_card, game_manager.get_owner_at_position(current_position))
 		current_position = target_slot
 		
 		# Update the visual display with new stats
