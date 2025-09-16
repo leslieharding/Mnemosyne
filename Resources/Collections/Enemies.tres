@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=183 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=190 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -25,8 +25,6 @@
 script = ExtResource("4_qmggo")
 ability_name = "Tremor"
 description = "On play sets up tremors in adjacent empty slots, these reactivate combat at the start of the next two turns."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://myxy4oox5wct"
 
 [sub_resource type="Resource" id="Resource_lm3ty"]
@@ -35,16 +33,12 @@ card_name = "Python"
 values = Array[int]([5, 5, 5, 5])
 description = "Strike me down Apollo and you will  have Gaia to answer to"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_no17v")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_c7e3y"]
 script = ExtResource("6_p88u5")
 ability_name = "Core"
 description = "If played in the central slot it gains +2 stats."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://ch8hny3xbynvi"
 
 [sub_resource type="Resource" id="Resource_m5w2u"]
@@ -53,8 +47,6 @@ card_name = "The Omphalos"
 values = Array[int]([2, 3, 2, 4])
 description = "I'm kind of in the middle of something. The world. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_c7e3y")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_mxtxa"]
@@ -62,9 +54,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Ismenian Dragon"
 values = Array[int]([2, 3, 4, 5])
 description = "A curse upon your house, no one kills a child of Ares without consequences"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_oovod"]
@@ -72,9 +61,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Ladon"
 values = Array[int]([100, 4, 2, 2])
 description = "Only Hercules could possible take this head on"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qmggo"]
@@ -82,17 +68,12 @@ script = ExtResource("2_xcqsp")
 card_name = "Calcian Dragon"
 values = Array[int]([1, 2, 1, 2])
 description = "Medea's potion seems to be in full effect, the fleece is yours for the taking"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ma358"]
 script = ExtResource("4_qmggo")
 ability_name = "Tremor"
 description = "On play sets up tremors in adjacent empty slots, these reactivate combat at the start of the next two turns."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://myxy4oox5wct"
 
 [sub_resource type="Resource" id="Resource_vfgb0"]
@@ -101,16 +82,12 @@ card_name = "Python"
 values = Array[int]([6, 6, 6, 6])
 description = "Strike me down Apollo and you will  have Gaia to answer to"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ma358")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_x66sl"]
 script = ExtResource("6_p88u5")
 ability_name = "Core"
 description = "If played in the central slot it gains +2 stats."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://ch8hny3xbynvi"
 
 [sub_resource type="Resource" id="Resource_sygum"]
@@ -119,8 +96,6 @@ card_name = "The Omphalos"
 values = Array[int]([3, 3, 3, 4])
 description = "I'm kind of in the middle of something. The world. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_x66sl")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_upckc"]
@@ -128,9 +103,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Ismenian Dragon"
 values = Array[int]([3, 4, 5, 6])
 description = "A curse upon your house, no one kills a child of Ares without consequences"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_r05oc"]
@@ -138,9 +110,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Ladon"
 values = Array[int]([1000, 4, 2, 2])
 description = "Only Hercules could possible take this head on"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cakw3"]
@@ -148,17 +117,12 @@ script = ExtResource("2_xcqsp")
 card_name = "Calcian Dragon"
 values = Array[int]([1, 2, 3, 4])
 description = "Medea's potion seems to be in full effect, the fleece is yours for the taking"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_barb5"]
 script = ExtResource("4_qmggo")
 ability_name = "Tremor"
 description = "On play sets up tremors in adjacent empty slots, these reactivate combat at the start of the next two turns."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://myxy4oox5wct"
 
 [sub_resource type="Resource" id="Resource_p88u5"]
@@ -167,16 +131,12 @@ card_name = "Python"
 values = Array[int]([7, 7, 7, 7])
 description = "Strike me down Apollo and you will  have Gaia to answer to"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_barb5")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qhn1w"]
 script = ExtResource("6_p88u5")
 ability_name = "Core"
 description = "If played in the central slot it gains +2 stats."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://ch8hny3xbynvi"
 
 [sub_resource type="Resource" id="Resource_hu0wn"]
@@ -185,8 +145,6 @@ card_name = "The Omphalos"
 values = Array[int]([4, 4, 5, 5])
 description = "I'm kind of in the middle of something. The world. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_qhn1w")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0vidc"]
@@ -194,9 +152,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Ismenian Dragon"
 values = Array[int]([4, 5, 6, 7])
 description = "A curse upon your house, no one kills a child of Ares without consequences"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_1g5vp"]
@@ -204,9 +159,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Ladon"
 values = Array[int]([10000, 4, 2, 2])
 description = "Only Hercules could possible take this head on"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4qd0a"]
@@ -214,9 +166,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Calcian Dragon"
 values = Array[int]([2, 3, 4, 5])
 description = "Medea's potion seems to be in full effect, the fleece is yours for the taking"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_j1bdk"]
@@ -225,8 +174,6 @@ deck_name = "Pythons Brood 1"
 deck_description = "Level 1"
 difficulty_level = 1
 card_indices = Array[int]([0, 1, 2, 3, 4])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_57iqf"]
@@ -235,8 +182,6 @@ deck_name = "Pythons Brood 2"
 deck_description = "Level 2"
 difficulty_level = 2
 card_indices = Array[int]([5, 6, 7, 8, 9])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_kjbhx"]
@@ -245,8 +190,6 @@ deck_name = "Pythons Brood 3"
 deck_description = "Level 3"
 difficulty_level = 3
 card_indices = Array[int]([10, 11, 12, 13, 14])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_efy6x"]
@@ -261,7 +204,6 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 script = ExtResource("8_upckc")
 ability_name = "Bolster Confidence"
 description = "When this card captures a player's card it increases the stats of wavering family members by 1"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://bskifvkjo5blo"
 
@@ -271,15 +213,12 @@ card_name = "Alphenor"
 values = Array[int]([6, 6, 6, 6])
 description = "Come mother, Leto and her progeny need to pay for what they did to us"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_mdu6c")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_y7i8f"]
 script = ExtResource("8_sygum")
 ability_name = "Infighting"
 description = "Betrays adjacent aggressive family members on being captured. "
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
 
@@ -289,15 +228,12 @@ card_name = "Cleodoxa"
 values = Array[int]([3, 2, 3, 2])
 description = "Oh mother just say sorry would you, this all could have been avoided"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_y7i8f")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_1wuoh"]
 script = ExtResource("8_upckc")
 ability_name = "Bolster Confidence"
 description = "When this card captures a player's card it increases the stats of wavering family members by 1"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://bskifvkjo5blo"
 
@@ -307,15 +243,12 @@ card_name = "Astyoche"
 values = Array[int]([5, 4, 6, 5])
 description = "I will fight, even if my wretched siblings wont!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_1wuoh")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0tc0w"]
 script = ExtResource("8_upckc")
 ability_name = "Bolster Confidence"
 description = "When this card captures a player's card it increases the stats of wavering family members by 1"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://bskifvkjo5blo"
 
@@ -325,15 +258,12 @@ card_name = "Sipylus"
 values = Array[int]([7, 2, 7, 2])
 description = "Yes I'll fight mother, but it seems you haven't learnt a thing"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0tc0w")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ti8cg"]
 script = ExtResource("8_sygum")
 ability_name = "Infighting"
 description = "Betrays adjacent aggressive family members on being captured. "
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
 
@@ -343,15 +273,12 @@ card_name = "Damasichthon"
 values = Array[int]([4, 3, 2, 1])
 description = "You brought this ruin upon our house, must we suffer again for your hubris"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ti8cg")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qv1it"]
 script = ExtResource("8_upckc")
 ability_name = "Bolster Confidence"
 description = "When this card captures a player's card it increases the stats of wavering family members by 1"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://bskifvkjo5blo"
 
@@ -361,15 +288,12 @@ card_name = "Alphenor"
 values = Array[int]([7, 7, 7, 7])
 description = "Come mother, Leto and her progeny need to pay for what they did to us"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_qv1it")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_nbgbv"]
 script = ExtResource("8_sygum")
 ability_name = "Infighting"
 description = "Betrays adjacent aggressive family members on being captured. "
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
 
@@ -379,15 +303,12 @@ card_name = "Cleodoxa"
 values = Array[int]([3, 2, 4, 3])
 description = "Oh mother just say sorry would you, this all could have been avoided"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_nbgbv")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2mbuq"]
 script = ExtResource("8_upckc")
 ability_name = "Bolster Confidence"
 description = "When this card captures a player's card it increases the stats of wavering family members by 1"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://bskifvkjo5blo"
 
@@ -397,15 +318,12 @@ card_name = "Astyoche"
 values = Array[int]([6, 5, 7, 6])
 description = "I will fight, even if my wretched siblings wont!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_2mbuq")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qoaa3"]
 script = ExtResource("8_upckc")
 ability_name = "Bolster Confidence"
 description = "When this card captures a player's card it increases the stats of wavering family members by 1"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://bskifvkjo5blo"
 
@@ -415,15 +333,12 @@ card_name = "Sipylus"
 values = Array[int]([8, 2, 8, 2])
 description = "Yes I'll fight mother, but it seems you haven't learnt a thing"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_qoaa3")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_annky"]
 script = ExtResource("8_sygum")
 ability_name = "Infighting"
 description = "Betrays adjacent aggressive family members on being captured. "
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
 
@@ -433,15 +348,12 @@ card_name = "Damasichthon"
 values = Array[int]([5, 4, 3, 2])
 description = "You brought this ruin upon our house, must we suffer again for your hubris"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_annky")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_btsoc"]
 script = ExtResource("8_upckc")
 ability_name = "Bolster Confidence"
 description = "When this card captures a player's card it increases the stats of wavering family members by 1"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://bskifvkjo5blo"
 
@@ -451,15 +363,12 @@ card_name = "Alphenor"
 values = Array[int]([8, 8, 8, 8])
 description = "Come mother, Leto and her progeny need to pay for what they did to us"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_btsoc")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_dj7db"]
 script = ExtResource("8_sygum")
 ability_name = "Infighting"
 description = "Betrays adjacent aggressive family members on being captured. "
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
 
@@ -469,15 +378,12 @@ card_name = "Cleodoxa"
 values = Array[int]([4, 3, 5, 4])
 description = "Oh mother just say sorry would you, this all could have been avoided"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_dj7db")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cmqnt"]
 script = ExtResource("8_upckc")
 ability_name = "Bolster Confidence"
 description = "When this card captures a player's card it increases the stats of wavering family members by 1"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://bskifvkjo5blo"
 
@@ -487,15 +393,12 @@ card_name = "Astyoche"
 values = Array[int]([7, 6, 7, 7])
 description = "I will fight, even if my wretched siblings wont!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_cmqnt")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_um0ru"]
 script = ExtResource("8_upckc")
 ability_name = "Bolster Confidence"
 description = "When this card captures a player's card it increases the stats of wavering family members by 1"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://bskifvkjo5blo"
 
@@ -505,15 +408,12 @@ card_name = "Sipylus"
 values = Array[int]([9, 2, 9, 2])
 description = "Yes I'll fight mother, but it seems you haven't learnt a thing"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_um0ru")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_pdb1u"]
 script = ExtResource("8_sygum")
 ability_name = "Infighting"
 description = "Betrays adjacent aggressive family members on being captured. "
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://dh1ykxl2k5ank"
 
@@ -523,8 +423,6 @@ card_name = "Damasichthon"
 values = Array[int]([6, 5, 4, 3])
 description = "You brought this ruin upon our house, must we suffer again for your hubris"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_pdb1u")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cetws"]
@@ -533,8 +431,6 @@ deck_name = "Niobes Brood 1"
 deck_description = "Level 1"
 difficulty_level = 1
 card_indices = Array[int]([0, 1, 2, 3, 4])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_unt1i"]
@@ -543,8 +439,6 @@ deck_name = "Niobes Brood 2"
 deck_description = "Level 2"
 difficulty_level = 2
 card_indices = Array[int]([5, 6, 7, 8, 9])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_jq8at"]
@@ -553,8 +447,6 @@ deck_name = "Niobes Brood 3"
 deck_description = "Level 3"
 difficulty_level = 3
 card_indices = Array[int]([10, 11, 12, 13, 14])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_y0w8m"]
@@ -570,9 +462,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Nyx"
 values = Array[int]([4, 5, 6, 7])
 description = "Never heard of me? Try turning the light out and I'll be everywhere"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_btcve"]
@@ -580,9 +469,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Erebus"
 values = Array[int]([4, 4, 4, 4])
 description = "I wouldn't upset my wife, things could get very dark "
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_nvk4f"]
@@ -590,9 +476,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Hemera"
 values = Array[int]([2, 1, 2, 1])
 description = "Its not a phase mom, I like the light and theres nothing you can do about it"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_dgx1d"]
@@ -600,27 +483,19 @@ script = ExtResource("2_xcqsp")
 card_name = "Aether"
 values = Array[int]([1, 3, 3, 1])
 description = "Mum. Dad. This is embarassing, you know I have to see these people at work"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_crfbb"]
 script = ExtResource("8_vfgb0")
 ability_name = "Chaos"
 description = "On play, this card's stats are randomized. "
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://cjryt268c8rko"
 
 [sub_resource type="Resource" id="Resource_mpjhg"]
 script = ExtResource("2_xcqsp")
 card_name = "Chaos"
-values = Array[int]([1, 1, 1, 1])
 description = "I'm just glad the family still invites me to things"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_crfbb")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ryxg6"]
@@ -628,9 +503,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Nyx"
 values = Array[int]([5, 6, 7, 8])
 description = "Never heard of me? Try turning the light out and I'll be everywhere"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_b1ysv"]
@@ -638,9 +510,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Erebus"
 values = Array[int]([4, 5, 5, 4])
 description = "I wouldn't upset my wife, things could get very dark "
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_jruhe"]
@@ -648,9 +517,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Hemera "
 values = Array[int]([2, 2, 2, 2])
 description = "Its not a phase mom, I like the light and theres nothing you can do about it"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_86f4t"]
@@ -658,27 +524,19 @@ script = ExtResource("2_xcqsp")
 card_name = "Aether"
 values = Array[int]([2, 4, 4, 2])
 description = "Mum. Dad. This is embarassing, you know I have to see these people at work"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_buye7"]
 script = ExtResource("8_vfgb0")
 ability_name = "Chaos"
 description = "On play, this card's stats are randomized. "
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://cjryt268c8rko"
 
 [sub_resource type="Resource" id="Resource_e5rwc"]
 script = ExtResource("2_xcqsp")
 card_name = "Chaos"
-values = Array[int]([1, 1, 1, 1])
 description = "I'm just glad the family still invites me to things"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_buye7")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ueo1r"]
@@ -686,9 +544,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Nyx"
 values = Array[int]([6, 7, 8, 9])
 description = "Never heard of me? Try turning the light out and I'll be everywhere"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2lbxq"]
@@ -696,9 +551,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Erebus"
 values = Array[int]([5, 5, 4, 5])
 description = "I wouldn't upset my wife, things could get very dark "
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_25gb6"]
@@ -706,9 +558,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Hemera "
 values = Array[int]([3, 3, 3, 3])
 description = "Its not a phase mom, I like the light and theres nothing you can do about it"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7uopj"]
@@ -716,57 +565,39 @@ script = ExtResource("2_xcqsp")
 card_name = "Aether"
 values = Array[int]([3, 5, 5, 3])
 description = "Mum. Dad. This is embarassing, you know I have to see these people at work"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hi20n"]
 script = ExtResource("8_vfgb0")
 ability_name = "Chaos"
 description = "On play, this card's stats are randomized. "
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://cjryt268c8rko"
 
 [sub_resource type="Resource" id="Resource_spvwg"]
 script = ExtResource("2_xcqsp")
 card_name = "Chaos"
-values = Array[int]([1, 1, 1, 1])
 description = "I'm just glad the family still invites me to things"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_hi20n")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_x1kcy"]
 script = ExtResource("3_601pn")
-deck_name = ""
-deck_description = ""
-difficulty_level = 0
 card_indices = Array[int]([0, 1, 2, 3, 4])
 deck_power_type = 1
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_wg2k6"]
 script = ExtResource("3_601pn")
-deck_name = ""
-deck_description = ""
 difficulty_level = 1
 card_indices = Array[int]([5, 6, 7, 8, 9])
 deck_power_type = 1
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_mvnyh"]
 script = ExtResource("3_601pn")
-deck_name = ""
-deck_description = ""
 difficulty_level = 2
 card_indices = Array[int]([10, 11, 12, 13, 14])
 deck_power_type = 1
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_bdmj8"]
@@ -781,7 +612,6 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 script = ExtResource("11_cakw3")
 ability_name = "Charge"
 description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 
@@ -791,16 +621,12 @@ card_name = "Marsyas Flayed"
 values = Array[int]([5, 6, 8, 2])
 description = "How can those judges be fair? they are your Aunts are they not?"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_hjvcs")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bueog"]
 script = ExtResource("12_hu0wn")
 ability_name = "Coerce"
 description = "On play designates a card in your opponent's hand that they must play next turn."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://cjsf2c6w6dnrf"
 
 [sub_resource type="Resource" id="Resource_8k02u"]
@@ -809,15 +635,12 @@ card_name = "Thamyris"
 values = Array[int]([1, 4, 4, 2])
 description = "Ho man, they actually agreed to this bet? Play like you have never played before boy"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_bueog")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0g8v8"]
 script = ExtResource("13_0vidc")
 ability_name = "Greedy"
 description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://cu3icvy8efjky"
 
@@ -827,8 +650,6 @@ card_name = "Colymbas"
 values = Array[int]([3, 3, 3, 3])
 description = "We have drunk from Pieria have we not? How could we possibly lose?"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0g8v8")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_srqjw"]
@@ -836,9 +657,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Iynx"
 values = Array[int]([1, 3, 2, 5])
 description = "Good God its all wrong, comeon sisters we practiced this a million times!"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_1shm4"]
@@ -846,16 +664,12 @@ script = ExtResource("2_xcqsp")
 card_name = "Cissa"
 values = Array[int]([8, 1, 1, 1])
 description = "My voice, whats happening to my SQUAWKKKKKK!"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_q75w4"]
 script = ExtResource("11_cakw3")
 ability_name = "Charge"
 description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 
@@ -865,16 +679,12 @@ card_name = "Marsyas Flayed"
 values = Array[int]([6, 7, 9, 3])
 description = "How can those judges be fair? they are your Aunts are they not?"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_q75w4")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ujm7o"]
 script = ExtResource("12_hu0wn")
 ability_name = "Coerce"
 description = "On play designates a card in your opponent's hand that they must play next turn."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://cjsf2c6w6dnrf"
 
 [sub_resource type="Resource" id="Resource_0fei0"]
@@ -883,15 +693,12 @@ card_name = "Thamyris"
 values = Array[int]([2, 5, 5, 3])
 description = "Ho man, they actually agreed to this bet? Play like you have never played before boy"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ujm7o")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_dn5nk"]
 script = ExtResource("13_0vidc")
 ability_name = "Greedy"
 description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://cu3icvy8efjky"
 
@@ -901,8 +708,6 @@ card_name = "Colymbas"
 values = Array[int]([4, 4, 4, 4])
 description = "We have drunk from Pieria have we not? How could we possibly lose?"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_dn5nk")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cd5hd"]
@@ -910,9 +715,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Iynx"
 values = Array[int]([2, 4, 3, 6])
 description = "Good God its all wrong, comeon sisters we practiced this a million times!"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_703p7"]
@@ -920,16 +722,12 @@ script = ExtResource("2_xcqsp")
 card_name = "Cissa"
 values = Array[int]([8, 1, 1, 1])
 description = "My voice, whats happening to my SQUAWKKKKKK!"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_igddo"]
 script = ExtResource("11_cakw3")
 ability_name = "Charge"
 description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 
@@ -939,16 +737,12 @@ card_name = "Marsyas Flayed"
 values = Array[int]([7, 8, 8, 5])
 description = "How can those judges be fair? they are your Aunts are they not?"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_igddo")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_olaqh"]
 script = ExtResource("12_hu0wn")
 ability_name = "Coerce"
 description = "On play designates a card in your opponent's hand that they must play next turn."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://cjsf2c6w6dnrf"
 
 [sub_resource type="Resource" id="Resource_msags"]
@@ -957,15 +751,12 @@ card_name = "Thamyris"
 values = Array[int]([3, 6, 6, 4])
 description = "Ho man, they actually agreed to this bet? Play like you have never played before boy"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_olaqh")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_v6mik"]
 script = ExtResource("13_0vidc")
 ability_name = "Greedy"
 description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://cu3icvy8efjky"
 
@@ -975,8 +766,6 @@ card_name = "Colymbas"
 values = Array[int]([5, 5, 5, 5])
 description = "We have drunk from Pieria have we not? How could we possibly lose?"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_v6mik")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_t2t3x"]
@@ -984,9 +773,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Iynx"
 values = Array[int]([3, 5, 4, 7])
 description = "Good God its all wrong, comeon sisters we practiced this a million times!"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_wrrra"]
@@ -994,9 +780,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Cissa"
 values = Array[int]([8, 1, 1, 1])
 description = "My voice, whats happening to my SQUAWKKKKKK!"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_x2e5i"]
@@ -1005,8 +788,6 @@ deck_name = "The Wrong Note 1"
 deck_description = "Level 1"
 difficulty_level = 1
 card_indices = Array[int]([0, 1, 2, 3, 4])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_hou4s"]
@@ -1015,8 +796,6 @@ deck_name = "The Wrong Note 2"
 deck_description = "Level 2"
 difficulty_level = 2
 card_indices = Array[int]([5, 6, 7, 8, 9])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_145qj"]
@@ -1025,8 +804,6 @@ deck_name = "The Wrong Note 3"
 deck_description = "Level 3"
 difficulty_level = 3
 card_indices = Array[int]([10, 11, 12, 13, 14])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_tahvs"]
@@ -1041,7 +818,6 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 script = ExtResource("8_oovod")
 ability_name = "Toxic"
 description = "When this card is captured, it captures the card that captured it"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://dyur10e6s3lah"
 
@@ -1051,15 +827,12 @@ card_name = "Nosos"
 values = Array[int]([2, 2, 2, 2])
 description = "Come closer breath me in, I'm sure nothing bad will happen"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_g6p1i")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_v6hvw"]
 script = ExtResource("12_r05oc")
 ability_name = "Corruption"
 description = "Decreases the stats of adjacent enemies by 1 at the start of each turn if still owned by the enemy"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://btwpyhndpjg0p"
 
@@ -1069,8 +842,6 @@ card_name = "Limos"
 values = Array[int]([3, 5, 6, 2])
 description = "Here, eat. Surely now the hunger will go away"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_v6hvw")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qxjpb"]
@@ -1078,9 +849,6 @@ script = ExtResource("2_xcqsp")
 card_name = "The Keres"
 values = Array[int]([6, 1, 8, 1])
 description = "Look at that battlefield sisters, I can almost smell the rot from here, delicious"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fl83v"]
@@ -1088,9 +856,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Achlys"
 values = Array[int]([6, 6, 5, 5])
 description = "No need to take notice of me, I'll be along to visit you soon enough"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_dftyx"]
@@ -1098,16 +863,12 @@ script = ExtResource("2_xcqsp")
 card_name = "Smintheus"
 values = Array[int]([1, 2, 3, 4])
 description = "What an adorable rat, come over here so i can pat you!"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0i5ty"]
 script = ExtResource("8_oovod")
 ability_name = "Toxic"
 description = "When this card is captured, it captures the card that captured it"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://dyur10e6s3lah"
 
@@ -1117,15 +878,12 @@ card_name = "Nosos"
 values = Array[int]([3, 3, 3, 3])
 description = "Come closer breath me in, I'm sure nothing bad will happen"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0i5ty")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ydelp"]
 script = ExtResource("12_r05oc")
 ability_name = "Corruption"
 description = "Decreases the stats of adjacent enemies by 1 at the start of each turn if still owned by the enemy"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://btwpyhndpjg0p"
 
@@ -1135,8 +893,6 @@ card_name = "Limos"
 values = Array[int]([4, 6, 7, 3])
 description = "Here, eat. Surely now the hunger will go away"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ydelp")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_kv21b"]
@@ -1144,9 +900,6 @@ script = ExtResource("2_xcqsp")
 card_name = "The Keres"
 values = Array[int]([7, 2, 9, 2])
 description = "Look at that battlefield sisters, I can almost smell the rot from here, delicious"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_6ktpb"]
@@ -1154,9 +907,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Achlys"
 values = Array[int]([6, 6, 7, 6])
 description = "No need to take notice of me, I'll be along to visit you soon enough"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xwhr2"]
@@ -1164,16 +914,12 @@ script = ExtResource("2_xcqsp")
 card_name = "Smintheus"
 values = Array[int]([2, 3, 4, 5])
 description = "What an adorable rat, come over here!"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_pee5b"]
 script = ExtResource("8_oovod")
 ability_name = "Toxic"
 description = "When this card is captured, it captures the card that captured it"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://dyur10e6s3lah"
 
@@ -1183,15 +929,12 @@ card_name = "Nosos"
 values = Array[int]([4, 4, 4, 4])
 description = "Come closer breath me in, I'm sure nothing bad will happen"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_pee5b")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ehyfs"]
 script = ExtResource("12_r05oc")
 ability_name = "Corruption"
 description = "Decreases the stats of adjacent enemies by 1 at the start of each turn if still owned by the enemy"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://btwpyhndpjg0p"
 
@@ -1201,8 +944,6 @@ card_name = "Limos"
 values = Array[int]([5, 8, 5, 6])
 description = "Here, eat. Surely now the hunger will go away"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ehyfs")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xhuqv"]
@@ -1210,9 +951,6 @@ script = ExtResource("2_xcqsp")
 card_name = "The Keres"
 values = Array[int]([8, 2, 8, 3])
 description = "Look at that battlefield sisters, I can almost smell the rot from here, delicious"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0vwsy"]
@@ -1220,9 +958,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Achlys"
 values = Array[int]([6, 6, 7, 7])
 description = "No need to take notice of me, I'll be along to visit you soon enough"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_3mdct"]
@@ -1230,9 +965,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Smintheus"
 values = Array[int]([3, 4, 5, 6])
 description = "What an adorable rat, come over here!"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_5m6f6"]
@@ -1241,8 +973,6 @@ deck_name = "The Plague 1"
 deck_description = "Level 1"
 difficulty_level = 1
 card_indices = Array[int]([0, 1, 2, 3, 4])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_ctnn8"]
@@ -1251,8 +981,6 @@ deck_name = "The Plague 2"
 deck_description = "Level 2"
 difficulty_level = 2
 card_indices = Array[int]([5, 6, 7, 8, 9])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_c4kby"]
@@ -1261,8 +989,6 @@ deck_name = "The Plague 3"
 deck_description = "Level 3"
 difficulty_level = 3
 card_indices = Array[int]([10, 11, 12, 13, 14])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_bsikd"]
@@ -1275,10 +1001,8 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
 [sub_resource type="Resource" id="Resource_nxrfj"]
 script = ExtResource("7_oovod")
-boost_amount = 1
 ability_name = "Passive Boost"
 description = "Increases the value of your other cards by 1 when owned"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://d1cwgpmvptcjn"
 
@@ -1288,17 +1012,12 @@ card_name = "Rhea"
 values = Array[int]([6, 6, 6, 6])
 description = "The Olympian Mother"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_nxrfj")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_6q6nx"]
 script = ExtResource("5_m5w2u")
-boost_amount = 1
 ability_name = "Stat Boost"
 description = "When attacking gain 2 power in that direction"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
 
 [sub_resource type="Resource" id="Resource_fxeb3"]
@@ -1307,15 +1026,12 @@ card_name = "Hyperion"
 values = Array[int]([7, 7, 6, 6])
 description = "He that walks on high"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6q6nx")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ed58i"]
 script = ExtResource("6_mxtxa")
 ability_name = "Defensive Counter"
 description = "If this card successfully defends it also captures the attacking card. "
-unlock_level = 0
 trigger_condition = 1
 metadata/_custom_type_script = "uid://b72irnrav5w53"
 
@@ -1325,8 +1041,6 @@ card_name = "Atlas"
 values = Array[int]([8, 7, 8, 7])
 description = "The world upon thine shoulders"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ed58i")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_eypsl"]
@@ -1334,8 +1048,6 @@ script = ExtResource("8_m5w2u")
 ability_name = "Extended Range"
 description = "Attacks in all directions including diagonals.
 "
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://43v8bwokc47i"
 
 [sub_resource type="Resource" id="Resource_68lbv"]
@@ -1344,8 +1056,6 @@ card_name = "Oceanus"
 values = Array[int]([7, 6, 6, 7])
 description = "The depths and all that belong to it"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_eypsl")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8eb4r"]
@@ -1353,19 +1063,13 @@ script = ExtResource("2_xcqsp")
 card_name = "Phoebe"
 values = Array[int]([5, 6, 5, 6])
 description = "The shining one"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ydsva"]
 script = ExtResource("3_601pn")
 deck_name = "Chronos"
 deck_description = "tutorial deck"
-difficulty_level = 0
 card_indices = Array[int]([0, 1, 2, 3, 4])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_25nh6"]
@@ -1378,11 +1082,8 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
 [sub_resource type="Resource" id="Resource_gr0xj"]
 script = ExtResource("5_m5w2u")
-boost_amount = 1
 ability_name = "Stat Boost"
 description = "Boosts stats duh"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://bqbrhjegh1g6e"
 
 [sub_resource type="Resource" id="Resource_vawst"]
@@ -1391,8 +1092,6 @@ card_name = "Fárbauti"
 values = Array[int]([5, 5, 5, 5])
 description = "He who strikes dangerous blows"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_gr0xj")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_wlj4d"]
@@ -1400,17 +1099,12 @@ script = ExtResource("2_xcqsp")
 card_name = "Laufey"
 values = Array[int]([5, 5, 5, 5])
 description = "The Needle"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_s4ywq"]
 script = ExtResource("6_mxtxa")
 ability_name = "Defensive Counter"
 description = "Counters defensively duh"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://b72irnrav5w53"
 
 [sub_resource type="Resource" id="Resource_rf8tk"]
@@ -1419,8 +1113,6 @@ card_name = "Sigyn"
 values = Array[int]([6, 6, 6, 6])
 description = "Oh for goodness sake whats he gone and done now"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_s4ywq")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cdkae"]
@@ -1428,18 +1120,10 @@ script = ExtResource("2_xcqsp")
 card_name = "Narfi"
 values = Array[int]([7, 7, 7, 7])
 description = "I don't blame you Váli, we are caught in the net of ill cast by our father"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8cjcf"]
 script = ExtResource("7_oovod")
-boost_amount = 1
-ability_name = ""
-description = ""
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://d1cwgpmvptcjn"
 
 [sub_resource type="Resource" id="Resource_1puft"]
@@ -1448,18 +1132,13 @@ card_name = "Váli"
 values = Array[int]([6, 6, 6, 6])
 description = "Im hungry brother, such like one has never seen, hungry like a peasant in Fimbulwinter, im sorry."
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_8cjcf")])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8p8y8"]
 script = ExtResource("3_601pn")
 deck_name = "Boss1 deck"
 deck_description = "the first hurdle"
-difficulty_level = 0
 card_indices = Array[int]([0, 1, 2, 3, 4])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_i1x7r"]
@@ -1475,9 +1154,6 @@ script = ExtResource("2_xcqsp")
 card_name = "Ratatoskr "
 values = Array[int]([2, 2, 2, 2])
 description = "Yes Níðhöggr the eagle is silly for thinking you have smelly breath, I know!"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_vsd4h"]
@@ -1485,49 +1161,31 @@ script = ExtResource("2_xcqsp")
 card_name = "Útgarða-Loki"
 values = Array[int]([8, 7, 8, 7])
 description = "Now I know how powerful you are, my illusions will make sure you never find me again"
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hybsk"]
 script = ExtResource("2_xcqsp")
 card_name = "Skrymir"
 values = Array[int]([3, 4, 2, 6])
-description = ""
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_pcu0e"]
 script = ExtResource("2_xcqsp")
 card_name = "Logi "
 values = Array[int]([2, 6, 7, 4])
-description = ""
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8yysy"]
 script = ExtResource("2_xcqsp")
 card_name = "Hugi "
 values = Array[int]([9, 9, 2, 2])
-description = ""
-abilities = Array[ExtResource("3_lm3ty")]([])
-level_data = Array[ExtResource("5_mxtxa")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_gbksv"]
 script = ExtResource("3_601pn")
 deck_name = "Hermes Boss"
 deck_description = "test hermes boss"
-difficulty_level = 0
 card_indices = Array[int]([0, 1, 2, 3, 4])
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_go2fa"]
@@ -1538,6 +1196,46 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_lasla"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_gbksv")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_e8k06"]
+script = ExtResource("2_xcqsp")
+card_name = "Thrym"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_6yfxy"]
+script = ExtResource("2_xcqsp")
+card_name = "Beli"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_8aknj"]
+script = ExtResource("2_xcqsp")
+card_name = "Kári "
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_p5kmc"]
+script = ExtResource("2_xcqsp")
+card_name = "Frosti"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ei4g5"]
+script = ExtResource("2_xcqsp")
+card_name = "Jökull"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7eaan"]
+script = ExtResource("3_601pn")
+deck_name = "Demeter Boss"
+deck_description = "Demeter Boss for testing"
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_e0pot"]
+script = ExtResource("1_e7ref")
+enemy_name = "Demeter Boss"
+enemy_description = "Demeter Boss for testing"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_e8k06"), SubResource("Resource_6yfxy"), SubResource("Resource_8aknj"), SubResource("Resource_p5kmc"), SubResource("Resource_ei4g5")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_7eaan")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
 [resource]
 script = ExtResource("4_a5nvj")
-enemies = Array[ExtResource("1_e7ref")]([SubResource("Resource_efy6x"), SubResource("Resource_y0w8m"), SubResource("Resource_bdmj8"), SubResource("Resource_tahvs"), SubResource("Resource_bsikd"), SubResource("Resource_25nh6"), SubResource("Resource_i1x7r"), SubResource("Resource_go2fa")])
+enemies = Array[ExtResource("1_e7ref")]([SubResource("Resource_efy6x"), SubResource("Resource_y0w8m"), SubResource("Resource_bdmj8"), SubResource("Resource_tahvs"), SubResource("Resource_bsikd"), SubResource("Resource_25nh6"), SubResource("Resource_i1x7r"), SubResource("Resource_go2fa"), SubResource("Resource_e0pot")])
