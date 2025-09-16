@@ -6696,6 +6696,7 @@ func execute_race_sequence(starting_position: int, racing_card: CardResource, ra
 	# Complete the race and switch turns
 	complete_race()
 
+# Replace the execute_race_move function (around lines 2890-2930)
 func execute_race_move(from_position: int, to_position: int, racing_card: CardResource, racing_owner: Owner):
 	"""Move the racing card from one position to another with proper visual updates"""
 	
@@ -6705,8 +6706,41 @@ func execute_race_move(from_position: int, to_position: int, racing_card: CardRe
 	var card_collection_index = grid_to_collection_index.get(from_position, -1)
 	var card_level = get_card_level(card_collection_index) if card_collection_index != -1 else 1
 	
-	# Clear the original position
-	clear_grid_slot(from_position)
+	# FIXED: Store reference to the existing card display before clearing
+	var existing_card_display = null
+	var from_slot = grid_slots[from_position]
+	for child in from_slot.get_children():
+		if child is CardDisplay:
+			existing_card_display = child
+			break
+	
+	# FIXED: Clear the original position without using clear_grid_slot to avoid freeing the card display
+	grid_occupied[from_position] = false
+	grid_ownership[from_position] = Owner.NONE
+	grid_card_data[from_position] = null
+	
+	# Clear passive abilities for this position
+	if from_position in active_passive_abilities:
+		active_passive_abilities.erase(from_position)
+	
+	# FIXED: Move the existing card display instead of creating a new one
+	if existing_card_display and is_instance_valid(existing_card_display):
+		# Remove from old slot
+		from_slot.remove_child(existing_card_display)
+		
+		# Add to new slot
+		var to_slot = grid_slots[to_position]
+		to_slot.add_child(existing_card_display)
+		
+		# Update the card display with current data (in case stats changed)
+		existing_card_display.setup(racing_card, card_level, current_god, card_collection_index)
+	else:
+		# Fallback: create new card display if the old one was somehow invalid
+		var slot = grid_slots[to_position]
+		var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+		var card_display = card_display_scene.instantiate()
+		card_display.setup(racing_card, card_level, current_god, card_collection_index)
+		slot.add_child(card_display)
 	
 	# Place the card at the new position
 	grid_occupied[to_position] = true
@@ -6718,18 +6752,15 @@ func execute_race_move(from_position: int, to_position: int, racing_card: CardRe
 		grid_to_collection_index[to_position] = card_collection_index
 		grid_to_collection_index.erase(from_position)
 	
-	# Create the visual card display at the new position
-	var slot = grid_slots[to_position]
-	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
-	var card_display = card_display_scene.instantiate()
-	card_display.setup(racing_card)
-	slot.add_child(card_display)
-	
 	# Apply styling to target slot
+	var to_slot = grid_slots[to_position]
 	if racing_owner == Owner.PLAYER:
-		slot.add_theme_stylebox_override("panel", player_card_style)
+		to_slot.add_theme_stylebox_override("panel", player_card_style)
 	else:
-		slot.add_theme_stylebox_override("panel", opponent_card_style)
+		to_slot.add_theme_stylebox_override("panel", opponent_card_style)
+	
+	# Clear styling from source slot (reset to default)
+	from_slot.add_theme_stylebox_override("panel", default_grid_style)
 	
 	# Execute placement effects at new location (like ordain bonus)
 	if racing_owner == Owner.PLAYER:
