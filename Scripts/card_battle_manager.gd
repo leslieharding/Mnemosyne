@@ -1399,6 +1399,11 @@ func update_board_visuals():
 			var card_display = get_card_display_at_position(i)
 			
 			if card_display and card_display.panel:
+				# DON'T override styling for camouflaged cards
+				if is_slot_camouflaged(i):
+					print("Skipping board visual update for camouflaged card at position ", i)
+					continue
+				
 				# Force apply the correct ownership styling
 				if grid_ownership[i] == Owner.PLAYER:
 					card_display.panel.add_theme_stylebox_override("panel", player_card_style)
@@ -1510,6 +1515,18 @@ func _on_opponent_card_placed(grid_index: int):
 	# NOW setup the card display with the actual card data
 	card_display.setup(opponent_card_data, opponent_card_level, current_god, 0, true)  # true = is_opponent_card
 	
+	# EXECUTE ON-PLAY ABILITIES AFTER display setup is complete
+	if opponent_card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, opponent_card_level):
+		print("Opponent card has on-play abilities - executing AFTER display setup")
+		
+		var ability_context = {
+			"placed_card": opponent_card_data,
+			"grid_position": grid_index,
+			"game_manager": self,
+			"card_level": opponent_card_level
+		}
+		opponent_card_data.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, opponent_card_level)
+	
 	# Connect hover signals for opponent cards too
 	card_display.card_hovered.connect(_on_card_hovered)
 	card_display.card_unhovered.connect(_on_card_unhovered)
@@ -1519,17 +1536,9 @@ func _on_opponent_card_placed(grid_index: int):
 		card_display.panel.gui_input.connect(_on_grid_card_right_click.bind(grid_index))
 		print("Connected right-click handler for opponent card at grid position ", grid_index)
 	
-	# DEBUG: Verify the card display has the data
-	print("=== CARD DISPLAY DEBUG ===")
-	print("Card display card_data: ", card_display.card_data)
-	if card_display.card_data:
-		print("Card display abilities: ", card_display.card_data.abilities.size())
-	else:
-		print("ERROR: Card display card_data is null!")
-	print("===========================")
-	
-	# Apply opponent card styling to the slot (not the card display)
-	slot.add_theme_stylebox_override("panel", opponent_card_style)
+	# Apply opponent card styling to the slot (not the card display) - BUT NOT if camouflaged  
+	if not is_slot_camouflaged(grid_index):
+		slot.add_theme_stylebox_override("panel", opponent_card_style)
 	
 	print("Opponent card abilities: ", opponent_card_data.abilities.size())
 	for i in range(opponent_card_data.abilities.size()):
@@ -1538,21 +1547,6 @@ func _on_opponent_card_placed(grid_index: int):
 	
 	# Check for hunt traps when opponent places cards
 	check_hunt_trap_trigger(grid_index, opponent_card_data, Owner.OPPONENT)
-	
-	# NEW: EXECUTE ON-PLAY ABILITIES FOR OPPONENT CARDS
-	if opponent_card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, opponent_card_level):
-		print("Opponent card has on-play abilities - executing")
-		
-		var ability_context = {
-			"placed_card": opponent_card_data,
-			"grid_position": grid_index,
-			"game_manager": self,
-			"card_level": opponent_card_level
-		}
-		opponent_card_data.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, opponent_card_level)
-		
-		# Update the visual display after abilities execute
-		update_card_display(grid_index, opponent_card_data)
 	
 	# Handle passive abilities when opponent places card
 	handle_passive_abilities_on_place(grid_index, opponent_card_data, opponent_card_level)
@@ -3214,7 +3208,7 @@ func place_card_on_grid():
 		prediction_hit_style.border_width_right = 4
 		prediction_hit_style.border_width_bottom = 4
 		card_display.panel.add_theme_stylebox_override("panel", prediction_hit_style)
-	else:
+	elif not is_slot_camouflaged(current_grid_index):
 		card_display.panel.add_theme_stylebox_override("panel", player_card_style)
 
 	# Connect hover signals for player cards
@@ -6889,7 +6883,7 @@ func start_camouflage_mode(camouflage_position: int, camouflage_owner: Owner, ca
 	active_camouflage_slots[camouflage_position] = {
 		"card": camouflage_card,
 		"owner": camouflage_owner,
-		"turns_remaining": 1  # Lasts one turn (opponent's next turn)
+		"turns_remaining": 2  # Lasts one turn (opponent's next turn)
 	}
 	
 	# Hide the card visually
@@ -7063,11 +7057,20 @@ func clear_all_camouflage_effects():
 	active_camouflage_slots.clear()
 	print("All camouflage effects cleared")
 
+
 func hide_camouflaged_card(card_display: CardDisplay):
 	"""Hide a camouflaged card visually"""
+	print("=== HIDE CAMOUFLAGED CARD DEBUG ===")
+	print("Card display exists: ", card_display != null)
+	print("Card display panel exists: ", card_display.panel != null if card_display else "N/A")
+	
 	if card_display and card_display.panel:
+		print("BEFORE hiding - card modulate: ", card_display.modulate)
+		print("BEFORE hiding - panel style override exists: ", card_display.panel.has_theme_stylebox_override("panel"))
+		
 		# Make the card semi-transparent and add a special border
 		card_display.modulate = Color(1, 1, 1, 0.3)  # 30% opacity
+		print("SET modulate to: ", card_display.modulate)
 		
 		# Create a special camouflage style
 		var camouflage_style = StyleBoxFlat.new()
@@ -7083,4 +7086,19 @@ func hide_camouflaged_card(card_display: CardDisplay):
 		camouflage_style.corner_radius_bottom_right = 8
 		
 		card_display.panel.add_theme_stylebox_override("panel", camouflage_style)
+		print("Applied camouflage style to panel")
+		
+		print("AFTER hiding - card modulate: ", card_display.modulate)
+		print("AFTER hiding - panel style override exists: ", card_display.panel.has_theme_stylebox_override("panel"))
+		
 		print("Hidden camouflaged card: ", card_display.get_card_data().card_name)
+		
+		# Wait a few frames and check if the effect is still there
+		await get_tree().process_frame
+		await get_tree().process_frame
+		await get_tree().process_frame
+		print("3 FRAMES LATER - card modulate: ", card_display.modulate)
+		print("3 FRAMES LATER - panel style override exists: ", card_display.panel.has_theme_stylebox_override("panel"))
+	else:
+		print("ERROR: Cannot hide camouflaged card - missing card_display or panel!")
+	print("=== END HIDE CAMOUFLAGED CARD DEBUG ===")
