@@ -47,6 +47,15 @@ func execute(context: Dictionary) -> bool:
 	
 	print("Sun Bather boosted card stats to: ", placed_card.values)
 	
+	# FIXED: Update the visual display to show the new stats
+	var slot = game_manager.grid_slots[grid_position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = placed_card  # Update the card data reference
+			child.update_display()         # Refresh the visual display
+			print("SunBatherAbility: Updated CardDisplay visual for sun-bathing card")
+			break
+	
 	return true
 
 func can_execute(context: Dictionary) -> bool:

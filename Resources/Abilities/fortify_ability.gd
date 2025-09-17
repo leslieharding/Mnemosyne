@@ -59,8 +59,14 @@ func apply_fortify(position: int, card: CardResource, game_manager) -> bool:
 	
 	print("Stats fortified to: ", card.values, " (added +2 to all directions)")
 	
-	# Update visual display
-	game_manager.update_card_display(position, card)
+	# FIXED: Update visual display to show the new stats
+	var slot = game_manager.grid_slots[position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = card  # Update the card data reference
+			child.update_display()  # Refresh the visual display
+			print("FortifyAbility: Updated CardDisplay visual for card at position ", position)
+			break
 	
 	return true
 
@@ -84,8 +90,14 @@ func remove_fortify(position: int, card: CardResource, game_manager) -> bool:
 	# Mark as inactive
 	card.set_meta("fortify_active", false)
 	
-	# Update visual display
-	game_manager.update_card_display(position, card)
+	# FIXED: Update visual display to show the new stats
+	var slot = game_manager.grid_slots[position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = card  # Update the card data reference
+			child.update_display()  # Refresh the visual display
+			print("FortifyAbility: Updated CardDisplay visual for card at position ", position)
+			break
 	
 	return true
 

@@ -50,37 +50,48 @@ func execute(context: Dictionary) -> bool:
 	# Print results
 	if boosted_directions.size() > 0:
 		print("StatBoostAbility: Card values after boost: ", placed_card.values)
-		print(ability_name, " activated! Boosted ", " and ".join(boosted_directions), " by +", boost_amount, " each")
+		print(ability_name, " activated! ", placed_card.card_name, " gained +", boost_amount, " in directions facing enemies: ", boosted_directions)
+		
+		# FIXED: Update the visual display to show the new stats
+		var slot = game_manager.grid_slots[grid_position]
+		for child in slot.get_children():
+			if child is CardDisplay:
+				child.card_data = placed_card  # Update the card data reference
+				child.update_display()         # Refresh the visual display
+				print("StatBoostAbility: Updated CardDisplay visual for boosted card")
+				break
+		
 		return true
 	else:
-		print(ability_name, " had no effect - no adjacent enemies found")
+		print("StatBoostAbility: No enemies found adjacent - no boost applied")
 		return false
 
-func can_execute(context: Dictionary) -> bool:
-	# Basic check - could add more conditions here
-	return true
-
+# Helper function to get adjacent position in a given direction
 func get_adjacent_position(grid_position: int, direction: int, game_manager) -> int:
-	var grid_size = game_manager.grid_size
+	var grid_size = game_manager.grid_size  # Should be 3 for 3x3 grid
 	var grid_x = grid_position % grid_size
 	var grid_y = grid_position / grid_size
 	
-	match direction:
-		0: # North
-			if grid_y > 0:
-				return (grid_y - 1) * grid_size + grid_x
-		1: # East
-			if grid_x < grid_size - 1:
-				return grid_y * grid_size + (grid_x + 1)
-		2: # South
-			if grid_y < grid_size - 1:
-				return (grid_y + 1) * grid_size + grid_x
-		3: # West
-			if grid_x > 0:
-				return grid_y * grid_size + (grid_x - 1)
+	var new_x = grid_x
+	var new_y = grid_y
 	
-	return -1
+	match direction:
+		0:  # North
+			new_y -= 1
+		1:  # East
+			new_x += 1
+		2:  # South
+			new_y += 1
+		3:  # West
+			new_x -= 1
+	
+	# Check bounds
+	if new_x < 0 or new_x >= grid_size or new_y < 0 or new_y >= grid_size:
+		return -1
+	
+	return new_y * grid_size + new_x
 
+# Helper function to get direction name for logging
 func get_direction_name(direction: int) -> String:
 	match direction:
 		0: return "North"
@@ -88,3 +99,6 @@ func get_direction_name(direction: int) -> String:
 		2: return "South"
 		3: return "West"
 		_: return "Unknown"
+
+func can_execute(context: Dictionary) -> bool:
+	return true

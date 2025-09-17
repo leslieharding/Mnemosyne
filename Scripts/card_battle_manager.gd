@@ -3171,7 +3171,7 @@ func place_card_on_grid():
 	if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER and current_grid_index in sunlit_positions and not darkness_shroud_active:
 		print("Sun Power boost activated for card in sunlit position!")
 		for i in range(card_data.values.size()):
-			card_data.values[i] += 2
+			card_data.values[i] += 1
 		sun_boosted = true
 		print("Card boosted to: ", card_data.values)
 	

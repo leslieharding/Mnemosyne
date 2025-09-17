@@ -41,6 +41,14 @@ func execute(context: Dictionary) -> bool:
 	print("CoreAbility: Stats boosted from ", original_values, " to ", placed_card.values)
 	print(ability_name, " activated! ", placed_card.card_name, " gained +2 to all stats for being in the central position!")
 	
+	var slot = game_manager.grid_slots[grid_position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = placed_card  # Update the card data reference
+			child.update_display()         # Refresh the visual display
+			print("CoreAbility: Updated CardDisplay visual for boosted card")
+			break
+	
 	return true
 
 func can_execute(context: Dictionary) -> bool:

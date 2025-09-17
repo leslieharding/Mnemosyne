@@ -55,9 +55,14 @@ func execute(context: Dictionary) -> bool:
 	print(ability_name, " activated! ", captured_card.card_name, " was captured and nullified its own stats!")
 	print("Stats changed from ", original_values, " to ", captured_card.values)
 	
-	# Update the visual display
-	if game_manager.has_method("update_card_display"):
-		game_manager.update_card_display(captured_position, captured_card)
+	# FIXED: Update the visual display to show the new stats
+	var slot = game_manager.grid_slots[captured_position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = captured_card  # Update the card data reference
+			child.update_display()             # Refresh the visual display
+			print("StatNullifyAbility: Updated CardDisplay visual for nullified card")
+			break
 	
 	# VISUAL EFFECT: Show stat nullify arrow (only when stats actually changed)
 	var card_display = game_manager.get_card_display_at_position(captured_position)

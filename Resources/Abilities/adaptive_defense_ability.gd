@@ -54,8 +54,14 @@ func apply_adaptive_defense(position: int, card: CardResource, game_manager) -> 
 	
 	print("Stats doubled to: ", card.values)
 	
-	# Update visual display
-	game_manager.update_card_display(position, card)
+	# FIXED: Update visual display to show the new stats
+	var slot = game_manager.grid_slots[position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = card  # Update the card data reference
+			child.update_display()  # Refresh the visual display
+			print("AdaptiveDefenseAbility: Updated CardDisplay visual for card at position ", position)
+			break
 	
 	# Start passive pulse effect to show the ability is active
 	var card_display = game_manager.get_card_display_at_position(position)
@@ -86,8 +92,14 @@ func remove_adaptive_defense(position: int, card: CardResource, game_manager) ->
 	# Mark as inactive
 	card.set_meta("adaptive_defense_active", false)
 	
-	# Update visual display
-	game_manager.update_card_display(position, card)
+	# FIXED: Update visual display to show the new stats
+	var slot = game_manager.grid_slots[position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = card  # Update the card data reference
+			child.update_display()  # Refresh the visual display
+			print("AdaptiveDefenseAbility: Updated CardDisplay visual for card at position ", position)
+			break
 	
 	# Stop passive pulse effect
 	var card_display = game_manager.get_card_display_at_position(position)

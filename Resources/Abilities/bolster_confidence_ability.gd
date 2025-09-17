@@ -98,8 +98,14 @@ func execute(context: Dictionary) -> bool:
 		
 		print("BolsterConfidenceAbility: ", card.card_name, " stats boosted to: ", card.values)
 		
-		# Update the visual display
-		game_manager.update_card_display(position, card)
+		# FIXED: Update the visual display to show the new stats
+		var slot = game_manager.grid_slots[position]
+		for child in slot.get_children():
+			if child is CardDisplay:
+				child.card_data = card  # Update the card data reference
+				child.update_display()  # Refresh the visual display
+				print("BolsterConfidenceAbility: Updated CardDisplay visual for bolstered card at position ", position)
+				break
 		
 		bolster_count += 1
 	
