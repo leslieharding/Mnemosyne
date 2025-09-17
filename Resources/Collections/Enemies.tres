@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=190 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=197 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -1236,6 +1236,46 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_e8k06"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_7eaan")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_eeisl"]
+script = ExtResource("2_xcqsp")
+card_name = "Ullr"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_axwpf"]
+script = ExtResource("2_xcqsp")
+card_name = "Skadi"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_j6smf"]
+script = ExtResource("2_xcqsp")
+card_name = "Hræsvelgr"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_u66db"]
+script = ExtResource("2_xcqsp")
+card_name = "Járnsaxa"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_3fk8b"]
+script = ExtResource("2_xcqsp")
+card_name = "Aurboða"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_nrk2q"]
+script = ExtResource("3_601pn")
+deck_name = "Artemis Boss"
+deck_description = "Testing"
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_keqme"]
+script = ExtResource("1_e7ref")
+enemy_name = "Artemis Boss"
+enemy_description = "Testing"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_eeisl"), SubResource("Resource_axwpf"), SubResource("Resource_j6smf"), SubResource("Resource_u66db"), SubResource("Resource_3fk8b")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_nrk2q")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
 [resource]
 script = ExtResource("4_a5nvj")
-enemies = Array[ExtResource("1_e7ref")]([SubResource("Resource_efy6x"), SubResource("Resource_y0w8m"), SubResource("Resource_bdmj8"), SubResource("Resource_tahvs"), SubResource("Resource_bsikd"), SubResource("Resource_25nh6"), SubResource("Resource_i1x7r"), SubResource("Resource_go2fa"), SubResource("Resource_e0pot")])
+enemies = Array[ExtResource("1_e7ref")]([SubResource("Resource_efy6x"), SubResource("Resource_y0w8m"), SubResource("Resource_bdmj8"), SubResource("Resource_tahvs"), SubResource("Resource_bsikd"), SubResource("Resource_25nh6"), SubResource("Resource_i1x7r"), SubResource("Resource_go2fa"), SubResource("Resource_e0pot"), SubResource("Resource_keqme")])
