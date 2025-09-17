@@ -1,27 +1,19 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=22 format=3 uid="uid://dwrds6g3whmsq"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=20 format=3 uid="uid://dwrds6g3whmsq"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_ttyo6"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_nyy1t"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_swqiw"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_021ek"]
-[ext_resource type="Script" uid="uid://cm8gt3refuukf" path="res://Resources/Abilities/camouflage_ability.gd" id="3_cynoy"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_nyy1t"]
 [ext_resource type="Script" uid="uid://c4aeeb6pohv6k" path="res://Resources/Abilities/soothe_ability.gd" id="5_lnj4m"]
 [ext_resource type="Script" uid="uid://bvlqcwb0iagi4" path="res://Resources/Abilities/phalanx_ability.gd" id="6_xpt5f"]
 [ext_resource type="Script" uid="uid://dja2ta0rb7v13" path="res://Resources/Abilities/treachery_ability.gd" id="7_cynoy"]
 [ext_resource type="Script" uid="uid://cnmf4yohj44kh" path="res://Resources/Abilities/morph_ability.gd" id="7_wiuqi"]
 
-[sub_resource type="Resource" id="Resource_8h57p"]
-script = ExtResource("3_cynoy")
-ability_name = "Camouflage"
-description = "On play this card is hidden for one turn, if the opponent tries to play a card in the same slot it is captured"
-metadata/_custom_type_script = "uid://cm8gt3refuukf"
-
 [sub_resource type="Resource" id="Resource_lnj4m"]
 script = ExtResource("1_ttyo6")
 card_name = "Atalanta"
 values = Array[int]([5, 5, 5, 5])
-abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_8h57p")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_uc8ql"]

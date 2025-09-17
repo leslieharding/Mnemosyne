@@ -3082,6 +3082,22 @@ func place_card_on_grid():
 	if current_grid_index == active_compel_slot:
 		print("Player placing card in compelled slot - removing compel constraint")
 		remove_compel_constraint()
+	
+	if check_camouflage_capture(current_grid_index, Owner.PLAYER):
+		# Camouflage was triggered - the capture sequence has been executed
+		# The player's card is captured and cannot be placed
+		print("Player's card was captured by camouflage!")
+		
+		# Remove the card from hand since it was captured
+		remove_card_from_hand(selected_card_index)
+		
+		# Reset selection
+		selected_card_index = -1
+		current_grid_index = -1
+		
+		# Switch turns after camouflage capture
+		turn_manager.next_turn()
+		return
 		
 	if grid_occupied[current_grid_index]:
 		print("Grid slot is already occupied!")
@@ -6917,25 +6933,107 @@ func execute_camouflage_capture(camouflage_slot: int, captured_owner: Owner):
 	
 	print("Executing camouflage capture at slot ", camouflage_slot)
 	
-	# The opponent's card that was just placed gets captured immediately
-	# (This should be called before the opponent's card is actually placed)
+	# Get the attacking card data that needs to be captured
+	var attacking_card_data = null
+	var attacking_card_level = 1
+	
+	if captured_owner == Owner.PLAYER:
+		if selected_card_index >= 0 and selected_card_index < player_deck.size():
+			attacking_card_data = player_deck[selected_card_index].duplicate(true)
+			attacking_card_level = get_card_level(selected_card_index)
+	else:
+		attacking_card_data = opponent_manager.get_last_played_card()
+		if attacking_card_data:
+			attacking_card_data = attacking_card_data.duplicate(true)
+			attacking_card_level = get_card_level(0)
+	
+	if not attacking_card_data:
+		print("ERROR: Could not get attacking card data for camouflage capture!")
+		return
+	
+	# SIMPLE FIX: Clear the slot completely first (removes camouflaged card display)
+	var slot = grid_slots[camouflage_slot]
+	for child in slot.get_children():
+		child.queue_free()
+	
+	# Update grid data for the captured card (owned by camouflage owner)
+	grid_occupied[camouflage_slot] = true
+	grid_ownership[camouflage_slot] = camouflaged_owner
+	grid_card_data[camouflage_slot] = attacking_card_data
+	
+	# Create new card display for the captured card
+	var captured_card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
+	slot.add_child(captured_card_display)
+	captured_card_display.setup(attacking_card_data, attacking_card_level, current_god, 0, camouflaged_owner == Owner.OPPONENT)
+	
+	# Apply correct styling
+	if camouflaged_owner == Owner.PLAYER:
+		captured_card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+	else:
+		captured_card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
 	
 	# Find next available slot for the camouflaged card
 	var next_slot = find_next_available_slot(camouflage_slot)
 	
 	if next_slot != -1:
-		# Move camouflaged card to next available slot
-		move_camouflaged_card(camouflage_slot, next_slot, camouflaged_card, camouflaged_owner)
-	else:
-		# No available slots - reveal card in place
-		print("No available slots for camouflaged card - revealing in place")
+		# Place camouflaged card in next available slot (no longer hidden)
+		grid_occupied[next_slot] = true
+		grid_ownership[next_slot] = camouflaged_owner
+		grid_card_data[next_slot] = camouflaged_card
+		
+		var next_slot_container = grid_slots[next_slot]
+		var camouflaged_card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
+		next_slot_container.add_child(camouflaged_card_display)
+		camouflaged_card_display.setup(camouflaged_card, 1, current_god, 0, camouflaged_owner == Owner.OPPONENT)
+		
+		# Apply correct styling to revealed camouflaged card
+		if camouflaged_owner == Owner.PLAYER:
+			camouflaged_card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+		else:
+			camouflaged_card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
 	
 	# Remove camouflage effect
 	active_camouflage_slots.erase(camouflage_slot)
 	
 	# Update game status
 	var owner_name = "Player" if camouflaged_owner == Owner.PLAYER else "Opponent"
-	game_status_label.text = "🎭 CAMOUFLAGE ACTIVATED! " + owner_name + "'s card captured the opponent's card!"
+	var captured_name = "Player" if captured_owner == Owner.PLAYER else "Opponent"
+	game_status_label.text = "🎭 CAMOUFLAGE ACTIVATED! " + owner_name + "'s card captured " + captured_name + "'s card!"
+
+func _setup_captured_card_display(card_display: CardDisplay, card_data: CardResource, card_level: int, is_opponent_card: bool, slot_index: int):
+	"""Helper function to set up a captured card display after it's been added to the scene"""
+	if not card_display or not card_display.panel:
+		print("ERROR: Card display or panel is null in _setup_captured_card_display")
+		return
+	
+	# Setup the captured card display
+	card_display.setup(card_data, card_level, current_god, 0, is_opponent_card)
+	
+	# Apply correct ownership styling to the captured card
+	if not is_opponent_card:
+		card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+	else:
+		card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+	
+	# Connect hover and input signals for the captured card
+	card_display.card_hovered.connect(_on_card_hovered)
+	card_display.card_unhovered.connect(_on_card_unhovered)
+	if card_display.panel:
+		card_display.panel.gui_input.connect(_on_grid_card_right_click.bind(slot_index))
+	
+	print("Captured card display setup complete for slot ", slot_index)
+
+func _check_game_end_after_camouflage():
+	"""Check if game should end after camouflage sequence completes"""
+	print("Checking if game should end after camouflage sequence...")
+	
+	if should_game_end():
+		print("Game should end after camouflage - triggering end_game()")
+		end_game()
+	else:
+		print("Game continues after camouflage sequence")
+
+
 
 func find_next_available_slot(starting_slot: int) -> int:
 	"""Find the next numerically available slot after the starting slot"""
@@ -6995,6 +7093,10 @@ func reveal_camouflaged_card(card_display: CardDisplay):
 	if card_display and card_display.panel:
 		# Restore full opacity
 		card_display.modulate = Color(1, 1, 1, 1)
+		
+		# CRITICAL FIX: Restore normal mouse input handling
+		card_display.panel.mouse_filter = Control.MOUSE_FILTER_PASS
+		print("Restored camouflaged card mouse_filter to PASS")
 		
 		# Restore normal ownership styling
 		var grid_position = -1
@@ -7068,37 +7170,18 @@ func hide_camouflaged_card(card_display: CardDisplay):
 		print("BEFORE hiding - card modulate: ", card_display.modulate)
 		print("BEFORE hiding - panel style override exists: ", card_display.panel.has_theme_stylebox_override("panel"))
 		
-		# Make the card semi-transparent and add a special border
-		card_display.modulate = Color(1, 1, 1, 0.3)  # 30% opacity
-		print("SET modulate to: ", card_display.modulate)
+		# Make the card completely transparent
+		card_display.modulate = Color(1, 1, 1, 0)
 		
-		# Create a special camouflage style
-		var camouflage_style = StyleBoxFlat.new()
-		camouflage_style.bg_color = Color("#222222", 0.8)
-		camouflage_style.border_color = Color("#666666")
-		camouflage_style.border_width_left = 3
-		camouflage_style.border_width_top = 3
-		camouflage_style.border_width_right = 3
-		camouflage_style.border_width_bottom = 3
-		camouflage_style.corner_radius_top_left = 8
-		camouflage_style.corner_radius_top_right = 8
-		camouflage_style.corner_radius_bottom_left = 8
-		camouflage_style.corner_radius_bottom_right = 8
+		# CRITICAL FIX: Allow mouse input to pass through the camouflaged card
+		# so clicks can reach the underlying grid slot
+		card_display.panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		print("Set camouflaged card mouse_filter to IGNORE")
 		
-		card_display.panel.add_theme_stylebox_override("panel", camouflage_style)
-		print("Applied camouflage style to panel")
+		# Remove any ownership styling to make the slot appear empty
+		card_display.panel.remove_theme_stylebox_override("panel")
 		
 		print("AFTER hiding - card modulate: ", card_display.modulate)
-		print("AFTER hiding - panel style override exists: ", card_display.panel.has_theme_stylebox_override("panel"))
-		
-		print("Hidden camouflaged card: ", card_display.get_card_data().card_name)
-		
-		# Wait a few frames and check if the effect is still there
-		await get_tree().process_frame
-		await get_tree().process_frame
-		await get_tree().process_frame
-		print("3 FRAMES LATER - card modulate: ", card_display.modulate)
-		print("3 FRAMES LATER - panel style override exists: ", card_display.panel.has_theme_stylebox_override("panel"))
-	else:
-		print("ERROR: Cannot hide camouflaged card - missing card_display or panel!")
-	print("=== END HIDE CAMOUFLAGED CARD DEBUG ===")
+		print("AFTER hiding - mouse_filter: ", card_display.panel.mouse_filter)
+	
+	print("Card successfully camouflaged and mouse input set to pass through")
