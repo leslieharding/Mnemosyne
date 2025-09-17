@@ -2826,7 +2826,7 @@ func _on_grid_mouse_entered(grid_index):
 		return
 	
 	# Only apply selection highlight if a card is selected and slot is not occupied
-	if selected_card_index != -1 and not grid_occupied[grid_index]:
+	if selected_card_index != -1 and (not grid_occupied[grid_index] or is_slot_camouflaged(grid_index)):
 		# Clear the previous selection highlight
 		if current_grid_index != -1:
 			# Restore the previous slot's original styling
