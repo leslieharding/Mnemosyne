@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_nyy1t"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_swqiw"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_021ek"]
-[ext_resource type="Script" uid="uid://buhjtyfib4g6b" path="res://Resources/Abilities/charm_ability.gd" id="3_lnj4m"]
+[ext_resource type="Script" uid="uid://cm8gt3refuukf" path="res://Resources/Abilities/camouflage_ability.gd" id="3_cynoy"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_nyy1t"]
 [ext_resource type="Script" uid="uid://c4aeeb6pohv6k" path="res://Resources/Abilities/soothe_ability.gd" id="5_lnj4m"]
 [ext_resource type="Script" uid="uid://bvlqcwb0iagi4" path="res://Resources/Abilities/phalanx_ability.gd" id="6_xpt5f"]
@@ -12,82 +12,61 @@
 [ext_resource type="Script" uid="uid://cnmf4yohj44kh" path="res://Resources/Abilities/morph_ability.gd" id="7_wiuqi"]
 
 [sub_resource type="Resource" id="Resource_8h57p"]
-script = ExtResource("3_lnj4m")
-ability_name = "Charm"
-description = "On play this card draws in distant enemies then attacks them."
-unlock_level = 0
-trigger_condition = 0
-metadata/_custom_type_script = "uid://buhjtyfib4g6b"
+script = ExtResource("3_cynoy")
+ability_name = "Camouflage"
+description = "On play this card is hidden for one turn, if the opponent tries to play a card in the same slot it is captured"
+metadata/_custom_type_script = "uid://cm8gt3refuukf"
 
 [sub_resource type="Resource" id="Resource_lnj4m"]
 script = ExtResource("1_ttyo6")
 card_name = "Atalanta"
 values = Array[int]([5, 5, 5, 5])
-description = ""
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_8h57p")])
-level_data = Array[ExtResource("3_021ek")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_uc8ql"]
 script = ExtResource("5_lnj4m")
 ability_name = "Soothe"
 description = "Reduces the strength of the next card played by your opponent by 1"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://c4aeeb6pohv6k"
 
 [sub_resource type="Resource" id="Resource_xpt5f"]
 script = ExtResource("1_ttyo6")
 card_name = "Meleager"
 values = Array[int]([5, 5, 5, 5])
-description = ""
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_uc8ql")])
-level_data = Array[ExtResource("3_021ek")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hq4qt"]
 script = ExtResource("6_xpt5f")
 ability_name = "Phalanx"
 description = "On play if you own all 3 cards in a row or column, boost the formations stats by 2"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://bvlqcwb0iagi4"
 
 [sub_resource type="Resource" id="Resource_wiuqi"]
 script = ExtResource("1_ttyo6")
 card_name = "Hippolytus"
 values = Array[int]([5, 5, 5, 5])
-description = ""
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_hq4qt")])
-level_data = Array[ExtResource("3_021ek")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_mbexa"]
 script = ExtResource("7_cynoy")
 ability_name = "Treachery"
 description = "One captured enemy will try and attack an ally"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://dja2ta0rb7v13"
 
 [sub_resource type="Resource" id="Resource_cynoy"]
 script = ExtResource("1_ttyo6")
 card_name = "Orion"
 values = Array[int]([5, 5, 5, 5])
-description = ""
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_mbexa")])
-level_data = Array[ExtResource("3_021ek")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_30n57"]
 script = ExtResource("7_wiuqi")
 ability_name = "Morph"
 description = "Rotate this cards stats every turn"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://cnmf4yohj44kh"
 
@@ -95,10 +74,7 @@ metadata/_custom_type_script = "uid://cnmf4yohj44kh"
 script = ExtResource("1_ttyo6")
 card_name = "Callisto "
 values = Array[int]([3, 4, 5, 6])
-description = ""
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_30n57")])
-level_data = Array[ExtResource("3_021ek")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ttyo6"]
@@ -107,15 +83,10 @@ deck_name = "The Hunt"
 deck_description = "The beauty and precision of the singular killing blow."
 card_indices = Array[int]([0, 1, 2, 3, 4])
 is_starter_deck = true
-required_capture_exp = 0
-required_defense_exp = 0
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [resource]
 script = ExtResource("3_nyy1t")
-god_name = ""
 cards = Array[ExtResource("1_ttyo6")]([SubResource("Resource_lnj4m"), SubResource("Resource_xpt5f"), SubResource("Resource_wiuqi"), SubResource("Resource_cynoy"), SubResource("Resource_vobqy")])
 decks = Array[ExtResource("2_swqiw")]([SubResource("Resource_ttyo6")])
 metadata/_custom_type_script = "uid://bdwr18g3ouvfo"

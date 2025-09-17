@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CamouflageAbility" load_steps=2 format=3 uid="uid://dmqloui25vr0i"]
+
+[ext_resource type="Script" uid="uid://cm8gt3refuukf" path="res://Resources/Abilities/camouflage_ability.gd" id="1_4tqre"]
+
+[resource]
+script = ExtResource("1_4tqre")
+ability_name = "Camouflage"
+description = "On play this card is hidden for one turn, if the opponent tries to play a card in the same slot it is captured"
+metadata/_custom_type_script = "uid://cm8gt3refuukf"

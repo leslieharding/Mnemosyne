@@ -58,6 +58,14 @@ var current_coercer_card: CardResource = null
 var active_coerced_card_index: int = -1  # Index of card in player's hand that must be played
 var coerced_card_style: StyleBoxFlat
 
+# Camouflage tracking system
+var active_camouflage_slots: Dictionary = {}  # slot_position -> camouflage_data
+var camouflage_data = {
+	"card": null,            # The camouflaged card
+	"owner": Owner.NONE,     # Who owns the camouflaged card
+	"turns_remaining": 0     # How many turns until it's revealed (1 turn duration)
+}
+
 # Compel tracking system
 var compel_mode_active: bool = false
 var current_compeller_position: int = -1
@@ -837,7 +845,7 @@ func _on_turn_changed(is_player_turn: bool):
 	
 	# Process morph abilities at the start of every turn (both owners)
 	process_morph_turn_start()
-	
+	process_camouflage_turn_end()
 	# Process cultivation abilities at the start of player's turn
 	if is_player_turn:
 		process_cultivation_turn_start()
@@ -1411,6 +1419,17 @@ func _on_opponent_card_placed(grid_index: int):
 		opponent_is_thinking = false  # Reset thinking flag on error
 		return
 	
+	# CAMOUFLAGE CHECK: Before processing placement, check if this triggers camouflage capture
+	if check_camouflage_capture(grid_index, Owner.OPPONENT):
+		# Camouflage was triggered - the capture sequence has been executed
+		# The opponent's card is captured and cannot be placed
+		print("Opponent's card was captured by camouflage!")
+		opponent_is_thinking = false
+		
+		# Switch turns back to player after camouflage capture
+		turn_manager.next_turn()
+		return
+	
 	if grid_occupied[grid_index]:
 		print("Opponent tried to place card on occupied slot!")
 		opponent_is_thinking = false  # Reset thinking flag on error
@@ -1596,6 +1615,7 @@ func end_game():
 	clear_all_ordain_effects()
 	clear_all_sanctuary_effects()
 	clear_all_trojan_horses()
+	clear_all_camouflage_effects()
 	misdirection_used = false
 	
 	var tracker = get_node("/root/BossPredictionTrackerAutoload")
@@ -1777,6 +1797,8 @@ func restart_round():
 	grid_to_collection_index.clear()
 	clear_all_sanctuary_effects()
 	clear_all_coerce_constraints()
+	clear_all_camouflage_effects()
+
 	
 	# Clear the grid completely
 	for i in range(grid_slots.size()):
@@ -4676,17 +4698,17 @@ func remove_compel_constraint():
 	# Clear tracking
 	active_compel_slot = -1
 
-# Check if a slot is available for opponent considering compel constraint
+# Modify the is_slot_available_for_opponent function to treat camouflaged slots as empty
 func is_slot_available_for_opponent(slot_index: int) -> bool:
-	# If slot is occupied, it's not available
-	if grid_occupied[slot_index]:
+	# If slot is occupied AND not camouflaged, it's not available
+	if grid_occupied[slot_index] and not is_slot_camouflaged(slot_index):
 		return false
 	
 	# If there's an active compel constraint, only the compelled slot is available
 	if active_compel_slot != -1:
 		return slot_index == active_compel_slot
 	
-	# Otherwise, any empty slot is available
+	# Otherwise, any empty slot OR camouflaged slot is available
 	return true
 
 # Opponent AI compel target selection
@@ -6854,3 +6876,168 @@ func clear_all_race_constraints():
 		current_racer_owner = Owner.NONE
 		current_racer_card = null
 		print("All race constraints cleared")
+
+
+func start_camouflage_mode(camouflage_position: int, camouflage_owner: Owner, camouflage_card: CardResource):
+	"""Start camouflage effect for a card at the specified position"""
+	print("Camouflage mode activated for ", camouflage_card.card_name, " at position ", camouflage_position)
+	
+	# Store camouflage data
+	active_camouflage_slots[camouflage_position] = {
+		"card": camouflage_card,
+		"owner": camouflage_owner,
+		"turns_remaining": 1  # Lasts one turn (opponent's next turn)
+	}
+	
+	# Hide the card visually (for now, we'll implement visual hiding later)
+	# The card remains in grid_occupied, grid_ownership, and grid_card_data arrays
+	
+	print("Card camouflaged! Hidden for 1 turn at position ", camouflage_position)
+
+func check_camouflage_capture(target_slot: int, placing_owner: Owner) -> bool:
+	"""Check if placing a card triggers camouflage capture"""
+	if target_slot not in active_camouflage_slots:
+		return false
+	
+	var camouflage_data = active_camouflage_slots[target_slot]
+	var camouflaged_owner = camouflage_data["owner"]
+	
+	# Only trigger if opponent is trying to place in the camouflaged slot
+	if placing_owner != camouflaged_owner:
+		print("CAMOUFLAGE TRIGGERED! Opponent tried to place in camouflaged slot ", target_slot)
+		execute_camouflage_capture(target_slot, placing_owner)
+		return true
+	
+	return false
+
+func execute_camouflage_capture(camouflage_slot: int, captured_owner: Owner):
+	"""Execute the camouflage capture sequence"""
+	var camouflage_data = active_camouflage_slots[camouflage_slot]
+	var camouflaged_card = camouflage_data["card"]
+	var camouflaged_owner = camouflage_data["owner"]
+	
+	print("Executing camouflage capture at slot ", camouflage_slot)
+	
+	# The opponent's card that was just placed gets captured immediately
+	# (This should be called before the opponent's card is actually placed)
+	
+	# Find next available slot for the camouflaged card
+	var next_slot = find_next_available_slot(camouflage_slot)
+	
+	if next_slot != -1:
+		# Move camouflaged card to next available slot
+		move_camouflaged_card(camouflage_slot, next_slot, camouflaged_card, camouflaged_owner)
+	else:
+		# No available slots - reveal card in place
+		print("No available slots for camouflaged card - revealing in place")
+	
+	# Remove camouflage effect
+	active_camouflage_slots.erase(camouflage_slot)
+	
+	# Update game status
+	var owner_name = "Player" if camouflaged_owner == Owner.PLAYER else "Opponent"
+	game_status_label.text = "🎭 CAMOUFLAGE ACTIVATED! " + owner_name + "'s card captured the opponent's card!"
+
+func find_next_available_slot(starting_slot: int) -> int:
+	"""Find the next numerically available slot after the starting slot"""
+	# Start searching from the slot after the current one
+	for i in range(starting_slot + 1, grid_slots.size()):
+		if not grid_occupied[i]:
+			return i
+	
+	# If no slot found after starting_slot, search from beginning
+	for i in range(0, starting_slot):
+		if not grid_occupied[i]:
+			return i
+	
+	return -1  # No available slots
+
+func move_camouflaged_card(from_slot: int, to_slot: int, card: CardResource, card_owner: Owner):
+	"""Move a camouflaged card from one slot to another and reveal it"""
+	print("Moving camouflaged card from slot ", from_slot, " to slot ", to_slot)
+	
+	# Get the card display from the original slot
+	var card_display = get_card_display_at_position(from_slot)
+	
+	# Update data structures - clear source
+	grid_occupied[from_slot] = false
+	grid_ownership[from_slot] = Owner.NONE
+	grid_card_data[from_slot] = null
+	
+	# Update data structures - set destination
+	grid_occupied[to_slot] = true
+	grid_ownership[to_slot] = card_owner
+	grid_card_data[to_slot] = card
+	
+	# Move collection index mapping if it exists
+	if from_slot in grid_to_collection_index:
+		var collection_index = grid_to_collection_index[from_slot]
+		grid_to_collection_index.erase(from_slot)
+		grid_to_collection_index[to_slot] = collection_index
+	
+	# Move the visual display
+	if card_display:
+		var source_slot = grid_slots[from_slot]
+		var target_slot = grid_slots[to_slot]
+		
+		# Remove from source slot
+		source_slot.remove_child(card_display)
+		
+		# Add to target slot
+		target_slot.add_child(card_display)
+		
+		# Reveal the card (remove any camouflage visual effects)
+		reveal_camouflaged_card(card_display)
+	
+	print("Camouflaged card moved and revealed at slot ", to_slot)
+
+func reveal_camouflaged_card(card_display: CardDisplay):
+	"""Reveal a camouflaged card (remove visual hiding effects)"""
+	# For now, this is a placeholder - visual hiding will be implemented later
+	# This function will restore normal visibility to the card
+	print("Revealing camouflaged card: ", card_display.get_card_data().card_name if card_display.get_card_data() else "Unknown")
+
+func process_camouflage_turn_end():
+	"""Process camouflage effects at the end of each turn"""
+	var slots_to_reveal = []
+	
+	# Check all active camouflage slots
+	for slot in active_camouflage_slots.keys():
+		var camouflage_data = active_camouflage_slots[slot]
+		camouflage_data["turns_remaining"] -= 1
+		
+		if camouflage_data["turns_remaining"] <= 0:
+			slots_to_reveal.append(slot)
+	
+	# Reveal cards whose camouflage has expired
+	for slot in slots_to_reveal:
+		reveal_camouflage_effect(slot)
+
+func reveal_camouflage_effect(slot: int):
+	"""Reveal a camouflaged card when its duration expires"""
+	if slot not in active_camouflage_slots:
+		return
+	
+	var camouflage_data = active_camouflage_slots[slot]
+	var card = camouflage_data["card"]
+	
+	print("Camouflage expired - revealing card at slot ", slot, ": ", card.card_name)
+	
+	# Get the card display and reveal it
+	var card_display = get_card_display_at_position(slot)
+	if card_display:
+		reveal_camouflaged_card(card_display)
+	
+	# Remove from active camouflage tracking
+	active_camouflage_slots.erase(slot)
+
+func is_slot_camouflaged(slot: int) -> bool:
+	"""Check if a slot contains a camouflaged card"""
+	return slot in active_camouflage_slots
+
+func clear_all_camouflage_effects():
+	"""Clear all camouflage effects (for game end or reset)"""
+	for slot in active_camouflage_slots.keys():
+		reveal_camouflage_effect(slot)
+	active_camouflage_slots.clear()
+	print("All camouflage effects cleared")
