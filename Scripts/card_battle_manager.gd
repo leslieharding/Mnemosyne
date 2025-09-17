@@ -121,8 +121,8 @@ var active_trojan_horses: Array[int] = []  # Track positions of active trojan ho
 var couple_definitions = {
 	"Phaeton": "Cygnus",
 	"Cygnus": "Phaeton", 
-	"Orpheus": "Euridyce",
-	"Euridyce": "Orpheus"
+	"Orpheus": "Eurydice",
+	"Eurydice": "Orpheus"
 }
 # Journal button reference  
 var journal_button: JournalButton
@@ -3774,9 +3774,6 @@ func check_for_couple_union(placed_card: CardResource, grid_position: int):
 					# Couple found! Record the union
 					progress_tracker.record_couple_union(placed_card_name, partner_name)
 					
-					# Show notification if available
-					if notification_manager:
-						notification_manager.show_notification("💕 " + couple_id + " united! 💕")
 					
 					return
 
