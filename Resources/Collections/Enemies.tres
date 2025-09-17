@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=197 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=201 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -20,6 +20,7 @@
 [ext_resource type="Script" uid="uid://cjsf2c6w6dnrf" path="res://Resources/Abilities/coerce_ability.gd" id="12_hu0wn"]
 [ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="12_r05oc"]
 [ext_resource type="Script" uid="uid://cu3icvy8efjky" path="res://Resources/Abilities/greedy_ability.gd" id="13_0vidc"]
+[ext_resource type="Script" uid="uid://cm8gt3refuukf" path="res://Resources/Abilities/camouflage_ability.gd" id="14_1g5vp"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -652,11 +653,18 @@ description = "We have drunk from Pieria have we not? How could we possibly lose
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0g8v8")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_jej5r"]
+script = ExtResource("14_1g5vp")
+ability_name = "Camouflage"
+description = "On play this card is hidden for one turn, if the opponent tries to play a card in the same slot it is captured"
+metadata/_custom_type_script = "uid://cm8gt3refuukf"
+
 [sub_resource type="Resource" id="Resource_srqjw"]
 script = ExtResource("2_xcqsp")
 card_name = "Iynx"
 values = Array[int]([1, 3, 2, 5])
 description = "Good God its all wrong, comeon sisters we practiced this a million times!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_jej5r")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_1shm4"]
@@ -710,11 +718,18 @@ description = "We have drunk from Pieria have we not? How could we possibly lose
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_dn5nk")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_afuhd"]
+script = ExtResource("14_1g5vp")
+ability_name = "Camouflage"
+description = "On play this card is hidden for one turn, if the opponent tries to play a card in the same slot it is captured"
+metadata/_custom_type_script = "uid://cm8gt3refuukf"
+
 [sub_resource type="Resource" id="Resource_cd5hd"]
 script = ExtResource("2_xcqsp")
 card_name = "Iynx"
 values = Array[int]([2, 4, 3, 6])
 description = "Good God its all wrong, comeon sisters we practiced this a million times!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_afuhd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_703p7"]
@@ -768,11 +783,18 @@ description = "We have drunk from Pieria have we not? How could we possibly lose
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_v6mik")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_ob81h"]
+script = ExtResource("14_1g5vp")
+ability_name = "Camouflage"
+description = "On play this card is hidden for one turn, if the opponent tries to play a card in the same slot it is captured"
+metadata/_custom_type_script = "uid://cm8gt3refuukf"
+
 [sub_resource type="Resource" id="Resource_t2t3x"]
 script = ExtResource("2_xcqsp")
 card_name = "Iynx"
 values = Array[int]([3, 5, 4, 7])
 description = "Good God its all wrong, comeon sisters we practiced this a million times!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ob81h")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_wrrra"]

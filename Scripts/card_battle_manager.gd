@@ -3040,14 +3040,17 @@ func _on_grid_gui_input(event, grid_index):
 		
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			# SIMPLIFIED: Just check if card selected and slot not occupied
-			# Hunt trap handling moved to place_card_on_grid()
-			if selected_card_index != -1 and not grid_occupied[grid_index]:
+			
+			if selected_card_index != -1 and (not grid_occupied[grid_index] or is_slot_camouflaged(grid_index)):
 				place_card_on_grid()
 
-# Update the visual display of a card after its stats change
 func update_card_display(grid_index: int, card_data: CardResource):
 	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	# Don't update display for camouflaged cards - they should remain hidden
+	if is_slot_camouflaged(grid_index):
+		print("Skipping display update for camouflaged card at slot ", grid_index)
 		return
 	
 	var slot = grid_slots[grid_index]
@@ -6889,8 +6892,10 @@ func start_camouflage_mode(camouflage_position: int, camouflage_owner: Owner, ca
 		"turns_remaining": 1  # Lasts one turn (opponent's next turn)
 	}
 	
-	# Hide the card visually (for now, we'll implement visual hiding later)
-	# The card remains in grid_occupied, grid_ownership, and grid_card_data arrays
+	# Hide the card visually
+	var card_display = get_card_display_at_position(camouflage_position)
+	if card_display:
+		hide_camouflaged_card(card_display)
 	
 	print("Card camouflaged! Hidden for 1 turn at position ", camouflage_position)
 
@@ -6993,9 +6998,25 @@ func move_camouflaged_card(from_slot: int, to_slot: int, card: CardResource, car
 
 func reveal_camouflaged_card(card_display: CardDisplay):
 	"""Reveal a camouflaged card (remove visual hiding effects)"""
-	# For now, this is a placeholder - visual hiding will be implemented later
-	# This function will restore normal visibility to the card
-	print("Revealing camouflaged card: ", card_display.get_card_data().card_name if card_display.get_card_data() else "Unknown")
+	if card_display and card_display.panel:
+		# Restore full opacity
+		card_display.modulate = Color(1, 1, 1, 1)
+		
+		# Restore normal ownership styling
+		var grid_position = -1
+		for i in range(grid_slots.size()):
+			if get_card_display_at_position(i) == card_display:
+				grid_position = i
+				break
+		
+		if grid_position != -1:
+			var owner = grid_ownership[grid_position]
+			if owner == Owner.PLAYER:
+				card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+			else:
+				card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+		
+		print("Revealed camouflaged card: ", card_display.get_card_data().card_name if card_display.get_card_data() else "Unknown")
 
 func process_camouflage_turn_end():
 	"""Process camouflage effects at the end of each turn"""
@@ -7041,3 +7062,25 @@ func clear_all_camouflage_effects():
 		reveal_camouflage_effect(slot)
 	active_camouflage_slots.clear()
 	print("All camouflage effects cleared")
+
+func hide_camouflaged_card(card_display: CardDisplay):
+	"""Hide a camouflaged card visually"""
+	if card_display and card_display.panel:
+		# Make the card semi-transparent and add a special border
+		card_display.modulate = Color(1, 1, 1, 0.3)  # 30% opacity
+		
+		# Create a special camouflage style
+		var camouflage_style = StyleBoxFlat.new()
+		camouflage_style.bg_color = Color("#222222", 0.8)
+		camouflage_style.border_color = Color("#666666")
+		camouflage_style.border_width_left = 3
+		camouflage_style.border_width_top = 3
+		camouflage_style.border_width_right = 3
+		camouflage_style.border_width_bottom = 3
+		camouflage_style.corner_radius_top_left = 8
+		camouflage_style.corner_radius_top_right = 8
+		camouflage_style.corner_radius_bottom_left = 8
+		camouflage_style.corner_radius_bottom_right = 8
+		
+		card_display.panel.add_theme_stylebox_override("panel", camouflage_style)
+		print("Hidden camouflaged card: ", card_display.get_card_data().card_name)
