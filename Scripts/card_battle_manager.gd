@@ -28,6 +28,8 @@ var misdirection_used: bool = false
 var is_hermes_boss_battle: bool = false
 var visual_stat_inversion_active: bool = false
 
+var fimbulwinter_boss_active: bool = false
+
 # Tremor tracking system
 var active_tremors: Dictionary = {}  # tremor_id -> tremor_data
 var tremor_id_counter: int = 0
@@ -399,6 +401,9 @@ func setup_boss_prediction_tracker():
 				visual_stat_inversion_active = true
 				print("Hermes boss battle detected - visual stat inversion activated!")
 				game_status_label.text = "The trickster's illusions warp your perception..."
+			elif current_node.enemy_name == BossConfig.DEMETER_BOSS_NAME:
+				print("Demeter boss battle detected!")
+				game_status_label.text = "Winter will follow winter which follows winter"	
 		
 		print("Boss battle detected: ", is_boss_battle)
 	
@@ -6023,16 +6028,36 @@ func get_persephone_level() -> int:
 		return 1
 
 
-# Add this new function after setup_misdirection_power() function
 func setup_seasons_power():
 	print("=== SETTING UP SEASONS POWER ===")
-	current_season = Season.SUMMER  # Start in Summer (Persephone in hand)
+	
+	# Check if this is the Fimbulwinter boss battle
+	var params = get_scene_params()
+	var is_fimbulwinter_boss = false
+	
+	if params.has("current_node"):
+		var current_node = params["current_node"]
+		if current_node.node_type == MapNode.NodeType.BOSS and current_node.enemy_name == BossConfig.DEMETER_BOSS_NAME:
+			is_fimbulwinter_boss = true
+			print("FIMBULWINTER BOSS DETECTED - Eternal Winter mode activated!")
+	
+	# Set initial season
+	if is_fimbulwinter_boss:
+		current_season = Season.WINTER  # Force winter for Fimbulwinter boss
+		fimbulwinter_boss_active = true  # Add this flag to prevent season changes
+	else:
+		current_season = Season.SUMMER  # Normal start in Summer
+		fimbulwinter_boss_active = false
 	
 	# Create season status display
 	create_seasons_status_label()
 	update_seasons_display()
 	
-	print("The Seasons power activated - Summer begins with Persephone in hand")
+	if is_fimbulwinter_boss:
+		print("The Seasons power activated - Eternal Winter enforced by Fimbulwinter!")
+	else:
+		print("The Seasons power activated - Summer begins with Persephone in hand")
+
 
 func create_seasons_status_label():
 	# Create a label to show current season
@@ -6054,10 +6079,19 @@ func update_seasons_display():
 			seasons_status_label.text = "🌞 Summer - Growth Flourishes"
 			seasons_status_label.add_theme_color_override("font_color", Color("#FFD700"))  # Gold
 		Season.WINTER:
-			seasons_status_label.text = "❄️ Winter - Growth Withers"
-			seasons_status_label.add_theme_color_override("font_color", Color("#87CEEB"))  # Sky blue
+			if fimbulwinter_boss_active:
+				seasons_status_label.text = "🌨️ Fimbulwinter - Eternal Freeze"
+				seasons_status_label.add_theme_color_override("font_color", Color("#4169E1"))  # Royal blue for boss
+			else:
+				seasons_status_label.text = "❄️ Winter - Growth Withers" 
+				seasons_status_label.add_theme_color_override("font_color", Color("#87CEEB"))  # Sky blue
 
 func transition_to_winter():
+	# Prevent season changes during Fimbulwinter boss fight
+	if fimbulwinter_boss_active:
+		print("Season transition blocked - Fimbulwinter maintains eternal winter!")
+		return
+	
 	if current_season == Season.SUMMER:
 		print("=== SEASON TRANSITION: SUMMER → WINTER ===")
 		current_season = Season.WINTER

@@ -1223,14 +1223,14 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7eaan"]
 script = ExtResource("3_601pn")
-deck_name = "Demeter Boss"
+deck_name = "Fimbulwinter"
 deck_description = "Demeter Boss for testing"
 card_indices = Array[int]([0, 1, 2, 3, 4])
 metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_e0pot"]
 script = ExtResource("1_e7ref")
-enemy_name = "Demeter Boss"
+enemy_name = "Fimbulwinter"
 enemy_description = "Demeter Boss for testing"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_e8k06"), SubResource("Resource_6yfxy"), SubResource("Resource_8aknj"), SubResource("Resource_p5kmc"), SubResource("Resource_ei4g5")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_7eaan")])

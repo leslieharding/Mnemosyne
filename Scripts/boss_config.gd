@@ -6,6 +6,8 @@ extends RefCounted
 # Change these values here to update boss names throughout the entire game
 const APOLLO_BOSS_NAME: String = "?????"
 const HERMES_BOSS_NAME: String = "Hermes Boss"
+const DEMETER_BOSS_NAME: String = "Fimbulwinter"
+
 
 # Helper function to get boss name by god
 static func get_boss_name_for_god(god_name: String) -> String:
@@ -14,5 +16,7 @@ static func get_boss_name_for_god(god_name: String) -> String:
 			return APOLLO_BOSS_NAME
 		"Hermes":
 			return HERMES_BOSS_NAME
+		"Demeter":
+			return DEMETER_BOSS_NAME
 		_:
 			return APOLLO_BOSS_NAME  # Default fallback

@@ -53,7 +53,8 @@ static func assign_enemies_to_tiers(god_name: String = "Apollo") -> Dictionary:
 	# Define god-specific enemy pools
 	var god_enemy_pools = {
 		"Apollo": ["Pythons Gang", "Niobes Brood", "Cultists of Nyx", "The Wrong Note", "The Plague"],
-		"Hermes": ["Rival Merchants", "Crossroads Bandits", "Divine Messengers", "Underworld Gatekeepers", "Olympian Rivals"]
+		"Hermes": ["Rival Merchants", "Crossroads Bandits", "Divine Messengers", "Underworld Gatekeepers", "Olympian Rivals"],
+		"Demeter": ["Pythons Gang", "Niobes Brood", "Cultists of Nyx", "The Wrong Note", "The Plague"]
 	}
 	
 	# Get enemies for the current god, fallback to Apollo's enemies if god not found
