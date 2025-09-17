@@ -7,6 +7,7 @@ extends RefCounted
 const APOLLO_BOSS_NAME: String = "?????"
 const HERMES_BOSS_NAME: String = "Hermes Boss"
 const DEMETER_BOSS_NAME: String = "Fimbulwinter"
+const ARTEMIS_BOSS_NAME: String = "Artemis Boss"
 
 
 # Helper function to get boss name by god
@@ -18,5 +19,7 @@ static func get_boss_name_for_god(god_name: String) -> String:
 			return HERMES_BOSS_NAME
 		"Demeter":
 			return DEMETER_BOSS_NAME
+		"Artemis":
+			return ARTEMIS_BOSS_NAME	
 		_:
 			return APOLLO_BOSS_NAME  # Default fallback
