@@ -55,15 +55,8 @@ func show_journal(initial_tab: String = ""):
 	# Update content before showing
 	refresh_all_content()
 	
-	# Select initial tab if specified
-	if initial_tab != "":
-		match initial_tab:
-			"bestiary":
-				tab_container.current_tab = 0
-			"gods":
-				tab_container.current_tab = 1
-			"mnemosyne":
-				tab_container.current_tab = 2
+	# Always default to Bestiary tab (index 0)
+	tab_container.current_tab = 0
 	
 	# Animate in
 	if journal_tween:
@@ -589,18 +582,9 @@ func _on_god_selected(god_name: String, god_data: Dictionary):
 	for child in details_panel.get_children():
 		child.queue_free()
 	
-	# Get detailed god information using the new god content manager
-	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
-	var detailed_info = memory_manager.get_god_detailed_info(god_name)
-	
-	if detailed_info.is_empty():
-		var error_label = Label.new()
-		error_label.text = "No information available for this deity."
-		details_panel.add_child(error_label)
-		return
-	
-	# Create detailed god display using the new rich content
-	create_enhanced_god_display(details_panel, detailed_info)
+	# Use the simpler display function that works directly with god_data
+	# This avoids the complex god content manager which might have data structure issues
+	create_detailed_god_display(details_panel, god_name, god_data)
 
 func create_enhanced_god_display(container: Control, info: Dictionary):
 	var main_vbox = VBoxContainer.new()

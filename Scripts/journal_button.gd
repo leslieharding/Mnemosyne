@@ -110,7 +110,7 @@ func _on_journal_button_pressed():
 		print("Journal created with dedicated CanvasLayer at position: ", journal_instance.position, " size: ", journal_instance.size)
 	
 	# Show journal with proper animation by calling its show_journal method
-	journal_instance.show_journal("mnemosyne")  # Start on Mnemosyne tab
+	journal_instance.show_journal("")  # Start on Mnemosyne tab
 	
 	# Hide notifications when opened
 	hide_notification()

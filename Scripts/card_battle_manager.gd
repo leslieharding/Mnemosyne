@@ -1664,6 +1664,10 @@ func end_game():
 		opponent_is_thinking = false
 		turn_manager.end_game()
 		
+		record_enemy_encounter(false)  
+		record_god_experience()
+		check_god_unlocks()
+		
 		# Add a delay then go to run summary
 		await get_tree().create_timer(3.0).timeout
 		
@@ -3393,6 +3397,11 @@ func remove_card_from_hand(card_index: int):
 	display_player_hand()
 
 func show_reward_screen():
+	# RECORD THE BATTLE RESULTS BEFORE GOING TO REWARDS
+	record_enemy_encounter(true)  # true = victory since we only reach rewards on victory
+	record_god_experience()
+	check_god_unlocks()
+	
 	var params = get_scene_params()
 	
 	# Check for perfect victory using board ownership
