@@ -6,6 +6,8 @@ var player_deck: Array[CardResource] = []
 var selected_deck_index: int = -1
 var selected_card_index: int = -1
 
+var battle_snapshot: Dictionary = {}
+
 # Grid navigation variables
 var current_grid_index: int = -1  # Current selected grid position
 var grid_size: int = 3  # 3x3 grid
@@ -212,8 +214,7 @@ var tutorial_overlay: Control
 var tutorial_modal: AcceptDialog
 var tutorial_panel: PanelContainer
 
-var consecutive_draws: int = 0
-var current_enemy_id: String = ""
+
 
 # Deck power system
 var active_deck_power: DeckDefinition.DeckPowerType = DeckDefinition.DeckPowerType.NONE
@@ -717,23 +718,10 @@ func get_panel_state_name() -> String:
 		PanelState.FADING_OUT: return "FADING_OUT"
 		_: return "UNKNOWN"
 
-func start_game():
-	
-	# Reset consecutive draws counter for each new combat session
-	consecutive_draws = 0
-	current_enemy_id = ""
 
-	# Track which enemy we're fighting
-	var scene_params = get_scene_params()
-	if scene_params.has("current_node"):
-		var node = scene_params["current_node"]
-		current_enemy_id = node.enemy_name if node.enemy_name != "" else "Unknown"
-	elif scene_params.has("opponent"):
-		current_enemy_id = scene_params["opponent"]
-	else:
-		current_enemy_id = "Unknown"
-		
-	print("Starting new combat session against: ", current_enemy_id, " - draws reset to 0")
+func start_game():	
+	
+	create_battle_snapshot()
 	
 	# DO NOT clear run stat growth tracker - we want to preserve growth across battles
 	# Only ensure the tracker knows about the current deck indices
@@ -1596,6 +1584,7 @@ func should_game_end() -> bool:
 	# Game ends if board is full or both players are out of cards
 	return available_slots == 0 or (player_deck.is_empty() and not opponent_manager.has_cards())
 
+# REPLACE the entire end_game() function in Scripts/card_battle_manager.gd
 
 func end_game():
 	# Clean up all tremor visual effects first
@@ -1652,65 +1641,20 @@ func end_game():
 	print("=== GAME ENDED ===")
 	print("Final Score - Player: ", scores.player, " | Opponent: ", scores.opponent)
 	print("Result: ", winner)
-	print("Consecutive draws: ", consecutive_draws)
 	print("==================")
-	# NEW: Check for draw condition FIRST
-	if scores.player == scores.opponent:
-		# Verify we're still fighting the same enemy
-		var battle_params = get_scene_params()
-		var enemy_id = ""
-		if battle_params.has("current_node"):
-			var node = battle_params["current_node"]
-			enemy_id = node.enemy_name if node.enemy_name != "" else "Unknown"
-		elif battle_params.has("opponent"):
-			enemy_id = battle_params["opponent"]
-		else:
-			enemy_id = "Unknown"
-		
-		# Reset draws if this is a different enemy
-		if enemy_id != current_enemy_id:
-			print("Different enemy detected! Resetting draws. Old: ", current_enemy_id, " New: ", enemy_id)
-			consecutive_draws = 0
-			current_enemy_id = enemy_id
-		
-		consecutive_draws += 1
-		print("DRAW detected against ", current_enemy_id, "! Consecutive draws: ", consecutive_draws)
-		
-		if consecutive_draws >= 2:
-			# Two draws in a row = automatic loss
-			print("Two draws in a row - treating as loss")
-			game_status_label.text = "Defeat! Two draws count as a loss!"
-			disable_player_input()
-			opponent_is_thinking = false
-			turn_manager.end_game()
-			
-			# Add a delay then go to run summary as loss
-			await get_tree().create_timer(3.0).timeout
-			
-			# Pass data to summary screen
-			var params = get_scene_params()
-			get_tree().set_meta("scene_params", {
-				"god": params.get("god", current_god),
-				"deck_index": params.get("deck_index", 0),
-				"victory": false
-			})
-			TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
-			return
-		else:
-			# First draw - restart the round
-			print("First draw - restarting round")
-			game_status_label.text = "Draw! Restarting round..."
-			disable_player_input()
-			opponent_is_thinking = false
-			turn_manager.end_game()
-			
-			# Show draw message briefly then restart
-			await get_tree().create_timer(2.0).timeout
-			restart_round()
-			return
 	
-	# Reset consecutive draws counter on non-draw result
-	consecutive_draws = 0
+	# SIMPLIFIED DRAW HANDLING - No more consecutive draw tracking
+	if scores.player == scores.opponent:
+		print("Draw detected - restarting battle from snapshot")
+		game_status_label.text = "Draw! Restarting battle..."
+		disable_player_input()
+		opponent_is_thinking = false
+		turn_manager.end_game()
+		
+		# Show draw message briefly then restart
+		await get_tree().create_timer(2.0).timeout
+		restart_round()
+		return
 	
 	# Check for loss condition
 	if scores.opponent > scores.player:
@@ -1731,6 +1675,9 @@ func end_game():
 			"victory": false
 		})
 		TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
+		
+		# Clear the battle snapshot since the battle is over
+		clear_battle_snapshot()
 		return
 	
 	# Player won - check if this completes the run
@@ -1764,55 +1711,27 @@ func end_game():
 				"victory": true
 			})
 			TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
+			
+			# Clear the battle snapshot since the battle is over
+			clear_battle_snapshot()
 			return
 	
 	# Not the final boss - continue with reward screen
 	show_reward_screen()
+	
+	# Clear the battle snapshot since the battle is over
+	clear_battle_snapshot()
 
 func restart_round():
 	print("=== RESTARTING ROUND DUE TO DRAW ===")
 	
-	# Store original game parameters for restoration
-	var params = get_scene_params()
-	var god_name = params.get("god", current_god)
-	var deck_index = params.get("deck_index", 0)
-	
-	print("Restoring: God=", god_name, " DeckIndex=", deck_index)
-	
-	# Clear all visual effects first
-	if visual_effects_manager:
-		visual_effects_manager.clear_all_tremor_shake_effects(grid_slots)
-		visual_effects_manager.clear_all_hunt_effects(grid_slots)
-	
-	# Clear all special game state
-	clear_all_hunt_traps()
-	active_passive_abilities.clear()
-	active_tremors.clear()
-	grid_to_collection_index.clear()
-	clear_all_sanctuary_effects()
-	clear_all_coerce_constraints()
-	clear_all_camouflage_effects()
-
-	
-	# Clear the grid completely
-	for i in range(grid_slots.size()):
-		if grid_occupied[i]:
-			var slot = grid_slots[i]
-			# Remove all children (cards, effects, etc.)
-			for child in slot.get_children():
-				child.queue_free()
-		
-		# Reset grid state
-		grid_occupied[i] = false
-		grid_ownership[i] = Owner.NONE
-		grid_card_data[i] = null
-		
-		# Reset slot styling
-		var slot = grid_slots[i]
-		restore_slot_original_styling(i)
-	
-	# Wait for cleanup to complete
-	await get_tree().process_frame
+	# Use snapshot restoration instead of manual deck restoration
+	var restoration_success = restore_battle_from_snapshot()
+	if not restoration_success:
+		print("ERROR: Failed to restore from battle snapshot!")
+		# Fallback to end game as loss
+		end_game()
+		return
 	
 	# Reset card selection state
 	selected_card_index = -1
@@ -1822,145 +1741,24 @@ func restart_round():
 	opponent_is_thinking = false
 	hunt_mode_active = false
 	
-	# CRITICAL: Properly restore original decks
-	var restoration_success = restore_original_decks_properly(god_name, deck_index)
-	if not restoration_success:
-		print("ERROR: Failed to restore decks properly!")
-		# Fallback to end game as loss
-		end_game()
-		return
-	
-	# Validate deck restoration
-	if player_deck.is_empty() or deck_card_indices.is_empty():
-		print("ERROR: Player deck is empty after restoration!")
-		end_game()
-		return
-	
-	if not opponent_manager.has_cards():
-		print("ERROR: Opponent deck is empty after restoration!")
-		end_game()
-		return
-	
-	# Re-apply deck power effects (sun positions, etc.)
-	reapply_deck_powers()
-	
-	# Redisplay player hand with proper card data
+	# Redisplay player hand with restored card data
 	display_player_hand()
 	
 	# Verify hand display worked
 	await get_tree().process_frame
 	var hand_container_cards = hand_container.get_node_or_null("CardsContainer")
 	if not hand_container_cards or hand_container_cards.get_child_count() == 0:
-		print("ERROR: Failed to display player hand after restart!")
+		print("ERROR: Failed to display player hand after snapshot restore!")
 		end_game()
 		return
 	
-	print("Round restart successful - starting new coin flip")
+	print("Round restart from snapshot successful - starting new coin flip")
 	
 	# Brief pause to show result, then start new game
 	await get_tree().create_timer(2.0).timeout
 	turn_manager.start_game()
 
 
-func restore_original_decks_properly(god_name: String, deck_index: int) -> bool:
-	print("=== RESTORING ORIGINAL DECKS ===")
-	
-	# Restore player deck with full validation
-	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
-	var collection: GodCardCollection = load(collection_path)
-	
-	if not collection:
-		print("ERROR: Failed to load collection: ", collection_path)
-		return false
-	
-	if deck_index >= collection.decks.size():
-		print("ERROR: Invalid deck index ", deck_index, " for ", god_name)
-		return false
-	
-	# Get the original deck definition
-	var deck_def = collection.decks[deck_index]
-	
-	# Restore deck card indices (this is critical!)
-	deck_card_indices = deck_def.card_indices.duplicate()
-	
-	# Restore the actual cards
-	player_deck = collection.get_deck(deck_index)
-	
-	print("Restored player deck: ", player_deck.size(), " cards")
-	print("Restored deck indices: ", deck_card_indices)
-	
-	# Validate restoration
-	if player_deck.size() != deck_card_indices.size():
-		print("ERROR: Deck size mismatch after restoration!")
-		return false
-	
-	if player_deck.size() == 0:
-		print("ERROR: Empty deck after restoration!")
-		return false
-	
-	# Restore opponent deck
-	var opponent_restoration = restore_opponent_deck()
-	if not opponent_restoration:
-		print("ERROR: Failed to restore opponent deck!")
-		return false
-	
-	print("=== DECK RESTORATION SUCCESSFUL ===")
-	return true
-
-func restore_opponent_deck() -> bool:
-	print("Restoring opponent deck...")
-	
-	# Re-setup opponent based on current parameters
-	var params = get_scene_params()
-	
-	if is_tutorial_mode:
-		setup_chronos_opponent()
-	else:
-		if params.has("current_node"):
-			var current_node = params["current_node"]
-			var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
-			var enemy_difficulty = current_node.enemy_difficulty
-			
-			print("Restoring opponent: ", enemy_name, " (difficulty ", enemy_difficulty, ")")
-			opponent_manager.setup_opponent(enemy_name, enemy_difficulty)
-		else:
-			print("No enemy data found, using default Shadow Acolyte")
-			opponent_manager.setup_opponent("Shadow Acolyte", 0)
-	
-	# Validate opponent restoration
-	if not opponent_manager.has_cards():
-		print("ERROR: Opponent manager has no cards after restoration!")
-		return false
-	
-	print("Opponent deck restored: ", opponent_manager.get_remaining_cards(), " cards")
-	return true
-
-func reapply_deck_powers():
-	print("=== REAPPLYING DECK POWERS ===")
-	
-	# Re-initialize deck power effects
-	var params = get_scene_params()
-	var god_name = params.get("god", current_god)
-	var deck_index = params.get("deck_index", 0)
-	
-	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
-	var collection: GodCardCollection = load(collection_path)
-	
-	if collection and deck_index < collection.decks.size():
-		var deck_def = collection.decks[deck_index]
-		initialize_deck_power(deck_def)
-	
-	# Re-initialize enemy deck power
-	if not is_tutorial_mode and params.has("current_node"):
-		var current_node = params["current_node"]
-		var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
-		var enemy_difficulty = current_node.enemy_difficulty
-		
-		var deck_def = opponent_manager.get_current_deck_definition()
-		if deck_def and deck_def.deck_power_type != EnemyDeckDefinition.EnemyDeckPowerType.NONE:
-			initialize_enemy_deck_power(deck_def)
-	
-	print("Deck powers reapplied successfully")
 
 func _on_tutorial_finished():
 	print("Tutorial battle completed, transitioning to post-battle cutscene")
@@ -7182,3 +6980,209 @@ func hide_camouflaged_card(card_display: CardDisplay):
 		print("AFTER hiding - mouse_filter: ", card_display.panel.mouse_filter)
 	
 	print("Card successfully camouflaged and mouse input set to pass through")
+
+
+func create_battle_snapshot():
+	print("=== CREATING BATTLE SNAPSHOT ===")
+	
+	battle_snapshot = {
+		"experience_data": {},
+		"stat_growth_data": {},
+		"deck_power_state": {},
+		"enemy_deck_power_state": {},
+		"player_deck": [],
+		"deck_card_indices": [],
+		"god_name": current_god,
+		"deck_index": selected_deck_index,
+		"battle_params": get_scene_params()
+	}
+	
+	# Snapshot experience tracker state
+	var exp_tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+	if exp_tracker:
+		battle_snapshot["experience_data"] = exp_tracker.get_all_experience().duplicate(true)
+		print("Snapshotted experience data: ", battle_snapshot["experience_data"])
+	
+	# Snapshot stat growth tracker state  
+	var growth_tracker = get_node_or_null("/root/RunStatGrowthTrackerAutoload")
+	if growth_tracker:
+		battle_snapshot["stat_growth_data"] = growth_tracker.run_stat_growth.duplicate()
+		print("Snapshotted stat growth data: ", battle_snapshot["stat_growth_data"])
+	
+	# Snapshot deck power state
+	battle_snapshot["deck_power_state"] = {
+		"active_deck_power": active_deck_power,
+		"misdirection_used": misdirection_used,
+		"sunlit_positions": sunlit_positions.duplicate() if sunlit_positions else [],
+		"darkness_shroud_active": darkness_shroud_active,
+		"soothe_active": soothe_active,
+		"visual_stat_inversion_active": visual_stat_inversion_active,
+		"is_hermes_boss_battle": is_hermes_boss_battle,
+		"fimbulwinter_boss_active": fimbulwinter_boss_active
+	}
+	
+	# Snapshot enemy deck power state
+	battle_snapshot["enemy_deck_power_state"] = {
+		"active_enemy_deck_power": active_enemy_deck_power
+	}
+	
+	# Snapshot player deck (deep copy the card resources)
+	battle_snapshot["player_deck"] = []
+	for card in player_deck:
+		if card:
+			var card_copy = card.duplicate()
+			battle_snapshot["player_deck"].append(card_copy)
+		else:
+			battle_snapshot["player_deck"].append(null)
+	
+	# Snapshot deck card indices
+	battle_snapshot["deck_card_indices"] = deck_card_indices.duplicate()
+	
+	# NOTE: No opponent deck snapshot needed - we just reload from definition
+	# The opponent always has the same deck, so we don't need to snapshot it
+	
+	print("Battle snapshot created successfully with ", battle_snapshot.keys().size(), " data categories")
+	
+	
+	
+func restore_battle_from_snapshot() -> bool:
+	print("=== RESTORING BATTLE FROM SNAPSHOT ===")
+	
+	if battle_snapshot.is_empty():
+		print("ERROR: No battle snapshot available!")
+		return false
+	
+	# Clear all visual effects first
+	if visual_effects_manager:
+		visual_effects_manager.clear_all_tremor_shake_effects(grid_slots)
+		visual_effects_manager.clear_all_hunt_effects(grid_slots)
+	
+	# Clear all special game state
+	clear_all_hunt_traps()
+	active_passive_abilities.clear()
+	active_tremors.clear()
+	grid_to_collection_index.clear()
+	clear_all_sanctuary_effects()
+	clear_all_coerce_constraints()
+	clear_all_camouflage_effects()
+	
+	# Clear the grid completely
+	for i in range(grid_slots.size()):
+		if grid_occupied[i]:
+			var slot = grid_slots[i]
+			# Remove all children (cards, effects, etc.)
+			for child in slot.get_children():
+				child.queue_free()
+		
+		# Reset grid state
+		grid_occupied[i] = false
+		grid_ownership[i] = Owner.NONE
+		grid_card_data[i] = null
+		
+		# Reset slot styling
+		var slot = grid_slots[i]
+		restore_slot_original_styling(i)
+	
+	# Wait for cleanup to complete - NO AWAIT HERE since this is not async
+	# await get_tree().process_frame  # REMOVE THIS LINE
+	
+	# Restore experience tracker state
+	var exp_tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+	if exp_tracker and battle_snapshot.has("experience_data"):
+		exp_tracker.run_experience = battle_snapshot["experience_data"].duplicate(true)
+		exp_tracker.current_deck_indices = battle_snapshot["deck_card_indices"].duplicate()
+		print("Restored experience tracker to snapshot state")
+	
+	# Restore stat growth tracker state
+	var growth_tracker = get_node_or_null("/root/RunStatGrowthTrackerAutoload")
+	if growth_tracker and battle_snapshot.has("stat_growth_data"):
+		growth_tracker.run_stat_growth = battle_snapshot["stat_growth_data"].duplicate()
+		growth_tracker.current_deck_indices = battle_snapshot["deck_card_indices"].duplicate()
+		print("Restored stat growth tracker to snapshot state")
+	
+	# Restore deck power state
+	if battle_snapshot.has("deck_power_state"):
+		var deck_power_state = battle_snapshot["deck_power_state"]
+		active_deck_power = deck_power_state.get("active_deck_power", DeckDefinition.DeckPowerType.NONE)
+		misdirection_used = deck_power_state.get("misdirection_used", false)
+		sunlit_positions = deck_power_state.get("sunlit_positions", []).duplicate()
+		darkness_shroud_active = deck_power_state.get("darkness_shroud_active", false)
+		soothe_active = deck_power_state.get("soothe_active", false)
+		visual_stat_inversion_active = deck_power_state.get("visual_stat_inversion_active", false)
+		is_hermes_boss_battle = deck_power_state.get("is_hermes_boss_battle", false)
+		fimbulwinter_boss_active = deck_power_state.get("fimbulwinter_boss_active", false)
+		print("Restored deck power state")
+	
+	# Restore enemy deck power state
+	if battle_snapshot.has("enemy_deck_power_state"):
+		var enemy_power_state = battle_snapshot["enemy_deck_power_state"]
+		active_enemy_deck_power = enemy_power_state.get("active_enemy_deck_power", EnemyDeckDefinition.EnemyDeckPowerType.NONE)
+		print("Restored enemy deck power state")
+	
+	# Restore player deck
+	if battle_snapshot.has("player_deck"):
+		player_deck = []
+		for card_data in battle_snapshot["player_deck"]:
+			if card_data:
+				player_deck.append(card_data.duplicate())
+			else:
+				player_deck.append(null)
+		print("Restored player deck: ", player_deck.size(), " cards")
+	
+	# Restore deck card indices
+	if battle_snapshot.has("deck_card_indices"):
+		deck_card_indices = battle_snapshot["deck_card_indices"].duplicate()
+		print("Restored deck card indices: ", deck_card_indices)
+	
+	# Restore opponent deck - SIMPLIFIED: Just reload from original opponent definition
+	restore_opponent_deck_from_snapshot()
+	
+	# Re-apply visual effects for powers that should be active based on restored state
+	reapply_battle_visual_effects()
+	
+	print("Battle restoration from snapshot completed successfully")
+	return true
+
+
+func reapply_battle_visual_effects():
+	print("=== REAPPLYING BATTLE VISUAL EFFECTS ===")
+	
+	# Re-apply sunlit styling if sun power is active
+	if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER:
+		for position in sunlit_positions:
+			apply_sunlit_styling(position)
+		print("Re-applied sunlit styling to positions: ", sunlit_positions)
+	
+	# CRITICAL: Re-apply enemy deck powers that affect player powers
+	if active_enemy_deck_power == EnemyDeckDefinition.EnemyDeckPowerType.DARKNESS_SHROUD:
+		print("Re-applying Darkness Shroud effect after battle restart")
+		setup_darkness_shroud()  # This will counter sun power again
+	
+	print("Battle visual effects and enemy powers reapplied")
+
+# Clear snapshot when battle ends (win/loss)
+func clear_battle_snapshot():
+	battle_snapshot.clear()
+	print("Battle snapshot cleared")
+
+func restore_opponent_deck_from_snapshot():
+	print("Restoring opponent deck from original definition...")
+	
+	# Re-setup opponent based on current parameters (same as original system)
+	var params = get_scene_params()
+	
+	if is_tutorial_mode:
+		setup_chronos_opponent()
+	else:
+		if params.has("current_node"):
+			var current_node = params["current_node"]
+			var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
+			var enemy_difficulty = current_node.enemy_difficulty
+			
+			print("Restoring opponent: ", enemy_name, " (difficulty ", enemy_difficulty, ")")
+			opponent_manager.setup_opponent(enemy_name, enemy_difficulty)
+		else:
+			print("No enemy data found, using default Shadow Acolyte")
+			opponent_manager.setup_opponent("Shadow Acolyte", 0)
+	
+	print("Opponent deck restored: ", opponent_manager.get_remaining_cards(), " cards")
