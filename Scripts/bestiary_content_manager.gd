@@ -14,14 +14,7 @@ var enemy_profiles: Dictionary = {
 			"Ladon: Guard of the golden apples of the Hesperides, the fruit that confers immortality. Ladon would prevent mortals from getting close to the tree until Heracles cleared the way. Later a golden apple with the phrase ‘to the fairest’ on it, would send the known world to war.",
 			"Calcian Dragon: Medea’s soporific potion would make this beast easy pickings for the hero Jason. He would emerge with the golden fleece ecstatic. Having successfully led the Argo’s voyage and with a wildly devoted wife he set off for home. To tragedy. "
 		],
-		"tactical_notes": [
-			"",
-			"The Calcian Dragon slumbers under the effect of Medea’s potion making it an easy target for capture experience farming.",
-			"",
-			"Ladon has an extreme north-facing power level. Filling the southern slots will result in it being relatively useless.",
-			"",
-			""
-		]
+		
 	},
 	
 	"Niobes Brood": {
@@ -33,14 +26,7 @@ var enemy_profiles: Dictionary = {
 			"Such sacrilege would not go unanswered. Apollo defending his mothers pride would slay Niobe’s 7 daughters and 7 sons",
 			"Forever bound in her grief Niobe was turned to stone, out of which tears still fall to this day"
 		],
-		"tactical_notes": [
-			"",
-			"Just like every family, this lot doesn't get along",
-			"",
-			"Target the faltering family members and they will fight on your side",
-			"",
-			""
-		]
+		
 	},
 	
 	"Cultists of Nyx": {
@@ -52,14 +38,7 @@ var enemy_profiles: Dictionary = {
 			"",
 			""
 		],
-		"tactical_notes": [
-			"",
-			"",
-			"",
-			"",
-			"",
-			""
-		]
+		
 	},
 	
 	"The Wrong Note": {
@@ -71,14 +50,7 @@ var enemy_profiles: Dictionary = {
 			"",
 			""
 		],
-		"tactical_notes": [
-			"",
-			"",
-			"",
-			"",
-			"",
-			""
-		]
+		
 	},
 	
 	"The Plague": {
@@ -90,14 +62,7 @@ var enemy_profiles: Dictionary = {
 			"",
 			""
 		],
-		"tactical_notes": [
-			"",
-			"",
-			"",
-			"",
-			"",
-			""
-		]
+		
 	},
 	
 	"Chronos": {
@@ -109,14 +74,7 @@ var enemy_profiles: Dictionary = {
 			"",
 			""
 		],
-		"tactical_notes": [
-			"",
-			"",
-			"",
-			"",
-			"",
-			""
-		]
+		
 	},
 	
 	"?????": {
@@ -128,14 +86,7 @@ var enemy_profiles: Dictionary = {
 			"",
 			""
 		],
-		"tactical_notes": [
-			"",
-			"",
-			"",
-			"",
-			"",
-			""
-		]
+		
 	}
 }
 
@@ -158,7 +109,6 @@ func get_enemy_profile(enemy_name: String, memory_level: int, encounters: int = 
 		"defeats": encounters - victories,
 		"win_rate": win_rate,
 		"description": get_description(profile, memory_level, win_rate),
-		"tactical_note": get_tactical_note(profile, memory_level, win_rate),
 		"visible_stats": get_visible_stats(memory_level)
 	}
 
@@ -196,38 +146,7 @@ func get_performance_context(win_rate: float) -> String:
 	else:
 		return "This foe has proven particularly formidable."
 
-# Get tactical note
-func get_tactical_note(profile: Dictionary, memory_level: int, win_rate: float) -> String:
-	if memory_level < 2:
-		return ""
-	
-	var complete_tactical = ""
-	
-	# Build up tactical notes from level 2 to current memory level
-	for level in range(2, memory_level + 1):  # Start from level 2 since tactical info starts there
-		if level < profile["tactical_notes"].size():
-			var level_tactical = profile["tactical_notes"][level]
-			if level_tactical != "":  # Only add non-empty tactical entries
-				if complete_tactical != "":
-					complete_tactical += "\n\n"  # Add spacing between tactical sections
-				complete_tactical += level_tactical
-	
-	# Add win rate specific advice for levels 3+
-	if memory_level >= 3 and complete_tactical != "":
-		var advice = get_tactical_advice(win_rate)
-		if advice != "":
-			complete_tactical += "\n\n" + advice
-	
-	return complete_tactical
 
-# Get tactical advice based on win rate
-func get_tactical_advice(win_rate: float) -> String:
-	if win_rate >= 0.7:
-		return "Continue using proven strategies."
-	elif win_rate >= 0.4:
-		return "Consider adapting your approach."
-	else:
-		return "Significant tactical revision recommended."
 
 # Get visible stats based on memory level
 func get_visible_stats(memory_level: int) -> Array[String]:
@@ -267,7 +186,6 @@ func get_default_profile(enemy_name: String, memory_level: int) -> Dictionary:
 		"memory_level": memory_level,
 		"memory_description": get_memory_level_description(memory_level),
 		"description": "An unknown adversary requiring further study.",
-		"tactical_note": "",
 		"visible_stats": get_visible_stats(memory_level)
 	}
 

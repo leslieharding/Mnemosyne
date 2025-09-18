@@ -419,24 +419,6 @@ func create_detailed_enemy_display(container: Control, info: Dictionary):
 		
 		main_vbox.add_child(stats_container)
 	
-	# Tactical information (higher memory levels)
-	if "tactical_note" in info and info["tactical_note"] != "":
-		var separator3 = HSeparator.new()
-		main_vbox.add_child(separator3)
-		
-		var tactical_title = Label.new()
-		tactical_title.text = "Tactical Analysis"
-		tactical_title.add_theme_font_size_override("font_size", 16)
-		tactical_title.add_theme_color_override("font_color", Color("#DDDDDD"))
-		main_vbox.add_child(tactical_title)
-		
-		var tactical_label = Label.new()
-		tactical_label.text = info["tactical_note"]
-		tactical_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		tactical_label.add_theme_font_size_override("font_size", 12)
-		tactical_label.add_theme_color_override("font_color", Color("#BBBBBB"))
-		main_vbox.add_child(tactical_label)
-	
 	# Add main container to the details panel
 	container.add_child(main_vbox)
 
@@ -668,27 +650,7 @@ func create_enhanced_god_display(container: Control, info: Dictionary):
 	
 	main_vbox.add_child(lore_container)
 	
-	# === TACTICAL ADVICE SECTION === (Level 2+)
-	if "tactical_advice" in info["visible_content"] and info["tactical_advice"] != "":
-		var separator2 = HSeparator.new()
-		main_vbox.add_child(separator2)
-		
-		var tactical_container = VBoxContainer.new()
-		
-		var tactical_title = Label.new()
-		tactical_title.text = "Tactical Mastery"
-		tactical_title.add_theme_font_size_override("font_size", 18)
-		tactical_title.add_theme_color_override("font_color", Color("#FF6347"))  # Tomato red
-		tactical_container.add_child(tactical_title)
-		
-		var tactical_label = Label.new()
-		tactical_label.text = info["tactical_advice"]
-		tactical_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		tactical_label.add_theme_font_size_override("font_size", 13)
-		tactical_label.add_theme_color_override("font_color", Color("#CCCCCC"))
-		tactical_container.add_child(tactical_label)
-		
-		main_vbox.add_child(tactical_container)
+	
 	
 	# === DIVINE INSIGHTS SECTION === (Level 4+)
 	if "divine_insights" in info["visible_content"] and info["divine_insights"] != "":
