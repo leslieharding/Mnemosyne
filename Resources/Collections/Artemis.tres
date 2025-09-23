@@ -75,6 +75,7 @@ deck_name = "The Hunt"
 deck_description = "The beauty and precision of the singular killing blow."
 card_indices = Array[int]([0, 1, 2, 3, 4])
 is_starter_deck = true
+deck_power_type = 5
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [resource]

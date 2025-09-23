@@ -3154,6 +3154,7 @@ func place_card_on_grid():
 		# Show notification about the extra turn
 		if notification_manager:
 			notification_manager.show_notification("🎯 Coordination: You play again!")	
+		return	
 	
 	# Switch turns only if no special modes are active
 	turn_manager.next_turn()
