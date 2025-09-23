@@ -96,6 +96,12 @@ var ordain_target_style: StyleBoxFlat
 var active_ordain_owner: Owner = Owner.NONE  # Track who created the ordain effect
 var active_ordain_turns_remaining: int = 0  # Track how many turns until ordain expires
 
+# Coordinate power system
+var coordinate_used: bool = false
+var is_coordination_active: bool = false
+var coordinate_button: Button = null
+
+
 # Seasons power system
 enum Season {
 	SUMMER,
@@ -2206,7 +2212,9 @@ func initialize_deck_power(deck_def: DeckDefinition):
 		DeckDefinition.DeckPowerType.MISDIRECTION_POWER:
 			setup_misdirection_power()
 		DeckDefinition.DeckPowerType.SEASONS_POWER:
-			setup_seasons_power()	
+			setup_seasons_power()
+		DeckDefinition.DeckPowerType.COORDINATE_POWER:
+			setup_coordinate_power()		
 		DeckDefinition.DeckPowerType.NONE:
 			print("No deck power for this deck")
 		_:
@@ -7195,3 +7203,66 @@ func restore_opponent_deck_from_snapshot():
 			opponent_manager.setup_opponent("Shadow Acolyte", 0)
 	
 	print("Opponent deck restored: ", opponent_manager.get_remaining_cards(), " cards")
+
+func setup_coordinate_power():
+	print("Setting up Coordinate power")
+	coordinate_used = false
+	is_coordination_active = false
+	create_coordinate_button()
+
+func create_coordinate_button():
+	# Create coordinate button similar to seasons status label
+	coordinate_button = Button.new()
+	coordinate_button.name = "CoordinateButton"
+	coordinate_button.text = "🎯 Coordinate"
+	coordinate_button.custom_minimum_size = Vector2(150, 40)
+	coordinate_button.add_theme_font_size_override("font_size", 14)
+	coordinate_button.add_theme_color_override("font_color", Color.WHITE)
+	
+	# Position it in the same area as seasons label (around position 10, 100)
+	coordinate_button.position = Vector2(10, 100)
+	
+	# Connect the button signal
+	coordinate_button.pressed.connect(_on_coordinate_button_pressed)
+	
+	# Add to scene
+	add_child(coordinate_button)
+	
+	print("Coordinate button created and added to battle scene")
+
+func _on_coordinate_button_pressed():
+	activate_coordinate_power()
+
+func activate_coordinate_power():
+	if coordinate_used:
+		print("Coordinate power already used this battle")
+		if notification_manager:
+			notification_manager.show_notification("Coordinate already used this battle")
+		return false
+	
+	if not active_deck_power == DeckDefinition.DeckPowerType.COORDINATE_POWER:
+		print("Coordinate power not available for this deck")
+		return false
+	
+	# Can only use during player's turn
+	if turn_manager.current_player != TurnManager.Player.HUMAN:
+		print("Coordinate can only be used during your turn")
+		if notification_manager:
+			notification_manager.show_notification("Coordinate can only be used during your turn")
+		return false
+	
+	print("=== COORDINATE POWER ACTIVATED ===")
+	coordinate_used = true
+	is_coordination_active = true
+	
+	# Update button appearance
+	if coordinate_button:
+		coordinate_button.disabled = true
+		coordinate_button.modulate = Color(0.5, 0.5, 0.5)
+		coordinate_button.text = "🎯 Coordinate (Used)"
+	
+	# Show notification
+	if notification_manager:
+		notification_manager.show_notification("🎯 Coordinate activated! You will play twice in a row.")
+	
+	return true
