@@ -3147,6 +3147,13 @@ func place_card_on_grid():
 	if race_mode_active:
 		print("Race mode active - staying on turn until race completes")
 		return
+	if is_coordination_active and turn_manager.current_player == TurnManager.Player.HUMAN:
+		print("🎯 Coordination active - player gets another turn!")
+		is_coordination_active = false  # Reset after giving the extra turn
+		
+		# Show notification about the extra turn
+		if notification_manager:
+			notification_manager.show_notification("🎯 Coordination: You play again!")	
 	
 	# Switch turns only if no special modes are active
 	turn_manager.next_turn()
@@ -7011,7 +7018,9 @@ func create_battle_snapshot():
 		"deck_card_indices": [],
 		"god_name": current_god,
 		"deck_index": selected_deck_index,
-		"battle_params": get_scene_params()
+		"battle_params": get_scene_params(),
+		"coordinate_used": coordinate_used,
+		"is_coordination_active": is_coordination_active
 	}
 	
 	# Snapshot experience tracker state
@@ -7128,6 +7137,9 @@ func restore_battle_from_snapshot() -> bool:
 		visual_stat_inversion_active = deck_power_state.get("visual_stat_inversion_active", false)
 		is_hermes_boss_battle = deck_power_state.get("is_hermes_boss_battle", false)
 		fimbulwinter_boss_active = deck_power_state.get("fimbulwinter_boss_active", false)
+		coordinate_used = deck_power_state.get("coordinate_used", false)
+		is_coordination_active = deck_power_state.get("is_coordination_active", false)
+		
 		print("Restored deck power state")
 	
 	# Restore enemy deck power state
