@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="TorchesAbility" load_steps=2 format=3 uid="uid://dwxn4cem2i5is"]
+
+[ext_resource type="Script" uid="uid://bheirx7xq22eb" path="res://Resources/Abilities/torches_ability.gd" id="1_hpofs"]
+
+[resource]
+script = ExtResource("1_hpofs")
+ability_name = "Torches"
+description = "Attacks all non-adjacent slots."
+metadata/_custom_type_script = "uid://bheirx7xq22eb"

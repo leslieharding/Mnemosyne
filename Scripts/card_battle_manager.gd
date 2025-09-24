@@ -6910,29 +6910,42 @@ func move_camouflaged_card(from_slot: int, to_slot: int, card: CardResource, car
 
 func reveal_camouflaged_card(card_display: CardDisplay):
 	"""Reveal a camouflaged card (remove visual hiding effects)"""
-	if card_display and card_display.panel:
-		# Restore full opacity
-		card_display.modulate = Color(1, 1, 1, 1)
-		
-		# CRITICAL FIX: Restore normal mouse input handling
-		card_display.panel.mouse_filter = Control.MOUSE_FILTER_PASS
-		print("Restored camouflaged card mouse_filter to PASS")
-		
-		# Restore normal ownership styling
-		var grid_position = -1
-		for i in range(grid_slots.size()):
-			if get_card_display_at_position(i) == card_display:
-				grid_position = i
-				break
-		
-		if grid_position != -1:
-			var owner = grid_ownership[grid_position]
-			if owner == Owner.PLAYER:
-				card_display.panel.add_theme_stylebox_override("panel", player_card_style)
-			else:
-				card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
-		
-		print("Revealed camouflaged card: ", card_display.get_card_data().card_name if card_display.get_card_data() else "Unknown")
+	# Validate the card display still exists and is valid
+	if not is_instance_valid(card_display):
+		print("reveal_camouflaged_card: Card display is no longer valid")
+		return
+	
+	if not card_display.panel:
+		print("reveal_camouflaged_card: Card display panel is null")
+		return
+	
+	# Check if panel is still valid (not freed)
+	if not is_instance_valid(card_display.panel):
+		print("reveal_camouflaged_card: Card display panel has been freed")
+		return
+	
+	# Restore full opacity
+	card_display.modulate = Color(1, 1, 1, 1)
+	
+	# CRITICAL FIX: Restore normal mouse input handling
+	card_display.panel.mouse_filter = Control.MOUSE_FILTER_PASS
+	print("Restored camouflaged card mouse_filter to PASS")
+	
+	# Restore normal ownership styling
+	var grid_position = -1
+	for i in range(grid_slots.size()):
+		if get_card_display_at_position(i) == card_display:
+			grid_position = i
+			break
+	
+	if grid_position != -1:
+		var owner = grid_ownership[grid_position]
+		if owner == Owner.PLAYER:
+			card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+		else:
+			card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+	
+	print("Revealed camouflaged card: ", card_display.get_card_data().card_name if card_display.get_card_data() else "Unknown")
 
 func process_camouflage_turn_end():
 	"""Process camouflage effects at the end of each turn"""

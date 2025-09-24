@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=32 format=3 uid="uid://dgxi7oww6yrg0"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=34 format=3 uid="uid://dgxi7oww6yrg0"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_stdfb"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_0nxk6"]
@@ -11,21 +11,17 @@
 [ext_resource type="Script" uid="uid://bsyjru6fxhmp5" path="res://Resources/Abilities/cultivate_ability.gd" id="6_0ni4c"]
 [ext_resource type="Script" uid="uid://46m7rkeu3yy6" path="res://Resources/Abilities/enrich_ability.gd" id="7_wun1n"]
 [ext_resource type="Script" uid="uid://c8h2thhm30b1n" path="res://Resources/Abilities/retaliate_ability.gd" id="8_f4d4a"]
+[ext_resource type="Script" uid="uid://bheirx7xq22eb" path="res://Resources/Abilities/torches_ability.gd" id="10_dqtp2"]
 
 [sub_resource type="Resource" id="Resource_sf7va"]
 script = ExtResource("3_5rr7c")
 ability_name = "Queen Of The Underworld"
 description = "On play summon a random ally from the underworld."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://pi7ejymr8slf"
 
 [sub_resource type="Resource" id="Resource_44pn2"]
 script = ExtResource("3_34bjj")
-level = 1
-values = Array[int]([1, 1, 1, 1])
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_sf7va")])
-description = ""
 metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 
 [sub_resource type="Resource" id="Resource_0o55e"]
@@ -33,15 +29,12 @@ script = ExtResource("3_5rr7c")
 ability_name = "Queen Of The Underworld"
 description = "On play choose an ally from the underworld to summon."
 unlock_level = 2
-trigger_condition = 0
 metadata/_custom_type_script = "uid://pi7ejymr8slf"
 
 [sub_resource type="Resource" id="Resource_58xlt"]
 script = ExtResource("3_34bjj")
 level = 2
-values = Array[int]([1, 1, 1, 1])
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_0o55e")])
-description = ""
 metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 
 [sub_resource type="Resource" id="Resource_xcclb"]
@@ -49,23 +42,17 @@ script = ExtResource("3_5rr7c")
 ability_name = "Queen Of The Underworld"
 description = "On play choose an ally from the underworld to summon."
 unlock_level = 2
-trigger_condition = 0
 metadata/_custom_type_script = "uid://pi7ejymr8slf"
 
 [sub_resource type="Resource" id="Resource_uk8b8"]
 script = ExtResource("3_34bjj")
 level = 3
-values = Array[int]([1, 1, 1, 1])
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_xcclb")])
-description = ""
 metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 
 [sub_resource type="Resource" id="Resource_5rr7c"]
 script = ExtResource("1_stdfb")
 card_name = "Persephone"
-values = Array[int]([1, 1, 1, 1])
-description = ""
-abilities = Array[ExtResource("2_0nxk6")]([])
 level_data = Array[ExtResource("3_34bjj")]([SubResource("Resource_44pn2"), SubResource("Resource_58xlt"), SubResource("Resource_uk8b8")])
 uses_level_progression = true
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -74,80 +61,56 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 script = ExtResource("5_rjcyb")
 ability_name = "Grow"
 description = "On play, this card gains +1 to all stats for the entire run"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://u1ucm0sox8pa"
 
 [sub_resource type="Resource" id="Resource_rjcyb"]
 script = ExtResource("1_stdfb")
 card_name = "Triptolemus"
-values = Array[int]([1, 1, 1, 1])
-description = ""
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_clfq6")])
-level_data = Array[ExtResource("3_34bjj")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_20mgd"]
 script = ExtResource("6_0ni4c")
 ability_name = "Cultivate"
 description = "If still owned, this card gains 10 experience at the start of each of your turns"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://bsyjru6fxhmp5"
 
 [sub_resource type="Resource" id="Resource_0ni4c"]
 script = ExtResource("1_stdfb")
 card_name = "Iasion"
-values = Array[int]([1, 1, 1, 1])
-description = ""
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_20mgd")])
-level_data = Array[ExtResource("3_34bjj")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_o6j45"]
 script = ExtResource("7_wun1n")
 ability_name = "Enrich"
 description = "On play, choose a slot. For the remainder of the run this slot will boost the stats of friendly cards by 1"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://46m7rkeu3yy6"
 
 [sub_resource type="Resource" id="Resource_wun1n"]
 script = ExtResource("1_stdfb")
 card_name = "Metanira"
-values = Array[int]([1, 1, 1, 1])
-description = ""
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_o6j45")])
-level_data = Array[ExtResource("3_34bjj")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_n75mf"]
 script = ExtResource("8_f4d4a")
 ability_name = "Retaliate"
 description = "When this card is captured, it weakens the attacking card"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://c8h2thhm30b1n"
 
 [sub_resource type="Resource" id="Resource_f4d4a"]
 script = ExtResource("1_stdfb")
 card_name = "Cyane"
-values = Array[int]([1, 1, 1, 1])
-description = ""
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_n75mf")])
-level_data = Array[ExtResource("3_34bjj")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_k8dqu"]
 script = ExtResource("4_34bjj")
 ability_name = "Extended Range"
 description = "Attacks in all directions"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://43v8bwokc47i"
 
 [sub_resource type="Resource" id="Resource_5fthg"]
@@ -156,8 +119,6 @@ card_name = "Cerberus"
 values = Array[int]([7, 7, 7, 7])
 description = "The hound of Hell "
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_k8dqu")])
-level_data = Array[ExtResource("3_34bjj")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_w2mmm"]
@@ -165,19 +126,20 @@ script = ExtResource("1_stdfb")
 card_name = "Hades"
 values = Array[int]([6, 8, 8, 6])
 description = "The King of the Underworld"
-abilities = Array[ExtResource("2_0nxk6")]([])
-level_data = Array[ExtResource("3_34bjj")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_56smr"]
+script = ExtResource("10_dqtp2")
+ability_name = "Torches"
+description = "Attacks all non-adjacent slots."
+metadata/_custom_type_script = "uid://bheirx7xq22eb"
 
 [sub_resource type="Resource" id="Resource_4cibv"]
 script = ExtResource("1_stdfb")
 card_name = "Hecate"
 values = Array[int]([5, 5, 5, 5])
 description = "A torch to reveal any darkness"
-abilities = Array[ExtResource("2_0nxk6")]([])
-level_data = Array[ExtResource("3_34bjj")]([])
-uses_level_progression = false
+abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_56smr")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_dqtp2"]
@@ -186,15 +148,11 @@ deck_name = "Natures Bounty"
 deck_description = "Tend the soil so and it will pay you back threefold"
 card_indices = Array[int]([0, 1, 2, 3, 4])
 is_starter_deck = true
-required_capture_exp = 0
-required_defense_exp = 0
 deck_power_type = 4
-power_config = {}
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [resource]
 script = ExtResource("3_0nxk6")
-god_name = ""
 cards = Array[ExtResource("1_stdfb")]([SubResource("Resource_5rr7c"), SubResource("Resource_rjcyb"), SubResource("Resource_0ni4c"), SubResource("Resource_wun1n"), SubResource("Resource_f4d4a"), SubResource("Resource_5fthg"), SubResource("Resource_w2mmm"), SubResource("Resource_4cibv")])
 decks = Array[ExtResource("2_60vm0")]([SubResource("Resource_dqtp2")])
 metadata/_custom_type_script = "uid://bdwr18g3ouvfo"
