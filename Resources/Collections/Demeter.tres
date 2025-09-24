@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=34 format=3 uid="uid://dgxi7oww6yrg0"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=36 format=3 uid="uid://dgxi7oww6yrg0"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_stdfb"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_0nxk6"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://46m7rkeu3yy6" path="res://Resources/Abilities/enrich_ability.gd" id="7_wun1n"]
 [ext_resource type="Script" uid="uid://c8h2thhm30b1n" path="res://Resources/Abilities/retaliate_ability.gd" id="8_f4d4a"]
 [ext_resource type="Script" uid="uid://bheirx7xq22eb" path="res://Resources/Abilities/torches_ability.gd" id="10_dqtp2"]
+[ext_resource type="Script" uid="uid://b3kubk5opefp6" path="res://Resources/Abilities/wealth_ability.gd" id="10_k8dqu"]
 
 [sub_resource type="Resource" id="Resource_sf7va"]
 script = ExtResource("3_5rr7c")
@@ -121,11 +122,18 @@ description = "The hound of Hell "
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_k8dqu")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_0at4a"]
+script = ExtResource("10_k8dqu")
+ability_name = "Wealth"
+description = "On play this card grants ALL of your cards exp."
+metadata/_custom_type_script = "uid://b3kubk5opefp6"
+
 [sub_resource type="Resource" id="Resource_w2mmm"]
 script = ExtResource("1_stdfb")
 card_name = "Hades"
 values = Array[int]([6, 8, 8, 6])
 description = "The King of the Underworld"
+abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_0at4a")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_56smr"]

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="WealthAbility" load_steps=2 format=3 uid="uid://wl6jkxqhgg7m"]
+
+[ext_resource type="Script" uid="uid://b3kubk5opefp6" path="res://Resources/Abilities/wealth_ability.gd" id="1_8akt5"]
+
+[resource]
+script = ExtResource("1_8akt5")
+ability_name = "Wealth"
+description = "On play this card grants ALL of your cards exp."
+metadata/_custom_type_script = "uid://b3kubk5opefp6"
