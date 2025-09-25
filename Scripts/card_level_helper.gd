@@ -25,7 +25,7 @@ static func get_mnemosyne_card_level(card_index: int = -1) -> int:
 		print("Warning: SceneTree not available, returning level 1")
 		return 1
 		
-	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTracker")
+	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
 	if tracker:
 		# If card_index is provided, return upgrade count for that specific card
 		# Otherwise return overall progression level (for backward compatibility)

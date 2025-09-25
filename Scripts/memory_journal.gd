@@ -933,7 +933,7 @@ func populate_mnemosyne_cards_with_progression(container: VBoxContainer):
 		return
 	
 	# Try to get the tracker - but don't fail if it's not available
-	var tracker = get_node_or_null("/root/MnemosyneProgressTracker")
+	var tracker = get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
 	var has_progression = tracker != null
 	
 	# Add progression summary only if tracker is available and has progression

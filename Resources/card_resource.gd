@@ -81,7 +81,7 @@ func should_use_mnemosyne_tracker() -> bool:
 	if not scene_tree:
 		return false
 	
-	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTracker")
+	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
 	if not tracker:
 		return false
 	
@@ -95,7 +95,7 @@ func get_mnemosyne_values() -> Array[int]:
 	if not scene_tree:
 		return [1, 1, 1, 1]
 	
-	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTracker")
+	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
 	if not tracker:
 		return [1, 1, 1, 1]
 	

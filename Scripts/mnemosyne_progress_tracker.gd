@@ -103,9 +103,10 @@ func apply_contribution(god_name: String, deck_index: int) -> bool:
 func get_card_values(card_index: int) -> Array[int]:
 	if card_index < 0 or card_index >= MNEMOSYNE_CARD_COUNT:
 		print("Warning: Invalid Mnemosyne card index: ", card_index)
-		return BASE_CARD_VALUES.duplicate()
+		var base_values: Array[int] = [1, 1, 1, 1]
+		return base_values
 	
-	var values = BASE_CARD_VALUES.duplicate()
+	var values: Array[int] = [1, 1, 1, 1]  # Start with base values
 	
 	# Apply all upgrades for this card
 	for upgrade in progression_data["applied_upgrades"]:

@@ -491,7 +491,7 @@ func update_mnemosyne_button_text():
 		return
 	
 	# Get the Mnemosyne tracker
-	var tracker = get_node_or_null("/root/MnemosyneProgressTracker")
+	var tracker = get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
 	if not tracker:
 		print("MnemosyneProgressTracker not found for button update")
 		mnemosyne_button.text = "🧠 Mnemosyne Progress\n(Tracker Unavailable)"
@@ -648,7 +648,7 @@ func apply_unified_experience_reward():
 
 func apply_mnemosyne_reward():
 	# Check if tracker exists
-	var tracker = get_node_or_null("/root/MnemosyneProgressTracker")
+	var tracker = get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
 	if not tracker:
 		print("MnemosyneProgressTracker not found!")
 		return
