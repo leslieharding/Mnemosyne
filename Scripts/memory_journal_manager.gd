@@ -20,7 +20,7 @@ var memory_data: Dictionary = {
 		"gods_encountered": [],
 		"enemies_mastered": 0,
 		"memory_fragments": 0,
-		"consciousness_level": 1,
+		
 		"personal_notes": []
 	}
 }
@@ -30,7 +30,6 @@ var save_path: String = "user://memory_journal.save"
 # Updated memory level thresholds - experience needed for each level
 const BESTIARY_EXPERIENCE_THRESHOLDS = [0, 3, 8, 15, 25, 40]  # Level 0 through 5
 const GOD_LEVEL_THRESHOLDS = [1, 5, 15, 30, 50]      # battles with god needed for each level
-const MNEMOSYNE_LEVEL_THRESHOLDS = [10, 25, 50, 100, 200]  # total battles for consciousness levels
 
 # Experience values
 const WIN_EXPERIENCE = 2
@@ -271,8 +270,6 @@ func record_god_achievement(god_name: String, achievement_type: String, value: V
 	print("Achievement recorded for ", god_name, ": ", achievement_type, " = ", value)
 	save_memory_data()
 
-# === MNEMOSYNE FUNCTIONS === (unchanged)
-
 func update_mnemosyne_battle_stats(victory: bool):
 	memory_data["mnemosyne"]["total_battles"] += 1
 	if victory:
@@ -280,30 +277,9 @@ func update_mnemosyne_battle_stats(victory: bool):
 	else:
 		memory_data["mnemosyne"]["total_defeats"] += 1
 	
-	# Check for consciousness level increase
-	var old_level = memory_data["mnemosyne"]["consciousness_level"]
-	var new_level = calculate_mnemosyne_consciousness_level()
-	if new_level > old_level:
-		memory_data["mnemosyne"]["consciousness_level"] = new_level
-		emit_signal("memory_level_increased", "mnemosyne", "consciousness", new_level)
-		
-		# Trigger conversation for consciousness breakthrough at level 3 or higher
-		if new_level >= 3 and has_node("/root/ConversationManagerAutoload"):
-			var conv_manager = get_node("/root/ConversationManagerAutoload")
-			print("Triggering consciousness_breakthrough conversation")
-			conv_manager.trigger_conversation("consciousness_breakthrough")
-		
-		# Add insight when leveling up
-		add_mnemosyne_insight("My understanding deepens... I can feel my awareness expanding beyond mortal comprehension.")
-
-# Calculate Mnemosyne's consciousness level (unchanged)
-func calculate_mnemosyne_consciousness_level() -> int:
-	var total_battles = memory_data["mnemosyne"]["total_battles"]
-	for i in range(MNEMOSYNE_LEVEL_THRESHOLDS.size()):
-		if total_battles < MNEMOSYNE_LEVEL_THRESHOLDS[i]:
-			return i + 1
-	return MNEMOSYNE_LEVEL_THRESHOLDS.size() + 1
-
+	save_memory_data()
+	
+	
 # Add a personal note/insight for Mnemosyne (unchanged)
 func add_mnemosyne_insight(note: String):
 	var insight = {
@@ -317,26 +293,13 @@ func add_mnemosyne_insight(note: String):
 	if memory_data["mnemosyne"]["personal_notes"].size() > 50:
 		memory_data["mnemosyne"]["personal_notes"].pop_front()
 
-# Add memory fragments (unchanged)
-func add_memory_fragments(amount: int):
-	memory_data["mnemosyne"]["memory_fragments"] += amount
+
 
 # Get Mnemosyne's full data (unchanged)
 func get_mnemosyne_memory() -> Dictionary:
 	return memory_data["mnemosyne"]
 
-# Get consciousness level description (unchanged)
-func get_consciousness_description(level: int) -> String:
-	match level:
-		1: return "Nascent Awareness"
-		2: return "Growing Comprehension"
-		3: return "Expanding Insight"
-		4: return "Deep Understanding"
-		5: return "Profound Wisdom"
-		6: return "Transcendent Knowledge"
-		_: return "Omniscient Memory"
 
-# === SAVE/LOAD FUNCTIONS === (unchanged)
 
 # Save memory data to disk
 func save_memory_data():
@@ -373,8 +336,8 @@ func clear_all_memories():
 			"total_defeats": 0,
 			"gods_encountered": [],
 			"enemies_mastered": 0,
-			"memory_fragments": 0,
-			"consciousness_level": 1,
+			
+			
 			"personal_notes": []
 		}
 	}
@@ -395,7 +358,7 @@ func get_memory_summary() -> Dictionary:
 		"gods_experienced": memory_data["gods"].size(),
 		"consciousness_level": memory_data["mnemosyne"]["consciousness_level"],
 		"total_battles": memory_data["mnemosyne"]["total_battles"],
-		"memory_fragments": memory_data["mnemosyne"]["memory_fragments"]
+		
 	}
 
 # Count enemies that have reached mastery level

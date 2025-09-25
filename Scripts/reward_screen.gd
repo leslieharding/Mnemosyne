@@ -483,25 +483,40 @@ func create_unified_experience_info_display(card_index: int, tracker, god_name: 
 	
 	return exp_container
 
+
 func update_mnemosyne_button_text():
 	# Safety check
 	if not get_tree():
 		print("Error: No scene tree in update_mnemosyne_button_text")
 		return
 	
-	# Use get_node_or_null instead of has_node check
-	var memory_manager = get_node_or_null("/root/MemoryJournalManagerAutoload")
-	if not memory_manager:
-		print("MemoryJournalManagerAutoload not found for Mnemosyne button update")
-		mnemosyne_button.text = "🧠 Consciousness Boost\n(Memory Manager Unavailable)"
+	# Get the Mnemosyne tracker
+	var tracker = get_node_or_null("/root/MnemosyneProgressTracker")
+	if not tracker:
+		print("MnemosyneProgressTracker not found for button update")
+		mnemosyne_button.text = "🧠 Mnemosyne Progress\n(Tracker Unavailable)"
 		return
 	
-	var mnemosyne_data = memory_manager.get_mnemosyne_memory()
-	var current_level = mnemosyne_data.get("consciousness_level", 1)
-	var current_desc = memory_manager.get_consciousness_description(current_level)
-	var next_desc = memory_manager.get_consciousness_description(current_level + 1)
+	var params = get_scene_params()
+	var god_name = params.get("god", "Apollo")
+	var deck_index = params.get("deck_index", 0)
 	
-	mnemosyne_button.text = "🧠 Consciousness Boost\n" + current_desc + " → " + next_desc
+	# Check if this god/deck can contribute
+	if not tracker.can_contribute(god_name, deck_index):
+		mnemosyne_button.text = "🧠 Mnemosyne Progress\n" + god_name + " Deck " + str(deck_index) + " - Max Contributions Reached"
+		mnemosyne_button.disabled = true
+		return
+	
+	var remaining = tracker.get_remaining_contributions(god_name, deck_index)
+	var next_upgrade = tracker.get_next_upgrade_info()
+	
+	if next_upgrade.is_empty():
+		mnemosyne_button.text = "🧠 Mnemosyne Progress\n(Max Level Reached)"
+		mnemosyne_button.disabled = true
+		return
+	
+	mnemosyne_button.text = "🧠 Mnemosyne Progress\n" + "Next: " + next_upgrade["card_name"] + " " + next_upgrade["stat_name"] + " (" + str(remaining) + " left)"
+
 
 # Separate input handlers for wrapper and panel
 func _on_card_wrapper_input(event: InputEvent, card_index: int):
@@ -630,43 +645,52 @@ func apply_unified_experience_reward():
 		# All rewards claimed - finish
 		finish_reward_selection()
 
+
 func apply_mnemosyne_reward():
-	# Check if memory manager exists
-	var memory_manager = get_node_or_null("/root/MemoryJournalManagerAutoload")
-	if not memory_manager:
-		print("MemoryJournalManagerAutoload not found!")
+	# Check if tracker exists
+	var tracker = get_node_or_null("/root/MnemosyneProgressTracker")
+	if not tracker:
+		print("MnemosyneProgressTracker not found!")
 		return
 	
-	# Apply consciousness boost
-	var boost_amount = 3
-	memory_manager.add_memory_fragments(boost_amount)
+	var params = get_scene_params()
+	var god_name = params.get("god", "Apollo")
+	var deck_index = params.get("deck_index", 0)
 	
-	# Force consciousness level recalculation
-	var current_battles = memory_manager.get_mnemosyne_memory()["total_battles"]
-	memory_manager.memory_data["mnemosyne"]["total_battles"] += boost_amount
-	var new_level = memory_manager.calculate_mnemosyne_consciousness_level()
-	memory_manager.memory_data["mnemosyne"]["consciousness_level"] = new_level
-	memory_manager.memory_data["mnemosyne"]["total_battles"] = current_battles
+	# Check if this god/deck can contribute
+	if not tracker.can_contribute(god_name, deck_index):
+		print("Cannot apply Mnemosyne reward - contribution limit reached for ", god_name, " deck ", deck_index)
+		return
 	
-	memory_manager.save_memory_data()
+	# Get upgrade info before applying (for feedback)
+	var upgrade_info = tracker.get_next_upgrade_info()
+	if upgrade_info.is_empty():
+		print("No more Mnemosyne upgrades available")
+		return
 	
-	# Track this reward
-	claimed_rewards.append("Mnemosyne Consciousness Boost")
-	rewards_remaining -= 1
-	
-	# Reset selection state
-	selected_card_index = -1
-	
-	# Deselect all cards
-	for display in card_displays:
-		if is_instance_valid(display):
-			display.deselect()
-	
-	# Update UI based on remaining rewards
-	if rewards_remaining > 0:
-		update_for_next_reward()
+	# Apply the contribution
+	if tracker.apply_contribution(god_name, deck_index):
+		var reward_desc = "Mnemosyne: " + upgrade_info["card_name"] + " " + upgrade_info["stat_name"] + " upgraded"
+		claimed_rewards.append(reward_desc)
+		rewards_remaining -= 1
+		
+		print("Applied Mnemosyne reward: ", reward_desc)
+		
+		# Reset selection state
+		selected_card_index = -1
+		
+		# Deselect all cards
+		for display in card_displays:
+			if is_instance_valid(display):
+				display.deselect()
+		
+		# Update UI based on remaining rewards
+		if rewards_remaining > 0:
+			update_for_next_reward()
+		else:
+			finish_reward_selection()
 	else:
-		finish_reward_selection()
+		print("Failed to apply Mnemosyne contribution")
 
 func update_for_next_reward():
 	# Re-enable reward options for next selection

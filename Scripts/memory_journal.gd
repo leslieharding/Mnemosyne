@@ -115,8 +115,9 @@ func update_header():
 	
 	title_label.text = "Mnemosyne's Memory Journal"
 	
-	var consciousness_desc = memory_manager.get_consciousness_description(summary["consciousness_level"])
-	summary_label.text = consciousness_desc + " • " + str(summary["enemies_encountered"]) + " Enemies • " + str(summary["gods_experienced"]) + " Gods"
+	# Remove consciousness description - just show basic stats
+	summary_label.text = str(summary["enemies_encountered"]) + " Enemies • " + str(summary["gods_experienced"]) + " Gods"
+
 
 func refresh_bestiary_tab():
 	print("=== REFRESHING BESTIARY TAB ===")
@@ -882,10 +883,8 @@ func get_god_insight_text(god_name: String, mastery_level: int) -> String:
 				5: return "You have achieved mastery over this god's domain, unlocking their full potential."
 				_: return "Your bond transcends mortality, becoming one with the divine essence itself."
 
-# NEW MNEMOSYNE DECK FUNCTIONS
-
 func refresh_mnemosyne_tab():
-	print("=== REFRESHING MNEMOSYNE TAB WITH SIMPLIFIED DISPLAY ===")
+	print("=== REFRESHING MNEMOSYNE TAB WITH NEW PROGRESSION DISPLAY ===")
 	
 	# Get the card container
 	var card_container = mnemosyne_tab.get_node("CardContainer")
@@ -893,22 +892,21 @@ func refresh_mnemosyne_tab():
 		print("ERROR: Could not find CardContainer")
 		return
 	
-	
 	# Clear existing cards
 	for child in card_container.get_children():
 		child.queue_free()
 	
 	await get_tree().process_frame
 	
-	# Load and display Mnemosyne deck
-	populate_mnemosyne_cards_simple(card_container)
+	# Load and display Mnemosyne deck with progression
+	populate_mnemosyne_cards_with_progression(card_container)
 	
 	print("Mnemosyne tab refresh complete!")
 
-func populate_mnemosyne_cards_simple(container: VBoxContainer):
-	print("Loading Mnemosyne deck for simple display...")
+func populate_mnemosyne_cards_with_progression(container: VBoxContainer):
+	print("Loading Mnemosyne deck with progression display...")
 	
-	# Load Mnemosyne collection
+	# Load Mnemosyne collection first
 	var collection_path = "res://Resources/Collections/Mnemosyne.tres"
 	if not ResourceLoader.exists(collection_path):
 		print("ERROR: Mnemosyne collection not found at: ", collection_path)
@@ -931,22 +929,121 @@ func populate_mnemosyne_cards_simple(container: VBoxContainer):
 		var no_cards_label = Label.new()
 		no_cards_label.text = "No memory cards found in Mnemosyne's collection."
 		no_cards_label.add_theme_color_override("font_color", Color("#888888"))
-		no_cards_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		container.add_child(no_cards_label)
 		return
 	
-	# Create compact card displays
+	# Try to get the tracker - but don't fail if it's not available
+	var tracker = get_node_or_null("/root/MnemosyneProgressTracker")
+	var has_progression = tracker != null
+	
+	# Add progression summary only if tracker is available and has progression
+	if has_progression and tracker.get_current_level() > 0:
+		var summary_label = Label.new()
+		summary_label.text = tracker.get_progression_summary()
+		summary_label.add_theme_font_size_override("font_size", 12)
+		summary_label.add_theme_color_override("font_color", Color("#DDDDDD"))
+		container.add_child(summary_label)
+		
+		container.add_child(HSeparator.new())
+	
+	# Create card displays showing current values (either base or progressed)
 	for i in range(mnemosyne_deck.size()):
 		var card = mnemosyne_deck[i]
 		if not card:
 			continue
 		
-		var card_display = create_compact_card_display(card)
-		container.add_child(card_display)
+		# Get current values - this will automatically use tracker if available, or fall back to base values
+		var current_values = card.get_effective_values(1)  # Level doesn't matter for Mnemosyne
+		
+		# Get upgrade count if tracker is available
+		var upgrade_count = 0
+		if has_progression:
+			upgrade_count = tracker.get_card_upgrade_count(i)
+		
+		# Create a simple card info panel
+		var card_panel = create_mnemosyne_card_panel(card.card_name, current_values, upgrade_count)
+		container.add_child(card_panel)
+		
+		print("Added Mnemosyne card: ", card.card_name, " with values ", current_values, " (", upgrade_count, " upgrades)")
+
+func create_mnemosyne_card_panel(card_name: String, values: Array[int], upgrade_count: int) -> Control:
+	var panel = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(0, 60)
 	
-	print("Created ", mnemosyne_deck.size(), " compact Mnemosyne card displays")
+	# Style the panel
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color("#2A2A2A")
+	style.border_color = Color("#4A4A4A")
+	style.border_width_left = 2
+	style.border_width_right = 2
+	style.border_width_top = 2
+	style.border_width_bottom = 2
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	panel.add_theme_stylebox_override("panel", style)
+	
+	# Margin container
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 12)
+	margin.add_theme_constant_override("margin_right", 12)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	panel.add_child(margin)
+	
+	# Main layout
+	var hbox = HBoxContainer.new()
+	margin.add_child(hbox)
+	
+	# Left side - card name and upgrade count
+	var left_vbox = VBoxContainer.new()
+	hbox.add_child(left_vbox)
+	
+	var name_label = Label.new()
+	name_label.text = card_name
+	name_label.add_theme_font_size_override("font_size", 16)
+	name_label.add_theme_color_override("font_color", Color("#FFFFFF"))
+	left_vbox.add_child(name_label)
+	
+	var upgrade_label = Label.new()
+	upgrade_label.text = "+" + str(upgrade_count) + " upgrades"
+	upgrade_label.add_theme_font_size_override("font_size", 12)
+	upgrade_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+	left_vbox.add_child(upgrade_label)
+	
+	# Add some spacing
+	hbox.add_child(Control.new())  # Spacer
+	
+	# Right side - current stats
+	var stats_container = HBoxContainer.new()
+	stats_container.add_theme_constant_override("separation", 8)
+	hbox.add_child(stats_container)
+	
+	var stat_names = ["N", "E", "S", "W"]
+	for i in range(4):
+		var stat_vbox = VBoxContainer.new()
+		
+		var stat_name = Label.new()
+		stat_name.text = stat_names[i]
+		stat_name.add_theme_font_size_override("font_size", 10)
+		stat_name.add_theme_color_override("font_color", Color("#CCCCCC"))
+		stat_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		stat_vbox.add_child(stat_name)
+		
+		var stat_value = Label.new()
+		stat_value.text = str(values[i])
+		stat_value.add_theme_font_size_override("font_size", 14)
+		stat_value.add_theme_color_override("font_color", Color("#FFD700"))
+		stat_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		stat_vbox.add_child(stat_value)
+		
+		stats_container.add_child(stat_vbox)
+	
+	return panel
 
 
+		
 func create_compact_card_display(card: CardResource) -> Control:
 	# Main panel for the card
 	var card_panel = PanelContainer.new()

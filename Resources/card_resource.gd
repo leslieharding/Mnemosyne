@@ -40,8 +40,11 @@ func get_level_data(level: int) -> LevelData:
 	
 	return best_match if best_match else level_data[0]
 
-# Convenience methods
 func get_effective_values(level: int) -> Array[int]:
+	# Check if this is a Mnemosyne card and use tracker values instead
+	if should_use_mnemosyne_tracker():
+		return get_mnemosyne_values()
+	
 	return get_level_data(level).values.duplicate()
 
 func get_effective_abilities(level: int) -> Array[CardAbility]:
@@ -70,3 +73,40 @@ func execute_abilities(trigger_type: CardAbility.TriggerType, context: Dictionar
 		if ability.trigger_condition == trigger_type:
 			print("Executing ability: ", ability.ability_name, " (", ability.description, ")")
 			ability.execute(context)
+
+
+func should_use_mnemosyne_tracker() -> bool:
+	# Check if we're dealing with a Mnemosyne card by looking for the tracker
+	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
+	if not scene_tree:
+		return false
+	
+	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTracker")
+	if not tracker:
+		return false
+	
+	# Check if this is a Mnemosyne card (based on card names)
+	var mnemosyne_cards = ["Clio", "Euterpe", "Terpsichore", "Thalia", "Melpomene"]
+	return card_name in mnemosyne_cards
+
+# NEW: Get values from Mnemosyne tracker
+func get_mnemosyne_values() -> Array[int]:
+	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
+	if not scene_tree:
+		return [1, 1, 1, 1]
+	
+	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTracker")
+	if not tracker:
+		return [1, 1, 1, 1]
+	
+	# Map card names to indices
+	var card_index = -1
+	match card_name:
+		"Clio": card_index = 0
+		"Euterpe": card_index = 1
+		"Terpsichore": card_index = 2
+		"Thalia": card_index = 3
+		"Melpomene": card_index = 4
+		_: return [1, 1, 1, 1]
+	
+	return tracker.get_card_values(card_index)
