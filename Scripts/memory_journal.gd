@@ -936,15 +936,7 @@ func populate_mnemosyne_cards_with_progression(container: VBoxContainer):
 	var tracker = get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
 	var has_progression = tracker != null
 	
-	# Add progression summary only if tracker is available and has progression
-	if has_progression and tracker.get_current_level() > 0:
-		var summary_label = Label.new()
-		summary_label.text = tracker.get_progression_summary()
-		summary_label.add_theme_font_size_override("font_size", 12)
-		summary_label.add_theme_color_override("font_color", Color("#DDDDDD"))
-		container.add_child(summary_label)
-		
-		container.add_child(HSeparator.new())
+	
 	
 	# Create card displays showing current values (either base or progressed)
 	for i in range(mnemosyne_deck.size()):
@@ -952,8 +944,12 @@ func populate_mnemosyne_cards_with_progression(container: VBoxContainer):
 		if not card:
 			continue
 		
-		# Get current values - this will automatically use tracker if available, or fall back to base values
-		var current_values = card.get_effective_values(1)  # Level doesn't matter for Mnemosyne
+		# Get current values - use tracker progression if available, otherwise base values
+		var current_values: Array[int]
+		if has_progression:
+			current_values = tracker.get_card_values(i)
+		else:
+			current_values = [1, 1, 1, 1]  # Base values
 		
 		# Get upgrade count if tracker is available
 		var upgrade_count = 0
