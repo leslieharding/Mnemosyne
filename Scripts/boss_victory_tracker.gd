@@ -47,7 +47,7 @@ func is_boss_defeated(boss_name: String) -> bool:
 
 # Get all defeated bosses
 func get_defeated_bosses() -> Array[String]:
-	var defeated = []
+	var defeated: Array[String] = []  # Fix: Explicitly type the array
 	for key in boss_victories.keys():
 		if boss_victories[key]:
 			var boss_name = key.replace("_boss_defeated", "").capitalize()
