@@ -137,6 +137,18 @@ func check_boss_ability_unlocks(victory_key: String):
 			var ability = card_boss_abilities[card_index][victory_key]
 			var card_name = CARD_NAMES[card_index]
 			
+			# SAFETY CHECK: Ensure ability is valid and has required properties
+			if not ability:
+				print("Warning: Null ability found for card ", card_index, " victory key ", victory_key)
+				continue
+			
+			# Check if ability has the ability_name property (it should be a CardAbility resource)
+			if not ability.has_method("execute") or not "ability_name" in ability:
+				print("Warning: Invalid ability resource for card ", card_index, " victory key ", victory_key)
+				print("  Ability type: ", typeof(ability))
+				print("  Ability string: ", str(ability))
+				continue
+			
 			print("Ability unlocked! ", card_name, " gained: ", ability.ability_name)
 			emit_signal("mnemosyne_ability_unlocked", card_index, ability.ability_name)
 			unlocked_any = true
@@ -184,6 +196,18 @@ func get_all_potential_abilities_for_card(card_index: int) -> Array[Dictionary]:
 	# Check each potential ability for this card
 	for victory_key in card_boss_abilities[card_index].keys():
 		var ability = card_boss_abilities[card_index][victory_key]
+		
+		# SAFETY CHECK: Validate ability resource
+		if not ability:
+			print("Warning: Null ability found for card ", card_index, " victory key ", victory_key)
+			continue
+		
+		# Ensure this is a valid CardAbility resource
+		if not ability.has_method("execute") or not "ability_name" in ability:
+			print("Warning: Invalid ability resource for card ", card_index, " victory key ", victory_key)
+			print("  Ability type: ", typeof(ability))
+			continue
+		
 		var is_unlocked = victory_flags.get(victory_key, false)
 		var boss_name = victory_key.replace("_boss_defeated", "").capitalize()
 		

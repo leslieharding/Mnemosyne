@@ -645,7 +645,6 @@ func apply_unified_experience_reward():
 		# All rewards claimed - finish
 		finish_reward_selection()
 
-
 func apply_mnemosyne_reward():
 	# Check if tracker exists
 	var tracker = get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
@@ -670,7 +669,10 @@ func apply_mnemosyne_reward():
 	
 	# Apply the contribution
 	if tracker.apply_contribution(god_name, deck_index):
-		var reward_desc = "Mnemosyne: " + upgrade_info["card_name"] + " " + upgrade_info["stat_name"] + " upgraded"
+		# FIX: Convert stat_index to stat_name
+		var stat_names = ["North", "East", "South", "West"]
+		var stat_name = stat_names[upgrade_info["stat_index"]]
+		var reward_desc = "Mnemosyne: " + upgrade_info["card_name"] + " " + stat_name + " upgraded"
 		claimed_rewards.append(reward_desc)
 		rewards_remaining -= 1
 		
