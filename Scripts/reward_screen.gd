@@ -515,7 +515,9 @@ func update_mnemosyne_button_text():
 		mnemosyne_button.disabled = true
 		return
 	
-	mnemosyne_button.text = "🧠 Mnemosyne Progress\n" + "Next: " + next_upgrade["card_name"] + " " + next_upgrade["stat_name"] + " (" + str(remaining) + " left)"
+	var stat_names = ["North", "East", "South", "West"]
+	var stat_name = stat_names[next_upgrade["stat_index"]]
+	mnemosyne_button.text = "🧠 Mnemosyne Progress\n" + "Next: " + next_upgrade["card_name"] + " " + stat_name + " (" + str(remaining) + " left)"
 
 
 # Separate input handlers for wrapper and panel
