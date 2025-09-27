@@ -962,68 +962,76 @@ func populate_mnemosyne_cards_with_progression(container: VBoxContainer):
 		
 		print("Added Mnemosyne card: ", card.card_name, " with values ", current_values, " (", upgrade_count, " upgrades)")
 
+
 func create_mnemosyne_card_panel(card_name: String, values: Array[int], upgrade_count: int) -> Control:
 	var panel = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(0, 60)
+	panel.custom_minimum_size = Vector2(0, 100)  # Increased height for abilities
 	
 	# Style the panel
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color("#2A2A2A")
-	style.border_color = Color("#4A4A4A")
+	style.bg_color = Color("#2A1A2A")
+	style.border_color = Color("#6A4A6A")
 	style.border_width_left = 2
-	style.border_width_right = 2
 	style.border_width_top = 2
+	style.border_width_right = 2
 	style.border_width_bottom = 2
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.corner_radius_bottom_left = 4
-	style.corner_radius_bottom_right = 4
+	style.corner_radius_top_left = 6
+	style.corner_radius_top_right = 6
+	style.corner_radius_bottom_left = 6
+	style.corner_radius_bottom_right = 6
 	panel.add_theme_stylebox_override("panel", style)
 	
 	# Margin container
 	var margin = MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 12)
-	margin.add_theme_constant_override("margin_right", 12)
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_right", 10)
 	margin.add_theme_constant_override("margin_top", 8)
 	margin.add_theme_constant_override("margin_bottom", 8)
 	panel.add_child(margin)
 	
-	# Main layout
-	var hbox = HBoxContainer.new()
-	margin.add_child(hbox)
+	# Main layout - horizontal container to put abilities to the right
+	var main_container = HBoxContainer.new()
+	main_container.add_theme_constant_override("separation", 20)
+	margin.add_child(main_container)
 	
-	# Left side - card name and upgrade count
-	var left_vbox = VBoxContainer.new()
-	hbox.add_child(left_vbox)
+	# Left side: Card info and stats
+	var left_side = VBoxContainer.new()
+	left_side.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	main_container.add_child(left_side)
+	
+	# Card name and upgrade info
+	var name_section = VBoxContainer.new()
+	left_side.add_child(name_section)
 	
 	var name_label = Label.new()
 	name_label.text = card_name
 	name_label.add_theme_font_size_override("font_size", 16)
-	name_label.add_theme_color_override("font_color", Color("#FFFFFF"))
-	left_vbox.add_child(name_label)
+	name_label.add_theme_color_override("font_color", Color("#DDA0DD"))
+	name_section.add_child(name_label)
 	
-	var upgrade_label = Label.new()
-	upgrade_label.text = "+" + str(upgrade_count) + " upgrades"
-	upgrade_label.add_theme_font_size_override("font_size", 12)
-	upgrade_label.add_theme_color_override("font_color", Color("#AAAAAA"))
-	left_vbox.add_child(upgrade_label)
+	if upgrade_count > 0:
+		var upgrade_label = Label.new()
+		upgrade_label.text = "+" + str(upgrade_count) + " upgrades"
+		upgrade_label.add_theme_font_size_override("font_size", 10)
+		upgrade_label.add_theme_color_override("font_color", Color("#FFD700"))
+		name_section.add_child(upgrade_label)
 	
-	# Add some spacing
-	hbox.add_child(Control.new())  # Spacer
-	
-	# Right side - current stats
+	# Stats section
 	var stats_container = HBoxContainer.new()
-	stats_container.add_theme_constant_override("separation", 8)
-	hbox.add_child(stats_container)
+	stats_container.add_theme_constant_override("separation", 10)
+	left_side.add_child(stats_container)
 	
 	var stat_names = ["N", "E", "S", "W"]
+	var stat_colors = [Color("#87CEEB"), Color("#FFB74D"), Color("#FF7043"), Color("#66BB6A")]
+	
 	for i in range(4):
 		var stat_vbox = VBoxContainer.new()
+		stat_vbox.custom_minimum_size.x = 30
 		
 		var stat_name = Label.new()
 		stat_name.text = stat_names[i]
 		stat_name.add_theme_font_size_override("font_size", 10)
-		stat_name.add_theme_color_override("font_color", Color("#CCCCCC"))
+		stat_name.add_theme_color_override("font_color", stat_colors[i])
 		stat_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		stat_vbox.add_child(stat_name)
 		
@@ -1036,10 +1044,108 @@ func create_mnemosyne_card_panel(card_name: String, values: Array[int], upgrade_
 		
 		stats_container.add_child(stat_vbox)
 	
+	# Right side: Abilities section
+	var abilities_section = VBoxContainer.new()
+	abilities_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	abilities_section.custom_minimum_size.x = 250  # Ensure abilities have enough space
+	main_container.add_child(abilities_section)
+	
+	var abilities_label = Label.new()
+	abilities_label.text = "Abilities:"
+	abilities_label.add_theme_font_size_override("font_size", 12)
+	abilities_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	abilities_section.add_child(abilities_label)
+	
+	var abilities_container = VBoxContainer.new()
+	abilities_section.add_child(abilities_container)
+	
+	# Get the card index from name
+	var card_index = get_card_index_from_name(card_name)
+	
+	# Get tracker for boss abilities
+	var tracker = get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
+	if tracker and card_index >= 0:
+		var ability_info = tracker.get_all_potential_abilities_for_card(card_index)
+		
+		if ability_info.size() > 0:
+			for info in ability_info:
+				var ability_row = create_ability_display(info)
+				abilities_container.add_child(ability_row)
+		else:
+			var no_abilities = Label.new()
+			no_abilities.text = "No special abilities available"
+			no_abilities.add_theme_font_size_override("font_size", 10)
+			no_abilities.add_theme_color_override("font_color", Color("#888888"))
+			abilities_container.add_child(no_abilities)
+	else:
+		var loading_label = Label.new()
+		loading_label.text = "Loading abilities..."
+		loading_label.add_theme_font_size_override("font_size", 10)
+		loading_label.add_theme_color_override("font_color", Color("#888888"))
+		abilities_container.add_child(loading_label)
+	
 	return panel
 
 
-		
+
+
+func get_card_index_from_name(card_name: String) -> int:
+	match card_name:
+		"Clio": return 0
+		"Euterpe": return 1
+		"Terpsichore": return 2
+		"Thalia": return 3
+		"Melpomene": return 4
+		_: return -1
+
+
+func create_ability_display(ability_info: Dictionary) -> Control:
+	var ability_row = HBoxContainer.new()
+	ability_row.add_theme_constant_override("separation", 10)
+	
+	# Status icon
+	var status_label = Label.new()
+	if ability_info["is_unlocked"]:
+		status_label.text = "✓"
+		status_label.add_theme_color_override("font_color", Color("#00FF00"))
+	else:
+		status_label.text = "✗"
+		status_label.add_theme_color_override("font_color", Color("#FF6666"))
+	status_label.add_theme_font_size_override("font_size", 12)
+	ability_row.add_child(status_label)
+	
+	# Ability name and description
+	var ability_info_container = VBoxContainer.new()
+	ability_info_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ability_row.add_child(ability_info_container)
+	
+	var ability_name = Label.new()
+	var ability = ability_info["ability"]
+	
+	# Show hidden info for locked abilities
+	if ability_info["is_unlocked"]:
+		ability_name.text = ability.ability_name
+		ability_name.add_theme_color_override("font_color", Color("#FFD700"))
+	else:
+		ability_name.text = "??????"
+		ability_name.add_theme_color_override("font_color", Color("#888888"))
+	
+	ability_name.add_theme_font_size_override("font_size", 11)
+	ability_info_container.add_child(ability_name)
+	
+	var ability_desc = Label.new()
+	if ability_info["is_unlocked"]:
+		ability_desc.text = ability.description
+	else:
+		ability_desc.text = "This card's ability is not yet unlocked"
+	
+	ability_desc.add_theme_font_size_override("font_size", 9)
+	ability_desc.add_theme_color_override("font_color", Color("#AAAAAA"))
+	ability_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	ability_info_container.add_child(ability_desc)
+	
+	return ability_row
+
 func create_compact_card_display(card: CardResource) -> Control:
 	# Main panel for the card
 	var card_panel = PanelContainer.new()

@@ -3447,6 +3447,7 @@ func show_reward_screen():
 	})
 	TransitionManagerAutoload.change_scene_to("res://Scenes/RewardScreen.tscn")
 
+
 func record_enemy_encounter(victory: bool):
 	if not has_node("/root/MemoryJournalManagerAutoload"):
 		return
@@ -3480,9 +3481,28 @@ func record_enemy_encounter(victory: bool):
 		print("  enemy_name: '", enemy_name, "'")
 		print("  is_boss: ", is_boss)
 	
-	# Record the encounter
+	# Record the encounter in memory journal
 	memory_manager.record_enemy_encounter(enemy_name, victory, enemy_difficulty)
 	print("Recorded enemy encounter: '", enemy_name, "' (victory: ", victory, ")")
+	
+	# NEW: Check for boss victory and update BossVictoryTracker
+	if victory and is_boss:
+		print("Boss victory detected! Updating BossVictoryTracker...")
+		
+		var boss_tracker = get_node_or_null("/root/BossVictoryTrackerAutoload")
+		if boss_tracker:
+			# Map enemy names to boss names for the tracker
+			var boss_name = map_enemy_name_to_boss(enemy_name)
+			if boss_name != "":
+				boss_tracker.mark_boss_defeated(boss_name)
+				print("Boss victory recorded: ", boss_name)
+				
+				# Show special notification for boss ability unlocks
+				show_boss_victory_notification(boss_name)
+			else:
+				print("Warning: Could not map enemy name '", enemy_name, "' to boss name")
+		else:
+			print("Warning: BossVictoryTrackerAutoload not found!")
 	
 	# Check current memory state
 	var enemy_memories = memory_manager.get_all_enemy_memories()
@@ -3496,15 +3516,27 @@ func record_enemy_encounter(victory: bool):
 		
 		print("Checking god unlocks...")
 		print("Current unlocked gods: ", progress_tracker.get_unlocked_gods())
-		print("Hermes already unlocked? ", progress_tracker.is_god_unlocked("Hermes"))
-		
-		var newly_unlocked = progress_tracker.check_god_unlocks()
-		print("Newly unlocked gods: ", newly_unlocked)
-		
-		if newly_unlocked.size() > 0:
-			print("Gods unlocked from this victory: ", newly_unlocked)
+
+func map_enemy_name_to_boss(enemy_name: String) -> String:
+	if enemy_name == null or enemy_name == "":
+		return ""
 	
-	print("=== END DEBUG ===")
+	# Map the actual enemy names from BossConfig to boss names for the tracker
+	var boss_mapping = {
+		"?????": "Apollo",                    # BossConfig.APOLLO_BOSS_NAME
+		"Hermes Boss": "Hermes",             # BossConfig.HERMES_BOSS_NAME  
+		"Fimbulwinter": "Demeter",           # BossConfig.DEMETER_BOSS_NAME
+		"Artemis Boss": "Artemis"            # BossConfig.ARTEMIS_BOSS_NAME
+	}
+	
+	return boss_mapping.get(enemy_name, "")
+
+# NEW: Show special notification when boss abilities are unlocked
+func show_boss_victory_notification(boss_name: String):
+	if notification_manager:
+		var message = "Victory over " + boss_name + " awakens new memories within Mnemosyne!"
+		notification_manager.show_notification(message)  # Show for 5 seconds
+
 
 func record_god_experience():
 	if not has_node("/root/MemoryJournalManagerAutoload"):

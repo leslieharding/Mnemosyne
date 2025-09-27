@@ -48,7 +48,14 @@ func get_effective_values(level: int) -> Array[int]:
 	return get_level_data(level).values.duplicate()
 
 func get_effective_abilities(level: int) -> Array[CardAbility]:
-	return get_level_data(level).abilities.duplicate()
+	var base_abilities = get_level_data(level).abilities.duplicate()
+	
+	# For Mnemosyne cards, add boss-unlocked abilities
+	if should_use_mnemosyne_tracker():
+		var boss_abilities = get_mnemosyne_boss_abilities()
+		base_abilities.append_array(boss_abilities)
+	
+	return base_abilities
 
 func get_effective_description(level: int) -> String:
 	var level_desc = get_level_data(level).description
@@ -73,7 +80,6 @@ func execute_abilities(trigger_type: CardAbility.TriggerType, context: Dictionar
 		if ability.trigger_condition == trigger_type:
 			print("Executing ability: ", ability.ability_name, " (", ability.description, ")")
 			ability.execute(context)
-
 
 func should_use_mnemosyne_tracker() -> bool:
 	# Check if we're dealing with a Mnemosyne card by looking for the tracker
@@ -110,3 +116,25 @@ func get_mnemosyne_values() -> Array[int]:
 		_: return [1, 1, 1, 1]
 	
 	return tracker.get_card_values(card_index)
+
+# NEW: Get boss-unlocked abilities from Mnemosyne tracker
+func get_mnemosyne_boss_abilities() -> Array[CardAbility]:
+	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
+	if not scene_tree:
+		return []
+	
+	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
+	if not tracker:
+		return []
+	
+	# Map card names to indices
+	var card_index = -1
+	match card_name:
+		"Clio": card_index = 0
+		"Euterpe": card_index = 1
+		"Terpsichore": card_index = 2
+		"Thalia": card_index = 3
+		"Melpomene": card_index = 4
+		_: return []
+	
+	return tracker.get_unlocked_abilities_for_card(card_index)

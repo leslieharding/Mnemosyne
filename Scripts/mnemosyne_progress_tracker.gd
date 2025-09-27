@@ -3,6 +3,7 @@ extends Node
 
 signal mnemosyne_card_upgraded(card_index: int, stat_index: int, new_value: int)
 signal mnemosyne_level_increased(new_level: int)
+signal mnemosyne_ability_unlocked(card_index: int, ability_name: String)
 
 # Save data
 var progression_data: Dictionary = {
@@ -16,8 +17,35 @@ const MAX_CONTRIBUTIONS_PER_DECK = 10
 const BASE_CARD_VALUES = [1, 1, 1, 1]  # N, E, S, W
 const MNEMOSYNE_CARD_COUNT = 5
 
+# Boss ability mappings - predefined abilities unlocked by defeating specific bosses
+# This is where you define which abilities each card gets when bosses are defeated
+var card_boss_abilities: Dictionary = {
+	0: {  # Clio (History Muse)
+		"apollo_boss_defeated": preload("res://Resources/Abilities/core.tres"),
+		"athena_boss_defeated": preload("res://Resources/Abilities/core.tres")
+	},
+	1: {  # Euterpe (Music Muse)  
+		"hermes_boss_defeated": preload("res://Resources/Abilities/core.tres"),
+		"apollo_boss_defeated": preload("res://Resources/Abilities/core.tres")
+	},
+	2: {  # Terpsichore (Dance Muse)
+		"hermes_boss_defeated": preload("res://Resources/Abilities/core.tres"),
+		"ares_boss_defeated": preload("res://Resources/Abilities/core.tres")
+	},
+	3: {  # Thalia (Comedy Muse)
+		"apollo_boss_defeated": preload("res://Resources/Abilities/core.tres"),
+		"artemis_boss_defeated": preload("res://Resources/Abilities/core.tres")
+	},
+	4: {  # Melpomene (Tragedy Muse)
+		"hades_boss_defeated": preload("res://Resources/Abilities/core.tres"),
+		"athena_boss_defeated": preload("res://Resources/Abilities/core.tres")
+	}
+}
+
+# Card name mapping for reference
+const CARD_NAMES = ["Clio", "Euterpe", "Terpsichore", "Thalia", "Melpomene"]
+
 # Progression map - defines order of upgrades
-# You can easily modify this to change upgrade progression
 var progression_map: Dictionary = {
 	1: {"card_index": 0, "stat_index": 0},   # Clio North
 	2: {"card_index": 1, "stat_index": 1},   # Euterpe East
@@ -29,7 +57,6 @@ var progression_map: Dictionary = {
 	8: {"card_index": 2, "stat_index": 2},   # Terpsichore South
 	9: {"card_index": 4, "stat_index": 0},   # Melpomene North
 	10: {"card_index": 1, "stat_index": 2},  # Euterpe South
-	# Add more levels as needed - this gives each card 2 upgrades to start
 }
 
 var save_path: String = "user://mnemosyne_progress.save"
@@ -98,6 +125,81 @@ func apply_contribution(god_name: String, deck_index: int) -> bool:
 		save_progression_data()
 		return true
 
+# === BOSS ABILITY SYSTEM ===
+
+# Called by BossVictoryTracker when a boss is defeated
+func check_boss_ability_unlocks(victory_key: String):
+	var unlocked_any = false
+	
+	# Check each card for abilities unlocked by this boss victory
+	for card_index in card_boss_abilities.keys():
+		if victory_key in card_boss_abilities[card_index]:
+			var ability = card_boss_abilities[card_index][victory_key]
+			var card_name = CARD_NAMES[card_index]
+			
+			print("Ability unlocked! ", card_name, " gained: ", ability.ability_name)
+			emit_signal("mnemosyne_ability_unlocked", card_index, ability.ability_name)
+			unlocked_any = true
+	
+	if unlocked_any:
+		print("Boss victory unlocked new Mnemosyne abilities!")
+
+# Get all unlocked abilities for a specific card
+func get_unlocked_abilities_for_card(card_index: int) -> Array[CardAbility]:
+	var unlocked_abilities: Array[CardAbility] = []
+	
+	if not card_index in card_boss_abilities:
+		return unlocked_abilities
+	
+	# Get boss victory tracker
+	var boss_tracker = get_node_or_null("/root/BossVictoryTrackerAutoload")
+	if not boss_tracker:
+		print("Warning: BossVictoryTrackerAutoload not found")
+		return unlocked_abilities
+	
+	var victory_flags = boss_tracker.get_boss_victory_flags()
+	
+	# Check each potential ability for this card
+	for victory_key in card_boss_abilities[card_index].keys():
+		if victory_flags.get(victory_key, false):
+			var ability = card_boss_abilities[card_index][victory_key]
+			unlocked_abilities.append(ability)
+			print("Card ", card_index, " has unlocked ability: ", ability.ability_name)
+	
+	return unlocked_abilities
+
+# Get all abilities for a card (both locked and unlocked) with their unlock status
+func get_all_potential_abilities_for_card(card_index: int) -> Array[Dictionary]:
+	var ability_info: Array[Dictionary] = []
+	
+	if not card_index in card_boss_abilities:
+		return ability_info
+	
+	# Get boss victory tracker
+	var boss_tracker = get_node_or_null("/root/BossVictoryTrackerAutoload")
+	var victory_flags = {}
+	if boss_tracker:
+		victory_flags = boss_tracker.get_boss_victory_flags()
+	
+	# Check each potential ability for this card
+	for victory_key in card_boss_abilities[card_index].keys():
+		var ability = card_boss_abilities[card_index][victory_key]
+		var is_unlocked = victory_flags.get(victory_key, false)
+		var boss_name = victory_key.replace("_boss_defeated", "").capitalize()
+		
+		ability_info.append({
+			"ability": ability,
+			"is_unlocked": is_unlocked,
+			"required_boss": boss_name,
+			"victory_key": victory_key
+		})
+	
+	return ability_info
+
+# Check if a card has any unlocked abilities
+func has_unlocked_abilities(card_index: int) -> bool:
+	return get_unlocked_abilities_for_card(card_index).size() > 0
+
 # === CARD VALUE CALCULATION ===
 
 func get_card_values(card_index: int) -> Array[int]:
@@ -143,50 +245,26 @@ func get_next_upgrade_info() -> Dictionary:
 			"level": next_level,
 			"card_index": upgrade["card_index"],
 			"stat_index": upgrade["stat_index"],
-			"card_name": get_card_name(upgrade["card_index"]),
-			"stat_name": get_stat_name(upgrade["stat_index"])
+			"card_name": CARD_NAMES[upgrade["card_index"]]
 		}
 	return {}
 
-func get_card_name(card_index: int) -> String:
-	match card_index:
-		0: return "Clio"
-		1: return "Euterpe"
-		2: return "Terpsichore"
-		3: return "Thalia"
-		4: return "Melpomene"
-		_: return "Unknown"
-
-func get_stat_name(stat_index: int) -> String:
-	match stat_index:
-		0: return "North"
-		1: return "East"
-		2: return "South"
-		3: return "West"
-		_: return "Unknown"
-
-func get_all_god_contributions() -> Dictionary:
-	return progression_data["god_contributions"].duplicate()
-
 func get_progression_summary() -> String:
-	var summary = "Mnemosyne Progress Level: " + str(progression_data["current_level"])
-	summary += "/" + str(get_max_possible_level()) + "\n\n"
+	var current = get_current_level()
+	var max_level = get_max_possible_level()
+	var summary = "Mnemosyne Memory Level: " + str(current) + "/" + str(max_level)
 	
-	summary += "Card Upgrade Counts:\n"
-	for i in range(MNEMOSYNE_CARD_COUNT):
-		var upgrade_count = get_card_upgrade_count(i)
-		var card_name = get_card_name(i)
-		var values = get_card_values(i)
-		summary += "• " + card_name + ": +" + str(upgrade_count) + " upgrades " + str(values) + "\n"
-	
-	summary += "\nGod Contributions:\n"
-	for deck_key in progression_data["god_contributions"]:
-		var contributions = progression_data["god_contributions"][deck_key]
-		summary += "• " + deck_key + ": " + str(contributions) + "/" + str(MAX_CONTRIBUTIONS_PER_DECK) + "\n"
+	if current < max_level:
+		var next_info = get_next_upgrade_info()
+		if not next_info.is_empty():
+			var stat_names = ["North", "East", "South", "West"]
+			summary += "\nNext: " + next_info["card_name"] + " " + stat_names[next_info["stat_index"]]
+	else:
+		summary += "\n(Maximum level reached)"
 	
 	return summary
 
-# === SAVE/LOAD ===
+# === PERSISTENCE ===
 
 func save_progression_data():
 	var save_file = FileAccess.open(save_path, FileAccess.WRITE)
@@ -201,20 +279,9 @@ func load_progression_data():
 	if FileAccess.file_exists(save_path):
 		var save_file = FileAccess.open(save_path, FileAccess.READ)
 		if save_file:
-			var loaded_data = save_file.get_var()
-			if loaded_data is Dictionary:
-				progression_data = loaded_data
-				
-				# Ensure all required keys exist (for save file migration)
-				if not "current_level" in progression_data:
-					progression_data["current_level"] = 0
-				if not "god_contributions" in progression_data:
-					progression_data["god_contributions"] = {}
-				if not "applied_upgrades" in progression_data:
-					progression_data["applied_upgrades"] = []
-				
-				print("Mnemosyne progression loaded")
+			progression_data = save_file.get_var()
 			save_file.close()
+			print("Mnemosyne progression loaded")
 		else:
 			print("Failed to load Mnemosyne progression!")
 	else:
@@ -222,21 +289,25 @@ func load_progression_data():
 
 # === DEBUG FUNCTIONS ===
 
-func debug_print_status():
-	print("=== MNEMOSYNE PROGRESS DEBUG ===")
-	print("Current Level: ", progression_data["current_level"])
-	print("Applied Upgrades: ", progression_data["applied_upgrades"].size())
-	print("God Contributions: ", progression_data["god_contributions"])
+func debug_progression_state():
+	print("=== MNEMOSYNE PROGRESSION DEBUG ===")
+	print("Current level: ", get_current_level())
+	print("Applied upgrades: ", progression_data["applied_upgrades"].size())
+	print("God contributions: ", progression_data["god_contributions"])
 	
 	for i in range(MNEMOSYNE_CARD_COUNT):
 		var values = get_card_values(i)
-		print(get_card_name(i), ": ", values)
+		var upgrades = get_card_upgrade_count(i)
+		var abilities = get_unlocked_abilities_for_card(i)
+		print("Card ", i, " (", CARD_NAMES[i], "): ", values, " (", upgrades, " upgrades, ", abilities.size(), " abilities)")
+	
+	print("====================================")
 
-func reset_all_progress():
+func reset_progression():
 	progression_data = {
 		"current_level": 0,
 		"god_contributions": {},
 		"applied_upgrades": []
 	}
 	save_progression_data()
-	print("Mnemosyne progress reset!")
+	print("Mnemosyne progression reset")
