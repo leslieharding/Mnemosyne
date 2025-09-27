@@ -5040,25 +5040,50 @@ func execute_dance_move(from_position: int, to_position: int, dancer_card: CardR
 	var card_collection_index = get_card_collection_index_for_dance(from_position)
 	var card_level = get_card_level(card_collection_index)
 	
-	# Clear the original position
-	clear_grid_slot(from_position)
-	
+	var existing_card_display = null
+	var from_slot = grid_slots[from_position]
+	for child in from_slot.get_children():
+		if child is CardDisplay:
+			existing_card_display = child
+			break
+
+	# FIXED: Clear the original position without using clear_grid_slot to avoid freeing the card display
+	grid_occupied[from_position] = false
+	grid_ownership[from_position] = Owner.NONE
+	grid_card_data[from_position] = null
+
+	# Clear passive abilities for this position
+	if from_position in active_passive_abilities:
+		active_passive_abilities.erase(from_position)
+
 	# Place the card at the new position
 	grid_occupied[to_position] = true
 	grid_ownership[to_position] = dancing_owner
 	grid_card_data[to_position] = dancer_card
-	
+
 	# Update grid to collection mapping for the new position
 	if card_collection_index != -1:
 		grid_to_collection_index[to_position] = card_collection_index
 		grid_to_collection_index.erase(from_position)
-	
-	# Create the visual card display at the new position
-	var slot = grid_slots[to_position]
-	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
-	var card_display = card_display_scene.instantiate()
-	card_display.setup(dancer_card)
-	slot.add_child(card_display)
+
+	# FIXED: Move the existing card display instead of creating a new one
+	if existing_card_display and is_instance_valid(existing_card_display):
+		# Remove from old slot
+		from_slot.remove_child(existing_card_display)
+		
+		# Add to new slot
+		var to_slot = grid_slots[to_position]
+		to_slot.add_child(existing_card_display)
+		
+		print("DancerAbility: Moved existing CardDisplay from position ", from_position, " to ", to_position)
+	else:
+		# Fallback: create new card display if the old one was somehow invalid
+		var slot = grid_slots[to_position]
+		var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+		var card_display = card_display_scene.instantiate()
+		card_display.setup(dancer_card, card_level, "", card_collection_index, dancing_owner == Owner.OPPONENT)
+		slot.add_child(card_display)
+		print("DancerAbility: Created new CardDisplay as fallback")
 	
 	# Execute placement effects at new location (like ordain bonus)
 	if dancing_owner == Owner.PLAYER:

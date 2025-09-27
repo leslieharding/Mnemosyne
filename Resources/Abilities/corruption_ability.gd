@@ -94,9 +94,13 @@ func process_corruption_turn(position: int, card: CardResource, game_manager) ->
 			print("Stats after corruption: ", target_card.values)
 			corruption_count += 1
 			
-			# Update the visual display to show the new stats
-			if game_manager.has_method("update_card_display"):
-				game_manager.update_card_display(target_position, target_card)
+			var target_slot = game_manager.grid_slots[target_position]
+			for child in target_slot.get_children():
+				if child is CardDisplay:
+					child.card_data = target_card  # Update the card data reference
+					child.update_display()         # Refresh the visual display
+					print("CorruptionAbility: Updated CardDisplay visual for corrupted card at position ", target_position)
+					break
 	
 	if corruption_count > 0:
 		print("CorruptionAbility activated! ", card.card_name, " corrupted ", corruption_count, " adjacent enemy cards")
