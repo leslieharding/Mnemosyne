@@ -129,6 +129,7 @@ func apply_contribution(god_name: String, deck_index: int) -> bool:
 
 # Called by BossVictoryTracker when a boss is defeated
 func check_boss_ability_unlocks(victory_key: String):
+	debug_boss_victory(victory_key)
 	var unlocked_any = false
 	
 	# Check each card for abilities unlocked by this boss victory
@@ -335,3 +336,24 @@ func reset_progression():
 	}
 	save_progression_data()
 	print("Mnemosyne progression reset")
+
+
+func debug_boss_victory(victory_key: String):
+	print("=== DEBUG BOSS VICTORY: ", victory_key, " ===")
+	print("Checking cards for abilities...")
+	
+	for card_index in card_boss_abilities.keys():
+		print("Card ", card_index, " (", CARD_NAMES[card_index], "):")
+		print("  Available victory keys: ", card_boss_abilities[card_index].keys())
+		
+		if victory_key in card_boss_abilities[card_index]:
+			var ability = card_boss_abilities[card_index][victory_key]
+			print("  MATCH FOUND! Ability: ", ability)
+			if ability:
+				print("  Ability name: ", ability.ability_name if "ability_name" in ability else "NO NAME PROPERTY")
+				print("  Has execute method: ", ability.has_method("execute"))
+			else:
+				print("  ERROR: Ability is null!")
+		else:
+			print("  No match for ", victory_key)
+	print("=====================================")
