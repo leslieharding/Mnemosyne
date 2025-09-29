@@ -42,6 +42,10 @@ var soothe_active: bool = false
 var opponent_hand_modal: OpponentHandModal = null
 var game_paused_for_modal: bool = false
 
+var active_volleys: Dictionary = {}  # volley_id -> volley_data
+var volley_id_counter: int = 0
+var volley_direction_modal: VolleyDirectionModal = null
+
 # Enrich mode variables
 var enrich_mode_active = false
 var current_enricher_position = -1
@@ -855,11 +859,13 @@ func _on_turn_changed(is_player_turn: bool):
 	# Process tremors at the start of each player's turn
 	if is_player_turn:
 		process_tremors_for_player(Owner.PLAYER)
+		process_volleys_for_player(Owner.PLAYER)
 		enable_player_input()
 		if is_boss_battle:
 			make_boss_prediction()
 	else:
 		process_tremors_for_player(Owner.OPPONENT)
+		process_volleys_for_player(Owner.OPPONENT)
 		disable_player_input()
 		# Only start opponent turn if not already thinking
 		if not opponent_is_thinking and not is_tutorial_mode and not game_paused_for_modal:
@@ -7349,3 +7355,262 @@ func activate_coordinate_power():
 		notification_manager.show_notification("🎯 Coordinate activated! You will play twice in a row.")
 	
 	return true
+
+func show_volley_direction_modal(source_position: int, owner: Owner, card: CardResource):
+	"""Show the directional selection modal for the Volley ability"""
+	if volley_direction_modal:
+		print("Volley direction modal already open - skipping")
+		return
+	
+	# Pause game interactions
+	game_paused_for_modal = true
+	disable_player_input()
+	
+	print("Creating volley direction modal...")
+	
+	# Create the modal from the scene file
+	var modal_scene = preload("res://Scenes/VolleyDirectionModal.tscn")
+	volley_direction_modal = modal_scene.instantiate()
+	
+	# Add it to the scene tree at a high layer
+	var canvas_layer = CanvasLayer.new()
+	canvas_layer.layer = 100
+	canvas_layer.name = "VolleyModalLayer"
+	add_child(canvas_layer)
+	canvas_layer.add_child(volley_direction_modal)
+	
+	# Connect the direction selected signal
+	volley_direction_modal.direction_selected.connect(_on_volley_direction_selected.bind(source_position, owner, card))
+	
+	print("Volley direction modal displayed")
+
+func _on_volley_direction_selected(direction: int, source_position: int, owner: Owner, card: CardResource):
+	"""Handle when a direction is selected for volley"""
+	print("Volley direction selected: ", direction, " for card at position ", source_position)
+	
+	# Register the volley
+	register_volley(source_position, direction, owner, 3)
+	
+	# Clean up modal reference
+	volley_direction_modal = null
+	
+	# Remove the canvas layer
+	var modal_layer = get_node_or_null("VolleyModalLayer")
+	if modal_layer:
+		modal_layer.queue_free()
+	
+	# Resume game
+	game_paused_for_modal = false
+	
+	# Re-enable player input if it's still the player's turn
+	if turn_manager.current_player == TurnManager.Player.HUMAN and turn_manager.is_game_active:
+		enable_player_input()
+	
+	# If it's the opponent's turn and they haven't started yet, start their turn
+	if turn_manager.is_opponent_turn() and not opponent_is_thinking:
+		call_deferred("opponent_take_turn")
+
+# ============================================
+# Add this function to register volleys
+# Can be placed near register_tremors() around line 2070
+# ============================================
+
+func register_volley(source_position: int, direction: int, owner: Owner, shots_remaining: int):
+	var volley_id = volley_id_counter
+	volley_id_counter += 1
+	
+	active_volleys[volley_id] = {
+		"source_position": source_position,
+		"direction": direction,  # 0=North, 1=East, 2=South, 3=West
+		"owner": owner,
+		"shots_remaining": shots_remaining,
+		"turn_registered": get_current_turn_number()
+	}
+	
+	print("Volley registered: ID ", volley_id, " from position ", source_position, " direction ", direction, " for ", shots_remaining, " shots")
+
+# ============================================
+# Add this function to process volleys at turn start
+# Can be placed near process_tremors_for_player() around line 2080
+# ============================================
+
+func process_volleys_for_player(player_owner: Owner):
+	print("Processing volleys for ", "Player" if player_owner == Owner.PLAYER else "Opponent")
+	
+	var volleys_to_remove = []
+	
+	for volley_id in active_volleys:
+		var volley_data = active_volleys[volley_id]
+		
+		# Only process volleys owned by the current player
+		if volley_data.owner != player_owner:
+			continue
+		
+		# Check if source card still exists and is owned by the original owner
+		var source_position = volley_data.source_position
+		if not grid_occupied[source_position] or grid_ownership[source_position] != volley_data.owner:
+			print("Volley source card captured/removed - ending volleys for ID ", volley_id)
+			volleys_to_remove.append(volley_id)
+			continue
+		
+		# Get the direction name for notification
+		var direction_name = get_direction_name_from_index(volley_data.direction)
+		var shot_num = 4 - volley_data.shots_remaining
+		
+		# Show notification
+		if notification_manager:
+			notification_manager.show_notification("Volley " + str(shot_num) + " of 3 fired " + direction_name)
+		
+		# Process the volley shot
+		process_single_volley(volley_id, volley_data)
+		
+		# Decrease shots remaining
+		volley_data.shots_remaining -= 1
+		if volley_data.shots_remaining <= 0:
+			print("Volley expired: ID ", volley_id)
+			volleys_to_remove.append(volley_id)
+	
+	# Remove expired volleys
+	for volley_id in volleys_to_remove:
+		active_volleys.erase(volley_id)
+
+# ============================================
+# Add this function to process a single volley shot
+# Can be placed after process_volleys_for_player()
+# ============================================
+
+func process_single_volley(volley_id: int, volley_data: Dictionary):
+	var source_position = volley_data.source_position
+	var direction = volley_data.direction
+	var volley_owner = volley_data.owner
+	
+	# Get source card data
+	var source_card = grid_card_data[source_position]
+	if not source_card:
+		print("Warning: Volley source card data missing")
+		return
+	
+	# Get direction deltas
+	var dir_info = get_direction_info(direction)
+	if not dir_info:
+		print("Warning: Invalid volley direction")
+		return
+	
+	# Calculate source position in grid coordinates
+	var source_x = source_position % grid_size
+	var source_y = source_position / grid_size
+	
+	# Check slot 1 (adjacent)
+	var target1_x = source_x + dir_info.dx
+	var target1_y = source_y + dir_info.dy
+	var target1_index = -1
+	
+	if target1_x >= 0 and target1_x < grid_size and target1_y >= 0 and target1_y < grid_size:
+		target1_index = target1_y * grid_size + target1_x
+	
+	# Check slot 2 (2 spaces away)
+	var target2_x = source_x + (dir_info.dx * 2)
+	var target2_y = source_y + (dir_info.dy * 2)
+	var target2_index = -1
+	
+	if target2_x >= 0 and target2_x < grid_size and target2_y >= 0 and target2_y < grid_size:
+		target2_index = target2_y * grid_size + target2_x
+	
+	# Determine which target to hit
+	var target_index = -1
+	
+	if target1_index != -1 and grid_occupied[target1_index]:
+		# Slot 1 has a card - arrow stops here
+		target_index = target1_index
+	elif target2_index != -1 and grid_occupied[target2_index]:
+		# Slot 1 empty, slot 2 has a card
+		target_index = target2_index
+	else:
+		# No targets - miss
+		print("Volley missed - no targets in firing line")
+		if notification_manager:
+			notification_manager.show_notification("Volley missed!")
+		return
+	
+	# We have a target
+	var target_owner = grid_ownership[target_index]
+	var target_card = grid_card_data[target_index]
+	
+	# Check if target is an ally
+	if target_owner == volley_owner:
+		print("Volley hit allied card - no effect")
+		if notification_manager:
+			notification_manager.show_notification("Arrow blocked by ally")
+		return
+	
+	# Target is an enemy - resolve combat
+	print("Volley hitting enemy at position ", target_index)
+	
+	# Use directional combat
+	var attacker_value = source_card.values[dir_info.my_value_index]
+	var defender_value = target_card.values[dir_info.their_value_index]
+	
+	print("Volley combat: Attacker ", attacker_value, " vs Defender ", defender_value)
+	
+	if attacker_value > defender_value:
+		# Capture the target
+		print("Volley captured enemy card at position ", target_index)
+		
+		# Execute capture
+		grid_ownership[target_index] = volley_owner
+		
+		# Show capture visual
+		var target_card_display = get_card_display_at_position(target_index)
+		if target_card_display and visual_effects_manager:
+			visual_effects_manager.show_capture_flash(target_card_display, volley_owner == Owner.PLAYER)
+		
+		# Award experience for volley capture
+		if volley_owner == Owner.PLAYER:
+			var source_card_index = get_card_collection_index(source_position)
+			if source_card_index != -1:
+				var exp_tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+				if exp_tracker:
+					exp_tracker.add_capture_exp(source_card_index, 10)
+					print("Volley capture awarded 10 exp to card at collection index ", source_card_index)
+		
+		# Execute ON_CAPTURE abilities
+		var target_card_collection_index = get_card_collection_index(target_index)
+		var target_card_level = get_card_level(target_card_collection_index)
+		
+		if target_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, target_card_level):
+			var capture_context = {
+				"captured_card": target_card,
+				"captured_position": target_index,
+				"capturing_card": source_card,
+				"capturing_position": source_position,
+				"game_manager": self,
+				"direction": dir_info.name,
+				"card_level": target_card_level
+			}
+			target_card.execute_abilities(CardAbility.TriggerType.ON_CAPTURE, capture_context, target_card_level)
+		
+		# Update UI
+		update_board_visuals()
+	else:
+		print("Volley failed to capture - defender too strong")
+		if notification_manager:
+			notification_manager.show_notification("Volley deflected!")
+
+# ============================================
+# Add this helper function to get direction info
+# Can be placed after process_single_volley()
+# ============================================
+
+func get_direction_info(direction: int) -> Dictionary:
+	# Returns direction delta and value indices for combat
+	match direction:
+		0:  # North
+			return {"dx": 0, "dy": -1, "my_value_index": 0, "their_value_index": 2, "name": "North"}
+		1:  # East
+			return {"dx": 1, "dy": 0, "my_value_index": 1, "their_value_index": 3, "name": "East"}
+		2:  # South
+			return {"dx": 0, "dy": 1, "my_value_index": 2, "their_value_index": 0, "name": "South"}
+		3:  # West
+			return {"dx": -1, "dy": 0, "my_value_index": 3, "their_value_index": 1, "name": "West"}
+		_:
+			return {}

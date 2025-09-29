@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="VolleyAbility" load_steps=2 format=3 uid="uid://x8bbhtjln0to"]
+
+[ext_resource type="Script" uid="uid://cbulr8qu0u1fj" path="res://Resources/Abilities/volley_ability.gd" id="1_ydb35"]
+
+[resource]
+script = ExtResource("1_ydb35")
+ability_name = "Volley"
+description = "At the start of your next 3 turns, this card fires an arrow in the selected direction."
+metadata/_custom_type_script = "uid://cbulr8qu0u1fj"
