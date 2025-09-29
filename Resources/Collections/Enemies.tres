@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=195 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=252 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -1259,6 +1259,320 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_eeisl"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_nrk2q")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_gr0xj"]
+script = ExtResource("2_xcqsp")
+card_name = "Brontes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_s4ywq"]
+script = ExtResource("2_xcqsp")
+card_name = "Steropes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_hjvcs"]
+script = ExtResource("2_xcqsp")
+card_name = "Arges"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_q75w4"]
+script = ExtResource("2_xcqsp")
+card_name = "Daedalus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_igddo"]
+script = ExtResource("2_xcqsp")
+card_name = "Icarus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7vsw5"]
+script = ExtResource("2_xcqsp")
+card_name = "Brontes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_b8v1v"]
+script = ExtResource("2_xcqsp")
+card_name = "Steropes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_gysws"]
+script = ExtResource("2_xcqsp")
+card_name = "Arges"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_byvew"]
+script = ExtResource("2_xcqsp")
+card_name = "Daedalus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_5o4ql"]
+script = ExtResource("2_xcqsp")
+card_name = "Icarus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_gtjee"]
+script = ExtResource("2_xcqsp")
+card_name = "Brontes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_1bcjg"]
+script = ExtResource("2_xcqsp")
+card_name = "Steropes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_1wq57"]
+script = ExtResource("2_xcqsp")
+card_name = "Arges"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_cmpjq"]
+script = ExtResource("2_xcqsp")
+card_name = "Daedalus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_j8i2h"]
+script = ExtResource("2_xcqsp")
+card_name = "Icarus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_h21fd"]
+script = ExtResource("3_601pn")
+deck_name = "Craftsmen 1"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_tetdj"]
+script = ExtResource("3_601pn")
+deck_name = "Craftsmen"
+deck_description = "level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_6d3gv"]
+script = ExtResource("3_601pn")
+deck_name = "Craftsmen"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_arlqt"]
+script = ExtResource("1_e7ref")
+enemy_name = "Craftsmen"
+enemy_description = "Beautiful creations to rival hephaestus himself"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_gr0xj"), SubResource("Resource_s4ywq"), SubResource("Resource_hjvcs"), SubResource("Resource_q75w4"), SubResource("Resource_igddo"), SubResource("Resource_7vsw5"), SubResource("Resource_b8v1v"), SubResource("Resource_gysws"), SubResource("Resource_byvew"), SubResource("Resource_5o4ql"), SubResource("Resource_gtjee"), SubResource("Resource_1bcjg"), SubResource("Resource_1wq57"), SubResource("Resource_cmpjq"), SubResource("Resource_j8i2h")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_h21fd"), SubResource("Resource_tetdj"), SubResource("Resource_6d3gv")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_wkbxl"]
+script = ExtResource("2_xcqsp")
+card_name = "Typhon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_slolt"]
+script = ExtResource("2_xcqsp")
+card_name = "Echidna"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_hsh3b"]
+script = ExtResource("2_xcqsp")
+card_name = "Alcyoneus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_jnf2v"]
+script = ExtResource("2_xcqsp")
+card_name = "Porphyrion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_wjixo"]
+script = ExtResource("2_xcqsp")
+card_name = "Enceladus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_thrr0"]
+script = ExtResource("2_xcqsp")
+card_name = "Typhon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_b5g45"]
+script = ExtResource("2_xcqsp")
+card_name = "Echidna"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_qeou4"]
+script = ExtResource("2_xcqsp")
+card_name = "Alcyoneus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_tyopu"]
+script = ExtResource("2_xcqsp")
+card_name = "Porphyrion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_hx3bo"]
+script = ExtResource("2_xcqsp")
+card_name = "Enceladus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_mt8hw"]
+script = ExtResource("2_xcqsp")
+card_name = "Typhon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_mjsp8"]
+script = ExtResource("2_xcqsp")
+card_name = "Echidna"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_aiele"]
+script = ExtResource("2_xcqsp")
+card_name = "Alcyoneus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_0w7xa"]
+script = ExtResource("2_xcqsp")
+card_name = "Porphyrion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_pnr51"]
+script = ExtResource("2_xcqsp")
+card_name = "Enceladus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_g1csu"]
+script = ExtResource("3_601pn")
+deck_name = "Giants"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_ydp47"]
+script = ExtResource("3_601pn")
+deck_name = "Giants"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_g1plx"]
+script = ExtResource("3_601pn")
+deck_name = "Giants"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_ofow0"]
+script = ExtResource("1_e7ref")
+enemy_name = "Giants"
+enemy_description = "The Gaia generation are still waiting for their time to take Olympus"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_wkbxl"), SubResource("Resource_slolt"), SubResource("Resource_hsh3b"), SubResource("Resource_jnf2v"), SubResource("Resource_wjixo"), SubResource("Resource_thrr0"), SubResource("Resource_b5g45"), SubResource("Resource_qeou4"), SubResource("Resource_tyopu"), SubResource("Resource_hx3bo"), SubResource("Resource_mt8hw"), SubResource("Resource_mjsp8"), SubResource("Resource_aiele"), SubResource("Resource_0w7xa"), SubResource("Resource_pnr51")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_g1csu"), SubResource("Resource_ydp47"), SubResource("Resource_g1plx")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_qqdll"]
+script = ExtResource("2_xcqsp")
+card_name = "Nemian Lion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ylqbb"]
+script = ExtResource("2_xcqsp")
+card_name = "Ceryneian Hind"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_us2li"]
+script = ExtResource("2_xcqsp")
+card_name = "Erymanthian Boar"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_hagql"]
+script = ExtResource("2_xcqsp")
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_f325l"]
+script = ExtResource("2_xcqsp")
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_xkavt"]
+script = ExtResource("2_xcqsp")
+card_name = "Nemian Lion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_iceqr"]
+script = ExtResource("2_xcqsp")
+card_name = "Ceryneian Hind"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_waifj"]
+script = ExtResource("2_xcqsp")
+card_name = "Erymanthian Boar"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_dpxsw"]
+script = ExtResource("2_xcqsp")
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_y3qva"]
+script = ExtResource("2_xcqsp")
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_45hcx"]
+script = ExtResource("2_xcqsp")
+card_name = "Nemian Lion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_cp6g7"]
+script = ExtResource("2_xcqsp")
+card_name = "Ceryneian Hind"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_doqhv"]
+script = ExtResource("2_xcqsp")
+card_name = "Erymanthian Boar"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ht7ut"]
+script = ExtResource("2_xcqsp")
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_08s53"]
+script = ExtResource("2_xcqsp")
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_2mpk6"]
+script = ExtResource("3_601pn")
+deck_name = "Animal Foes of Heracles"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_atujd"]
+script = ExtResource("3_601pn")
+deck_name = "Animal Foes of Heracles"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_5fef0"]
+script = ExtResource("3_601pn")
+deck_name = "Animal Foes of Heracles"
+deck_description = "Level 3 "
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_1lucb"]
+script = ExtResource("1_e7ref")
+enemy_name = "Animal Foes of Heracles"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_qqdll"), SubResource("Resource_ylqbb"), SubResource("Resource_us2li"), SubResource("Resource_hagql"), SubResource("Resource_f325l"), SubResource("Resource_xkavt"), SubResource("Resource_iceqr"), SubResource("Resource_waifj"), SubResource("Resource_dpxsw"), SubResource("Resource_y3qva"), SubResource("Resource_45hcx"), SubResource("Resource_cp6g7"), SubResource("Resource_doqhv"), SubResource("Resource_ht7ut"), SubResource("Resource_08s53")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_2mpk6"), SubResource("Resource_atujd"), SubResource("Resource_5fef0")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
 [resource]
 script = ExtResource("4_a5nvj")
-enemies = Array[ExtResource("1_e7ref")]([SubResource("Resource_efy6x"), SubResource("Resource_y0w8m"), SubResource("Resource_bdmj8"), SubResource("Resource_tahvs"), SubResource("Resource_bsikd"), SubResource("Resource_25nh6"), SubResource("Resource_i1x7r"), SubResource("Resource_go2fa"), SubResource("Resource_e0pot"), SubResource("Resource_keqme")])
+enemies = Array[ExtResource("1_e7ref")]([SubResource("Resource_efy6x"), SubResource("Resource_y0w8m"), SubResource("Resource_bdmj8"), SubResource("Resource_tahvs"), SubResource("Resource_bsikd"), SubResource("Resource_25nh6"), SubResource("Resource_i1x7r"), SubResource("Resource_go2fa"), SubResource("Resource_e0pot"), SubResource("Resource_keqme"), SubResource("Resource_arlqt"), SubResource("Resource_ofow0"), SubResource("Resource_1lucb")])
