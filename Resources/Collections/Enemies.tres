@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=252 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=496 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -1490,10 +1490,12 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hagql"]
 script = ExtResource("2_xcqsp")
+card_name = "Stymphalian Birds"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_f325l"]
 script = ExtResource("2_xcqsp")
+card_name = "Cretan Bull"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xkavt"]
@@ -1513,10 +1515,12 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_dpxsw"]
 script = ExtResource("2_xcqsp")
+card_name = "Stymphalian Birds"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_y3qva"]
 script = ExtResource("2_xcqsp")
+card_name = "Cretan Bull"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_45hcx"]
@@ -1536,10 +1540,12 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ht7ut"]
 script = ExtResource("2_xcqsp")
+card_name = "Stymphalian Birds"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_08s53"]
 script = ExtResource("2_xcqsp")
+card_name = "Cretan Bull"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2mpk6"]
@@ -1573,6 +1579,1360 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_qqdll"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_2mpk6"), SubResource("Resource_atujd"), SubResource("Resource_5fef0")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_0hkfq"]
+script = ExtResource("2_xcqsp")
+card_name = "Lernaean Hydra"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_vdgh6"]
+script = ExtResource("2_xcqsp")
+card_name = "Geryon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_xevch"]
+script = ExtResource("2_xcqsp")
+card_name = "Antaeus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_2kjvc"]
+script = ExtResource("2_xcqsp")
+card_name = "Nessus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_nhcai"]
+script = ExtResource("2_xcqsp")
+card_name = "Caucus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_q8cq5"]
+script = ExtResource("2_xcqsp")
+card_name = "Lernaean Hydra"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_op6xp"]
+script = ExtResource("2_xcqsp")
+card_name = "Geryon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ii6a8"]
+script = ExtResource("2_xcqsp")
+card_name = "Antaeus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_lpes6"]
+script = ExtResource("2_xcqsp")
+card_name = "Nessus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_otgnn"]
+script = ExtResource("2_xcqsp")
+card_name = "Caucus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_hqm4o"]
+script = ExtResource("2_xcqsp")
+card_name = "Lernaean Hydra"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7m0nf"]
+script = ExtResource("2_xcqsp")
+card_name = "Geryon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_jes06"]
+script = ExtResource("2_xcqsp")
+card_name = "Antaeus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_d38lb"]
+script = ExtResource("2_xcqsp")
+card_name = "Nessus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_jh7cp"]
+script = ExtResource("2_xcqsp")
+card_name = "Caucus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ixl0x"]
+script = ExtResource("3_601pn")
+deck_name = "Creature Foes of Heracles"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_qmwuc"]
+script = ExtResource("3_601pn")
+deck_name = "Creature Foes of Heracles"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_fiiis"]
+script = ExtResource("3_601pn")
+deck_name = "Creature Foes of Heracles"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_6sn3q"]
+script = ExtResource("1_e7ref")
+enemy_name = "Creature Foes of Heracles"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_0hkfq"), SubResource("Resource_vdgh6"), SubResource("Resource_xevch"), SubResource("Resource_2kjvc"), SubResource("Resource_nhcai"), SubResource("Resource_q8cq5"), SubResource("Resource_op6xp"), SubResource("Resource_ii6a8"), SubResource("Resource_lpes6"), SubResource("Resource_otgnn"), SubResource("Resource_hqm4o"), SubResource("Resource_7m0nf"), SubResource("Resource_jes06"), SubResource("Resource_d38lb"), SubResource("Resource_jh7cp")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_ixl0x"), SubResource("Resource_qmwuc"), SubResource("Resource_fiiis")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_lmtjb"]
+script = ExtResource("2_xcqsp")
+card_name = "Eurystheus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_k6viv"]
+script = ExtResource("2_xcqsp")
+card_name = "Augeas"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_1b7m7"]
+script = ExtResource("2_xcqsp")
+card_name = "Lycus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_6hn0s"]
+script = ExtResource("2_xcqsp")
+card_name = "Neleus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_4xi8q"]
+script = ExtResource("2_xcqsp")
+card_name = "Laomedon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_s8l0t"]
+script = ExtResource("2_xcqsp")
+card_name = "Eurystheus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_cyy2l"]
+script = ExtResource("2_xcqsp")
+card_name = "Augeas"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_1k8u1"]
+script = ExtResource("2_xcqsp")
+card_name = "Lycus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_psohk"]
+script = ExtResource("2_xcqsp")
+card_name = "Neleus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_cs5xl"]
+script = ExtResource("2_xcqsp")
+card_name = "Laomedon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_0n7hm"]
+script = ExtResource("2_xcqsp")
+card_name = "Eurystheus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_c8bfg"]
+script = ExtResource("2_xcqsp")
+card_name = "Augeas"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_hpg3d"]
+script = ExtResource("2_xcqsp")
+card_name = "Lycus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_2bmv8"]
+script = ExtResource("2_xcqsp")
+card_name = "Neleus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_qf2wx"]
+script = ExtResource("2_xcqsp")
+card_name = "Laomedon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_66kuf"]
+script = ExtResource("3_601pn")
+deck_name = "Human Foes of Heracles"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_nsmj4"]
+script = ExtResource("3_601pn")
+deck_name = "Human Foes of Heracles"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_iceon"]
+script = ExtResource("3_601pn")
+deck_name = "Human Foes of Heracles"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_lrgju"]
+script = ExtResource("1_e7ref")
+enemy_name = "Human Foes of Heracles"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_lmtjb"), SubResource("Resource_k6viv"), SubResource("Resource_1b7m7"), SubResource("Resource_6hn0s"), SubResource("Resource_4xi8q"), SubResource("Resource_s8l0t"), SubResource("Resource_cyy2l"), SubResource("Resource_1k8u1"), SubResource("Resource_psohk"), SubResource("Resource_cs5xl"), SubResource("Resource_0n7hm"), SubResource("Resource_c8bfg"), SubResource("Resource_hpg3d"), SubResource("Resource_2bmv8"), SubResource("Resource_qf2wx")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_66kuf"), SubResource("Resource_nsmj4"), SubResource("Resource_iceon")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_sx1u7"]
+script = ExtResource("2_xcqsp")
+card_name = "Hypnos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_casoc"]
+script = ExtResource("2_xcqsp")
+card_name = "Morpheus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_tcg2e"]
+script = ExtResource("2_xcqsp")
+card_name = "Phobetor"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_xgshi"]
+script = ExtResource("2_xcqsp")
+card_name = "Phantasos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_moy4t"]
+script = ExtResource("2_xcqsp")
+card_name = "Lethe"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_1uaba"]
+script = ExtResource("2_xcqsp")
+card_name = "Hypnos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_4su5n"]
+script = ExtResource("2_xcqsp")
+card_name = "Morpheus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_anro1"]
+script = ExtResource("2_xcqsp")
+card_name = "Phobetor"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_4tgq4"]
+script = ExtResource("2_xcqsp")
+card_name = "Phantasos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_c0kee"]
+script = ExtResource("2_xcqsp")
+card_name = "Lethe"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_3i16t"]
+script = ExtResource("2_xcqsp")
+card_name = "Hypnos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_l311s"]
+script = ExtResource("2_xcqsp")
+card_name = "Morpheus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_0jtkh"]
+script = ExtResource("2_xcqsp")
+card_name = "Phobetor"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_fd8ao"]
+script = ExtResource("2_xcqsp")
+card_name = "Phantasos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_xd3pl"]
+script = ExtResource("2_xcqsp")
+card_name = "Lethe"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_k2ri4"]
+script = ExtResource("3_601pn")
+deck_name = "Sleep"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_ivtli"]
+script = ExtResource("3_601pn")
+deck_name = "Sleep "
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_ry2r1"]
+script = ExtResource("3_601pn")
+deck_name = "Sleep"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_iwe3x"]
+script = ExtResource("1_e7ref")
+enemy_name = "Sleep"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_sx1u7"), SubResource("Resource_casoc"), SubResource("Resource_tcg2e"), SubResource("Resource_xgshi"), SubResource("Resource_moy4t"), SubResource("Resource_1uaba"), SubResource("Resource_4su5n"), SubResource("Resource_anro1"), SubResource("Resource_4tgq4"), SubResource("Resource_c0kee"), SubResource("Resource_3i16t"), SubResource("Resource_l311s"), SubResource("Resource_0jtkh"), SubResource("Resource_fd8ao"), SubResource("Resource_xd3pl")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_k2ri4"), SubResource("Resource_ivtli"), SubResource("Resource_ry2r1")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_0xkme"]
+script = ExtResource("2_xcqsp")
+card_name = "Hippolyta"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ipscd"]
+script = ExtResource("2_xcqsp")
+card_name = "Penthesilea"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_kgdai"]
+script = ExtResource("2_xcqsp")
+card_name = "Antiope"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_h2ihk"]
+script = ExtResource("2_xcqsp")
+card_name = "Ortihyia"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ok5r3"]
+script = ExtResource("2_xcqsp")
+card_name = "Melanippe"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_0lwlj"]
+script = ExtResource("2_xcqsp")
+card_name = "Hippolyta"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_vxoeu"]
+script = ExtResource("2_xcqsp")
+card_name = "Penthesilea"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_awqpr"]
+script = ExtResource("2_xcqsp")
+card_name = "Antiope"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_fooao"]
+script = ExtResource("2_xcqsp")
+card_name = "Ortihyia"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_nkwwd"]
+script = ExtResource("2_xcqsp")
+card_name = "Melanippe"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_3g22x"]
+script = ExtResource("2_xcqsp")
+card_name = "Hippolyta"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_qp1j3"]
+script = ExtResource("2_xcqsp")
+card_name = "Penthesilea"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_efvm1"]
+script = ExtResource("2_xcqsp")
+card_name = "Antiope"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_p460b"]
+script = ExtResource("2_xcqsp")
+card_name = "Ortihyia"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_71fym"]
+script = ExtResource("2_xcqsp")
+card_name = "Melanippe"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_pvqt1"]
+script = ExtResource("3_601pn")
+deck_name = "Amazons"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_7bpic"]
+script = ExtResource("3_601pn")
+deck_name = "Amazons"
+deck_description = "Level 2 "
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_7jdex"]
+script = ExtResource("3_601pn")
+deck_name = "Amazons"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_gn4yd"]
+script = ExtResource("1_e7ref")
+enemy_name = "Amazons"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_0xkme"), SubResource("Resource_ipscd"), SubResource("Resource_kgdai"), SubResource("Resource_h2ihk"), SubResource("Resource_ok5r3"), SubResource("Resource_0lwlj"), SubResource("Resource_vxoeu"), SubResource("Resource_awqpr"), SubResource("Resource_fooao"), SubResource("Resource_nkwwd"), SubResource("Resource_3g22x"), SubResource("Resource_qp1j3"), SubResource("Resource_efvm1"), SubResource("Resource_p460b"), SubResource("Resource_71fym")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_pvqt1"), SubResource("Resource_7bpic"), SubResource("Resource_7jdex")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_3mljd"]
+script = ExtResource("2_xcqsp")
+card_name = "Pamphredo"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_etni1"]
+script = ExtResource("2_xcqsp")
+card_name = "Deino"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_sv88j"]
+script = ExtResource("2_xcqsp")
+card_name = "Enyo"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ndpv3"]
+script = ExtResource("2_xcqsp")
+card_name = "Stheno"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_0f2du"]
+script = ExtResource("2_xcqsp")
+card_name = "Eurayle"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_8yt5e"]
+script = ExtResource("2_xcqsp")
+card_name = "Pamphredo"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_8r6bt"]
+script = ExtResource("2_xcqsp")
+card_name = "Deino"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_4lpco"]
+script = ExtResource("2_xcqsp")
+card_name = "Enyo"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_x8k5p"]
+script = ExtResource("2_xcqsp")
+card_name = "Stheno"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_vm3ob"]
+script = ExtResource("2_xcqsp")
+card_name = "Eurayle"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_io75k"]
+script = ExtResource("2_xcqsp")
+card_name = "Pamphredo"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_x8thm"]
+script = ExtResource("2_xcqsp")
+card_name = "Deino"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_tyd6l"]
+script = ExtResource("2_xcqsp")
+card_name = "Enyo"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_0v5fe"]
+script = ExtResource("2_xcqsp")
+card_name = "Stheno"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_5sra8"]
+script = ExtResource("2_xcqsp")
+card_name = "Eurayle"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_rt4kd"]
+script = ExtResource("3_601pn")
+deck_name = "The Graeae"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_sgvu1"]
+script = ExtResource("3_601pn")
+deck_name = "The Graeae"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_rgx8d"]
+script = ExtResource("3_601pn")
+deck_name = "The Graeae"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_fcoum"]
+script = ExtResource("1_e7ref")
+enemy_name = "The Graeae"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_3mljd"), SubResource("Resource_etni1"), SubResource("Resource_sv88j"), SubResource("Resource_ndpv3"), SubResource("Resource_0f2du"), SubResource("Resource_8yt5e"), SubResource("Resource_8r6bt"), SubResource("Resource_4lpco"), SubResource("Resource_x8k5p"), SubResource("Resource_vm3ob"), SubResource("Resource_io75k"), SubResource("Resource_x8thm"), SubResource("Resource_tyd6l"), SubResource("Resource_0v5fe"), SubResource("Resource_5sra8")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_rt4kd"), SubResource("Resource_sgvu1"), SubResource("Resource_rgx8d")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_ji3j4"]
+script = ExtResource("2_xcqsp")
+card_name = "Agape"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_j61fv"]
+script = ExtResource("2_xcqsp")
+card_name = "Phillia"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_vdtsq"]
+script = ExtResource("2_xcqsp")
+card_name = "Storge"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_m3p87"]
+script = ExtResource("2_xcqsp")
+card_name = "Ludus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7pmn1"]
+script = ExtResource("2_xcqsp")
+card_name = "Pragma"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_13dgc"]
+script = ExtResource("2_xcqsp")
+card_name = "Agape"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_5uu6l"]
+script = ExtResource("2_xcqsp")
+card_name = "Phillia"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_53bvp"]
+script = ExtResource("2_xcqsp")
+card_name = "Storge"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7w5wj"]
+script = ExtResource("2_xcqsp")
+card_name = "Ludus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_f2b55"]
+script = ExtResource("2_xcqsp")
+card_name = "Pragma"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_0gx84"]
+script = ExtResource("2_xcqsp")
+card_name = "Agape"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_tuc7k"]
+script = ExtResource("2_xcqsp")
+card_name = "Phillia"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_fufya"]
+script = ExtResource("2_xcqsp")
+card_name = "Storge"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_cwvwu"]
+script = ExtResource("2_xcqsp")
+card_name = "Ludus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_uf8ur"]
+script = ExtResource("2_xcqsp")
+card_name = "Pragma"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ksx4d"]
+script = ExtResource("3_601pn")
+deck_name = "Rogue Love"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_dgb65"]
+script = ExtResource("3_601pn")
+deck_name = "Rogue Love"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_uwjbv"]
+script = ExtResource("3_601pn")
+deck_name = "Rogue Love"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_ruq1d"]
+script = ExtResource("1_e7ref")
+enemy_name = "Rogue Love"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_ji3j4"), SubResource("Resource_j61fv"), SubResource("Resource_vdtsq"), SubResource("Resource_m3p87"), SubResource("Resource_7pmn1"), SubResource("Resource_13dgc"), SubResource("Resource_5uu6l"), SubResource("Resource_53bvp"), SubResource("Resource_7w5wj"), SubResource("Resource_f2b55"), SubResource("Resource_0gx84"), SubResource("Resource_tuc7k"), SubResource("Resource_fufya"), SubResource("Resource_cwvwu"), SubResource("Resource_uf8ur")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_ksx4d"), SubResource("Resource_dgb65"), SubResource("Resource_uwjbv")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_x0dbj"]
+script = ExtResource("2_xcqsp")
+card_name = "Aparte"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_2014u"]
+script = ExtResource("2_xcqsp")
+card_name = "Geras"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_gciji"]
+script = ExtResource("2_xcqsp")
+card_name = "Eris"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_hf3l5"]
+script = ExtResource("2_xcqsp")
+card_name = "Phobos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ulagn"]
+script = ExtResource("2_xcqsp")
+card_name = "Ponos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_wsx8j"]
+script = ExtResource("2_xcqsp")
+card_name = "Aparte"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_jih0t"]
+script = ExtResource("2_xcqsp")
+card_name = "Geras"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_jxoag"]
+script = ExtResource("2_xcqsp")
+card_name = "Eris"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_o7b3b"]
+script = ExtResource("2_xcqsp")
+card_name = "Phobos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_hylkq"]
+script = ExtResource("2_xcqsp")
+card_name = "Ponos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7qrof"]
+script = ExtResource("2_xcqsp")
+card_name = "Aparte"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_2b14q"]
+script = ExtResource("2_xcqsp")
+card_name = "Geras"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_iicxb"]
+script = ExtResource("2_xcqsp")
+card_name = "Eris"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_2g0p6"]
+script = ExtResource("2_xcqsp")
+card_name = "Phobos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ryebc"]
+script = ExtResource("2_xcqsp")
+card_name = "Ponos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_asfaw"]
+script = ExtResource("3_601pn")
+deck_name = "Pandora's box"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_1bi7m"]
+script = ExtResource("3_601pn")
+deck_name = "Pandora's box"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_y3j3v"]
+script = ExtResource("3_601pn")
+deck_name = "Pandora's box"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_3smum"]
+script = ExtResource("1_e7ref")
+enemy_name = "Pandora's box"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_x0dbj"), SubResource("Resource_2014u"), SubResource("Resource_gciji"), SubResource("Resource_hf3l5"), SubResource("Resource_ulagn"), SubResource("Resource_wsx8j"), SubResource("Resource_jih0t"), SubResource("Resource_jxoag"), SubResource("Resource_o7b3b"), SubResource("Resource_hylkq"), SubResource("Resource_7qrof"), SubResource("Resource_2b14q"), SubResource("Resource_iicxb"), SubResource("Resource_2g0p6"), SubResource("Resource_ryebc")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_asfaw"), SubResource("Resource_1bi7m"), SubResource("Resource_y3j3v")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_4hn3y"]
+script = ExtResource("2_xcqsp")
+card_name = "Narcissus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_krri3"]
+script = ExtResource("2_xcqsp")
+card_name = "Hyacinthus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_a1d0l"]
+script = ExtResource("2_xcqsp")
+card_name = "Endymion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_wvs6b"]
+script = ExtResource("2_xcqsp")
+card_name = "Helen"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_lajff"]
+script = ExtResource("2_xcqsp")
+card_name = "Andromeda"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_yowfl"]
+script = ExtResource("2_xcqsp")
+card_name = "Narcissus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7lah4"]
+script = ExtResource("2_xcqsp")
+card_name = "Hyacinthus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_w0qee"]
+script = ExtResource("2_xcqsp")
+card_name = "Endymion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_lckab"]
+script = ExtResource("2_xcqsp")
+card_name = "Helen"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_4v345"]
+script = ExtResource("2_xcqsp")
+card_name = "Andromeda"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_md6vc"]
+script = ExtResource("2_xcqsp")
+card_name = "Narcissus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_6i2da"]
+script = ExtResource("2_xcqsp")
+card_name = "Hyacinthus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_hcc02"]
+script = ExtResource("2_xcqsp")
+card_name = "Endymion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_jpqut"]
+script = ExtResource("2_xcqsp")
+card_name = "Helen"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_tuvfp"]
+script = ExtResource("2_xcqsp")
+card_name = "Andromeda"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_chfja"]
+script = ExtResource("3_601pn")
+deck_name = "So beautiful it hurts"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_ci4fy"]
+script = ExtResource("3_601pn")
+deck_name = "So beautiful it hurts"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_kp3sj"]
+script = ExtResource("3_601pn")
+deck_name = "So beautiful it hurts"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_7e6hb"]
+script = ExtResource("1_e7ref")
+enemy_name = "So beautiful it hurts"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_4hn3y"), SubResource("Resource_krri3"), SubResource("Resource_a1d0l"), SubResource("Resource_wvs6b"), SubResource("Resource_lajff"), SubResource("Resource_yowfl"), SubResource("Resource_7lah4"), SubResource("Resource_w0qee"), SubResource("Resource_lckab"), SubResource("Resource_4v345"), SubResource("Resource_md6vc"), SubResource("Resource_6i2da"), SubResource("Resource_hcc02"), SubResource("Resource_jpqut"), SubResource("Resource_tuvfp")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_chfja"), SubResource("Resource_ci4fy"), SubResource("Resource_kp3sj")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_m3ito"]
+script = ExtResource("2_xcqsp")
+card_name = "Pasiphae"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_bdu77"]
+script = ExtResource("2_xcqsp")
+card_name = "Cretan bull"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_yy5yo"]
+script = ExtResource("2_xcqsp")
+card_name = "King Minos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_mqcxu"]
+script = ExtResource("2_xcqsp")
+card_name = "Asterion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_at5k1"]
+script = ExtResource("2_xcqsp")
+card_name = "Ariadne "
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_73a1l"]
+script = ExtResource("2_xcqsp")
+card_name = "Pasiphae"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_j0g3r"]
+script = ExtResource("2_xcqsp")
+card_name = "Cretan bull"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_40ydj"]
+script = ExtResource("2_xcqsp")
+card_name = "King Minos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_txako"]
+script = ExtResource("2_xcqsp")
+card_name = "Asterion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_hgi0j"]
+script = ExtResource("2_xcqsp")
+card_name = "Ariadne "
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_qvjdy"]
+script = ExtResource("2_xcqsp")
+card_name = "Pasiphae"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_81fhb"]
+script = ExtResource("2_xcqsp")
+card_name = "Cretan bull"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ldhch"]
+script = ExtResource("2_xcqsp")
+card_name = "King Minos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ak5s2"]
+script = ExtResource("2_xcqsp")
+card_name = "Asterion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_rsops"]
+script = ExtResource("2_xcqsp")
+card_name = "Ariadne "
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_bdc7o"]
+script = ExtResource("3_601pn")
+deck_name = "Crete"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_peio1"]
+script = ExtResource("3_601pn")
+deck_name = "Crete"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_4tg5b"]
+script = ExtResource("3_601pn")
+deck_name = "Crete"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_knayq"]
+script = ExtResource("1_e7ref")
+enemy_name = "Crete"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_m3ito"), SubResource("Resource_bdu77"), SubResource("Resource_yy5yo"), SubResource("Resource_mqcxu"), SubResource("Resource_at5k1"), SubResource("Resource_73a1l"), SubResource("Resource_j0g3r"), SubResource("Resource_40ydj"), SubResource("Resource_txako"), SubResource("Resource_hgi0j"), SubResource("Resource_qvjdy"), SubResource("Resource_81fhb"), SubResource("Resource_ldhch"), SubResource("Resource_ak5s2"), SubResource("Resource_rsops")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_bdc7o"), SubResource("Resource_peio1"), SubResource("Resource_4tg5b")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_whob8"]
+script = ExtResource("2_xcqsp")
+card_name = "Acteon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7pqpj"]
+script = ExtResource("2_xcqsp")
+card_name = "Lacon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_dwkjr"]
+script = ExtResource("2_xcqsp")
+card_name = "Harpalos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_p40uf"]
+script = ExtResource("2_xcqsp")
+card_name = "Labros"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_47lgk"]
+script = ExtResource("2_xcqsp")
+card_name = "Hylactor"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7aepx"]
+script = ExtResource("2_xcqsp")
+card_name = "Acteon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_4funx"]
+script = ExtResource("2_xcqsp")
+card_name = "Lacon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_gnc0c"]
+script = ExtResource("2_xcqsp")
+card_name = "Harpalos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_0yu2v"]
+script = ExtResource("2_xcqsp")
+card_name = "Labros"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_lv34v"]
+script = ExtResource("2_xcqsp")
+card_name = "Hylactor"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_yenj1"]
+script = ExtResource("2_xcqsp")
+card_name = "Acteon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_smtcm"]
+script = ExtResource("2_xcqsp")
+card_name = "Lacon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_3k1g8"]
+script = ExtResource("2_xcqsp")
+card_name = "Harpalos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_fx736"]
+script = ExtResource("2_xcqsp")
+card_name = "Labros"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_x4l2x"]
+script = ExtResource("2_xcqsp")
+card_name = "Hylactor"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_4eoc3"]
+script = ExtResource("3_601pn")
+deck_name = "The Hunting Party"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_o5fsv"]
+script = ExtResource("3_601pn")
+deck_name = "The Hunting Party"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_c5pyn"]
+script = ExtResource("3_601pn")
+deck_name = "The Hunting Party"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_3rv7w"]
+script = ExtResource("1_e7ref")
+enemy_name = "The Hunting Party"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_whob8"), SubResource("Resource_7pqpj"), SubResource("Resource_dwkjr"), SubResource("Resource_p40uf"), SubResource("Resource_47lgk"), SubResource("Resource_7aepx"), SubResource("Resource_4funx"), SubResource("Resource_gnc0c"), SubResource("Resource_0yu2v"), SubResource("Resource_lv34v"), SubResource("Resource_yenj1"), SubResource("Resource_smtcm"), SubResource("Resource_3k1g8"), SubResource("Resource_fx736"), SubResource("Resource_x4l2x")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_4eoc3"), SubResource("Resource_o5fsv"), SubResource("Resource_c5pyn")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_mllwu"]
+script = ExtResource("2_xcqsp")
+card_name = "Scylla"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ouj4i"]
+script = ExtResource("2_xcqsp")
+card_name = "Charybdis"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_34jyf"]
+script = ExtResource("2_xcqsp")
+card_name = "Polyphemus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_s6suc"]
+script = ExtResource("2_xcqsp")
+card_name = "Circe"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ex2ms"]
+script = ExtResource("2_xcqsp")
+card_name = "Parthenope"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_pfu7s"]
+script = ExtResource("2_xcqsp")
+card_name = "Scylla"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7c4eb"]
+script = ExtResource("2_xcqsp")
+card_name = "Charybdis"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_x1em1"]
+script = ExtResource("2_xcqsp")
+card_name = "Polyphemus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_67nd5"]
+script = ExtResource("2_xcqsp")
+card_name = "Circe"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ktebg"]
+script = ExtResource("2_xcqsp")
+card_name = "Parthenope"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_i45n1"]
+script = ExtResource("2_xcqsp")
+card_name = "Scylla"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_01hsj"]
+script = ExtResource("2_xcqsp")
+card_name = "Charybdis"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_l7lfy"]
+script = ExtResource("2_xcqsp")
+card_name = "Polyphemus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_pxj21"]
+script = ExtResource("2_xcqsp")
+card_name = "Circe"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_fw6om"]
+script = ExtResource("2_xcqsp")
+card_name = "Parthenope"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_lair4"]
+script = ExtResource("3_601pn")
+deck_name = "The Way Home"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_vy3qu"]
+script = ExtResource("3_601pn")
+deck_name = "The Way Home"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_0uc6h"]
+script = ExtResource("3_601pn")
+deck_name = "The Way Home"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_5ope5"]
+script = ExtResource("1_e7ref")
+enemy_name = "The Way Home"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_mllwu"), SubResource("Resource_ouj4i"), SubResource("Resource_34jyf"), SubResource("Resource_s6suc"), SubResource("Resource_ex2ms"), SubResource("Resource_pfu7s"), SubResource("Resource_7c4eb"), SubResource("Resource_x1em1"), SubResource("Resource_67nd5"), SubResource("Resource_ktebg"), SubResource("Resource_i45n1"), SubResource("Resource_01hsj"), SubResource("Resource_l7lfy"), SubResource("Resource_pxj21"), SubResource("Resource_fw6om")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_lair4"), SubResource("Resource_vy3qu"), SubResource("Resource_0uc6h")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_p8t6d"]
+script = ExtResource("2_xcqsp")
+card_name = "Periphetes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_uyaj5"]
+script = ExtResource("2_xcqsp")
+card_name = "Sinus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_bqojl"]
+script = ExtResource("2_xcqsp")
+card_name = "Sciron"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_c4isu"]
+script = ExtResource("2_xcqsp")
+card_name = "Cercyon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_gm07s"]
+script = ExtResource("2_xcqsp")
+card_name = "Procrustes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_4yhrc"]
+script = ExtResource("2_xcqsp")
+card_name = "Periphetes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_63676"]
+script = ExtResource("2_xcqsp")
+card_name = "Sinus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_blewv"]
+script = ExtResource("2_xcqsp")
+card_name = "Sciron"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_xb1cl"]
+script = ExtResource("2_xcqsp")
+card_name = "Cercyon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_xox7f"]
+script = ExtResource("2_xcqsp")
+card_name = "Procrustes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_unglp"]
+script = ExtResource("2_xcqsp")
+card_name = "Periphetes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_21mb6"]
+script = ExtResource("2_xcqsp")
+card_name = "Sinus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_d2mjc"]
+script = ExtResource("2_xcqsp")
+card_name = "Sciron"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_rrm5w"]
+script = ExtResource("2_xcqsp")
+card_name = "Cercyon"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_2lpng"]
+script = ExtResource("2_xcqsp")
+card_name = "Procrustes"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_o8xdb"]
+script = ExtResource("3_601pn")
+deck_name = "Isthmus Road"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_o3x3x"]
+script = ExtResource("3_601pn")
+deck_name = "Isthmus Road"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_6hydl"]
+script = ExtResource("3_601pn")
+deck_name = "Isthmus Road"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_beoaf"]
+script = ExtResource("1_e7ref")
+enemy_name = "Isthmus Road"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_p8t6d"), SubResource("Resource_uyaj5"), SubResource("Resource_bqojl"), SubResource("Resource_c4isu"), SubResource("Resource_gm07s"), SubResource("Resource_4yhrc"), SubResource("Resource_63676"), SubResource("Resource_blewv"), SubResource("Resource_xb1cl"), SubResource("Resource_xox7f"), SubResource("Resource_unglp"), SubResource("Resource_21mb6"), SubResource("Resource_d2mjc"), SubResource("Resource_rrm5w"), SubResource("Resource_2lpng")])
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_o8xdb"), SubResource("Resource_o3x3x"), SubResource("Resource_6hydl")])
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
+[sub_resource type="Resource" id="Resource_bpwh1"]
+script = ExtResource("2_xcqsp")
+card_name = "Dolos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_u77kq"]
+script = ExtResource("2_xcqsp")
+card_name = "Sisyphus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_rfcos"]
+script = ExtResource("2_xcqsp")
+card_name = "Tantalus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7y3gw"]
+script = ExtResource("2_xcqsp")
+card_name = "Ixion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_fq1fo"]
+script = ExtResource("2_xcqsp")
+card_name = "Salmoneus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_nqu4c"]
+script = ExtResource("2_xcqsp")
+card_name = "Dolos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_8np3j"]
+script = ExtResource("2_xcqsp")
+card_name = "Sisyphus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_4h7vp"]
+script = ExtResource("2_xcqsp")
+card_name = "Tantalus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_eoxwa"]
+script = ExtResource("2_xcqsp")
+card_name = "Ixion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_cmqdx"]
+script = ExtResource("2_xcqsp")
+card_name = "Salmoneus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_f5fhw"]
+script = ExtResource("2_xcqsp")
+card_name = "Dolos"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_2lea1"]
+script = ExtResource("2_xcqsp")
+card_name = "Sisyphus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_87kaq"]
+script = ExtResource("2_xcqsp")
+card_name = "Tantalus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_wqxhb"]
+script = ExtResource("2_xcqsp")
+card_name = "Ixion"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_064r4"]
+script = ExtResource("2_xcqsp")
+card_name = "Salmoneus"
+metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_8j8lk"]
+script = ExtResource("1_e7ref")
+enemy_name = "Wicked Kings"
+cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_bpwh1"), SubResource("Resource_u77kq"), SubResource("Resource_rfcos"), SubResource("Resource_7y3gw"), SubResource("Resource_fq1fo"), SubResource("Resource_nqu4c"), SubResource("Resource_8np3j"), SubResource("Resource_4h7vp"), SubResource("Resource_eoxwa"), SubResource("Resource_cmqdx"), SubResource("Resource_f5fhw"), SubResource("Resource_2lea1"), SubResource("Resource_87kaq"), SubResource("Resource_wqxhb"), SubResource("Resource_064r4")])
+decks = null
+metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
+
 [resource]
 script = ExtResource("4_a5nvj")
-enemies = Array[ExtResource("1_e7ref")]([SubResource("Resource_efy6x"), SubResource("Resource_y0w8m"), SubResource("Resource_bdmj8"), SubResource("Resource_tahvs"), SubResource("Resource_bsikd"), SubResource("Resource_25nh6"), SubResource("Resource_i1x7r"), SubResource("Resource_go2fa"), SubResource("Resource_e0pot"), SubResource("Resource_keqme"), SubResource("Resource_arlqt"), SubResource("Resource_ofow0"), SubResource("Resource_1lucb")])
+enemies = Array[ExtResource("1_e7ref")]([SubResource("Resource_efy6x"), SubResource("Resource_y0w8m"), SubResource("Resource_bdmj8"), SubResource("Resource_tahvs"), SubResource("Resource_bsikd"), SubResource("Resource_25nh6"), SubResource("Resource_i1x7r"), SubResource("Resource_go2fa"), SubResource("Resource_e0pot"), SubResource("Resource_keqme"), SubResource("Resource_arlqt"), SubResource("Resource_ofow0"), SubResource("Resource_1lucb"), SubResource("Resource_6sn3q"), SubResource("Resource_lrgju"), SubResource("Resource_iwe3x"), SubResource("Resource_gn4yd"), SubResource("Resource_fcoum"), SubResource("Resource_ruq1d"), SubResource("Resource_3smum"), SubResource("Resource_7e6hb"), SubResource("Resource_knayq"), SubResource("Resource_3rv7w"), SubResource("Resource_5ope5"), SubResource("Resource_beoaf"), SubResource("Resource_8j8lk")])
