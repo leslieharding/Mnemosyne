@@ -16,6 +16,11 @@ var grid_occupied: Array = []  # Track which slots have cards
 var grid_ownership: Array = []  # Track who owns each card (can change via combat)
 var grid_card_data: Array = []  # Track the actual card data for each slot
 
+
+# Rhythm power variables
+var rhythm_slot: int = -1  # Current rhythm slot position (-1 means none)
+var rhythm_boost_value: int = 1  # Current boost value (doubles on use)
+
 # Experience tracking
 var deck_card_indices: Array[int] = []  # Original indices in god's collection
 var exp_panel: ExpPanel  # Reference to experience panel
@@ -858,6 +863,13 @@ func _on_turn_changed(is_player_turn: bool):
 	
 	# Process tremors at the start of each player's turn
 	if is_player_turn:
+		# Reassign rhythm slot at the start of Apollo player's turn
+		if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER:
+			# Clear previous rhythm slot visual if it exists
+			if rhythm_slot >= 0:
+				clear_rhythm_slot_visual(rhythm_slot)
+			# Assign new rhythm slot
+			assign_new_rhythm_slot()
 		process_tremors_for_player(Owner.PLAYER)
 		process_volleys_for_player(Owner.PLAYER)
 		enable_player_input()
@@ -2220,7 +2232,9 @@ func initialize_deck_power(deck_def: DeckDefinition):
 		DeckDefinition.DeckPowerType.SEASONS_POWER:
 			setup_seasons_power()
 		DeckDefinition.DeckPowerType.COORDINATE_POWER:
-			setup_coordinate_power()		
+			setup_coordinate_power()	
+		DeckDefinition.DeckPowerType.RHYTHM_POWER:
+			setup_rhythm_power()	
 		DeckDefinition.DeckPowerType.NONE:
 			print("No deck power for this deck")
 		_:
@@ -2283,6 +2297,11 @@ func apply_deck_power_effects(card_data: CardResource, grid_position: int) -> bo
 		DeckDefinition.DeckPowerType.SUN_POWER:
 			print("DEBUG: Applying sun power boost")
 			return apply_sun_power_boost(card_data, grid_position)
+		DeckDefinition.DeckPowerType.RHYTHM_POWER:
+			print("DEBUG: Checking rhythm power at position ", grid_position)
+			if grid_position == rhythm_slot:
+				return apply_rhythm_boost(card_data)
+			return false	
 		DeckDefinition.DeckPowerType.NONE:
 			print("DEBUG: No deck power active")
 			return false
@@ -7097,7 +7116,9 @@ func create_battle_snapshot():
 		"deck_index": selected_deck_index,
 		"battle_params": get_scene_params(),
 		"coordinate_used": coordinate_used,
-		"is_coordination_active": is_coordination_active
+		"is_coordination_active": is_coordination_active,
+		"rhythm_slot": rhythm_slot,
+		"rhythm_boost_value": rhythm_boost_value
 	}
 	
 	# Snapshot experience tracker state
@@ -7203,6 +7224,7 @@ func restore_battle_from_snapshot() -> bool:
 		growth_tracker.current_deck_indices = battle_snapshot["deck_card_indices"].duplicate()
 		print("Restored stat growth tracker to snapshot state")
 	
+	
 	# Restore deck power state
 	if battle_snapshot.has("deck_power_state"):
 		var deck_power_state = battle_snapshot["deck_power_state"]
@@ -7216,6 +7238,8 @@ func restore_battle_from_snapshot() -> bool:
 		fimbulwinter_boss_active = deck_power_state.get("fimbulwinter_boss_active", false)
 		coordinate_used = deck_power_state.get("coordinate_used", false)
 		is_coordination_active = deck_power_state.get("is_coordination_active", false)
+		rhythm_slot = deck_power_state.get("rhythm_slot", -1)
+		rhythm_boost_value = deck_power_state.get("rhythm_boost_value", 1)
 		
 		print("Restored deck power state")
 	
@@ -7258,6 +7282,11 @@ func reapply_battle_visual_effects():
 		for position in sunlit_positions:
 			apply_sunlit_styling(position)
 		print("Re-applied sunlit styling to positions: ", sunlit_positions)
+	# Re-apply rhythm slot visual if active
+	if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER:
+		if rhythm_slot >= 0 and not grid_occupied[rhythm_slot]:
+			apply_rhythm_slot_visual(rhythm_slot)
+		print("Re-applied rhythm slot visual to position: ", rhythm_slot)
 	
 	# CRITICAL: Re-apply enemy deck powers that affect player powers
 	if active_enemy_deck_power == EnemyDeckDefinition.EnemyDeckPowerType.DARKNESS_SHROUD:
@@ -7614,3 +7643,86 @@ func get_direction_info(direction: int) -> Dictionary:
 			return {"dx": -1, "dy": 0, "my_value_index": 3, "their_value_index": 1, "name": "West"}
 		_:
 			return {}
+
+func setup_rhythm_power():
+	print("=== SETTING UP RHYTHM POWER ===")
+	# Assign initial rhythm slot
+	assign_new_rhythm_slot()
+	
+	if notification_manager:
+		notification_manager.show_notification("🎵 The rhythm guides your moves")
+
+func assign_new_rhythm_slot():
+	# Get all empty slots
+	var empty_slots: Array[int] = []
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:
+			empty_slots.append(i)
+	
+	# If no empty slots, rhythm power is inactive for this turn
+	if empty_slots.is_empty():
+		rhythm_slot = -1
+		print("No empty slots available for rhythm slot")
+		return
+	
+	# Randomly select an empty slot
+	rhythm_slot = empty_slots[randi() % empty_slots.size()]
+	print("Rhythm slot assigned to position: ", rhythm_slot, " (boost value: +", rhythm_boost_value, ")")
+	
+	# Apply visual effect to the rhythm slot
+	apply_rhythm_slot_visual(rhythm_slot)
+
+func apply_rhythm_slot_visual(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	var slot = grid_slots[grid_index]
+	
+	# Create purple/magenta glow style for rhythm
+	var rhythm_style = StyleBoxFlat.new()
+	rhythm_style.bg_color = Color(0.8, 0.2, 0.8, 0.3)  # Purple/magenta with transparency
+	rhythm_style.border_color = Color(1.0, 0.4, 1.0, 0.8)  # Bright magenta border
+	rhythm_style.border_width_left = 3
+	rhythm_style.border_width_right = 3
+	rhythm_style.border_width_top = 3
+	rhythm_style.border_width_bottom = 3
+	rhythm_style.corner_radius_top_left = 8
+	rhythm_style.corner_radius_top_right = 8
+	rhythm_style.corner_radius_bottom_left = 8
+	rhythm_style.corner_radius_bottom_right = 8
+	
+	slot.add_theme_stylebox_override("panel", rhythm_style)
+	print("Applied rhythm visual effect to slot ", grid_index)
+
+func clear_rhythm_slot_visual(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	
+	var slot = grid_slots[grid_index]
+	slot.remove_theme_stylebox_override("panel")
+	print("Cleared rhythm visual effect from slot ", grid_index)
+
+func apply_rhythm_boost(card_data: CardResource) -> bool:
+	if rhythm_slot < 0:
+		return false
+	
+	print("🎵 RHYTHM BOOST ACTIVATED! Card receives +", rhythm_boost_value, " to all stats")
+	
+	# Apply boost to all directional stats
+	card_data.values[0] += rhythm_boost_value  # North
+	card_data.values[1] += rhythm_boost_value  # East
+	card_data.values[2] += rhythm_boost_value  # South
+	card_data.values[3] += rhythm_boost_value  # West
+	
+	# Double the boost value for next use
+	rhythm_boost_value *= 2
+	print("Rhythm boost value increased to: +", rhythm_boost_value)
+	
+	# Clear the visual effect from the used slot
+	clear_rhythm_slot_visual(rhythm_slot)
+	
+	# Show notification
+	if notification_manager:
+		notification_manager.show_notification("🎵 Rhythm unleashed! Next rhythm: +" + str(rhythm_boost_value))
+	
+	return true

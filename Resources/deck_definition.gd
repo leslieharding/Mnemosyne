@@ -9,7 +9,8 @@ enum DeckPowerType {
 	PROPHECY_POWER,
 	MISDIRECTION_POWER,
 	SEASONS_POWER,
-	COORDINATE_POWER
+	COORDINATE_POWER,
+	RHYTHM_POWER
 }
 
 @export var deck_name: String
@@ -89,6 +90,8 @@ func get_power_description() -> String:
 			return "🌸❄️ The Seasons: Summer when Persephone is in hand (grow abilities trigger twice), Winter when played (grow abilities reverse)"
 		DeckPowerType.COORDINATE_POWER:
 			return "🎯 Coordinate: Once per battle, play twice in a row"	
+		DeckPowerType.RHYTHM_POWER:
+			return "🎵 Rhythm: Each turn, a random empty slot pulses with rhythm. Playing a card there grants +X to all stats, where X doubles with each successful use (starts at +1)"	
 		DeckPowerType.NONE:
 			return ""
 		_:

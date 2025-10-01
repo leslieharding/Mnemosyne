@@ -25,7 +25,6 @@
 script = ExtResource("3_tpnlu")
 ability_name = "Charge"
 description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 
@@ -33,13 +32,11 @@ metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 script = ExtResource("3_tpnlu")
 ability_name = "Charge"
 description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 
 [sub_resource type="Resource" id="Resource_l7o3e"]
 script = ExtResource("4_2h7tk")
-level = 1
 values = Array[int]([5, 5, 5, 5])
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_sfw3d")])
 description = "When attacking increases power by 1"
@@ -49,7 +46,6 @@ metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 script = ExtResource("3_tpnlu")
 ability_name = "Charge"
 description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 
@@ -65,7 +61,6 @@ metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 script = ExtResource("3_tpnlu")
 ability_name = "Charge"
 description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 
@@ -91,8 +86,6 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 script = ExtResource("5_gowu1")
 ability_name = "Sun Bather"
 description = "Receives double stats from the sun"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://bjrn1xq2fqgxo"
 
 [sub_resource type="Resource" id="Resource_ogwmq"]
@@ -101,15 +94,12 @@ card_name = "Phaeton"
 values = Array[int]([4, 4, 4, 4])
 description = "Look up, you will see me driving the sun along"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_2h7tk")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_p7jhq"]
 script = ExtResource("6_ca26u")
 ability_name = "Stat Nullify"
 description = "When this card is captured, set its stats to 1"
-unlock_level = 0
 trigger_condition = 2
 metadata/_custom_type_script = "uid://dgsvwgjhs2vju"
 
@@ -119,15 +109,12 @@ card_name = "Cygnus"
 values = Array[int]([2, 2, 2, 2])
 description = "Oh Phaeton dont listen to him"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_p7jhq")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bufwg"]
 script = ExtResource("7_gowu1")
 ability_name = "Critical Strike"
 description = "When played, regardless of direction of attack, the opponents weakest stat will be used in defense"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://b3qdfwuofelgc"
 
@@ -137,16 +124,12 @@ card_name = "Phlegon"
 values = Array[int]([3, 3, 4, 4])
 description = "Shining bright"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_bufwg")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bi2ap"]
 script = ExtResource("8_xjxyc")
-boost_amount = 1
 ability_name = "Passive Boost"
 description = "When in play and uncaptured increases the other stats of your cards by one"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://d1cwgpmvptcjn"
 
@@ -156,15 +139,12 @@ card_name = "Eos"
 values = Array[int]([3, 4, 5, 6])
 description = "Rosey Fingered Eos throws open the doors to a new day"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_bi2ap")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_71nia"]
 script = ExtResource("9_qbbw0")
 ability_name = "Cheat Death"
 description = "This card prevents the first time it would be captured"
-unlock_level = 0
 trigger_condition = 1
 metadata/_custom_type_script = "uid://bcu6cf6gen411"
 
@@ -174,16 +154,12 @@ card_name = "Calliope"
 values = Array[int]([2, 2, 3, 3])
 description = "lovely voice personified"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_71nia")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ca26u"]
 script = ExtResource("9_p7jhq")
 ability_name = "Harmony"
 description = "If at least two defending enemies have the same stats as me they are both captured"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://cs8jo68kos2c6"
 
 [sub_resource type="Resource" id="Resource_s8wyg"]
@@ -192,16 +168,12 @@ card_name = "Orpheus"
 values = Array[int]([3, 4, 5, 4])
 description = "Row you bastards row"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_ca26u")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xjxyc"]
 script = ExtResource("10_bufwg")
 ability_name = "Grow"
 description = "On play this cards stats are increased by 1 for the run"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://u1ucm0sox8pa"
 
 [sub_resource type="Resource" id="Resource_tl28v"]
@@ -210,16 +182,12 @@ card_name = "Eurydice"
 values = Array[int]([4, 6, 5, 5])
 description = "I'll be right behind you, have faith "
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_xjxyc")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qbbw0"]
 script = ExtResource("10_2h7tk")
 ability_name = "Symmetry"
 description = "If you are fighting atleast two enemies and the sum of the attacking stats versus defending stats is exactly the same, they are captured"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://btx30eg0dkxdt"
 
 [sub_resource type="Resource" id="Resource_6lt0f"]
@@ -228,15 +196,12 @@ card_name = "Marsyas "
 values = Array[int]([2, 1, 3, 2])
 description = "Of course I cant play it upside down, you're a cheat Apollo"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_qbbw0")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_b0n1o"]
 script = ExtResource("12_ca26u")
 ability_name = "Cultivate"
 description = "If still owned, this card gains 10 experience at the start of each of your turns"
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://bsyjru6fxhmp5"
 
@@ -246,16 +211,12 @@ card_name = "Arion"
 values = Array[int]([2, 2, 2, 2])
 description = "Would you allow me one last song? Before the sea takes me?"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_b0n1o")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_pwyti"]
 script = ExtResource("14_xjxyc")
 ability_name = "Compel"
 description = "On play, pick a slot. The opponent must play their next card there."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://c25iupuskk6vd"
 
 [sub_resource type="Resource" id="Resource_vk3b3"]
@@ -264,16 +225,12 @@ card_name = "Cassandra"
 values = Array[int]([3, 4, 3, 4])
 description = "Do not let that boy into the city, he will be the death of us all, yes you too!"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_pwyti")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_njf8p"]
 script = ExtResource("15_b0n1o")
 ability_name = "Ordain"
 description = "On play, choose an empty slot. If you play a card in that slot next turn it gains +2 to all stats."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://b7w3v4k1roxv1"
 
 [sub_resource type="Resource" id="Resource_yt4mj"]
@@ -282,16 +239,12 @@ card_name = "Tiresias"
 values = Array[int]([6, 5, 6, 5])
 description = "Use your famed logic Oedipus, the killer of Laius is among us"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_njf8p")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qeeu5"]
 script = ExtResource("16_tpnlu")
 ability_name = "Prophetic"
 description = "On play glimpse your opponents hand"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://ddbwhi0dqi1t0"
 
 [sub_resource type="Resource" id="Resource_exg8p"]
@@ -300,15 +253,12 @@ card_name = "Calchas"
 values = Array[int]([7, 2, 6, 4])
 description = "9 years it will take my lord, it is as clear to me as ever anything has been"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_qeeu5")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4h8a3"]
 script = ExtResource("16_cknfu")
 ability_name = "Pursuit"
 description = "If this card can capture, it attacks cards played in the same row/column and moves adjacent to them."
-unlock_level = 0
 trigger_condition = 3
 metadata/_custom_type_script = "uid://cgrjfouc2qnld"
 
@@ -318,16 +268,12 @@ card_name = "The Oracle At Delphi"
 values = Array[int]([9, 9, 9, 9])
 description = "Nothing good will come of asking me, but by all means ask away"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_4h8a3")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4qshc"]
 script = ExtResource("17_cknfu")
 ability_name = "Dancer"
 description = "After first playing this, dance to another slot."
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://fgbji7hao84c"
 
 [sub_resource type="Resource" id="Resource_vqeif"]
@@ -336,8 +282,6 @@ card_name = "Laocoön"
 values = Array[int]([5, 5, 5, 5])
 description = "Burn it my lord, I fear the Greeks even when they offer gifts"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_4qshc")])
-level_data = Array[ExtResource("4_2h7tk")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tn03x"]
@@ -346,10 +290,7 @@ deck_name = "The Sun"
 deck_description = "Shining forth from the utmost heights of heaven"
 card_indices = Array[int]([0, 1, 2, 3, 4])
 is_starter_deck = true
-required_capture_exp = 0
-required_defense_exp = 0
 deck_power_type = 1
-power_config = {}
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [sub_resource type="Resource" id="Resource_cknfu"]
@@ -357,11 +298,8 @@ script = ExtResource("2_w7xgs")
 deck_name = "Natural Harmonics"
 deck_description = "Have faith in what music can do"
 card_indices = Array[int]([5, 6, 7, 8, 9])
-is_starter_deck = false
 required_capture_exp = 100
-required_defense_exp = 0
-deck_power_type = 0
-power_config = {}
+deck_power_type = 6
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [sub_resource type="Resource" id="Resource_tpnlu"]
@@ -369,11 +307,8 @@ script = ExtResource("2_w7xgs")
 deck_name = "Phoebus Apollo"
 deck_description = "The master of augury guides your moves"
 card_indices = Array[int]([10, 11, 12, 13, 14])
-is_starter_deck = false
-required_capture_exp = 0
 required_defense_exp = 100
 deck_power_type = 2
-power_config = {}
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [resource]
