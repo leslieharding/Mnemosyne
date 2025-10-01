@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="FinaleAbility" load_steps=2 format=3 uid="uid://dhndu62ed6i0w"]
+
+[ext_resource type="Script" uid="uid://bfbpkrqf1u508" path="res://Resources/Abilities/finale_ability.gd" id="1_v35dy"]
+
+[resource]
+script = ExtResource("1_v35dy")
+ability_name = "Finale"
+description = "If this card is played in the last available slot its stats are doubled"
+metadata/_custom_type_script = "uid://bfbpkrqf1u508"

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=56 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=58 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://cs8jo68kos2c6" path="res://Resources/Abilities/harmony_ability.gd" id="9_p7jhq"]
 [ext_resource type="Script" uid="uid://bcu6cf6gen411" path="res://Resources/Abilities/cheat_death_ability.gd" id="9_qbbw0"]
 [ext_resource type="Script" uid="uid://btx30eg0dkxdt" path="res://Resources/Abilities/symmetry_ability.gd" id="10_2h7tk"]
+[ext_resource type="Script" uid="uid://bfbpkrqf1u508" path="res://Resources/Abilities/finale_ability.gd" id="12_cknfu"]
 [ext_resource type="Script" uid="uid://c25iupuskk6vd" path="res://Resources/Abilities/compel_ability.gd" id="14_xjxyc"]
 [ext_resource type="Script" uid="uid://b7w3v4k1roxv1" path="res://Resources/Abilities/ordain_ability.gd" id="15_b0n1o"]
 [ext_resource type="Script" uid="uid://cgrjfouc2qnld" path="res://Resources/Abilities/pursuit_ability.gd" id="16_cknfu"]
@@ -189,11 +190,16 @@ description = "Of course I cant play it upside down, you're a cheat Apollo"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_qbbw0")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_5pr4f"]
+script = ExtResource("12_cknfu")
+metadata/_custom_type_script = "uid://bfbpkrqf1u508"
+
 [sub_resource type="Resource" id="Resource_s7d3i"]
 script = ExtResource("1_vqrrp")
 card_name = "Arion"
 values = Array[int]([2, 2, 2, 2])
 description = "Would you allow me one last song? Before the sea takes me?"
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_5pr4f")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_pwyti"]
