@@ -2719,8 +2719,13 @@ func restore_slot_original_styling(grid_index: int):
 	
 	var slot = grid_slots[grid_index]
 	
-	# Check for ordain effect first
-	if grid_index == active_ordain_slot:
+	# Check for rhythm slot first (before other effects)
+	if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER and grid_index == rhythm_slot and not grid_occupied[grid_index]:
+		# Restore rhythm styling
+		apply_rhythm_slot_visual(grid_index)
+		return
+	# Check for ordain effect
+	elif grid_index == active_ordain_slot:
 		# Restore ordain styling
 		apply_ordain_target_styling(grid_index)
 	# Check for sanctuary effect 
@@ -2748,8 +2753,11 @@ func apply_selection_highlight(grid_index: int):
 	
 	var slot = grid_slots[grid_index]
 	
+	# Don't override rhythm styling with selection highlight
+	if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER and grid_index == rhythm_slot:
+		return
 	# Don't override ordain styling with selection highlight
-	if grid_index == active_ordain_slot:
+	elif grid_index == active_ordain_slot:
 		return
 	# Don't override compel styling with selection highlight
 	elif grid_index == active_compel_slot:
@@ -2761,14 +2769,12 @@ func apply_selection_highlight(grid_index: int):
 		# Create a combined sunlit + selected style
 		var sunlit_selected_style = StyleBoxFlat.new()
 		sunlit_selected_style.bg_color = Color("#444444")
-		sunlit_selected_style.border_width_left = 4  # Thicker border for selection
+		sunlit_selected_style.border_width_left = 4
 		sunlit_selected_style.border_width_top = 4
 		sunlit_selected_style.border_width_right = 4
 		sunlit_selected_style.border_width_bottom = 4
-		sunlit_selected_style.border_color = Color("#44AAFF")  # Blue selection border
-		
-		# Add a golden inner glow effect by using a background color
-		sunlit_selected_style.bg_color = Color("#554422")  # Golden tinted background
+		sunlit_selected_style.border_color = Color("#44AAFF")
+		sunlit_selected_style.bg_color = Color("#554422")
 		
 		slot.add_theme_stylebox_override("panel", sunlit_selected_style)
 	else:
@@ -2972,7 +2978,10 @@ func place_card_on_grid():
 	# Apply enrichment bonus if applicable
 	apply_enrichment_bonus_if_applicable(current_grid_index, card_data, placing_owner)
 	apply_sanctuary_cheat_death_if_applicable(current_grid_index, card_data, placing_owner)
-
+	
+	if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER and current_grid_index == rhythm_slot:
+		print("🎵 RHYTHM POWER ACTIVATED! Card placed in rhythm slot")
+		apply_rhythm_boost(card_data)
 	
 	print("Grid placement effective values (with growth and ordain): ", card_data.values)
 	print("Grid placement effective abilities count: ", card_data.abilities.size())
@@ -7646,14 +7655,13 @@ func get_direction_info(direction: int) -> Dictionary:
 
 func setup_rhythm_power():
 	print("=== SETTING UP RHYTHM POWER ===")
-	# Assign initial rhythm slot
-	assign_new_rhythm_slot()
+	
 	
 	if notification_manager:
 		notification_manager.show_notification("🎵 The rhythm guides your moves")
 
 func assign_new_rhythm_slot():
-	# Get all empty slots
+	# Get all empty slots - use explicit typing
 	var empty_slots: Array[int] = []
 	for i in range(grid_slots.size()):
 		if not grid_occupied[i]:
@@ -7665,8 +7673,9 @@ func assign_new_rhythm_slot():
 		print("No empty slots available for rhythm slot")
 		return
 	
-	# Randomly select an empty slot
-	rhythm_slot = empty_slots[randi() % empty_slots.size()]
+	# Randomly select an empty slot - use proper array access
+	var random_index = randi() % empty_slots.size()
+	rhythm_slot = empty_slots[random_index]
 	print("Rhythm slot assigned to position: ", rhythm_slot, " (boost value: +", rhythm_boost_value, ")")
 	
 	# Apply visual effect to the rhythm slot
