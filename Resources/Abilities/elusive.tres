@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ElusiveAbility" load_steps=2 format=3 uid="uid://b7nlhqo6p3ecu"]
+
+[ext_resource type="Script" uid="uid://di16hrjg7ypkb" path="res://Resources/Abilities/elusive_ability.gd" id="1_5up76"]
+
+[resource]
+script = ExtResource("1_5up76")
+ability_name = "Elusive"
+description = "This card evades capture (it would take coordination to catch this)"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://di16hrjg7ypkb"
