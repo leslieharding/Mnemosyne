@@ -485,6 +485,9 @@ func setup_managers():
 	opponent_manager = OpponentManager.new()
 	add_child(opponent_manager)
 	
+	# Pass game manager reference to opponent for AI decision making
+	opponent_manager.set_game_manager(self)
+	
 	# Create visual effects manager
 	visual_effects_manager = VisualEffectsManager.new()
 	add_child(visual_effects_manager)
