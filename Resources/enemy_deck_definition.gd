@@ -6,8 +6,7 @@ extends Resource
 enum EnemyDeckPowerType {
 	NONE,
 	DARKNESS_SHROUD,
-	TITAN_STRENGTH,
-	PLAGUE_CURSE
+	DISCORDANT
 }
 
 @export var deck_name: String
@@ -36,10 +35,8 @@ func get_power_description() -> String:
 	match deck_power_type:
 		EnemyDeckPowerType.DARKNESS_SHROUD:
 			return "🌑 Darkness Shroud: Nullifies any sun power effects, plunging the battlefield into shadow"
-		EnemyDeckPowerType.TITAN_STRENGTH:
-			return "⚡ Titan Strength: All enemy cards gain +1 to their highest stat direction"
-		EnemyDeckPowerType.PLAGUE_CURSE:
-			return "☠️ Plague Curse: When enemy cards are captured, they weaken adjacent player cards by -1"
+		EnemyDeckPowerType.DISCORDANT:
+			return "🎭 Discordant: The wrong notes corrupt the rhythm, turning its power against you"
 		EnemyDeckPowerType.NONE:
 			return ""
 		_:

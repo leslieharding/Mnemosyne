@@ -16,6 +16,7 @@ var grid_occupied: Array = []  # Track which slots have cards
 var grid_ownership: Array = []  # Track who owns each card (can change via combat)
 var grid_card_data: Array = []  # Track the actual card data for each slot
 
+var discordant_active: bool = false
 
 # Rhythm power variables
 var rhythm_slot: int = -1  # Current rhythm slot position (-1 means none)
@@ -541,10 +542,31 @@ func initialize_enemy_deck_power(deck_def: EnemyDeckDefinition):
 		EnemyDeckDefinition.EnemyDeckPowerType.DARKNESS_SHROUD:
 			setup_darkness_shroud()
 		
+		EnemyDeckDefinition.EnemyDeckPowerType.DISCORDANT:
+			setup_discordant()
+		
 		EnemyDeckDefinition.EnemyDeckPowerType.NONE:
 			print("No enemy deck power for this deck")
 		_:
 			print("Unknown enemy deck power type: ", active_enemy_deck_power)
+
+func setup_discordant():
+	print("=== SETTING UP DISCORDANT ===")
+	discordant_active = true
+	
+	# Check if player has rhythm power active
+	if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER:
+		print("🎭 Discordant activated! Wrong Note corrupts the rhythm's harmony.")
+		
+		# Clear any existing rhythm slot visuals
+		if rhythm_slot >= 0:
+			clear_rhythm_slot_visual(rhythm_slot)
+		
+		# Show notification
+		if notification_manager:
+			notification_manager.show_notification("🎭 The rhythm turns discordant - beware the wrong note!")
+	else:
+		print("Discordant ready, but no rhythm power detected")
 
 func setup_darkness_shroud():
 	print("=== SETTING UP DARKNESS SHROUD ===")
@@ -975,13 +997,10 @@ func update_game_status():
 		special_status = "🌑 Darkness Shroud vs ☀️ Solar Blessing - Shadows prevail! "
 	elif darkness_shroud_active:
 		special_status = "🌑 Darkness Shroud active - Shadows gather... "
-	elif active_enemy_deck_power != EnemyDeckDefinition.EnemyDeckPowerType.NONE:
-		# Show other enemy power status
-		match active_enemy_deck_power:
-			EnemyDeckDefinition.EnemyDeckPowerType.TITAN_STRENGTH:
-				special_status = "⚡ Titan Strength empowers your enemies! "
-			EnemyDeckDefinition.EnemyDeckPowerType.PLAGUE_CURSE:
-				special_status = "☠️ Plague Curse spreads corruption! "
+	if discordant_active and active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER:
+		special_status = "🎭 Discordant vs 🎵 Rhythm - Wrong notes corrupt the harmony! "
+	elif discordant_active:
+		special_status = "🎭 Discordant active - Wrong notes await... "
 	
 	if is_tutorial_mode:
 		# Special tutorial status messages
@@ -7151,6 +7170,7 @@ func create_battle_snapshot():
 		"misdirection_used": misdirection_used,
 		"sunlit_positions": sunlit_positions.duplicate() if sunlit_positions else [],
 		"darkness_shroud_active": darkness_shroud_active,
+		"discordant_active": discordant_active,
 		"soothe_active": soothe_active,
 		"visual_stat_inversion_active": visual_stat_inversion_active,
 		"is_hermes_boss_battle": is_hermes_boss_battle,
@@ -7244,6 +7264,7 @@ func restore_battle_from_snapshot() -> bool:
 		misdirection_used = deck_power_state.get("misdirection_used", false)
 		sunlit_positions = deck_power_state.get("sunlit_positions", []).duplicate()
 		darkness_shroud_active = deck_power_state.get("darkness_shroud_active", false)
+		discordant_active = deck_power_state.get("discordant_active", false)
 		soothe_active = deck_power_state.get("soothe_active", false)
 		visual_stat_inversion_active = deck_power_state.get("visual_stat_inversion_active", false)
 		is_hermes_boss_battle = deck_power_state.get("is_hermes_boss_battle", false)
@@ -7304,6 +7325,10 @@ func reapply_battle_visual_effects():
 	if active_enemy_deck_power == EnemyDeckDefinition.EnemyDeckPowerType.DARKNESS_SHROUD:
 		print("Re-applying Darkness Shroud effect after battle restart")
 		setup_darkness_shroud()  # This will counter sun power again
+	
+	if active_enemy_deck_power == EnemyDeckDefinition.EnemyDeckPowerType.DISCORDANT:
+		print("Re-applying Discordant effect after battle restart")
+		setup_discordant()  # This will counter rhythm power again
 	
 	print("Battle visual effects and enemy powers reapplied")
 
@@ -7718,23 +7743,45 @@ func apply_rhythm_boost(card_data: CardResource) -> bool:
 	if rhythm_slot < 0:
 		return false
 	
-	print("🎵 RHYTHM BOOST ACTIVATED! Card receives +", rhythm_boost_value, " to all stats")
+	# Check if Discordant is active - invert the boost
+	var effective_boost = rhythm_boost_value
+	var boost_emoji = "🎵"
+	var boost_text = "+"
 	
-	# Apply boost to all directional stats
-	card_data.values[0] += rhythm_boost_value  # North
-	card_data.values[1] += rhythm_boost_value  # East
-	card_data.values[2] += rhythm_boost_value  # South
-	card_data.values[3] += rhythm_boost_value  # West
+	if discordant_active:
+		effective_boost = -rhythm_boost_value  # Invert to negative
+		boost_emoji = "🎭"
+		boost_text = ""  # Negative sign is already in the number
+		print("🎭 DISCORDANT CORRUPTION! Card receives ", effective_boost, " to all stats (Wrong Note inverts the rhythm)")
+	else:
+		print("🎵 RHYTHM BOOST ACTIVATED! Card receives +", rhythm_boost_value, " to all stats")
 	
-	# Double the boost value for next use
+	# Apply boost (or penalty) to all directional stats, with floor at 0 for penalties
+	if discordant_active:
+		# When discordant is active, ensure values don't go below 0
+		card_data.values[0] = max(0, card_data.values[0] + effective_boost)  # North
+		card_data.values[1] = max(0, card_data.values[1] + effective_boost)  # East
+		card_data.values[2] = max(0, card_data.values[2] + effective_boost)  # South
+		card_data.values[3] = max(0, card_data.values[3] + effective_boost)  # West
+	else:
+		# Normal rhythm boost - no floor needed for positive values
+		card_data.values[0] += effective_boost  # North
+		card_data.values[1] += effective_boost  # East
+		card_data.values[2] += effective_boost  # South
+		card_data.values[3] += effective_boost  # West
+	
+	# Double the boost value for next use (magnitude increases regardless of sign)
 	rhythm_boost_value *= 2
-	print("Rhythm boost value increased to: +", rhythm_boost_value)
+	print("Rhythm boost magnitude increased to: ", rhythm_boost_value)
 	
 	# Clear the visual effect from the used slot
 	clear_rhythm_slot_visual(rhythm_slot)
 	
 	# Show notification
 	if notification_manager:
-		notification_manager.show_notification("🎵 Rhythm unleashed! Next rhythm: +" + str(rhythm_boost_value))
+		if discordant_active:
+			notification_manager.show_notification(boost_emoji + " Discordant strike! Next penalty: " + str(-rhythm_boost_value))
+		else:
+			notification_manager.show_notification(boost_emoji + " Rhythm unleashed! Next rhythm: +" + str(rhythm_boost_value))
 	
 	return true
