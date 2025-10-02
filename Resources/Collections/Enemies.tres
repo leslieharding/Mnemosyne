@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=496 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=497 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" uid="uid://cjsf2c6w6dnrf" path="res://Resources/Abilities/coerce_ability.gd" id="12_hu0wn"]
 [ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="12_r05oc"]
 [ext_resource type="Script" uid="uid://cu3icvy8efjky" path="res://Resources/Abilities/greedy_ability.gd" id="13_0vidc"]
+[ext_resource type="Script" uid="uid://nrdoysdoyfq1" path="res://Resources/Abilities/taxation_ability.gd" id="13_1g5vp"]
 [ext_resource type="Script" uid="uid://cm8gt3refuukf" path="res://Resources/Abilities/camouflage_ability.gd" id="14_1g5vp"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
@@ -645,10 +646,10 @@ abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0g8v8")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_jej5r"]
-script = ExtResource("14_1g5vp")
-ability_name = "Camouflage"
-description = "On play this card is hidden for one turn, if the opponent tries to play a card in the same slot it is captured"
-metadata/_custom_type_script = "uid://cm8gt3refuukf"
+script = ExtResource("13_1g5vp")
+ability_name = "Taxation"
+description = "On play this card steals +1 from each enemy card"
+metadata/_custom_type_script = "uid://nrdoysdoyfq1"
 
 [sub_resource type="Resource" id="Resource_srqjw"]
 script = ExtResource("2_xcqsp")

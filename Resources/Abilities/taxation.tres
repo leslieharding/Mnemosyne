@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="TaxationAbility" load_steps=2 format=3 uid="uid://bbim3d8nirevw"]
+
+[ext_resource type="Script" uid="uid://nrdoysdoyfq1" path="res://Resources/Abilities/taxation_ability.gd" id="1_xcp16"]
+
+[resource]
+script = ExtResource("1_xcp16")
+ability_name = "Taxation"
+description = "On play this card steals +1 from each enemy card"
+metadata/_custom_type_script = "uid://nrdoysdoyfq1"
