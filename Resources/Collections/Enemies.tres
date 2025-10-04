@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=497 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=501 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -16,6 +16,7 @@
 [ext_resource type="Script" uid="uid://dh1ykxl2k5ank" path="res://Resources/Abilities/infighting_ability.gd" id="8_sygum"]
 [ext_resource type="Script" uid="uid://bskifvkjo5blo" path="res://Resources/Abilities/bolster_confidence_ability.gd" id="8_upckc"]
 [ext_resource type="Script" uid="uid://cjryt268c8rko" path="res://Resources/Abilities/chaos_ability.gd" id="8_vfgb0"]
+[ext_resource type="Script" uid="uid://c7ndik1113xjf" path="res://Resources/Abilities/cloak_of_night_ability.gd" id="10_4qd0a"]
 [ext_resource type="Script" uid="uid://cjsf2c6w6dnrf" path="res://Resources/Abilities/coerce_ability.gd" id="12_hu0wn"]
 [ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="12_r05oc"]
 [ext_resource type="Script" uid="uid://cu3icvy8efjky" path="res://Resources/Abilities/greedy_ability.gd" id="13_0vidc"]
@@ -465,11 +466,18 @@ values = Array[int]([4, 5, 6, 7])
 description = "Never heard of me? Try turning the light out and I'll be everywhere"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_0pnl5"]
+script = ExtResource("10_4qd0a")
+ability_name = "Cloak of Night"
+description = "On play enemy cards are not visible for 2 turns"
+metadata/_custom_type_script = "uid://c7ndik1113xjf"
+
 [sub_resource type="Resource" id="Resource_btcve"]
 script = ExtResource("2_xcqsp")
 card_name = "Erebus"
 values = Array[int]([4, 4, 4, 4])
 description = "I wouldn't upset my wife, things could get very dark "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0pnl5")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_nvk4f"]
@@ -506,11 +514,18 @@ values = Array[int]([5, 6, 7, 8])
 description = "Never heard of me? Try turning the light out and I'll be everywhere"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_si65t"]
+script = ExtResource("10_4qd0a")
+ability_name = "Cloak of Night"
+description = "On play enemy cards are not visible for 2 turns"
+metadata/_custom_type_script = "uid://c7ndik1113xjf"
+
 [sub_resource type="Resource" id="Resource_b1ysv"]
 script = ExtResource("2_xcqsp")
 card_name = "Erebus"
 values = Array[int]([4, 5, 5, 4])
 description = "I wouldn't upset my wife, things could get very dark "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_si65t")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_jruhe"]
@@ -547,11 +562,18 @@ values = Array[int]([6, 7, 8, 9])
 description = "Never heard of me? Try turning the light out and I'll be everywhere"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_4i71b"]
+script = ExtResource("10_4qd0a")
+ability_name = "Cloak of Night"
+description = "On play enemy cards are not visible for 2 turns"
+metadata/_custom_type_script = "uid://c7ndik1113xjf"
+
 [sub_resource type="Resource" id="Resource_2lbxq"]
 script = ExtResource("2_xcqsp")
 card_name = "Erebus"
 values = Array[int]([5, 5, 4, 5])
 description = "I wouldn't upset my wife, things could get very dark "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_4i71b")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_25gb6"]

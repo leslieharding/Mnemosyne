@@ -18,6 +18,11 @@ var grid_card_data: Array = []  # Track the actual card data for each slot
 
 var discordant_active: bool = false
 
+# Cloak of Night ability tracking 
+var cloak_of_night_active: bool = false
+var cloak_of_night_turns_remaining: int = 0
+var hidden_opponent_cards = [] # Positions of hidden opponent cards
+
 # Rhythm power variables
 var rhythm_slot: int = -1  # Current rhythm slot position (-1 means none)
 var rhythm_boost_value: int = 1  # Current boost value (doubles on use)
@@ -639,6 +644,17 @@ func setup_chronos_opponent():
 			print("ERROR: Even fallback enemy has no cards!")
 
 func _on_card_hovered(card_data: CardResource):
+	
+	# Don't show hover info for cloaked cards
+	var all_displays = get_tree().get_nodes_in_group("battle_manager")
+	for node in all_displays:
+		if node == self:
+			for i in range(grid_slots.size()):
+				var card_display = get_card_display_at_position(i)
+				if card_display and card_display.card_data == card_data:
+					if card_display.get_meta("cloaked", false):
+						return
+	
 	if not card_data:
 		return
 	
@@ -861,6 +877,9 @@ func _on_game_started():
 		
 
 func _on_turn_changed(is_player_turn: bool):
+	# Process cloak of night turn tracking
+	process_cloak_of_night_turn()
+	
 	print("*** TURN CHANGED EVENT FIRED: is_player_turn=", is_player_turn, " ***")
 	print("Turn changed - is_player_turn: ", is_player_turn, " | opponent_is_thinking: ", opponent_is_thinking)
 	update_game_status()
@@ -1596,6 +1615,10 @@ func _on_opponent_card_placed(grid_index: int):
 	# NEW: CHECK FOR PURSUIT TRIGGERS AFTER OPPONENT'S TURN IS COMPLETE
 	print("Checking for Pursuit ability triggers...")
 	check_pursuit_triggers(grid_index, opponent_card_data)
+	
+	# If cloak of night is active, hide the newly placed card
+	if cloak_of_night_active:
+		hide_opponent_card_at_position(grid_index)
 	
 	# Clear the thinking flag since opponent finished their turn
 	opponent_is_thinking = false
@@ -7221,6 +7244,7 @@ func restore_battle_from_snapshot() -> bool:
 	clear_all_sanctuary_effects()
 	clear_all_coerce_constraints()
 	clear_all_camouflage_effects()
+	clear_cloak_of_night_ability()
 	
 	# Clear the grid completely
 	for i in range(grid_slots.size()):
@@ -7785,3 +7809,118 @@ func apply_rhythm_boost(card_data: CardResource) -> bool:
 			notification_manager.show_notification(boost_emoji + " Rhythm unleashed! Next rhythm: +" + str(rhythm_boost_value))
 	
 	return true
+
+
+func activate_cloak_of_night_ability():
+	print("=== ACTIVATING CLOAK OF NIGHT ABILITY ===")
+	cloak_of_night_active = true
+	cloak_of_night_turns_remaining = 2  # Lasts for 2 opponent turns
+	
+	# Hide all currently visible opponent cards
+	hide_all_opponent_cards()
+	
+	# Show notification
+	if notification_manager:
+		notification_manager.show_notification("🌑 Cloak of Night: Enemy cards are hidden!")
+	
+	print("Cloak of Night activated - will last for 2 opponent turns")
+
+func hide_all_opponent_cards():
+	print("Hiding all opponent cards on the grid")
+	hidden_opponent_cards.clear()
+	
+	for i in range(grid_slots.size()):
+		if grid_occupied[i] and grid_ownership[i] == Owner.OPPONENT:
+			hide_opponent_card_at_position(i)
+			hidden_opponent_cards.append(i)
+	
+	print("Hidden ", hidden_opponent_cards.size(), " opponent cards")
+
+func hide_opponent_card_at_position(grid_index: int):
+	var card_display = get_card_display_at_position(grid_index)
+	if not card_display:
+		return
+	
+	# Make the card content invisible but keep a darkened placeholder
+	card_display.modulate = Color(0.3, 0.3, 0.3, 1.0)  # Dark gray tint
+	
+	# Disable hover interactions
+	card_display.set_meta("cloaked", true)
+	if card_display.panel:
+		card_display.panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	# Apply special cloaked styling to the slot
+	var slot = grid_slots[grid_index]
+	var cloaked_style = StyleBoxFlat.new()
+	cloaked_style.bg_color = Color("#1A1A2A")  # Very dark blue
+	cloaked_style.border_color = Color("#4A4A6A")  # Slightly lighter border
+	cloaked_style.border_width_left = 3
+	cloaked_style.border_width_top = 3
+	cloaked_style.border_width_right = 3
+	cloaked_style.border_width_bottom = 3
+	slot.add_theme_stylebox_override("panel", cloaked_style)
+	
+	print("Hidden opponent card at position ", grid_index)
+
+func reveal_opponent_card_at_position(grid_index: int):
+	var card_display = get_card_display_at_position(grid_index)
+	if not card_display:
+		return
+	
+	# Restore normal visibility
+	card_display.modulate = Color(1, 1, 1, 1)
+	
+	# Re-enable hover interactions
+	card_display.set_meta("cloaked", false)
+	if card_display.panel:
+		card_display.panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	# Restore opponent card styling
+	var slot = grid_slots[grid_index]
+	slot.add_theme_stylebox_override("panel", opponent_card_style)
+	
+	print("Revealed opponent card at position ", grid_index)
+
+func reveal_all_opponent_cards():
+	print("Revealing all opponent cards")
+	
+	for position in hidden_opponent_cards:
+		if grid_occupied[position] and grid_ownership[position] == Owner.OPPONENT:
+			reveal_opponent_card_at_position(position)
+	
+	hidden_opponent_cards.clear()
+	print("All opponent cards revealed")
+
+func process_cloak_of_night_turn():
+	if not cloak_of_night_active:
+		return
+	
+	# Only count down on opponent turns
+	if turn_manager.is_opponent_turn():
+		cloak_of_night_turns_remaining -= 1
+		print("Cloak of Night turns remaining: ", cloak_of_night_turns_remaining)
+		
+		if cloak_of_night_turns_remaining <= 0:
+			end_cloak_of_night_ability()
+
+func end_cloak_of_night_ability():
+	print("=== CLOAK OF NIGHT ENDING ===")
+	cloak_of_night_active = false
+	cloak_of_night_turns_remaining = 0
+	
+	# Reveal all hidden cards
+	reveal_all_opponent_cards()
+	
+	# Show notification
+	if notification_manager:
+		notification_manager.show_notification("The shadows recede...")
+	
+	print("Cloak of Night effect ended")
+
+func clear_cloak_of_night_ability():
+	if cloak_of_night_active:
+		end_cloak_of_night_ability()
+	cloak_of_night_active = false
+	cloak_of_night_turns_remaining = 0
+	hidden_opponent_cards.clear()
+	print("Cloak of Night ability cleared")
