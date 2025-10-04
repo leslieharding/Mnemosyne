@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://dh4c5feb2eu1v" path="res://Resources/Abilities/charge_ability.gd" id="3_tpnlu"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="4_2h7tk"]
 [ext_resource type="Script" uid="uid://bjrn1xq2fqgxo" path="res://Resources/Abilities/sun_bather_ability.gd" id="5_gowu1"]
-[ext_resource type="Script" uid="uid://bulpe2jjtsy7d" path="res://Resources/Abilities/osmosis_ability.gd" id="7_tpnlu"]
+[ext_resource type="Script" uid="uid://cm2mhp17xds1o" path="res://Resources/Abilities/survival_ability.gd" id="7_sfw3d"]
 [ext_resource type="Script" uid="uid://cklxp8i7wphlo" path="res://Resources/Abilities/reckless_assault_ability.gd" id="8_sfw3d"]
 [ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="8_xjxyc"]
 [ext_resource type="Script" uid="uid://cs8jo68kos2c6" path="res://Resources/Abilities/harmony_ability.gd" id="9_p7jhq"]
@@ -97,15 +97,16 @@ abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_2h7tk")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fysfy"]
-script = ExtResource("7_tpnlu")
-ability_name = "Osmosis"
-description = "Gain the stats of any cards you capture"
-metadata/_custom_type_script = "uid://bulpe2jjtsy7d"
+script = ExtResource("7_sfw3d")
+ability_name = "Survival"
+description = "This card prevents the first time it would be captured, but reduces its stats to 1 to do so"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://cm2mhp17xds1o"
 
 [sub_resource type="Resource" id="Resource_pdvfu"]
 script = ExtResource("1_vqrrp")
 card_name = "Cygnus"
-values = Array[int]([4, 4, 4, 4])
+values = Array[int]([2, 3, 3, 3])
 description = "Oh Phaeton dont listen to him"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_fysfy")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
