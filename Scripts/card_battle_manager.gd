@@ -3294,8 +3294,12 @@ func place_card_on_grid():
 						"captures_made": captures
 					}
 					
-					ability.execute(aristeia_context)
-					return  # Don't switch turns if aristeia is active
+					var aristeia_activated = ability.execute(aristeia_context)
+					if aristeia_activated:
+						print("Aristeia successfully activated - mode is now active")
+					else:
+						print("Aristeia did not activate (no captures or ownership changed)")
+					break  # Exit the ability loop
 	# Update the score display immediately after combat
 	update_game_status()
 
@@ -3329,6 +3333,10 @@ func place_card_on_grid():
 	
 	if dance_mode_active:
 		print("Dance mode active - staying on turn for target selection")
+		return
+	
+	if aristeia_mode_active:
+		print("Aristeia mode active - staying on turn for target selection")
 		return
 	
 	if sanctuary_mode_active:

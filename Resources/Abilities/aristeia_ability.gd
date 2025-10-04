@@ -29,13 +29,10 @@ func execute(context: Dictionary) -> bool:
 		print("AristeiaAbility: Missing required context data")
 		return false
 	
-	# Check if card still belongs to original owner (toxic capture check)
-	var current_owner = game_manager.get_owner_at_position(grid_position)
-	var placing_owner = context.get("placing_owner", current_owner)
-	
-	if current_owner != placing_owner:
-		print("AristeiaAbility: Card ownership changed due to toxic capture - aristeia cancelled")
-		return false
+	# Get the original placing owner from context
+	# Don't check current ownership - toxic may have reversed it, but aristeia should still trigger
+	# because the capture DID happen successfully (even if toxic reversed ownership afterward)
+	var placing_owner = context.get("placing_owner")
 	
 	# Check if any captures were made
 	if captures_made <= 0:
@@ -45,7 +42,8 @@ func execute(context: Dictionary) -> bool:
 	print("AristeiaAbility activated! ", placed_card.card_name, " captured ", captures_made, " enemies and can move again!")
 	
 	# Enable aristeia mode in the game manager
-	game_manager.start_aristeia_mode(grid_position, current_owner, placed_card)
+	# Use the placing owner (original owner) not current owner
+	game_manager.start_aristeia_mode(grid_position, placing_owner, placed_card)
 	
 	return true
 
