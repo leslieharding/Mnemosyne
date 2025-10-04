@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="OsmosisAbility" load_steps=2 format=3 uid="uid://bdhnef6te26pu"]
+
+[ext_resource type="Script" uid="uid://bulpe2jjtsy7d" path="res://Resources/Abilities/osmosis_ability.gd" id="1_qk66p"]
+
+[resource]
+script = ExtResource("1_qk66p")
+ability_name = "Osmosis"
+description = "Gain the stats of any cards you capture"
+metadata/_custom_type_script = "uid://bulpe2jjtsy7d"
