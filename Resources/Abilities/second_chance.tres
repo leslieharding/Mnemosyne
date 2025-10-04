@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SecondChanceAbility" load_steps=2 format=3 uid="uid://bb6iaktck6kn6"]
+
+[ext_resource type="Script" uid="uid://dy321gsin4f3p" path="res://Resources/Abilities/second_chance_ability.gd" id="1_hobm3"]
+
+[resource]
+script = ExtResource("1_hobm3")
+ability_name = "Second Chance"
+description = "The first time this battle this card is captured return it to your hand"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dy321gsin4f3p"

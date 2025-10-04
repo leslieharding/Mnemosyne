@@ -1184,6 +1184,28 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 			
 			continue  # Skip the actual capture for this card
 		
+		if captured_card_data == null:
+			print("ERROR: captured_card_data is null at position ", captured_index, " - skipping second chance check")
+			continue
+		
+		
+		# NEW: Check for Second Chance ability before applying capture
+		var second_chance_triggered = check_for_second_chance(captured_index, captured_card_data, grid_index, attacking_card)
+		
+		if second_chance_triggered:
+			print("SECOND CHANCE! ", captured_card_data.card_name, " returned to hand instead of being captured!")
+			
+			# Award reduced experience for successful attack even though capture was prevented
+			if attacking_owner == Owner.PLAYER:
+				var card_collection_index = get_card_collection_index(grid_index)
+				if card_collection_index != -1:
+					var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
+					if exp_tracker:
+						exp_tracker.add_capture_exp(card_collection_index, 5)  # Reduced exp
+						print("Player gained 5 exp for attack (card returned via Second Chance)")
+			
+			continue  # Skip the actual capture for this card
+		
 		# CAPTURE SUCCESSFUL - Show visual effects now that we know capture will happen
 		var attacking_card_display = get_card_display_at_position(grid_index)
 		if attacking_card_display and visual_effects_manager:
@@ -8036,5 +8058,81 @@ func should_apply_exploit(attacking_card: CardResource, attacker_position: int) 
 		for ability in abilities:
 			if ability.ability_name == "Exploit":
 				return ExploitAbility.can_use_exploit(attacking_card)
+	
+	return false
+
+func check_for_second_chance(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource) -> bool:
+	print("=== CHECK_FOR_SECOND_CHANCE DEBUG ===")
+	print("Defender position: ", defender_pos)
+	print("Defending card: ", defending_card.card_name if defending_card else "NULL")
+	
+	# Safety check for null defending card
+	if not defending_card:
+		print("Second Chance check failed: defending_card is null")
+		return false
+	
+	# Additional safety check - verify defending_card is valid
+	if not is_instance_valid(defending_card):
+		print("Second Chance check failed: defending_card is not a valid instance")
+		return false
+	
+	# Clear any previous second chance flags for this position
+	remove_meta("second_chance_prevented_" + str(defender_pos))
+	
+	# Get the card level to check for the ability
+	var card_collection_index = get_card_collection_index(defender_pos)
+	var card_level = get_card_level(card_collection_index)
+	
+	print("DEBUG: Card collection index: ", card_collection_index, ", level: ", card_level)
+	
+	# Check if the defending card has Second Chance ability
+	if not defending_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, card_level):
+		print("No ON_CAPTURE abilities found")
+		return false
+	
+	# Check specifically for Second Chance ability
+	var has_second_chance = false
+	var second_chance_ability = null
+	
+	var available_abilities = defending_card.get_available_abilities(card_level)
+	for ability in available_abilities:
+		if ability.ability_name == "Second Chance":
+			has_second_chance = true
+			second_chance_ability = ability
+			break
+	
+	if not has_second_chance:
+		print("No Second Chance ability found")
+		return false
+	
+	# Check if already used
+	if defending_card.has_meta("second_chance_used") and defending_card.get_meta("second_chance_used"):
+		print("Second Chance already used this battle")
+		return false
+	
+	print("SECOND CHANCE! ", defending_card.card_name, " will return to hand!")
+	
+	# Execute the Second Chance ability
+	var capture_context = {
+		"captured_card": defending_card,
+		"captured_position": defender_pos,
+		"capturing_card": attacking_card,
+		"capturing_position": attacker_pos,
+		"game_manager": self,
+		"card_level": card_level
+	}
+	
+	var success = second_chance_ability.execute(capture_context)
+	
+	if success:
+		# Check if the ability set the prevention flag
+		var was_prevented = has_meta("second_chance_prevented_" + str(defender_pos)) and get_meta("second_chance_prevented_" + str(defender_pos))
+		
+		# Clean up the flag
+		if was_prevented:
+			remove_meta("second_chance_prevented_" + str(defender_pos))
+		
+		print("=== SECOND CHANCE RESULT: ", was_prevented, " ===")
+		return was_prevented
 	
 	return false
