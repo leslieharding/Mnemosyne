@@ -8224,7 +8224,7 @@ func select_aristeia_target(target_position: int):
 	var original_position = current_aristeia_position
 	var aristeia_owner = current_aristeia_owner
 	
-	# End aristeia mode first
+	# End aristeia mode first (just like dance does)
 	aristeia_mode_active = false
 	current_aristeia_position = -1
 	current_aristeia_owner = Owner.NONE
@@ -8237,7 +8237,7 @@ func execute_aristeia_move(from_position: int, to_position: int, aristeia_card: 
 	print("Executing aristeia move from position ", from_position, " to position ", to_position)
 	
 	# Get card collection info before clearing original position
-	var card_collection_index = get_card_collection_index_for_dance(from_position)  # Reuse dance function
+	var card_collection_index = get_card_collection_index_for_dance(from_position)
 	var card_level = get_card_level(card_collection_index)
 	
 	var existing_card_display = null
@@ -8289,22 +8289,6 @@ func execute_aristeia_move(from_position: int, to_position: int, aristeia_card: 
 	if aristeia_owner == Owner.PLAYER:
 		apply_ordain_bonus_if_applicable(to_position, aristeia_card, aristeia_owner)
 	
-	# Execute ON_PLAY abilities at new position
-	if aristeia_card.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
-		print("Executing on-play abilities for aristeia card at new position: ", aristeia_card.card_name)
-		
-		var ability_context = {
-			"placed_card": aristeia_card,
-			"grid_position": to_position,
-			"game_manager": self,
-			"placing_owner": aristeia_owner,
-			"card_level": card_level
-		}
-		aristeia_card.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, card_level)
-		
-		# Update the visual display after abilities execute (in case stats changed)
-		update_card_display(to_position, aristeia_card)
-	
 	# Handle passive abilities at new position
 	handle_passive_abilities_on_place(to_position, aristeia_card, card_level)
 	
@@ -8315,12 +8299,13 @@ func execute_aristeia_move(from_position: int, to_position: int, aristeia_card: 
 	var captures = resolve_combat(to_position, aristeia_owner, aristeia_card)
 	if captures > 0:
 		print("Aristeia card captured ", captures, " cards after moving!")
-		
-		# Check if Aristeia ability should trigger AGAIN
+	
+	# NEW: Check if Aristeia should chain (if captures were made, trigger again)
+	if captures > 0 and aristeia_card.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
 		var available_abilities = aristeia_card.get_available_abilities(card_level)
 		for ability in available_abilities:
 			if ability.ability_name == "Aristeia":
-				print("Aristeia chain continues - checking for another move")
+				print("Aristeia chain triggered - ", captures, " captures made, activating again")
 				
 				var aristeia_context = {
 					"placed_card": aristeia_card,
@@ -8332,7 +8317,7 @@ func execute_aristeia_move(from_position: int, to_position: int, aristeia_card: 
 				}
 				
 				ability.execute(aristeia_context)
-				return  # Don't proceed with turn switching if aristeia chains
+				return  # Don't switch turns if chaining
 	
 	# Update displays
 	update_card_display(to_position, aristeia_card)
