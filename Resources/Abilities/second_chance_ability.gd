@@ -8,21 +8,10 @@ func _init():
 	trigger_condition = TriggerType.ON_CAPTURE
 
 func execute(context: Dictionary) -> bool:
-	if not can_execute(context):
-		return false
-	
-	var captured_card = context.get("captured_card")
-	var captured_position = context.get("captured_position", -1)
-	var game_manager = context.get("game_manager")
-	
-	# Mark as used
-	captured_card.set_meta("second_chance_used", true)
-	
-	# Just set the flag - don't touch the board
-	game_manager.set_meta("second_chance_prevented_" + str(captured_position), true)
-	
-	print("Second Chance activated! Card will return to hand.")
-	
+	# This ability is now handled entirely by try_second_chance_rescue in card_battle_manager
+	# We don't need to do anything here because the check happens BEFORE capture
+	# This function only exists to satisfy the ability system
+	print("SecondChanceAbility.execute() called - but rescue already happened")
 	return true
 
 func can_execute(context: Dictionary) -> bool:

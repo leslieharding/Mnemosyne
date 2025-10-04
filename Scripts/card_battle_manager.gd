@@ -1101,6 +1101,7 @@ func set_card_ownership(grid_index: int, new_owner: Owner):
 		# Handle adaptive defense when ownership changes
 		handle_adaptive_defense_ownership_change(grid_index)
 
+
 func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource):
 	print("Resolving combat for card at slot ", grid_index)
 	
@@ -1116,20 +1117,18 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 		print("Standard combat")
 		captures = resolve_standard_combat(grid_index, attacking_owner, attacking_card)
 	
-	# NEW: Execute Bolster Confidence on the attacking card if it made any captures
+	# Execute Bolster Confidence on the attacking card if it made any captures
 	if captures.size() > 0:
-		var attacking_card_level = 0  # Enemy cards typically use level 0
+		var attacking_card_level = 0
 		if attacking_owner == Owner.PLAYER:
 			var attacking_card_index = get_card_collection_index(grid_index)
 			attacking_card_level = get_card_level(attacking_card_index)
 		
-		# Check specifically for Bolster Confidence ability on the attacking card
 		var available_abilities = attacking_card.get_available_abilities(attacking_card_level)
 		for ability in available_abilities:
 			if ability.ability_name == "Bolster Confidence":
 				print("DEBUG: Attacking card ", attacking_card.card_name, " has Bolster Confidence - checking captures")
 				
-				# Execute Bolster Confidence for each player card captured
 				for captured_index in captures:
 					var captured_card_data = grid_card_data[captured_index]
 					
@@ -1144,29 +1143,16 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 					}
 					
 					ability.execute(bolster_context)
-				break  # Only execute Bolster Confidence once per attacking card
+				break
 	
-	# Apply all captures and handle passive abilities - WITH CHEAT DEATH AND SECOND CHANCE CHECKS
+	# Apply all captures and handle passive abilities - WITH SECOND CHANCE CHECKS
 	var successful_captures = []
 	
 	for captured_index in captures:
 		print("=== PROCESSING POTENTIAL CAPTURE AT POSITION ", captured_index, " ===")
 		
-		# Store the card data before any changes
 		var captured_card_data = grid_card_data[captured_index]
 		var captured_owner = grid_ownership[captured_index]
-		print("DEBUG: Potential capture of: ", captured_card_data.card_name if captured_card_data else "NULL")
-		
-		# DISARRAY: Check if this is a confused friendly attacking friendly (ownership should flip to opponent)
-		var is_confused = attacking_card.has_meta("disarray_confused") and attacking_card.get_meta("disarray_confused")
-		var is_friendly_fire = (attacking_owner == captured_owner)
-		
-		if is_confused and is_friendly_fire:
-			print("DISARRAY FRIENDLY FIRE: Confused card captured friendly - giving to opponent!")
-			# Flip ownership to opponent instead of keeping with attacker
-			var new_owner = Owner.OPPONENT if attacking_owner == Owner.PLAYER else Owner.PLAYER
-			attacking_owner = new_owner
-		
 		print("DEBUG: Potential capture of: ", captured_card_data.card_name if captured_card_data else "NULL")
 		
 		# Check for null card data
@@ -1174,78 +1160,39 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 			print("ERROR: captured_card_data is null at position ", captured_index, " - skipping")
 			continue
 		
-		# NEW: Check for cheat death before applying capture
-		var capture_prevented = check_for_cheat_death(captured_index, captured_card_data, grid_index, attacking_card)
+		# DISARRAY: Check if this is a confused friendly attacking friendly
+		var is_confused = attacking_card.has_meta("disarray_confused") and attacking_card.get_meta("disarray_confused")
+		var is_friendly_fire = (attacking_owner == captured_owner)
 		
-		if capture_prevented:
-			print("CHEAT DEATH! Capture of ", captured_card_data.card_name, " at position ", captured_index, " was prevented!")
-			
-			# Award reduced experience for successful attack even though capture was prevented
-			if attacking_owner == Owner.PLAYER:
-				var card_collection_index = get_card_collection_index(grid_index)
-				if card_collection_index != -1:
-					var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
-					if exp_tracker:
-						exp_tracker.add_capture_exp(card_collection_index, 5)  # Reduced exp
-						print("Player gained 5 exp for attack (capture prevented by cheat death)")
-			
+		if is_confused and is_friendly_fire:
+			print("DISARRAY FRIENDLY FIRE: Confused card captured friendly - giving to opponent!")
+			var new_owner = Owner.OPPONENT if attacking_owner == Owner.PLAYER else Owner.PLAYER
+			attacking_owner = new_owner
+		
+		# ===== NEW: Check for Second Chance BEFORE processing capture =====
+		var second_chance_prevented = try_second_chance_rescue(captured_index, captured_card_data, grid_index, attacking_card, attacking_owner)
+		
+		if second_chance_prevented:
+			print("SECOND CHANCE! ", captured_card_data.card_name, " returned to hand instead of being captured!")
 			continue  # Skip the actual capture for this card
 		
-		# NEW: Check for Second Chance ability before applying capture
-		var second_chance_triggered = check_for_second_chance(captured_index, captured_card_data, grid_index, attacking_card)
-		if second_chance_triggered:
-			print("SECOND CHANCE! ", captured_card_data.card_name, " returned to hand instead of being captured!")
+		# ===== NEW: Check for Cheat Death BEFORE processing capture =====
+		var cheat_death_prevented = check_for_cheat_death(captured_index, captured_card_data, grid_index, attacking_card)
+		
+		if cheat_death_prevented:
+			print("CHEAT DEATH! Capture of ", captured_card_data.card_name, " at position ", captured_index, " was prevented!")
 			
-			# Get the stored info about this card
-			if captured_index in second_chance_cards:
-				var card_info = second_chance_cards[captured_index]
-				var returning_card = card_info.card
-				var original_owner = card_info.owner
-				var card_collection_index = card_info.collection_index
-				
-				# Remove from board
-				grid_occupied[captured_index] = false
-				grid_ownership[captured_index] = Owner.NONE
-				grid_card_data[captured_index] = null
-				
-				# Remove card display
-				var slot = grid_slots[captured_index]
-				for child in slot.get_children():
-					if child is CardDisplay:
-						child.queue_free()
-						break
-				
-				# Remove from tracking
-				grid_to_collection_index.erase(captured_index)
-				if captured_index in active_passive_abilities:
-					active_passive_abilities.erase(captured_index)
-				
-				# Return to appropriate hand
-				if original_owner == Owner.PLAYER:
-					player_deck.append(returning_card)
-					deck_card_indices.append(card_collection_index)
-					display_player_hand()
-					print("Returned ", returning_card.card_name, " to player hand")
-				elif original_owner == Owner.OPPONENT:
-					if opponent_manager:
-						opponent_manager.opponent_deck.append(returning_card)
-						print("Returned ", returning_card.card_name, " to opponent hand")
-				
-				# Clean up registration
-				second_chance_cards.erase(captured_index)
-			
-			# Award reduced experience
 			if attacking_owner == Owner.PLAYER:
 				var card_collection_index = get_card_collection_index(grid_index)
 				if card_collection_index != -1:
 					var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
 					if exp_tracker:
 						exp_tracker.add_capture_exp(card_collection_index, 5)
-						print("Player gained 5 exp for attack (card returned via Second Chance)")
+						print("Player gained 5 exp for attack (capture prevented by cheat death)")
 			
 			continue  # Skip the actual capture for this card
 		
-		# CAPTURE SUCCESSFUL - Show visual effects now that we know capture will happen
+		# CAPTURE SUCCESSFUL - Show visual effects
 		var attacking_card_display = get_card_display_at_position(grid_index)
 		if attacking_card_display and visual_effects_manager:
 			var is_player_attack = (attacking_owner == Owner.PLAYER)
@@ -1253,43 +1200,35 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 			if attack_direction != -1:
 				visual_effects_manager.show_capture_flash(attacking_card_display, attack_direction, is_player_attack)
 		
-		# Normal capture processing - Remove passive abilities of the captured card BEFORE changing ownership
+		# Normal capture processing - Remove passive abilities BEFORE changing ownership
 		handle_passive_abilities_on_capture(captured_index, captured_card_data)
 		
 		# Change ownership
 		grid_ownership[captured_index] = attacking_owner
 		print("Card at slot ", captured_index, " is now owned by ", "Player" if attacking_owner == Owner.PLAYER else "Opponent")
 		
-		# Award capture experience if it's a player card attacking
+		# Award capture experience
 		if attacking_owner == Owner.PLAYER:
 			var card_collection_index = get_card_collection_index(grid_index)
 			if card_collection_index != -1:
 				var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
 				if exp_tracker:
 					exp_tracker.add_capture_exp(card_collection_index, 10)
-					print("Player card at position ", grid_index, " (collection index ", card_collection_index, ") gained 10 capture exp")
-				else:
-					print("Warning: RunExperienceTrackerAutoload not found for capture exp")
+					print("Player card at position ", grid_index, " gained 10 capture exp")
 		
-		# Track this as a successful capture
+		# Track successful capture
 		successful_captures.append(captured_index)
 		
 		# Execute ON_CAPTURE abilities on the captured card
 		var card_collection_index = get_card_collection_index(captured_index)
 		var card_level = get_card_level(card_collection_index)
 		
-		print("DEBUG: Card collection index: ", card_collection_index, ", level: ", card_level)
-		print("DEBUG: About to check ON_CAPTURE abilities for ", captured_card_data.card_name, " at position ", captured_index)
-		
 		if captured_card_data.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, card_level):
-			print("DEBUG: Card ", captured_card_data.card_name, " HAS ON_CAPTURE abilities at level ", card_level)
-			
-			# EXECUTE ON_CAPTURE abilities on the captured card (like Infighting)
 			print("DEBUG: Executing ON_CAPTURE abilities for captured card: ", captured_card_data.card_name)
 			
 			var capture_context = {
 				"capturing_card": attacking_card,
-				"capturing_position": grid_index,  # The attacking position
+				"capturing_position": grid_index,
 				"captured_card": captured_card_data,
 				"captured_position": captured_index,
 				"game_manager": self,
@@ -1298,26 +1237,17 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 			}
 			
 			captured_card_data.execute_abilities(CardAbility.TriggerType.ON_CAPTURE, capture_context, card_level)
-		else:
-			print("DEBUG: Card ", captured_card_data.card_name, " has NO ON_CAPTURE abilities at level ", card_level)
-			if captured_card_data.abilities.size() > 0:
-				print("DEBUG: But it does have ", captured_card_data.abilities.size(), " abilities:")
-				for i in range(captured_card_data.abilities.size()):
-					var ability = captured_card_data.abilities[i]
-					print("  Ability ", i, ": ", ability.ability_name, " (trigger: ", ability.trigger_condition, ")")
 		
-		# FIXED: Check if the newly captured card has passive abilities that should be active for new owner
+		# Check if newly captured card has passive abilities for new owner
 		if captured_card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
 			print("Checking if passive abilities should restart for captured card at position ", captured_index)
 			
-			var new_owner = attacking_owner  # The card now belongs to the attacker
+			var new_owner = attacking_owner
 			var available_abilities = captured_card_data.get_available_abilities(card_level)
 			var active_abilities_for_new_owner = []
 			
 			for ability in available_abilities:
 				if ability.trigger_condition == CardAbility.TriggerType.PASSIVE:
-					# For now, assume all passive abilities can be active for any owner
-					# This maintains existing behavior until proper ownership checks are implemented
 					active_abilities_for_new_owner.append(ability)
 					print("Passive ability ", ability.ability_name, " will be active for new owner")
 			
@@ -8106,81 +8036,101 @@ func should_apply_exploit(attacking_card: CardResource, attacker_position: int) 
 	
 	return false
 
-func check_for_second_chance(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource) -> bool:
-	print("=== CHECK_FOR_SECOND_CHANCE DEBUG ===")
-	print("Defender position: ", defender_pos)
-	print("Defending card: ", defending_card.card_name if defending_card else "NULL")
+
+func try_second_chance_rescue(captured_index: int, captured_card: CardResource, attacker_pos: int, attacking_card: CardResource, attacking_owner: Owner) -> bool:
+	"""
+	Attempts to rescue a card using Second Chance ability.
+	Returns true if the card was rescued (capture prevented).
+	"""
+	print("=== TRY_SECOND_CHANCE_RESCUE ===")
+	print("Captured card: ", captured_card.card_name if captured_card else "NULL")
+	print("Position: ", captured_index)
 	
-	# Safety check for null defending card
-	if not defending_card:
-		print("Second Chance check failed: defending_card is null")
+	# Safety checks
+	if not captured_card or not is_instance_valid(captured_card):
+		print("Second Chance: Invalid card")
 		return false
 	
-	# Additional safety check - verify defending_card is valid
-	if not is_instance_valid(defending_card):
-		print("Second Chance check failed: defending_card is not a valid instance")
-		return false
-	
-	# Clear any previous second chance flags for this position
-	remove_meta("second_chance_prevented_" + str(defender_pos))
-	
-	# Get the card level to check for the ability
-	var card_collection_index = get_card_collection_index(defender_pos)
+	# Get card level
+	var card_collection_index = get_card_collection_index(captured_index)
 	var card_level = get_card_level(card_collection_index)
 	
-	print("DEBUG: Card collection index: ", card_collection_index, ", level: ", card_level)
-	
-	# Check if the defending card has Second Chance ability
-	if not defending_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, card_level):
-		print("No ON_CAPTURE abilities found")
+	# Check if card has Second Chance ability
+	if not captured_card.has_ability_type(CardAbility.TriggerType.ON_CAPTURE, card_level):
+		print("Second Chance: No ON_CAPTURE abilities")
 		return false
 	
-	# Check specifically for Second Chance ability
-	var has_second_chance = false
+	# Look for Second Chance ability specifically
 	var second_chance_ability = null
-	
-	var available_abilities = defending_card.get_available_abilities(card_level)
+	var available_abilities = captured_card.get_available_abilities(card_level)
 	for ability in available_abilities:
 		if ability.ability_name == "Second Chance":
-			has_second_chance = true
 			second_chance_ability = ability
 			break
 	
-	if not has_second_chance:
-		print("No Second Chance ability found")
+	if not second_chance_ability:
+		print("Second Chance: Ability not found")
 		return false
 	
 	# Check if already used
-	if defending_card.has_meta("second_chance_used") and defending_card.get_meta("second_chance_used"):
-		print("Second Chance already used this battle")
+	if captured_card.has_meta("second_chance_used") and captured_card.get_meta("second_chance_used"):
+		print("Second Chance: Already used this battle")
 		return false
 	
-	print("SECOND CHANCE! ", defending_card.card_name, " will return to hand!")
+	# Mark as used
+	captured_card.set_meta("second_chance_used", true)
+	print("SECOND CHANCE ACTIVATED! ", captured_card.card_name, " will return to hand!")
 	
-	# Execute the Second Chance ability
-	var capture_context = {
-		"captured_card": defending_card,
-		"captured_position": defender_pos,
-		"capturing_card": attacking_card,
-		"capturing_position": attacker_pos,
-		"game_manager": self,
-		"card_level": card_level
-	}
+	# Get stored card info
+	if not captured_index in second_chance_cards:
+		print("ERROR: Card not registered in second_chance_cards dictionary!")
+		return false
 	
-	var success = second_chance_ability.execute(capture_context)
+	var card_info = second_chance_cards[captured_index]
+	var original_owner = card_info.owner
+	var original_collection_index = card_info.collection_index
 	
-	if success:
-		# Check if the ability set the prevention flag
-		var was_prevented = has_meta("second_chance_prevented_" + str(defender_pos)) and get_meta("second_chance_prevented_" + str(defender_pos))
-		
-		# Clean up the flag
-		if was_prevented:
-			remove_meta("second_chance_prevented_" + str(defender_pos))
-		
-		print("=== SECOND CHANCE RESULT: ", was_prevented, " ===")
-		return was_prevented
+	# Remove from board
+	grid_occupied[captured_index] = false
+	grid_ownership[captured_index] = Owner.NONE
+	grid_card_data[captured_index] = null
 	
-	return false
+	# Remove card display
+	var slot = grid_slots[captured_index]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.queue_free()
+			break
+	
+	# Remove from tracking
+	grid_to_collection_index.erase(captured_index)
+	if captured_index in active_passive_abilities:
+		active_passive_abilities.erase(captured_index)
+	
+	# Return to appropriate hand
+	if original_owner == Owner.PLAYER:
+		player_deck.append(captured_card)
+		deck_card_indices.append(original_collection_index)
+		display_player_hand()
+		print("Returned ", captured_card.card_name, " to player hand")
+	elif original_owner == Owner.OPPONENT:
+		if opponent_manager:
+			opponent_manager.opponent_deck.append(captured_card)
+			print("Returned ", captured_card.card_name, " to opponent hand")
+	
+	# Clean up registration
+	second_chance_cards.erase(captured_index)
+	
+	# Award reduced experience to attacker
+	if attacking_owner == Owner.PLAYER:
+		var attacker_collection_index = get_card_collection_index(attacker_pos)
+		if attacker_collection_index != -1:
+			var exp_tracker = get_node("/root/RunExperienceTrackerAutoload")
+			if exp_tracker:
+				exp_tracker.add_capture_exp(attacker_collection_index, 5)
+				print("Player gained 5 exp for attack (card returned via Second Chance)")
+	
+	return true  # Capture was prevented
 
 
 func register_second_chance_if_needed(grid_position: int, card: CardResource, owner: Owner) -> void:
