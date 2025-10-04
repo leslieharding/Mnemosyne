@@ -1281,7 +1281,14 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 						print("Warning: Missing card data in combat resolution")
 						continue
 					
-					var my_value = attacking_card.values[direction.my_value_index]
+					# Check for Perfect Aim ability first
+					var my_value: int
+					if PerfectAimAbility.has_perfect_aim(attacking_card):
+						my_value = PerfectAimAbility.get_perfect_aim_value(attacking_card)
+						print("PERFECT AIM! Using highest stat: ", my_value, " instead of directional stat: ", attacking_card.values[direction.my_value_index])
+					else:
+						my_value = attacking_card.values[direction.my_value_index]
+					
 					var their_value: int
 
 					# Check for critical strike first
@@ -1306,16 +1313,9 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 					
 					if my_value > their_value:
 						print("Captured card at slot ", adj_index, "!")
-						
-						# NEW: Check for Trojan Horse reversal BEFORE adding to captures
-						var trojan_reversal_occurred = check_trojan_horse_reversal(adj_index, adjacent_card, grid_index, attacking_card, attacking_owner)
-						
-						if not trojan_reversal_occurred:
-							# Normal capture - only add to captures if trojan reversal didn't happen
-							captures.append(adj_index)
-							# NOTE: Visual effects now handled in resolve_combat() after cheat death check
+						captures.append(adj_index)
+						handle_standard_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction)
 					else:
-						# Defense successful
 						handle_standard_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction)
 	
 	return captures
@@ -1372,7 +1372,6 @@ func award_attack_experience(attacker_pos: int, attacking_owner: Owner, attackin
 				exp_tracker.add_capture_exp(card_collection_index, 5)  # Reduced exp since capture was prevented
 				print("Player card at position ", attacker_pos, " gained 5 exp for successful attack (capture prevented)")
 
-
 func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource) -> Array[int]:
 	var captures: Array[int] = []
 	
@@ -1397,8 +1396,14 @@ func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, atta
 					print("Warning: Missing card data in extended combat resolution")
 					continue
 				
-				# Calculate attack value based on direction
-				var my_attack_value = ExtendedRangeAbility.get_attack_value_for_direction(attacking_card.values, direction)
+				# Check for Perfect Aim ability first (overrides Extended Range calculations)
+				var my_attack_value: int
+				if PerfectAimAbility.has_perfect_aim(attacking_card):
+					my_attack_value = PerfectAimAbility.get_perfect_aim_value(attacking_card)
+					print("PERFECT AIM (Extended)! Using highest stat: ", my_attack_value)
+				else:
+					my_attack_value = ExtendedRangeAbility.get_attack_value_for_direction(attacking_card.values, direction)
+				
 				var their_defense_value: int
 				
 				## Check for critical strike first
@@ -1424,21 +1429,12 @@ func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, atta
 				
 				if my_attack_value > their_defense_value:
 					print("Extended range captured card at slot ", adj_index, "!")
-					
-					# NEW: Check for Trojan Horse reversal BEFORE adding to captures
-					var trojan_reversal_occurred = check_trojan_horse_reversal(adj_index, adjacent_card, grid_index, attacking_card, attacking_owner)
-					
-					if not trojan_reversal_occurred:
-						# Normal capture - only add to captures if trojan reversal didn't happen
-						captures.append(adj_index)
-						# NOTE: Visual effects now handled in resolve_combat() after cheat death check
+					captures.append(adj_index)
+					handle_extended_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction_name)
 				else:
-					# Defense successful
-					handle_extended_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
+					handle_extended_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction_name)
 	
 	return captures
-
-
 # Add helper function to get collection index from grid position
 func get_card_collection_index(grid_index: int) -> int:
 	if grid_index in grid_to_collection_index:

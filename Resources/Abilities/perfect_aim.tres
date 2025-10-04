@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="PerfectAimAbility" load_steps=2 format=3 uid="uid://bqkcn23fciq3u"]
+
+[ext_resource type="Script" uid="uid://1pof4tl06xi" path="res://Resources/Abilities/perfect_aim_ability.gd" id="1_vytoa"]
+
+[resource]
+script = ExtResource("1_vytoa")
+ability_name = "Perfect Aim"
+description = "Always attacks using its highest stat"
+metadata/_custom_type_script = "uid://1pof4tl06xi"

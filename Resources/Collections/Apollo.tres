@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=58 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=60 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://cs8jo68kos2c6" path="res://Resources/Abilities/harmony_ability.gd" id="9_p7jhq"]
 [ext_resource type="Script" uid="uid://bcu6cf6gen411" path="res://Resources/Abilities/cheat_death_ability.gd" id="9_qbbw0"]
 [ext_resource type="Script" uid="uid://ddpmk8j43lf0m" path="res://Resources/Abilities/personal_space_ability.gd" id="11_cknfu"]
+[ext_resource type="Script" uid="uid://1pof4tl06xi" path="res://Resources/Abilities/perfect_aim_ability.gd" id="11_tpnlu"]
 [ext_resource type="Script" uid="uid://bfbpkrqf1u508" path="res://Resources/Abilities/finale_ability.gd" id="12_cknfu"]
 [ext_resource type="Script" uid="uid://c25iupuskk6vd" path="res://Resources/Abilities/compel_ability.gd" id="14_xjxyc"]
 [ext_resource type="Script" uid="uid://b7w3v4k1roxv1" path="res://Resources/Abilities/ordain_ability.gd" id="15_b0n1o"]
@@ -169,11 +170,18 @@ description = "Row you bastards row"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_ca26u")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_rct8f"]
+script = ExtResource("11_tpnlu")
+ability_name = "Perfect Aim"
+description = "Always attacks using its highest stat"
+metadata/_custom_type_script = "uid://1pof4tl06xi"
+
 [sub_resource type="Resource" id="Resource_tl28v"]
 script = ExtResource("1_vqrrp")
 card_name = "Eurydice"
-values = Array[int]([4, 6, 5, 5])
+values = Array[int]([8, 1, 1, 1])
 description = "I'll be right behind you, have faith "
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_rct8f")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tj8k4"]
