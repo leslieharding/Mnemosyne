@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="RecklessAssaultAbility" load_steps=2 format=3 uid="uid://b6qjq3bt1pfwy"]
+
+[ext_resource type="Script" uid="uid://cklxp8i7wphlo" path="res://Resources/Abilities/reckless_assault_ability.gd" id="1_v7c74"]
+
+[resource]
+script = ExtResource("1_v7c74")
+ability_name = "Reckless Assault"
+description = "After combat this card's stats are reduced to 1"
+metadata/_custom_type_script = "uid://cklxp8i7wphlo"

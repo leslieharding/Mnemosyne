@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=60 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=61 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="4_2h7tk"]
 [ext_resource type="Script" uid="uid://bjrn1xq2fqgxo" path="res://Resources/Abilities/sun_bather_ability.gd" id="5_gowu1"]
 [ext_resource type="Script" uid="uid://bulpe2jjtsy7d" path="res://Resources/Abilities/osmosis_ability.gd" id="7_tpnlu"]
+[ext_resource type="Script" uid="uid://cklxp8i7wphlo" path="res://Resources/Abilities/reckless_assault_ability.gd" id="8_sfw3d"]
 [ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="8_xjxyc"]
 [ext_resource type="Script" uid="uid://cs8jo68kos2c6" path="res://Resources/Abilities/harmony_ability.gd" id="9_p7jhq"]
 [ext_resource type="Script" uid="uid://bcu6cf6gen411" path="res://Resources/Abilities/cheat_death_ability.gd" id="9_qbbw0"]
@@ -110,10 +111,10 @@ abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_fysfy")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_f4r1r"]
-script = ExtResource("3_sfw3d")
-ability_name = "Exploit"
-description = "If I am attacking the opponent's weakest stat, double my attack"
-metadata/_custom_type_script = "uid://bp6f5cssscdo5"
+script = ExtResource("8_sfw3d")
+ability_name = "Reckless Assault"
+description = "After combat this card's stats are reduced to 1"
+metadata/_custom_type_script = "uid://cklxp8i7wphlo"
 
 [sub_resource type="Resource" id="Resource_j3ax7"]
 script = ExtResource("1_vqrrp")
