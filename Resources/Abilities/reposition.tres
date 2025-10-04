@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RepositionAbility" load_steps=2 format=3 uid="uid://xi61cjsw1now"]
+
+[ext_resource type="Script" uid="uid://1heklkngs5s7" path="res://Resources/Abilities/reposition_ability.gd" id="1_guknu"]
+
+[resource]
+script = ExtResource("1_guknu")
+ability_name = "Reposition"
+description = "This card trades places with its attacker when captured"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://1heklkngs5s7"
