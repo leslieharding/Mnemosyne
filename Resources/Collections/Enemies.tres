@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=501 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=505 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -22,6 +22,7 @@
 [ext_resource type="Script" uid="uid://cu3icvy8efjky" path="res://Resources/Abilities/greedy_ability.gd" id="13_0vidc"]
 [ext_resource type="Script" uid="uid://nrdoysdoyfq1" path="res://Resources/Abilities/taxation_ability.gd" id="13_1g5vp"]
 [ext_resource type="Script" uid="uid://cm8gt3refuukf" path="res://Resources/Abilities/camouflage_ability.gd" id="14_1g5vp"]
+[ext_resource type="Script" uid="uid://d1m8carhhdy0w" path="res://Resources/Abilities/disarray_ability.gd" id="18_j1bdk"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -867,11 +868,18 @@ description = "Here, eat. Surely now the hunger will go away"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_v6hvw")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_ddk83"]
+script = ExtResource("18_j1bdk")
+ability_name = "Disarray"
+description = "Your opponents next card also attacks friendly cards as well as enemies"
+metadata/_custom_type_script = "uid://d1m8carhhdy0w"
+
 [sub_resource type="Resource" id="Resource_qxjpb"]
 script = ExtResource("2_xcqsp")
 card_name = "The Keres"
 values = Array[int]([6, 1, 8, 1])
 description = "Look at that battlefield sisters, I can almost smell the rot from here, delicious"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ddk83")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fl83v"]
@@ -918,11 +926,18 @@ description = "Here, eat. Surely now the hunger will go away"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ydelp")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_xcmoy"]
+script = ExtResource("18_j1bdk")
+ability_name = "Disarray"
+description = "Your opponents next card also attacks friendly cards as well as enemies"
+metadata/_custom_type_script = "uid://d1m8carhhdy0w"
+
 [sub_resource type="Resource" id="Resource_kv21b"]
 script = ExtResource("2_xcqsp")
 card_name = "The Keres"
 values = Array[int]([7, 2, 9, 2])
 description = "Look at that battlefield sisters, I can almost smell the rot from here, delicious"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_xcmoy")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_6ktpb"]
@@ -969,11 +984,18 @@ description = "Here, eat. Surely now the hunger will go away"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ehyfs")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_1chuv"]
+script = ExtResource("18_j1bdk")
+ability_name = "Disarray"
+description = "Your opponents next card also attacks friendly cards as well as enemies"
+metadata/_custom_type_script = "uid://d1m8carhhdy0w"
+
 [sub_resource type="Resource" id="Resource_xhuqv"]
 script = ExtResource("2_xcqsp")
 card_name = "The Keres"
 values = Array[int]([8, 2, 8, 3])
 description = "Look at that battlefield sisters, I can almost smell the rot from here, delicious"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_1chuv")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0vwsy"]

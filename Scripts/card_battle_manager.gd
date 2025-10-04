@@ -37,6 +37,8 @@ var darkness_shroud_active: bool = false
 
 var misdirection_used: bool = false
 
+var disarray_active: bool = false
+
 # Hermes boss visual inversion system
 var is_hermes_boss_battle: bool = false
 var visual_stat_inversion_active: bool = false
@@ -1149,8 +1151,21 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 		
 		# Store the card data before any changes
 		var captured_card_data = grid_card_data[captured_index]
+		var captured_owner = grid_ownership[captured_index]
+		print("DEBUG: Potential capture of: ", captured_card_data.card_name if captured_card_data else "NULL")
+		
+		# DISARRAY: Check if this is a confused friendly attacking friendly (ownership should flip to opponent)
+		var is_confused = attacking_card.has_meta("disarray_confused") and attacking_card.get_meta("disarray_confused")
+		var is_friendly_fire = (attacking_owner == captured_owner)
+		
+		if is_confused and is_friendly_fire:
+			print("DISARRAY FRIENDLY FIRE: Confused card captured friendly - giving to opponent!")
+			# Flip ownership to opponent instead of keeping with attacker
+			var new_owner = Owner.OPPONENT if attacking_owner == Owner.PLAYER else Owner.PLAYER
+			attacking_owner = new_owner
 		
 		print("DEBUG: Potential capture of: ", captured_card_data.card_name if captured_card_data else "NULL")
+		
 		
 		# NEW: Check for cheat death before applying capture
 		var capture_prevented = check_for_cheat_death(captured_index, captured_card_data, grid_index, attacking_card)
@@ -1253,6 +1268,13 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 	return successful_captures.size()
 
 func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource) -> Array[int]:
+	
+	print("=== RESOLVE_STANDARD_COMBAT DEBUG ===")
+	print("Attacking card: ", attacking_card.card_name)
+	print("Has disarray_confused meta: ", attacking_card.has_meta("disarray_confused"))
+	if attacking_card.has_meta("disarray_confused"):
+		print("Disarray value: ", attacking_card.get_meta("disarray_confused"))
+	
 	var captures: Array[int] = []
 	var grid_x = grid_index % grid_size
 	var grid_y = grid_index / grid_size
@@ -1274,7 +1296,13 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 			if grid_occupied[adj_index]:
 				var adjacent_owner = grid_ownership[adj_index]
 				
-				if adjacent_owner != Owner.NONE and adjacent_owner != attacking_owner:
+				# Check if card is confused by disarray (attacks both friendlies and enemies)
+				var is_confused = attacking_card.has_meta("disarray_confused") and attacking_card.get_meta("disarray_confused")
+				
+				print("DEBUG DISARRAY CHECK: Direction ", direction.name, " - adjacent_owner: ", adjacent_owner, " attacking_owner: ", attacking_owner, " is_confused: ", is_confused)
+				
+				# Check if there's a card to fight: enemy OR (friendly if confused)
+				if adjacent_owner != Owner.NONE and (adjacent_owner != attacking_owner or is_confused):
 					var adjacent_card = grid_card_data[adj_index]
 					
 					if not attacking_card or not adjacent_card:
@@ -1373,6 +1401,11 @@ func award_attack_experience(attacker_pos: int, attacking_owner: Owner, attackin
 				print("Player card at position ", attacker_pos, " gained 5 exp for successful attack (capture prevented)")
 
 func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, attacking_card: CardResource) -> Array[int]:
+	print("=== RESOLVE_EXTENDED_RANGE_combat DEBUG ===")
+	print("Attacking card: ", attacking_card.card_name)
+	print("Has disarray_confused meta: ", attacking_card.has_meta("disarray_confused"))
+	if attacking_card.has_meta("disarray_confused"):
+		print("Disarray value: ", attacking_card.get_meta("disarray_confused"))
 	var captures: Array[int] = []
 	
 	# Get all 8 adjacent positions using the helper function
@@ -1389,7 +1422,13 @@ func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, atta
 		if grid_occupied[adj_index]:
 			var adjacent_owner = grid_ownership[adj_index]
 			
-			if adjacent_owner != Owner.NONE and adjacent_owner != attacking_owner:
+			# Check if card is confused by disarray (attacks both friendlies and enemies)
+			var is_confused = attacking_card.has_meta("disarray_confused") and attacking_card.get_meta("disarray_confused")
+			
+			print("DEBUG DISARRAY CHECK (Extended): Direction ", direction_name, " - adjacent_owner: ", adjacent_owner, " attacking_owner: ", attacking_owner, " is_confused: ", is_confused)
+			
+			# Check if there's a card to fight: enemy OR (friendly if confused)
+			if adjacent_owner != Owner.NONE and (adjacent_owner != attacking_owner or is_confused):
 				var adjacent_card = grid_card_data[adj_index]
 				
 				if not attacking_card or not adjacent_card:
@@ -1522,6 +1561,20 @@ func _on_opponent_card_placed(grid_index: int):
 		# Deactivate soothe after use
 		soothe_active = false
 		print("Soothe effect has been consumed")
+		
+		# Apply Disarray effect if active - mark the card as confused
+	if disarray_active:
+		print("Applying Disarray effect to opponent card: ", opponent_card_data.card_name)
+		
+		# Mark this card as confused (will attack both friendlies and enemies)
+		opponent_card_data.set_meta("disarray_confused", true)
+		
+		print("Disarray effect applied - card will attack both friendly and enemy cards")
+		
+		# Deactivate disarray after use
+		disarray_active = false
+		print("Disarray effect has been consumed")
+		
 	if not opponent_card_data:
 		print("Warning: Could not get opponent card data!")
 		opponent_is_thinking = false
@@ -3012,6 +3065,22 @@ func place_card_on_grid():
 	# Apply the level-appropriate values and abilities AND growth to the grid copy
 	card_data.values = effective_values.duplicate()
 	card_data.abilities = effective_abilities.duplicate()
+	
+	# Apply Disarray effect if active - mark the card as confused
+	if disarray_active:
+		print("Applying Disarray effect to player card: ", card_data.card_name)
+		
+		# Mark this card as confused (will attack both friendlies and enemies)
+		card_data.set_meta("disarray_confused", true)
+		
+		print("Disarray effect applied - card will attack both friendly and enemy cards")
+		print("DEBUG DISARRAY: Player card metadata set - has_meta: ", card_data.has_meta("disarray_confused"), " value: ", card_data.get_meta("disarray_confused"))
+		
+		# Deactivate disarray after use
+		disarray_active = false
+		print("Disarray effect has been consumed")
+	
+	
 	
 	# FIXED: Apply ordain bonus to the card copy that will be placed on the grid
 	var placing_owner = Owner.PLAYER
@@ -7282,7 +7351,10 @@ func restore_battle_from_snapshot() -> bool:
 		var deck_power_state = battle_snapshot["deck_power_state"]
 		active_deck_power = deck_power_state.get("active_deck_power", DeckDefinition.DeckPowerType.NONE)
 		misdirection_used = deck_power_state.get("misdirection_used", false)
-		sunlit_positions = deck_power_state.get("sunlit_positions", []).duplicate()
+		var restored_sunlit = deck_power_state.get("sunlit_positions", [])
+		sunlit_positions.clear()
+		for pos in restored_sunlit:
+			sunlit_positions.append(pos)
 		darkness_shroud_active = deck_power_state.get("darkness_shroud_active", false)
 		discordant_active = deck_power_state.get("discordant_active", false)
 		soothe_active = deck_power_state.get("soothe_active", false)
@@ -7920,3 +7992,11 @@ func clear_cloak_of_night_ability():
 	cloak_of_night_turns_remaining = 0
 	hidden_opponent_cards.clear()
 	print("Cloak of Night ability cleared")
+
+
+func set_disarray_active(active: bool):
+	disarray_active = active
+	if active:
+		print("Disarray effect activated - next opponent card will attack both friendly and enemy cards")
+	else:
+		print("Disarray effect deactivated")

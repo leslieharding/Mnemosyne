@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="DisarrayAbility" load_steps=2 format=3 uid="uid://7f6etktkbm1w"]
+
+[ext_resource type="Script" uid="uid://d1m8carhhdy0w" path="res://Resources/Abilities/disarray_ability.gd" id="1_e81x8"]
+
+[resource]
+script = ExtResource("1_e81x8")
+ability_name = "Disarray"
+description = "Your opponents next card also attacks friendly cards as well as enemies"
+metadata/_custom_type_script = "uid://d1m8carhhdy0w"
