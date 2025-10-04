@@ -1339,6 +1339,26 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 					
 					print("Combat ", direction.name, ": My ", my_value, " vs Their ", their_value)
 					
+					# Check for Exploit ability - doubles attack if attacking weakest stat
+					if should_apply_exploit(attacking_card, grid_index):
+						if ExploitAbility.is_attacking_weakest_stat(attacking_card, adjacent_card, direction.my_value_index):
+							my_value = my_value * 2
+							print("EXPLOIT! Doubled attack value from ", my_value / 2, " to ", my_value)
+							
+							# Update the visual display to show doubled attack
+							var slot = grid_slots[grid_index]
+							for child in slot.get_children():
+								if child is CardDisplay:
+									# Temporarily boost the card's displayed value for visual feedback
+									attacking_card.values[direction.my_value_index] = my_value
+									child.card_data = attacking_card
+									child.update_display()
+									print("ExploitAbility: Updated CardDisplay visual for doubled attack")
+									break
+							
+							# Mark exploit as used
+							ExploitAbility.mark_exploit_used(attacking_card)
+					
 					if my_value > their_value:
 						print("Captured card at slot ", adj_index, "!")
 						captures.append(adj_index)
@@ -8000,3 +8020,21 @@ func set_disarray_active(active: bool):
 		print("Disarray effect activated - next opponent card will attack both friendly and enemy cards")
 	else:
 		print("Disarray effect deactivated")
+
+
+func should_apply_exploit(attacking_card: CardResource, attacker_position: int) -> bool:
+	if not attacking_card:
+		return false
+	
+	# Get the card level for ability checks
+	var card_collection_index = get_card_collection_index(attacker_position)
+	var card_level = get_card_level(card_collection_index)
+	
+	# Check if the card has exploit ability and can still use it
+	if attacking_card.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
+		var abilities = attacking_card.get_available_abilities(card_level)
+		for ability in abilities:
+			if ability.ability_name == "Exploit":
+				return ExploitAbility.can_use_exploit(attacking_card)
+	
+	return false

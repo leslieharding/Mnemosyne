@@ -4,11 +4,11 @@
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_w7xgs"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_cm1c1"]
+[ext_resource type="Script" uid="uid://bp6f5cssscdo5" path="res://Resources/Abilities/exploit_ability.gd" id="3_sfw3d"]
 [ext_resource type="Script" uid="uid://dh4c5feb2eu1v" path="res://Resources/Abilities/charge_ability.gd" id="3_tpnlu"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="4_2h7tk"]
 [ext_resource type="Script" uid="uid://bjrn1xq2fqgxo" path="res://Resources/Abilities/sun_bather_ability.gd" id="5_gowu1"]
 [ext_resource type="Script" uid="uid://dgsvwgjhs2vju" path="res://Resources/Abilities/stat_nullify_ability.gd" id="6_ca26u"]
-[ext_resource type="Script" uid="uid://b3qdfwuofelgc" path="res://Resources/Abilities/critical_strike_ability.gd" id="7_gowu1"]
 [ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="8_xjxyc"]
 [ext_resource type="Script" uid="uid://cs8jo68kos2c6" path="res://Resources/Abilities/harmony_ability.gd" id="9_p7jhq"]
 [ext_resource type="Script" uid="uid://bcu6cf6gen411" path="res://Resources/Abilities/cheat_death_ability.gd" id="9_qbbw0"]
@@ -22,11 +22,10 @@
 [ext_resource type="Script" uid="uid://fgbji7hao84c" path="res://Resources/Abilities/dancer_ability.gd" id="17_cknfu"]
 
 [sub_resource type="Resource" id="Resource_a6t01"]
-script = ExtResource("3_tpnlu")
-ability_name = "Charge"
-description = "If there is a distant unblocked enemy in your row or column at the start of your turn, charge at and capture them"
-trigger_condition = 3
-metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
+script = ExtResource("3_sfw3d")
+ability_name = "Exploit"
+description = "If I am attacking the opponent's weakest stat, double my attack"
+metadata/_custom_type_script = "uid://bp6f5cssscdo5"
 
 [sub_resource type="Resource" id="Resource_sfw3d"]
 script = ExtResource("3_tpnlu")
@@ -111,19 +110,18 @@ description = "Oh Phaeton dont listen to him"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_p7jhq")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
-[sub_resource type="Resource" id="Resource_bufwg"]
-script = ExtResource("7_gowu1")
-ability_name = "Critical Strike"
-description = "When played, regardless of direction of attack, the opponents weakest stat will be used in defense"
-trigger_condition = 3
-metadata/_custom_type_script = "uid://b3qdfwuofelgc"
+[sub_resource type="Resource" id="Resource_f4r1r"]
+script = ExtResource("3_sfw3d")
+ability_name = "Exploit"
+description = "If I am attacking the opponent's weakest stat, double my attack"
+metadata/_custom_type_script = "uid://bp6f5cssscdo5"
 
 [sub_resource type="Resource" id="Resource_j3ax7"]
 script = ExtResource("1_vqrrp")
 card_name = "Phlegon"
 values = Array[int]([3, 3, 4, 4])
 description = "Shining bright"
-abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_bufwg")])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_f4r1r")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bi2ap"]
