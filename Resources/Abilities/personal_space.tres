@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="PersonalSpaceAbility" load_steps=2 format=3 uid="uid://ciwt780k4ono1"]
+
+[ext_resource type="Script" uid="uid://ddpmk8j43lf0m" path="res://Resources/Abilities/personal_space_ability.gd" id="1_3o2dg"]
+
+[resource]
+script = ExtResource("1_3o2dg")
+ability_name = "Personal Space"
+description = "Gains +2 to all stats for each empty adjacent space, loses -1 to all stats for each adjacent card"
+metadata/_custom_type_script = "uid://ddpmk8j43lf0m"
