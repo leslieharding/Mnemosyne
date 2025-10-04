@@ -21,6 +21,11 @@ var discordant_active: bool = false
 # Track Second Chance cards and their info for returning to hand
 var second_chance_cards: Dictionary = {}  # Format: {grid_position: {card: CardResource, owner: Owner, collection_index: int}}
 
+var aristeia_mode_active: bool = false
+var current_aristeia_position: int = -1
+var current_aristeia_owner: Owner = Owner.NONE
+var current_aristeia_card: CardResource = null
+
 # Cloak of Night ability tracking 
 var cloak_of_night_active: bool = false
 var cloak_of_night_turns_remaining: int = 0
@@ -2908,6 +2913,17 @@ func _on_grid_gui_input(event, grid_index):
 					print("Cannot dance to occupied slot - can only dance to empty slots")
 				return  # Don't process normal card placement during dance mode
 	
+	# Handle aristeia target selection (during aristeia mode)
+	if aristeia_mode_active and current_aristeia_owner == Owner.PLAYER:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				# Only allow aristeia move to empty slots
+				if not grid_occupied[grid_index]:
+					select_aristeia_target(grid_index)
+				else:
+					print("Cannot move to occupied slot - can only move to empty slots")
+				return  # Don't process normal card placement during aristeia mode
+	
 	# Handle hunt target selection FIRST (but only during hunt mode setup)
 	if hunt_mode_active and current_hunter_owner == Owner.PLAYER:
 		if event is InputEventMouseButton:
@@ -3014,6 +3030,11 @@ func place_card_on_grid():
 	# Handle dance target selection FIRST (but only during dance mode setup)
 	if dance_mode_active and current_dancer_owner == Owner.PLAYER:
 		select_dance_target(current_grid_index)
+		return
+	
+	# Handle aristeia target selection (during aristeia mode setup)
+	if aristeia_mode_active and current_aristeia_owner == Owner.PLAYER:
+		select_aristeia_target(current_grid_index)
 		return
 	
 	# Handle hunt trap removal BEFORE checking if slot is occupied
@@ -3257,7 +3278,24 @@ func place_card_on_grid():
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 	if captures > 0:
 		print("Player captured ", captures, " cards!")
-
+		# NEW: Check if card has Aristeia ability and trigger it with captures_made
+		if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
+			var available_abilities = card_data.get_available_abilities(card_level)
+			for ability in available_abilities:
+				if ability.ability_name == "Aristeia":
+					print("Checking Aristeia ability with ", captures, " captures")
+					
+					var aristeia_context = {
+						"placed_card": card_data,
+						"grid_position": current_grid_index,
+						"game_manager": self,
+						"placing_owner": Owner.PLAYER,
+						"card_level": card_level,
+						"captures_made": captures
+					}
+					
+					ability.execute(aristeia_context)
+					return  # Don't switch turns if aristeia is active
 	# Update the score display immediately after combat
 	update_game_status()
 
@@ -8150,3 +8188,179 @@ func register_second_chance_if_needed(grid_position: int, card: CardResource, ow
 				}
 				print("Registered Second Chance card at position ", grid_position)
 				break
+
+func start_aristeia_mode(aristeia_position: int, aristeia_owner: Owner, aristeia_card: CardResource):
+	aristeia_mode_active = true
+	current_aristeia_position = aristeia_position
+	current_aristeia_owner = aristeia_owner
+	current_aristeia_card = aristeia_card
+	
+	# Update game status
+	if aristeia_owner == Owner.PLAYER:
+		game_status_label.text = "⚔️ ARISTEIA: Select an empty slot to move and fight again"
+	else:
+		game_status_label.text = "⚔️ " + opponent_manager.get_opponent_info().name + " is in aristeia..."
+		# Auto-select target for opponent
+		call_deferred("opponent_select_aristeia_target")
+	
+	print("Aristeia mode activated for ", aristeia_card.card_name, " at position ", aristeia_position)
+
+func select_aristeia_target(target_position: int):
+	if not aristeia_mode_active:
+		return
+	
+	print("Aristeia target selected: position ", target_position)
+	
+	# Get the aristeia card data from the original position
+	var aristeia_card = current_aristeia_card
+	var original_position = current_aristeia_position
+	var aristeia_owner = current_aristeia_owner
+	
+	# End aristeia mode first
+	aristeia_mode_active = false
+	current_aristeia_position = -1
+	current_aristeia_owner = Owner.NONE
+	current_aristeia_card = null
+	
+	# Move the card from original position to target position
+	execute_aristeia_move(original_position, target_position, aristeia_card, aristeia_owner)
+
+func execute_aristeia_move(from_position: int, to_position: int, aristeia_card: CardResource, aristeia_owner: Owner):
+	print("Executing aristeia move from position ", from_position, " to position ", to_position)
+	
+	# Get card collection info before clearing original position
+	var card_collection_index = get_card_collection_index_for_dance(from_position)  # Reuse dance function
+	var card_level = get_card_level(card_collection_index)
+	
+	var existing_card_display = null
+	var from_slot = grid_slots[from_position]
+	for child in from_slot.get_children():
+		if child is CardDisplay:
+			existing_card_display = child
+			break
+
+	# Clear the original position without freeing the card display
+	grid_occupied[from_position] = false
+	grid_ownership[from_position] = Owner.NONE
+	grid_card_data[from_position] = null
+
+	# Clear passive abilities for this position
+	if from_position in active_passive_abilities:
+		active_passive_abilities.erase(from_position)
+
+	# Place the card at the new position
+	grid_occupied[to_position] = true
+	grid_ownership[to_position] = aristeia_owner
+	grid_card_data[to_position] = aristeia_card
+
+	# Update grid to collection mapping for the new position
+	if card_collection_index != -1:
+		grid_to_collection_index[to_position] = card_collection_index
+		grid_to_collection_index.erase(from_position)
+
+	# Move the existing card display instead of creating a new one
+	if existing_card_display and is_instance_valid(existing_card_display):
+		# Remove from old slot
+		from_slot.remove_child(existing_card_display)
+		
+		# Add to new slot
+		var to_slot = grid_slots[to_position]
+		to_slot.add_child(existing_card_display)
+		
+		print("AristeiaAbility: Moved existing CardDisplay from position ", from_position, " to ", to_position)
+	else:
+		# Fallback: create new card display if the old one was somehow invalid
+		var slot = grid_slots[to_position]
+		var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
+		var card_display = card_display_scene.instantiate()
+		card_display.setup(aristeia_card, card_level, "", card_collection_index, aristeia_owner == Owner.OPPONENT)
+		slot.add_child(card_display)
+		print("AristeiaAbility: Created new CardDisplay as fallback")
+	
+	# Execute placement effects at new location (like ordain bonus)
+	if aristeia_owner == Owner.PLAYER:
+		apply_ordain_bonus_if_applicable(to_position, aristeia_card, aristeia_owner)
+	
+	# Execute ON_PLAY abilities at new position
+	if aristeia_card.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
+		print("Executing on-play abilities for aristeia card at new position: ", aristeia_card.card_name)
+		
+		var ability_context = {
+			"placed_card": aristeia_card,
+			"grid_position": to_position,
+			"game_manager": self,
+			"placing_owner": aristeia_owner,
+			"card_level": card_level
+		}
+		aristeia_card.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, card_level)
+		
+		# Update the visual display after abilities execute (in case stats changed)
+		update_card_display(to_position, aristeia_card)
+	
+	# Handle passive abilities at new position
+	handle_passive_abilities_on_place(to_position, aristeia_card, card_level)
+	
+	# Check for couple union at new position
+	check_for_couple_union(aristeia_card, to_position)
+	
+	# Resolve combat at the new position
+	var captures = resolve_combat(to_position, aristeia_owner, aristeia_card)
+	if captures > 0:
+		print("Aristeia card captured ", captures, " cards after moving!")
+		
+		# Check if Aristeia ability should trigger AGAIN
+		var available_abilities = aristeia_card.get_available_abilities(card_level)
+		for ability in available_abilities:
+			if ability.ability_name == "Aristeia":
+				print("Aristeia chain continues - checking for another move")
+				
+				var aristeia_context = {
+					"placed_card": aristeia_card,
+					"grid_position": to_position,
+					"game_manager": self,
+					"placing_owner": aristeia_owner,
+					"card_level": card_level,
+					"captures_made": captures
+				}
+				
+				ability.execute(aristeia_context)
+				return  # Don't proceed with turn switching if aristeia chains
+	
+	# Update displays
+	update_card_display(to_position, aristeia_card)
+	update_game_status()
+	
+	# Check if game should end
+	if should_game_end():
+		end_game()
+		return
+	
+	# Switch turns after aristeia is complete (no more captures)
+	print("Aristeia complete - switching turns")
+	turn_manager.next_turn()
+
+func opponent_select_aristeia_target():
+	if not aristeia_mode_active:
+		return
+	
+	# Simple AI: pick a random empty slot
+	var possible_targets = []
+	
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:  # Only empty slots
+			possible_targets.append(i)
+	
+	var target_position = -1
+	if possible_targets.size() > 0:
+		target_position = possible_targets[randi() % possible_targets.size()]
+	
+	if target_position != -1:
+		select_aristeia_target(target_position)
+
+func clear_all_aristeia_constraints():
+	if aristeia_mode_active:
+		aristeia_mode_active = false
+		current_aristeia_position = -1
+		current_aristeia_owner = Owner.NONE
+		current_aristeia_card = null
+		print("All aristeia constraints cleared")

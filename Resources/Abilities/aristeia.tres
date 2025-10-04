@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="AristeiaAbility" load_steps=2 format=3 uid="uid://b7jsveoplq2wc"]
+
+[ext_resource type="Script" uid="uid://cos8niadcx33u" path="res://Resources/Abilities/aristeia_ability.gd" id="1_bo2d6"]
+
+[resource]
+script = ExtResource("1_bo2d6")
+ability_name = "Aristeia"
+description = "If you capture atleast one enemy, you can move and fight again"
+metadata/_custom_type_script = "uid://cos8niadcx33u"

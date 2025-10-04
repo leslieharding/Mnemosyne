@@ -15,7 +15,7 @@
 [ext_resource type="Script" uid="uid://bcu6cf6gen411" path="res://Resources/Abilities/cheat_death_ability.gd" id="9_qbbw0"]
 [ext_resource type="Script" uid="uid://ddpmk8j43lf0m" path="res://Resources/Abilities/personal_space_ability.gd" id="11_cknfu"]
 [ext_resource type="Script" uid="uid://bfbpkrqf1u508" path="res://Resources/Abilities/finale_ability.gd" id="12_cknfu"]
-[ext_resource type="Script" uid="uid://dy321gsin4f3p" path="res://Resources/Abilities/second_chance_ability.gd" id="12_sfw3d"]
+[ext_resource type="Script" uid="uid://cos8niadcx33u" path="res://Resources/Abilities/aristeia_ability.gd" id="12_sfw3d"]
 [ext_resource type="Script" uid="uid://c25iupuskk6vd" path="res://Resources/Abilities/compel_ability.gd" id="14_xjxyc"]
 [ext_resource type="Script" uid="uid://b7w3v4k1roxv1" path="res://Resources/Abilities/ordain_ability.gd" id="15_b0n1o"]
 [ext_resource type="Script" uid="uid://cgrjfouc2qnld" path="res://Resources/Abilities/pursuit_ability.gd" id="16_cknfu"]
@@ -171,15 +171,14 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_rct8f"]
 script = ExtResource("12_sfw3d")
-ability_name = "Second Chance"
-description = "The first time this battle this card is captured return it to your hand"
-trigger_condition = 2
-metadata/_custom_type_script = "uid://dy321gsin4f3p"
+ability_name = "Aristea"
+description = "If you capture atleast one enemy, you can move and fight again"
+metadata/_custom_type_script = "uid://cos8niadcx33u"
 
 [sub_resource type="Resource" id="Resource_tl28v"]
 script = ExtResource("1_vqrrp")
 card_name = "Eurydice"
-values = Array[int]([8, 1, 1, 1])
+values = Array[int]([8, 6, 6, 6])
 description = "I'll be right behind you, have faith "
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_rct8f")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
