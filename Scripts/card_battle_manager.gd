@@ -3308,6 +3308,17 @@ func place_card_on_grid():
 					var aristeia_activated = ability.execute(aristeia_context)
 					if aristeia_activated:
 						print("Aristeia successfully activated - mode is now active")
+						
+						# Remove the card from hand now that it's been placed and aristeia activated
+						var temp_index = selected_card_index
+						selected_card_index = -1
+						remove_card_from_hand(temp_index)
+						
+						# Reset grid selection
+						if current_grid_index != -1:
+							restore_slot_original_styling(current_grid_index)
+						current_grid_index = -1
+						
 						return
 					else:
 						print("Aristeia did not activate (no captures or ownership changed)")
@@ -8307,30 +8318,41 @@ func execute_aristeia_move(from_position: int, to_position: int, aristeia_card: 
 	var captures = resolve_combat(to_position, aristeia_owner, aristeia_card)
 	if captures > 0:
 		print("Aristeia card captured ", captures, " cards after moving!")
-	
-	# Check if Aristeia should chain (if captures were made, trigger again)
-	if captures > 0 and aristeia_card.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
-		var available_abilities = aristeia_card.get_available_abilities(card_level)
-		for ability in available_abilities:
-			if ability.ability_name == "Aristeia":
-				print("Aristeia chain triggered - ", captures, " captures made, activating again")
-				
-				var aristeia_context = {
-					"placed_card": aristeia_card,
-					"grid_position": to_position,
-					"game_manager": self,
-					"placing_owner": aristeia_owner,
-					"card_level": card_level,
-					"captures_made": captures
-				}
-				
-				ability.execute(aristeia_context)
-				return  # Don't switch turns if chaining
-	
-	# Clean up aristeia mode
+		
+		# Chain Aristeia if more captures made
+		if aristeia_card.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
+			var available_abilities = aristeia_card.get_available_abilities(card_level)
+			for ability in available_abilities:
+				if ability.ability_name == "Aristeia":
+					print("Aristeia chain triggered!")
+					
+					var aristeia_context = {
+						"placed_card": aristeia_card,
+						"grid_position": to_position,
+						"game_manager": self,
+						"placing_owner": aristeia_owner,
+						"card_level": card_level,
+						"captures_made": captures
+					}
+					
+					ability.execute(aristeia_context)
+					return  # Keep mode active for next move
+
+	# No more captures - end aristeia
 	aristeia_mode_active = false
 	current_aristeia_position = -1
-	current_aristeia_owner
+	current_aristeia_owner = Owner.NONE
+	current_aristeia_card = null
+
+	update_card_display(to_position, aristeia_card)
+	update_game_status()
+
+	if should_game_end():
+		end_game()
+		return
+	
+	print("Aristeia complete - switching turns")
+	turn_manager.next_turn()	
 
 func opponent_select_aristeia_target():
 	if not aristeia_mode_active:
