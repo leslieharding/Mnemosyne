@@ -3260,7 +3260,18 @@ func place_card_on_grid():
 			"placing_owner": Owner.PLAYER,
 			"card_level": card_level
 		}
-		card_data.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, card_level)
+		
+		# Execute all ON_PLAY abilities EXCEPT Aristeia (which needs captures_made context)
+		var abilities = card_data.get_available_abilities(card_level)
+		for ability in abilities:
+			if ability.trigger_condition == CardAbility.TriggerType.ON_PLAY:
+				# Skip Aristeia during general ON_PLAY phase
+				if ability.ability_name == "Aristeia":
+					print("Skipping Aristeia during ON_PLAY - will check after combat")
+					continue
+				
+				print("Executing ability: ", ability.ability_name, " (", ability.description, ")")
+				ability.execute(ability_context)
 		
 		# Update the visual display after abilities execute (in case stats changed)
 		update_card_display(current_grid_index, card_data)
