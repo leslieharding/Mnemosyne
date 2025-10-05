@@ -171,7 +171,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_rct8f"]
 script = ExtResource("12_sfw3d")
-ability_name = "Aristea"
+ability_name = "Aristeia"
 description = "If you capture atleast one enemy, you can move and fight again"
 metadata/_custom_type_script = "uid://cos8niadcx33u"
 

@@ -3308,6 +3308,7 @@ func place_card_on_grid():
 					var aristeia_activated = ability.execute(aristeia_context)
 					if aristeia_activated:
 						print("Aristeia successfully activated - mode is now active")
+						return
 					else:
 						print("Aristeia did not activate (no captures or ownership changed)")
 					break  # Exit the ability loop
@@ -8235,11 +8236,7 @@ func select_aristeia_target(target_position: int):
 	var original_position = current_aristeia_position
 	var aristeia_owner = current_aristeia_owner
 	
-	# End aristeia mode first (just like dance does)
-	aristeia_mode_active = false
-	current_aristeia_position = -1
-	current_aristeia_owner = Owner.NONE
-	current_aristeia_card = null
+	
 	
 	# Move the card from original position to target position
 	execute_aristeia_move(original_position, target_position, aristeia_card, aristeia_owner)
@@ -8311,7 +8308,7 @@ func execute_aristeia_move(from_position: int, to_position: int, aristeia_card: 
 	if captures > 0:
 		print("Aristeia card captured ", captures, " cards after moving!")
 	
-	# NEW: Check if Aristeia should chain (if captures were made, trigger again)
+	# Check if Aristeia should chain (if captures were made, trigger again)
 	if captures > 0 and aristeia_card.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
 		var available_abilities = aristeia_card.get_available_abilities(card_level)
 		for ability in available_abilities:
@@ -8330,18 +8327,10 @@ func execute_aristeia_move(from_position: int, to_position: int, aristeia_card: 
 				ability.execute(aristeia_context)
 				return  # Don't switch turns if chaining
 	
-	# Update displays
-	update_card_display(to_position, aristeia_card)
-	update_game_status()
-	
-	# Check if game should end
-	if should_game_end():
-		end_game()
-		return
-	
-	# Switch turns after aristeia is complete (no more captures)
-	print("Aristeia complete - switching turns")
-	turn_manager.next_turn()
+	# Clean up aristeia mode
+	aristeia_mode_active = false
+	current_aristeia_position = -1
+	current_aristeia_owner
 
 func opponent_select_aristeia_target():
 	if not aristeia_mode_active:
