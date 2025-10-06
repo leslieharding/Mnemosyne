@@ -26,6 +26,9 @@ var current_aristeia_position: int = -1
 var current_aristeia_owner: Owner = Owner.NONE
 var current_aristeia_card: CardResource = null
 
+var is_artemis_boss_battle: bool = false
+var artemis_boss_counter_triggered: bool = false
+
 # Cloak of Night ability tracking 
 var cloak_of_night_active: bool = false
 var cloak_of_night_turns_remaining: int = 0
@@ -423,7 +426,6 @@ func update_tutorial_text(new_text: String):
 		text_label.text = new_text
 
 
-# Set up the boss prediction tracker
 func setup_boss_prediction_tracker():
 	# Check if this is a boss battle
 	var params = get_scene_params()
@@ -443,7 +445,12 @@ func setup_boss_prediction_tracker():
 				game_status_label.text = "The trickster's illusions warp your perception..."
 			elif current_node.enemy_name == BossConfig.DEMETER_BOSS_NAME:
 				print("Demeter boss battle detected!")
-				game_status_label.text = "Winter will follow winter which follows winter"	
+				game_status_label.text = "Winter will follow winter which follows winter"
+			elif current_node.enemy_name == BossConfig.ARTEMIS_BOSS_NAME:
+				is_artemis_boss_battle = true
+				artemis_boss_counter_triggered = false
+				print("Artemis boss battle detected - Coordinate counter activated!")
+				game_status_label.text = "The hunter's prey becomes the predator..."
 		
 		print("Boss battle detected: ", is_boss_battle)
 	
@@ -1696,6 +1703,29 @@ func _on_opponent_card_placed(grid_index: int):
 	if should_game_end():
 		end_game()
 		return
+	
+	# ARTEMIS BOSS MECHANIC: Check if we need a second turn after counter
+	if is_artemis_boss_battle and artemis_boss_counter_triggered:
+		# We're in the Artemis counter sequence
+		# Check if this was the FIRST opponent turn after the counter
+		# We can track this by checking if we're still on opponent turn and counter is triggered
+		
+		# Brief visual pause
+		await get_tree().create_timer(0.5).timeout
+		
+		# Check if opponent can take another turn
+		var available_slots_second: Array[int] = get_available_slots_for_opponent()
+		if not available_slots_second.is_empty() and opponent_manager.has_cards():
+			# Take second turn - don't switch players yet
+			call_deferred("opponent_take_turn")
+			# After this second turn completes, we'll check artemis_second_turn_complete
+			set_meta("artemis_second_turn", true)  # Mark that next opponent turn is the second one
+			return
+		elif has_meta("artemis_second_turn"):
+			# This WAS the second turn, now switch to player
+			remove_meta("artemis_second_turn")
+			print("Artemis boss second turn complete - switching to player")
+	
 	
 	print("Switching turns after opponent move")
 	
@@ -3381,10 +3411,33 @@ func place_card_on_grid():
 		print("🎯 Coordination active - player gets another turn!")
 		is_coordination_active = false  # Reset after giving the extra turn
 		
-		# Show notification about the extra turn
+		# CHECK IF GAME SHOULD END BEFORE ARTEMIS COUNTER
+		if should_game_end():
+			print("Game ending after Coordinate - board full or no cards left")
+			end_game()
+			return
+		
+		# ARTEMIS BOSS MECHANIC: Trigger counter after Coordinate ends (only if game not ending)
+		if is_artemis_boss_battle and not artemis_boss_counter_triggered:
+			print("=== ARTEMIS BOSS COUNTER ACTIVATED ===")
+			artemis_boss_counter_triggered = true
+			
+			# Return 2 opponent cards to hand
+			artemis_boss_return_cards_to_hand()
+			
+			# Brief pause for player to see what happened
+			await get_tree().create_timer(1.0).timeout
+			
+			# Now opponent takes TWO turns
+			# First turn
+			turn_manager.next_turn()  # Switch to opponent
+			# Turn change signal will trigger opponent_take_turn automatically
+			return
+		
+		# Normal coordinate behavior (not Artemis boss)
 		if notification_manager:
-			notification_manager.show_notification("🎯 Coordination: You play again!")	
-		return	
+			notification_manager.show_notification("🎯 Coordination: You play again!")
+		return
 	
 	# Switch turns only if no special modes are active
 	turn_manager.next_turn()
@@ -7348,7 +7401,11 @@ func create_battle_snapshot():
 		"soothe_active": soothe_active,
 		"visual_stat_inversion_active": visual_stat_inversion_active,
 		"is_hermes_boss_battle": is_hermes_boss_battle,
-		"fimbulwinter_boss_active": fimbulwinter_boss_active
+		"fimbulwinter_boss_active": fimbulwinter_boss_active,
+		"coordinate_used": coordinate_used,
+		"is_coordination_active": is_coordination_active,
+		"is_artemis_boss_battle": is_artemis_boss_battle,
+		"artemis_boss_counter_triggered": artemis_boss_counter_triggered  
 	}
 	
 	# Snapshot enemy deck power state
@@ -7451,6 +7508,8 @@ func restore_battle_from_snapshot() -> bool:
 		is_coordination_active = deck_power_state.get("is_coordination_active", false)
 		rhythm_slot = deck_power_state.get("rhythm_slot", -1)
 		rhythm_boost_value = deck_power_state.get("rhythm_boost_value", 1)
+		is_artemis_boss_battle = deck_power_state.get("is_artemis_boss_battle", false) 
+		artemis_boss_counter_triggered = deck_power_state.get("artemis_boss_counter_triggered", false)  
 		
 		print("Restored deck power state")
 	
@@ -8379,3 +8438,97 @@ func clear_all_aristeia_constraints():
 		current_aristeia_owner = Owner.NONE
 		current_aristeia_card = null
 		print("All aristeia constraints cleared")
+
+
+func artemis_boss_return_cards_to_hand():
+	"""
+	Artemis boss mechanic: Return 2 opponent cards to their hand
+	Priority: Captured opponent original cards > random opponent cards
+	"""
+	print("=== ARTEMIS BOSS COUNTER: Returning cards to opponent hand ===")
+	
+	# Find all opponent cards on the board
+	var opponent_original_cards = []  # Cards that started in opponent's hand
+	var other_opponent_cards = []  # Other opponent cards (captured from player)
+	
+	for i in range(grid_ownership.size()):
+		if grid_occupied[i] and grid_ownership[i] == Owner.OPPONENT:
+			var card = grid_card_data[i]
+			
+			# Check if this card is an opponent original (was placed by opponent, not captured)
+			# We can check if the card was registered in second_chance_cards as opponent owned
+			# OR check the opponent_manager to see if this card matches their original deck
+			var is_opponent_original = false
+			
+			# Check if card matches any in opponent's original deck
+			var opponent_info = opponent_manager.get_opponent_info()
+			for opp_card in opponent_info.deck:
+				if opp_card.card_name == card.card_name:
+					is_opponent_original = true
+					break
+			
+			if is_opponent_original:
+				opponent_original_cards.append(i)
+			else:
+				other_opponent_cards.append(i)
+	
+	print("Found ", opponent_original_cards.size(), " opponent original cards")
+	print("Found ", other_opponent_cards.size(), " other opponent cards")
+	
+	# Select up to 2 cards to return (prioritize originals)
+	var cards_to_return = []
+	
+	# First, add opponent originals (up to 2)
+	for i in range(min(2, opponent_original_cards.size())):
+		cards_to_return.append(opponent_original_cards[i])
+	
+	# If we still need more, add from other cards
+	if cards_to_return.size() < 2:
+		var remaining_needed = 2 - cards_to_return.size()
+		for i in range(min(remaining_needed, other_opponent_cards.size())):
+			cards_to_return.append(other_opponent_cards[i])
+	
+	print("Returning ", cards_to_return.size(), " cards to opponent hand")
+	
+	# Return each selected card to opponent hand
+	for grid_index in cards_to_return:
+		var card = grid_card_data[grid_index]
+		if not card:
+			continue
+		
+		print("Returning ", card.card_name, " from position ", grid_index, " to opponent hand")
+		
+		# Create a fresh copy at base stats
+		var base_card = card.duplicate(true)
+		# Reset to base level values (level 1)
+		var base_values = card.get_effective_values(1)
+		base_card.values = base_values.duplicate()
+		
+		# Remove from board (similar to Second Chance logic)
+		grid_occupied[grid_index] = false
+		grid_ownership[grid_index] = Owner.NONE
+		grid_card_data[grid_index] = null
+		
+		# Remove card display
+		var slot = grid_slots[grid_index]
+		for child in slot.get_children():
+			if child is CardDisplay:
+				child.queue_free()
+				break
+		
+		# Remove from tracking
+		grid_to_collection_index.erase(grid_index)
+		if grid_index in active_passive_abilities:
+			# Remove passive abilities without triggering effects
+			active_passive_abilities.erase(grid_index)
+		
+		# Add back to opponent hand
+		if opponent_manager:
+			opponent_manager.opponent_deck.append(base_card)
+			print("Added ", base_card.card_name, " back to opponent deck")
+	
+	# Update board visuals
+	update_board_visuals()
+	update_game_status()
+	
+	print("Artemis boss counter complete - ", cards_to_return.size(), " cards returned")
