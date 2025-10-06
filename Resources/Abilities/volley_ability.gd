@@ -24,10 +24,10 @@ func execute(context: Dictionary) -> bool:
 	# Get the owner of the volley card
 	var volley_owner = game_manager.get_owner_at_position(grid_position)
 	
-	print("VolleyAbility activated! ", placed_card.card_name, " will show direction modal")
+	print("VolleyAbility activated! ", placed_card.card_name, " will show direction modal AFTER combat")
 	
-	# Show the directional modal to select arrow direction
-	game_manager.show_volley_direction_modal(grid_position, volley_owner, placed_card)
+	# FIXED: Use call_deferred to show modal AFTER the current placement/combat completes
+	game_manager.call_deferred("show_volley_direction_modal", grid_position, volley_owner, placed_card)
 	
 	return true
 

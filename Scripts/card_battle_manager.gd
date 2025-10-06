@@ -38,6 +38,9 @@ var hidden_opponent_cards = [] # Positions of hidden opponent cards
 var rhythm_slot: int = -1  # Current rhythm slot position (-1 means none)
 var rhythm_boost_value: int = 1  # Current boost value (doubles on use)
 
+var coordinate_turns_remaining: int = 0  # Track how many coordinate turns left
+var artemis_counter_turns_remaining: int = 0  # Track Artemis boss counter turns
+
 # Experience tracking
 var deck_card_indices: Array[int] = []  # Original indices in god's collection
 var exp_panel: ExpPanel  # Reference to experience panel
@@ -1705,30 +1708,33 @@ func _on_opponent_card_placed(grid_index: int):
 		return
 	
 	# ARTEMIS BOSS MECHANIC: Check if we need a second turn after counter
-	if is_artemis_boss_battle and artemis_boss_counter_triggered:
+	if is_artemis_boss_battle and artemis_boss_counter_triggered and artemis_counter_turns_remaining > 0:
 		# We're in the Artemis counter sequence
-		# Check if this was the FIRST opponent turn after the counter
-		# We can track this by checking if we're still on opponent turn and counter is triggered
+		artemis_counter_turns_remaining -= 1
+		print("Artemis counter turns remaining: ", artemis_counter_turns_remaining)
 		
 		# Brief visual pause
 		await get_tree().create_timer(0.5).timeout
 		
 		# Check if opponent can take another turn
-		var available_slots_second: Array[int] = get_available_slots_for_opponent()
-		if not available_slots_second.is_empty() and opponent_manager.has_cards():
-			# Take second turn - don't switch players yet
-			call_deferred("opponent_take_turn")
-			# After this second turn completes, we'll check artemis_second_turn_complete
-			set_meta("artemis_second_turn", true)  # Mark that next opponent turn is the second one
-			return
-		elif has_meta("artemis_second_turn"):
-			# This WAS the second turn, now switch to player
-			remove_meta("artemis_second_turn")
-			print("Artemis boss second turn complete - switching to player")
-	
-	
+		if artemis_counter_turns_remaining > 0:
+			var available_slots_second: Array[int] = get_available_slots_for_opponent()
+			if not available_slots_second.is_empty() and opponent_manager.has_cards():
+				# Take second turn - don't switch players yet
+				print("Artemis boss taking turn ", 3 - artemis_counter_turns_remaining, " of 2")
+				call_deferred("opponent_take_turn")
+				return
+			else:
+				print("Artemis boss cannot take second turn - no cards or slots")
+				artemis_counter_turns_remaining = 0  # Force end
+		
+		# Counter turns complete
+		if artemis_counter_turns_remaining == 0:
+			print("Artemis boss counter complete - switching to player")
+			# Will fall through to normal turn switch below
+
 	print("Switching turns after opponent move")
-	
+
 	# Switch turns - this should make it the player's turn
 	turn_manager.next_turn()
 
@@ -3408,8 +3414,37 @@ func place_card_on_grid():
 		print("Race mode active - staying on turn until race completes")
 		return
 	if is_coordination_active and turn_manager.current_player == TurnManager.Player.HUMAN:
-		print("🎯 Coordination active - player gets another turn!")
-		is_coordination_active = false  # Reset after giving the extra turn
+		print("🎯 Coordination active - checking if player can take another turn")
+		
+		# CRITICAL: Check if player has cards left to play
+		if player_deck.is_empty():
+			print("Player has no cards left - ending coordination early")
+			is_coordination_active = false
+			coordinate_turns_remaining = 0
+			
+			# Check if game should end
+			if should_game_end():
+				end_game()
+				return
+			
+			# Not ending yet, switch to opponent
+			print("Switching to opponent turn")
+			turn_manager.next_turn()
+			return
+		
+		coordinate_turns_remaining -= 1
+		print("Coordinate turns remaining: ", coordinate_turns_remaining)
+		
+		if coordinate_turns_remaining > 0:
+			# Still have coordinate turns left - don't switch, stay on player turn
+			print("Coordinate continues - ", coordinate_turns_remaining, " turn(s) remaining")
+			if notification_manager:
+				notification_manager.show_notification("🎯 Coordination: Turn " + str(3 - coordinate_turns_remaining) + " of 2")
+			return
+		
+		# All coordinate turns used
+		print("Coordinate turns complete!")
+		is_coordination_active = false  # Reset after using both turns
 		
 		# CHECK IF GAME SHOULD END BEFORE ARTEMIS COUNTER
 		if should_game_end():
@@ -3421,6 +3456,7 @@ func place_card_on_grid():
 		if is_artemis_boss_battle and not artemis_boss_counter_triggered:
 			print("=== ARTEMIS BOSS COUNTER ACTIVATED ===")
 			artemis_boss_counter_triggered = true
+			artemis_counter_turns_remaining = 2  # Opponent gets 2 turns
 			
 			# Return 2 opponent cards to hand
 			artemis_boss_return_cards_to_hand()
@@ -3428,15 +3464,14 @@ func place_card_on_grid():
 			# Brief pause for player to see what happened
 			await get_tree().create_timer(1.0).timeout
 			
-			# Now opponent takes TWO turns
-			# First turn
+			# Now opponent takes their FIRST turn
 			turn_manager.next_turn()  # Switch to opponent
 			# Turn change signal will trigger opponent_take_turn automatically
 			return
 		
-		# Normal coordinate behavior (not Artemis boss)
+		# Normal coordinate behavior (not Artemis boss) - just switch turns
 		if notification_manager:
-			notification_manager.show_notification("🎯 Coordination: You play again!")
+			notification_manager.show_notification("🎯 Coordination complete!")
 		return
 	
 	# Switch turns only if no special modes are active
@@ -7511,6 +7546,17 @@ func restore_battle_from_snapshot() -> bool:
 		is_artemis_boss_battle = deck_power_state.get("is_artemis_boss_battle", false) 
 		artemis_boss_counter_triggered = deck_power_state.get("artemis_boss_counter_triggered", false)  
 		
+		if coordinate_button and active_deck_power == DeckDefinition.DeckPowerType.COORDINATE_POWER:
+			coordinate_button.disabled = coordinate_used
+			if coordinate_used:
+				coordinate_button.modulate = Color(0.5, 0.5, 0.5)
+				coordinate_button.text = "🎯 Coordinate (Used)"
+			else:
+				coordinate_button.modulate = Color(1, 1, 1)
+				coordinate_button.text = "🎯 Coordinate"
+			print("Restored coordinate button state - used: ", coordinate_used)
+		
+		
 		print("Restored deck power state")
 	
 	# Restore enemy deck power state
@@ -7646,6 +7692,7 @@ func activate_coordinate_power():
 	print("=== COORDINATE POWER ACTIVATED ===")
 	coordinate_used = true
 	is_coordination_active = true
+	coordinate_turns_remaining = 2  # Player gets 2 turns total
 	
 	# Update button appearance
 	if coordinate_button:
@@ -7658,7 +7705,6 @@ func activate_coordinate_power():
 		notification_manager.show_notification("🎯 Coordinate activated! You will play twice in a row.")
 	
 	return true
-
 func show_volley_direction_modal(source_position: int, owner: Owner, card: CardResource):
 	"""Show the directional selection modal for the Volley ability"""
 	if volley_direction_modal:
@@ -7687,6 +7733,9 @@ func show_volley_direction_modal(source_position: int, owner: Owner, card: CardR
 	
 	print("Volley direction modal displayed")
 
+
+
+
 func _on_volley_direction_selected(direction: int, source_position: int, owner: Owner, card: CardResource):
 	"""Handle when a direction is selected for volley"""
 	print("Volley direction selected: ", direction, " for card at position ", source_position)
@@ -7712,6 +7761,9 @@ func _on_volley_direction_selected(direction: int, source_position: int, owner: 
 	# If it's the opponent's turn and they haven't started yet, start their turn
 	if turn_manager.is_opponent_turn() and not opponent_is_thinking:
 		call_deferred("opponent_take_turn")
+
+
+
 
 # ============================================
 # Add this function to register volleys
@@ -8439,54 +8491,70 @@ func clear_all_aristeia_constraints():
 		current_aristeia_card = null
 		print("All aristeia constraints cleared")
 
-
 func artemis_boss_return_cards_to_hand():
 	"""
 	Artemis boss mechanic: Return 2 opponent cards to their hand
-	Priority: Captured opponent original cards > random opponent cards
+	Priority: 
+	1) Cards the opponent originally had that are now owned by PLAYER (captured cards)
+	2) Cards the opponent originally had that are still owned by OPPONENT
 	"""
 	print("=== ARTEMIS BOSS COUNTER: Returning cards to opponent hand ===")
 	
-	# Find all opponent cards on the board
-	var opponent_original_cards = []  # Cards that started in opponent's hand
-	var other_opponent_cards = []  # Other opponent cards (captured from player)
+	# Get the opponent's original deck card names
+	var opponent_deck_def = opponent_manager.get_current_deck_definition()
+	var original_opponent_card_names = []
+	
+	if opponent_deck_def:
+		# Load enemies collection to get original card list
+		var enemies_collection = load("res://Resources/Collections/Enemies.tres")
+		if enemies_collection:
+			# Find the enemy collection that matches our current opponent
+			for enemy in enemies_collection.enemies:
+				for deck in enemy.decks:
+					if deck == opponent_deck_def:
+						# Get all card names from this enemy collection
+						for card in enemy.cards:
+							original_opponent_card_names.append(card.card_name)
+						print("Original opponent deck cards: ", original_opponent_card_names)
+						break
+				if original_opponent_card_names.size() > 0:
+					break
+	
+	# Find opponent original cards, separated by current ownership
+	var captured_opponent_cards = []  # Originally opponent's, NOW owned by player (PRIORITY 1)
+	var still_opponent_owned = []     # Originally opponent's, STILL owned by opponent (PRIORITY 2)
 	
 	for i in range(grid_ownership.size()):
-		if grid_occupied[i] and grid_ownership[i] == Owner.OPPONENT:
+		if grid_occupied[i]:
 			var card = grid_card_data[i]
+			var current_owner = grid_ownership[i]
 			
-			# Check if this card is an opponent original (was placed by opponent, not captured)
-			# We can check if the card was registered in second_chance_cards as opponent owned
-			# OR check the opponent_manager to see if this card matches their original deck
-			var is_opponent_original = false
-			
-			# Check if card matches any in opponent's original deck
-			var opponent_info = opponent_manager.get_opponent_info()
-			for opp_card in opponent_info.deck:
-				if opp_card.card_name == card.card_name:
-					is_opponent_original = true
-					break
-			
-			if is_opponent_original:
-				opponent_original_cards.append(i)
-			else:
-				other_opponent_cards.append(i)
+			# Check if this card originated from opponent's deck
+			if card.card_name in original_opponent_card_names:
+				if current_owner == Owner.PLAYER:
+					# This is a captured opponent card - HIGHEST PRIORITY
+					captured_opponent_cards.append(i)
+					print("Found CAPTURED opponent card: ", card.card_name, " at position ", i, " (owned by player)")
+				elif current_owner == Owner.OPPONENT:
+					# This is still owned by opponent - LOWER PRIORITY
+					still_opponent_owned.append(i)
+					print("Found opponent-owned card: ", card.card_name, " at position ", i)
 	
-	print("Found ", opponent_original_cards.size(), " opponent original cards")
-	print("Found ", other_opponent_cards.size(), " other opponent cards")
+	print("Captured opponent cards: ", captured_opponent_cards.size())
+	print("Still opponent-owned cards: ", still_opponent_owned.size())
 	
-	# Select up to 2 cards to return (prioritize originals)
+	# Build the return list: prioritize captured cards first
 	var cards_to_return = []
 	
-	# First, add opponent originals (up to 2)
-	for i in range(min(2, opponent_original_cards.size())):
-		cards_to_return.append(opponent_original_cards[i])
+	# First, take all captured opponent cards (up to 2)
+	for i in range(min(2, captured_opponent_cards.size())):
+		cards_to_return.append(captured_opponent_cards[i])
 	
-	# If we still need more, add from other cards
-	if cards_to_return.size() < 2:
+	# If we need more and there are still-owned opponent cards, take those
+	if cards_to_return.size() < 2 and still_opponent_owned.size() > 0:
 		var remaining_needed = 2 - cards_to_return.size()
-		for i in range(min(remaining_needed, other_opponent_cards.size())):
-			cards_to_return.append(other_opponent_cards[i])
+		for i in range(min(remaining_needed, still_opponent_owned.size())):
+			cards_to_return.append(still_opponent_owned[i])
 	
 	print("Returning ", cards_to_return.size(), " cards to opponent hand")
 	
@@ -8532,3 +8600,4 @@ func artemis_boss_return_cards_to_hand():
 	update_game_status()
 	
 	print("Artemis boss counter complete - ", cards_to_return.size(), " cards returned")
+	print("This punishes the coordinate power by taking back captured cards!")
