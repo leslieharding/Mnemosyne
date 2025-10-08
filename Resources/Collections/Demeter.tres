@@ -54,6 +54,7 @@ metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 [sub_resource type="Resource" id="Resource_5rr7c"]
 script = ExtResource("1_stdfb")
 card_name = "Persephone"
+description = "Oh mother you know I'll be back in six months, couldnt you go easy on the world in the meantime?"
 level_data = Array[ExtResource("3_34bjj")]([SubResource("Resource_44pn2"), SubResource("Resource_58xlt"), SubResource("Resource_uk8b8")])
 uses_level_progression = true
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -67,6 +68,7 @@ metadata/_custom_type_script = "uid://u1ucm0sox8pa"
 [sub_resource type="Resource" id="Resource_rjcyb"]
 script = ExtResource("1_stdfb")
 card_name = "Triptolemus"
+description = "Gently friend, tend and care and wacth Gaia give back to you"
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_clfq6")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -80,6 +82,7 @@ metadata/_custom_type_script = "uid://bsyjru6fxhmp5"
 [sub_resource type="Resource" id="Resource_0ni4c"]
 script = ExtResource("1_stdfb")
 card_name = "Iasion"
+description = "Could it be? Surely the goddess is not looking at me"
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_20mgd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -92,6 +95,7 @@ metadata/_custom_type_script = "uid://46m7rkeu3yy6"
 [sub_resource type="Resource" id="Resource_wun1n"]
 script = ExtResource("1_stdfb")
 card_name = "Metanira"
+description = "Heavens fair lady what has got you so down? You can stay with us until all is well"
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_o6j45")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -105,6 +109,7 @@ metadata/_custom_type_script = "uid://c8h2thhm30b1n"
 [sub_resource type="Resource" id="Resource_f4d4a"]
 script = ExtResource("1_stdfb")
 card_name = "Cyane"
+description = "Its not right! You should have asked permission"
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_n75mf")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -118,7 +123,7 @@ metadata/_custom_type_script = "uid://43v8bwokc47i"
 script = ExtResource("1_stdfb")
 card_name = "Cerberus"
 values = Array[int]([7, 7, 7, 7])
-description = "The hound of Hell "
+description = "The original and undisputed hound of hell"
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_k8dqu")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -132,7 +137,7 @@ metadata/_custom_type_script = "uid://b3kubk5opefp6"
 script = ExtResource("1_stdfb")
 card_name = "Hades"
 values = Array[int]([6, 8, 8, 6])
-description = "The King of the Underworld"
+description = "Mighty Pluton, overjoyed with the return of his queen to the underworld, is feeling generous"
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_0at4a")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -146,7 +151,7 @@ metadata/_custom_type_script = "uid://bheirx7xq22eb"
 script = ExtResource("1_stdfb")
 card_name = "Hecate"
 values = Array[int]([5, 5, 5, 5])
-description = "A torch to reveal any darkness"
+description = "We will find her Demeter, nothing can hide from our torches. "
 abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_56smr")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 

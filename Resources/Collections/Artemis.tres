@@ -21,6 +21,7 @@ metadata/_custom_type_script = "uid://cbulr8qu0u1fj"
 script = ExtResource("1_ttyo6")
 card_name = "Atalanta"
 values = Array[int]([5, 5, 5, 5])
+description = "Down Meleager I have the shot"
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_8h57p")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -34,6 +35,7 @@ metadata/_custom_type_script = "uid://c4aeeb6pohv6k"
 script = ExtResource("1_ttyo6")
 card_name = "Meleager"
 values = Array[int]([5, 5, 5, 5])
+description = "I feel so strong, not even fire could hurt me. "
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_uc8ql")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -47,6 +49,7 @@ metadata/_custom_type_script = "uid://bvlqcwb0iagi4"
 script = ExtResource("1_ttyo6")
 card_name = "Hippolytus"
 values = Array[int]([5, 5, 5, 5])
+description = "Love? Whos got time for love when theres hunting afoot"
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_hq4qt")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -60,6 +63,7 @@ metadata/_custom_type_script = "uid://dja2ta0rb7v13"
 script = ExtResource("1_ttyo6")
 card_name = "Orion"
 values = Array[int]([5, 5, 5, 5])
+description = "You name it, aint nothing I cant hunt and kill"
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_mbexa")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -74,6 +78,7 @@ metadata/_custom_type_script = "uid://cnmf4yohj44kh"
 script = ExtResource("1_ttyo6")
 card_name = "Callisto "
 values = Array[int]([3, 4, 5, 6])
+description = "Artemis is that you? I'm surprised but what a honour"
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_30n57")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 

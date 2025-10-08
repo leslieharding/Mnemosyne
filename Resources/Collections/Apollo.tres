@@ -76,7 +76,7 @@ metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 script = ExtResource("1_vqrrp")
 card_name = "Helios"
 values = Array[int]([3, 3, 3, 3])
-description = "The sun titan arrives"
+description = "Mad? Me? No no no, Ive only tended the sun chariot for eons and you want the boy to do it after one day. Why would I be mad?"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_a6t01")])
 level_data = Array[ExtResource("4_2h7tk")]([SubResource("Resource_l7o3e"), SubResource("Resource_f31oe"), SubResource("Resource_gs2nm")])
 uses_level_progression = true
@@ -92,7 +92,7 @@ metadata/_custom_type_script = "uid://bjrn1xq2fqgxo"
 script = ExtResource("1_vqrrp")
 card_name = "Phaeton"
 values = Array[int]([4, 4, 4, 4])
-description = "Look up, you will see me driving the sun along"
+description = "Look up Epaphus, you will see me driving the sun along"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_2h7tk")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -121,7 +121,7 @@ metadata/_custom_type_script = "uid://cklxp8i7wphlo"
 script = ExtResource("1_vqrrp")
 card_name = "Phlegon"
 values = Array[int]([3, 3, 4, 4])
-description = "Shining bright"
+description = "All the other horses of the sun wish they were Phelgon. "
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_f4r1r")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
