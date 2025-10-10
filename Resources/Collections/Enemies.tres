@@ -1522,76 +1522,91 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_qqdll"]
 script = ExtResource("2_xcqsp")
 card_name = "Nemian Lion"
+description = "You too would be proud if your hide was as impenetrable"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ylqbb"]
 script = ExtResource("2_xcqsp")
 card_name = "Ceryneian Hind"
+description = "Are you to tell me my lord I brought you this Hind and you were unable to keep it? How unfortunate."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_us2li"]
 script = ExtResource("2_xcqsp")
 card_name = "Erymanthian Boar"
+description = "Come out Eurystheus I cant hear you from in there"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hagql"]
 script = ExtResource("2_xcqsp")
 card_name = "Stymphalian Birds"
+description = "Amassed, violent and filthy. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_f325l"]
 script = ExtResource("2_xcqsp")
 card_name = "Cretan Bull"
+description = "Sometimes in life you just gotta take the bull by the horns"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xkavt"]
 script = ExtResource("2_xcqsp")
 card_name = "Nemian Lion"
+description = "You too would be proud if your hide was as impenetrable"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_iceqr"]
 script = ExtResource("2_xcqsp")
 card_name = "Ceryneian Hind"
+description = "Are you to tell me my lord I brought you this Hind and you were unable to keep it? How unfortunate."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_waifj"]
 script = ExtResource("2_xcqsp")
 card_name = "Erymanthian Boar"
+description = "Come out Eurystheus I cant hear you from in there"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_dpxsw"]
 script = ExtResource("2_xcqsp")
 card_name = "Stymphalian Birds"
+description = "Amassed, violent and filthy. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_y3qva"]
 script = ExtResource("2_xcqsp")
 card_name = "Cretan Bull"
+description = "Sometimes in life you just gotta take the bull by the horns"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_45hcx"]
 script = ExtResource("2_xcqsp")
 card_name = "Nemian Lion"
+description = "You too would be proud if your hide was as impenetrable"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cp6g7"]
 script = ExtResource("2_xcqsp")
 card_name = "Ceryneian Hind"
+description = "Are you to tell me my lord I brought you this Hind and you were unable to keep it? How unfortunate."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_doqhv"]
 script = ExtResource("2_xcqsp")
 card_name = "Erymanthian Boar"
+description = "Come out Eurystheus I cant hear you from in there"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ht7ut"]
 script = ExtResource("2_xcqsp")
 card_name = "Stymphalian Birds"
+description = "Amassed, violent and filthy. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_08s53"]
 script = ExtResource("2_xcqsp")
 card_name = "Cretan Bull"
+description = "Sometimes in life you just gotta take the bull by the horns"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2mpk6"]
