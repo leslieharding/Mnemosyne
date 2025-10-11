@@ -1644,76 +1644,91 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_0hkfq"]
 script = ExtResource("2_xcqsp")
 card_name = "Lernaean Hydra"
+description = "We can figure out how to solve this problem Iolaus, we just have to put our heads together. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_vdgh6"]
 script = ExtResource("2_xcqsp")
 card_name = "Geryon"
+description = "Lets get them! To arms! Stay away from our cattle!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xevch"]
 script = ExtResource("2_xcqsp")
 card_name = "Antaeus"
+description = "Throw me to the floor as hard as you can, I'll always get back up"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2kjvc"]
 script = ExtResource("2_xcqsp")
 card_name = "Nessus"
+description = "If you ever feel your husbands love fading, give him my shirt, it is blessed. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_nhcai"]
 script = ExtResource("2_xcqsp")
-card_name = "Caucus"
+card_name = "Orthrus"
+description = "Whos that you smell boy? Someones coming for our cattle!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_q8cq5"]
 script = ExtResource("2_xcqsp")
 card_name = "Lernaean Hydra"
+description = "We can figure out how to solve this problem Iolaus, we just have to put our heads together. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_op6xp"]
 script = ExtResource("2_xcqsp")
 card_name = "Geryon"
+description = "Lets get them! To arms! Stay away from our cattle!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ii6a8"]
 script = ExtResource("2_xcqsp")
 card_name = "Antaeus"
+description = "Throw me to the floor as hard as you can, I'll always get back up"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_lpes6"]
 script = ExtResource("2_xcqsp")
 card_name = "Nessus"
+description = "If you ever feel your husbands love fading, give him my shirt, it is blessed. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_otgnn"]
 script = ExtResource("2_xcqsp")
-card_name = "Caucus"
+card_name = "Orthrus"
+description = "Whos that you smell boy? Someones coming for our cattle!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hqm4o"]
 script = ExtResource("2_xcqsp")
 card_name = "Lernaean Hydra"
+description = "We can figure out how to solve this problem Iolaus, we just have to put our heads together. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7m0nf"]
 script = ExtResource("2_xcqsp")
 card_name = "Geryon"
+description = "Lets get them! To arms! Stay away from our cattle!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_jes06"]
 script = ExtResource("2_xcqsp")
 card_name = "Antaeus"
+description = "Throw me to the floor as hard as you can, I'll always get back up"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_d38lb"]
 script = ExtResource("2_xcqsp")
 card_name = "Nessus"
+description = "If you ever feel your husbands love fading, give him my shirt, it is blessed. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_jh7cp"]
 script = ExtResource("2_xcqsp")
-card_name = "Caucus"
+card_name = "Orthrus"
+description = "Whos that you smell boy? Someones coming for our cattle!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ixl0x"]
@@ -1743,6 +1758,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_6sn3q"]
 script = ExtResource("1_e7ref")
 enemy_name = "Creature Foes of Heracles"
+enemy_description = "More children of Typhon consigned to Thanatos"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_0hkfq"), SubResource("Resource_vdgh6"), SubResource("Resource_xevch"), SubResource("Resource_2kjvc"), SubResource("Resource_nhcai"), SubResource("Resource_q8cq5"), SubResource("Resource_op6xp"), SubResource("Resource_ii6a8"), SubResource("Resource_lpes6"), SubResource("Resource_otgnn"), SubResource("Resource_hqm4o"), SubResource("Resource_7m0nf"), SubResource("Resource_jes06"), SubResource("Resource_d38lb"), SubResource("Resource_jh7cp")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_ixl0x"), SubResource("Resource_qmwuc"), SubResource("Resource_fiiis")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
@@ -1750,76 +1766,91 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_lmtjb"]
 script = ExtResource("2_xcqsp")
 card_name = "Eurystheus"
+description = "Eurystheus: Ahhh yes cousin I am technically correct, the best kind of correct. Ten becomes twelve."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_k6viv"]
 script = ExtResource("2_xcqsp")
 card_name = "Augeas"
+description = "Just to show you there are no hard feelings, would you like to meet my horses?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_1b7m7"]
 script = ExtResource("2_xcqsp")
 card_name = "Lycus"
+description = "I always love a good excuse to use the ol sacrifical altar."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_6hn0s"]
 script = ExtResource("2_xcqsp")
 card_name = "Neleus"
+description = "Cleanse you? So your red mist can descend on another innocent soul? Unlikely "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4xi8q"]
 script = ExtResource("2_xcqsp")
 card_name = "Laomedon"
+description = "Why pay when you can just say no?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_s8l0t"]
 script = ExtResource("2_xcqsp")
 card_name = "Eurystheus"
+description = "Eurystheus: Ahhh yes cousin I am technically correct, the best kind of correct. Ten becomes twelve."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cyy2l"]
 script = ExtResource("2_xcqsp")
 card_name = "Augeas"
+description = "Just to show you there are no hard feelings, would you like to meet my horses?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_1k8u1"]
 script = ExtResource("2_xcqsp")
 card_name = "Lycus"
+description = "I always love a good excuse to use the ol sacrifical altar."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_psohk"]
 script = ExtResource("2_xcqsp")
 card_name = "Neleus"
+description = "Cleanse you? So your red mist can descend on another innocent soul? Unlikely "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cs5xl"]
 script = ExtResource("2_xcqsp")
 card_name = "Laomedon"
+description = "Why pay when you can just say no?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0n7hm"]
 script = ExtResource("2_xcqsp")
 card_name = "Eurystheus"
+description = "Eurystheus: Ahhh yes cousin I am technically correct, the best kind of correct. Ten becomes twelve."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_c8bfg"]
 script = ExtResource("2_xcqsp")
 card_name = "Augeas"
+description = "Just to show you there are no hard feelings, would you like to meet my horses?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hpg3d"]
 script = ExtResource("2_xcqsp")
 card_name = "Lycus"
+description = "I always love a good excuse to use the ol sacrifical altar."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2bmv8"]
 script = ExtResource("2_xcqsp")
 card_name = "Neleus"
+description = "Cleanse you? So your red mist can descend on another innocent soul? Unlikely "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qf2wx"]
 script = ExtResource("2_xcqsp")
 card_name = "Laomedon"
+description = "Why pay when you can just say no?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_66kuf"]
@@ -1849,6 +1880,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_lrgju"]
 script = ExtResource("1_e7ref")
 enemy_name = "Human Foes of Heracles"
+enemy_description = "Choosing the wrong person to wrong."
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_lmtjb"), SubResource("Resource_k6viv"), SubResource("Resource_1b7m7"), SubResource("Resource_6hn0s"), SubResource("Resource_4xi8q"), SubResource("Resource_s8l0t"), SubResource("Resource_cyy2l"), SubResource("Resource_1k8u1"), SubResource("Resource_psohk"), SubResource("Resource_cs5xl"), SubResource("Resource_0n7hm"), SubResource("Resource_c8bfg"), SubResource("Resource_hpg3d"), SubResource("Resource_2bmv8"), SubResource("Resource_qf2wx")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_66kuf"), SubResource("Resource_nsmj4"), SubResource("Resource_iceon")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
@@ -1856,76 +1888,91 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_sx1u7"]
 script = ExtResource("2_xcqsp")
 card_name = "Hypnos"
+description = "Close your eyes but for a moment, just a moment and invite visions of poppy."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_casoc"]
 script = ExtResource("2_xcqsp")
 card_name = "Morpheus"
+description = "A message from Gods and destiny. Or just shifting slop? Who can tell?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tcg2e"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobetor"
+description = "Which Nightm--- I mean dream do you prefer? Snakes, teeth falling out, or something a bit more bespoke?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xgshi"]
 script = ExtResource("2_xcqsp")
 card_name = "Phantasos"
+description = "If your fever could talk in its sleep it would ask Phantasos for directions."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_moy4t"]
 script = ExtResource("2_xcqsp")
 card_name = "Lethe"
+description = "About to wake up? Drink deep and forget"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_1uaba"]
 script = ExtResource("2_xcqsp")
 card_name = "Hypnos"
+description = "Close your eyes but for a moment, just a moment and invite visions of poppy."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4su5n"]
 script = ExtResource("2_xcqsp")
 card_name = "Morpheus"
+description = "A message from Gods and destiny. Or just shifting slop? Who can tell?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_anro1"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobetor"
+description = "Which Nightm--- I mean dream do you prefer? Snakes, teeth falling out, or something a bit more bespoke?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4tgq4"]
 script = ExtResource("2_xcqsp")
 card_name = "Phantasos"
+description = "If your fever could talk in its sleep it would ask Phantasos for directions."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_c0kee"]
 script = ExtResource("2_xcqsp")
 card_name = "Lethe"
+description = "About to wake up? Drink deep and forget"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_3i16t"]
 script = ExtResource("2_xcqsp")
 card_name = "Hypnos"
+description = "Close your eyes but for a moment, just a moment and invite visions of poppy."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_l311s"]
 script = ExtResource("2_xcqsp")
 card_name = "Morpheus"
+description = "A message from Gods and destiny. Or just shifting slop? Who can tell?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0jtkh"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobetor"
+description = "Which Nightm--- I mean dream do you prefer? Snakes, teeth falling out, or something a bit more bespoke?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fd8ao"]
 script = ExtResource("2_xcqsp")
 card_name = "Phantasos"
+description = "If your fever could talk in its sleep it would ask Phantasos for directions."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xd3pl"]
 script = ExtResource("2_xcqsp")
 card_name = "Lethe"
+description = "About to wake up? Drink deep and forget"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_k2ri4"]
@@ -1955,6 +2002,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_iwe3x"]
 script = ExtResource("1_e7ref")
 enemy_name = "Sleep"
+enemy_description = "Deaths next door neighbour and brother"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_sx1u7"), SubResource("Resource_casoc"), SubResource("Resource_tcg2e"), SubResource("Resource_xgshi"), SubResource("Resource_moy4t"), SubResource("Resource_1uaba"), SubResource("Resource_4su5n"), SubResource("Resource_anro1"), SubResource("Resource_4tgq4"), SubResource("Resource_c0kee"), SubResource("Resource_3i16t"), SubResource("Resource_l311s"), SubResource("Resource_0jtkh"), SubResource("Resource_fd8ao"), SubResource("Resource_xd3pl")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_k2ri4"), SubResource("Resource_ivtli"), SubResource("Resource_ry2r1")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
@@ -2068,76 +2116,91 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_3mljd"]
 script = ExtResource("2_xcqsp")
 card_name = "Pamphredo"
+description = "Can you smell that sisters, it is a man among us, quickly Enyo the eye to me!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_etni1"]
 script = ExtResource("2_xcqsp")
 card_name = "Deino"
+description = "Chomp them Pemphredo! Or pass the tooth to me!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_sv88j"]
 script = ExtResource("2_xcqsp")
 card_name = "Enyo"
+description = "You sisters will say anything to have more time with tooth and eye, I'm not falling for it this time."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ndpv3"]
 script = ExtResource("2_xcqsp")
 card_name = "Stheno"
+description = "I killed so many more men than sister, why is she more famous than me?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0f2du"]
 script = ExtResource("2_xcqsp")
 card_name = "Eurayle"
+description = "Little good fame ever did her sister, but place a target upon her back, I miss her."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8yt5e"]
 script = ExtResource("2_xcqsp")
 card_name = "Pamphredo"
+description = "Can you smell that sisters, it is a man among us, quickly Enyo the eye to me!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8r6bt"]
 script = ExtResource("2_xcqsp")
 card_name = "Deino"
+description = "Chomp them Pemphredo! Or pass the tooth to me!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4lpco"]
 script = ExtResource("2_xcqsp")
 card_name = "Enyo"
+description = "You sisters will say anything to have more time with tooth and eye, I'm not falling for it this time."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_x8k5p"]
 script = ExtResource("2_xcqsp")
 card_name = "Stheno"
+description = "I killed so many more men than sister, why is she more famous than me?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_vm3ob"]
 script = ExtResource("2_xcqsp")
 card_name = "Eurayle"
+description = "Little good fame ever did her sister, but place a target upon her back, I miss her."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_io75k"]
 script = ExtResource("2_xcqsp")
 card_name = "Pamphredo"
+description = "Can you smell that sisters, it is a man among us, quickly Enyo the eye to me!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_x8thm"]
 script = ExtResource("2_xcqsp")
 card_name = "Deino"
+description = "Chomp them Pemphredo! Or pass the tooth to me!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tyd6l"]
 script = ExtResource("2_xcqsp")
 card_name = "Enyo"
+description = "You sisters will say anything to have more time with tooth and eye, I'm not falling for it this time."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0v5fe"]
 script = ExtResource("2_xcqsp")
 card_name = "Stheno"
+description = "I killed so many more men than sister, why is she more famous than me?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_5sra8"]
 script = ExtResource("2_xcqsp")
 card_name = "Eurayle"
+description = "Little good fame ever did her sister, but place a target upon her back, I miss her."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_rt4kd"]
@@ -2492,76 +2555,92 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_m3ito"]
 script = ExtResource("2_xcqsp")
 card_name = "Pasiphae"
+description = "I trust the mechanics will be optimised for pleasure Daedalus."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bdu77"]
 script = ExtResource("2_xcqsp")
 card_name = "Cretan bull"
+description = "Has one ever seen a more appealing bull? Such broad flanks oh my. 
+"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_yy5yo"]
 script = ExtResource("2_xcqsp")
 card_name = "King Minos"
+description = "Let me see the quality Athens has provided this year."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_mqcxu"]
 script = ExtResource("2_xcqsp")
 card_name = "Asterion"
+description = "We could always leave together half brother mine, we need not fight."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_at5k1"]
 script = ExtResource("2_xcqsp")
 card_name = "Ariadne "
+description = "He will return, after all I’ve done he wouldn't just leave."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_73a1l"]
 script = ExtResource("2_xcqsp")
 card_name = "Pasiphae"
+description = "I trust the mechanics will be optimised for pleasure Daedalus."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_j0g3r"]
 script = ExtResource("2_xcqsp")
 card_name = "Cretan bull"
+description = "Has one ever seen a more appealing bull? Such broad flanks oh my. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_40ydj"]
 script = ExtResource("2_xcqsp")
 card_name = "King Minos"
+description = "Let me see the quality Athens has provided this year."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_txako"]
 script = ExtResource("2_xcqsp")
 card_name = "Asterion"
+description = "We could always leave together half brother mine, we need not fight."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hgi0j"]
 script = ExtResource("2_xcqsp")
 card_name = "Ariadne "
+description = "He will return, after all I’ve done he wouldn't just leave."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qvjdy"]
 script = ExtResource("2_xcqsp")
 card_name = "Pasiphae"
+description = "I trust the mechanics will be optimised for pleasure Daedalus."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_81fhb"]
 script = ExtResource("2_xcqsp")
 card_name = "Cretan bull"
+description = "Has one ever seen a more appealing bull? Such broad flanks oh my. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ldhch"]
 script = ExtResource("2_xcqsp")
 card_name = "King Minos"
+description = "Let me see the quality Athens has provided this year."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ak5s2"]
 script = ExtResource("2_xcqsp")
 card_name = "Asterion"
+description = "We could always leave together half brother mine, we need not fight."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_rsops"]
 script = ExtResource("2_xcqsp")
 card_name = "Ariadne "
+description = "He will return, after all I’ve done he wouldn't just leave."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bdc7o"]
@@ -2591,6 +2670,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_knayq"]
 script = ExtResource("1_e7ref")
 enemy_name = "Crete"
+enemy_description = "A life time of therapy couldnt unwind this mess of a family"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_m3ito"), SubResource("Resource_bdu77"), SubResource("Resource_yy5yo"), SubResource("Resource_mqcxu"), SubResource("Resource_at5k1"), SubResource("Resource_73a1l"), SubResource("Resource_j0g3r"), SubResource("Resource_40ydj"), SubResource("Resource_txako"), SubResource("Resource_hgi0j"), SubResource("Resource_qvjdy"), SubResource("Resource_81fhb"), SubResource("Resource_ldhch"), SubResource("Resource_ak5s2"), SubResource("Resource_rsops")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_bdc7o"), SubResource("Resource_peio1"), SubResource("Resource_4tg5b")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
@@ -2697,6 +2777,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_3rv7w"]
 script = ExtResource("1_e7ref")
 enemy_name = "The Hunting Party"
+enemy_description = "Can anyone really blame him?"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_whob8"), SubResource("Resource_7pqpj"), SubResource("Resource_dwkjr"), SubResource("Resource_p40uf"), SubResource("Resource_47lgk"), SubResource("Resource_7aepx"), SubResource("Resource_4funx"), SubResource("Resource_gnc0c"), SubResource("Resource_0yu2v"), SubResource("Resource_lv34v"), SubResource("Resource_yenj1"), SubResource("Resource_smtcm"), SubResource("Resource_3k1g8"), SubResource("Resource_fx736"), SubResource("Resource_x4l2x")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_4eoc3"), SubResource("Resource_o5fsv"), SubResource("Resource_c5pyn")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
@@ -2810,76 +2891,91 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_p8t6d"]
 script = ExtResource("2_xcqsp")
 card_name = "Periphetes"
+description = "Yes it's real bronze, I can put it closer to your face if you want proof!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_uyaj5"]
 script = ExtResource("2_xcqsp")
 card_name = "Sinus"
+description = "One step back and a smidge to the left, yes in the middle of those two pines right there"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bqojl"]
 script = ExtResource("2_xcqsp")
 card_name = "Sciron"
+description = "Ohhh feet. Yes I like mine cleaner than clean. Get to scrubbing. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_c4isu"]
 script = ExtResource("2_xcqsp")
 card_name = "Cercyon"
+description = "Come join me for a spot of wrestling, to the winner glory, the loser death."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_gm07s"]
 script = ExtResource("2_xcqsp")
 card_name = "Procrustes"
+description = "Why yes of course you can stay the night, you will be especially taken by how comfortable the bed is, let me fit you to it.  "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4yhrc"]
 script = ExtResource("2_xcqsp")
 card_name = "Periphetes"
+description = "Yes it's real bronze, I can put it closer to your face if you want proof!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_63676"]
 script = ExtResource("2_xcqsp")
 card_name = "Sinus"
+description = "One step back and a smidge to the left, yes in the middle of those two pines right there"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_blewv"]
 script = ExtResource("2_xcqsp")
 card_name = "Sciron"
+description = "Ohhh feet. Yes I like mine cleaner than clean. Get to scrubbing. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xb1cl"]
 script = ExtResource("2_xcqsp")
 card_name = "Cercyon"
+description = "Come join me for a spot of wrestling, to the winner glory, the loser death."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xox7f"]
 script = ExtResource("2_xcqsp")
 card_name = "Procrustes"
+description = "Why yes of course you can stay the night, you will be especially taken by how comfortable the bed is, let me fit you to it.  "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_unglp"]
 script = ExtResource("2_xcqsp")
 card_name = "Periphetes"
+description = "Yes it's real bronze, I can put it closer to your face if you want proof!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_21mb6"]
 script = ExtResource("2_xcqsp")
 card_name = "Sinus"
+description = "One step back and a smidge to the left, yes in the middle of those two pines right there"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_d2mjc"]
 script = ExtResource("2_xcqsp")
 card_name = "Sciron"
+description = "Ohhh feet. Yes I like mine cleaner than clean. Get to scrubbing. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_rrm5w"]
 script = ExtResource("2_xcqsp")
 card_name = "Cercyon"
+description = "Come join me for a spot of wrestling, to the winner glory, the loser death."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2lpng"]
 script = ExtResource("2_xcqsp")
 card_name = "Procrustes"
+description = "Why yes of course you can stay the night, you will be especially taken by how comfortable the bed is, let me fit you to it.  "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_o8xdb"]
@@ -2909,6 +3005,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_beoaf"]
 script = ExtResource("1_e7ref")
 enemy_name = "Isthmus Road"
+enemy_description = "Take the hard road, it gives more exp"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_p8t6d"), SubResource("Resource_uyaj5"), SubResource("Resource_bqojl"), SubResource("Resource_c4isu"), SubResource("Resource_gm07s"), SubResource("Resource_4yhrc"), SubResource("Resource_63676"), SubResource("Resource_blewv"), SubResource("Resource_xb1cl"), SubResource("Resource_xox7f"), SubResource("Resource_unglp"), SubResource("Resource_21mb6"), SubResource("Resource_d2mjc"), SubResource("Resource_rrm5w"), SubResource("Resource_2lpng")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_o8xdb"), SubResource("Resource_o3x3x"), SubResource("Resource_6hydl")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
