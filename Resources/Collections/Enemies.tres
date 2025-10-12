@@ -2010,76 +2010,91 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_0xkme"]
 script = ExtResource("2_xcqsp")
 card_name = "Hippolyta"
+description = "I am your ninth labour? It wont be in chains I return to court."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ipscd"]
 script = ExtResource("2_xcqsp")
 card_name = "Penthesilea"
+description = "If I am to strike down Achilles, perhaps then I can cleanse my soul of guilt."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_kgdai"]
 script = ExtResource("2_xcqsp")
 card_name = "Antiope"
+description = "How cruel that my love would bring about war and destruction"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_h2ihk"]
 script = ExtResource("2_xcqsp")
 card_name = "Ortihyia"
+description = "I am not only queen, but queen amongst women."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ok5r3"]
 script = ExtResource("2_xcqsp")
 card_name = "Melanippe"
+description = "Sister you cannot be without your girdle, dont ransom me I will manage"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0lwlj"]
 script = ExtResource("2_xcqsp")
 card_name = "Hippolyta"
+description = "I am your ninth labour? It wont be in chains I return to court."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_vxoeu"]
 script = ExtResource("2_xcqsp")
 card_name = "Penthesilea"
+description = "If I am to strike down Achilles, perhaps then I can cleanse my soul of guilt."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_awqpr"]
 script = ExtResource("2_xcqsp")
 card_name = "Antiope"
+description = "How cruel that my love would bring about war and destruction"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fooao"]
 script = ExtResource("2_xcqsp")
 card_name = "Ortihyia"
+description = "I am not only queen, but queen amongst women."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_nkwwd"]
 script = ExtResource("2_xcqsp")
 card_name = "Melanippe"
+description = "Sister you cannot be without your girdle, dont ransom me I will manage"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_3g22x"]
 script = ExtResource("2_xcqsp")
 card_name = "Hippolyta"
+description = "I am your ninth labour? It wont be in chains I return to court."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qp1j3"]
 script = ExtResource("2_xcqsp")
 card_name = "Penthesilea"
+description = "If I am to strike down Achilles, perhaps then I can cleanse my soul of guilt."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_efvm1"]
 script = ExtResource("2_xcqsp")
 card_name = "Antiope"
+description = "How cruel that my love would bring about war and destruction"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_p460b"]
 script = ExtResource("2_xcqsp")
 card_name = "Ortihyia"
+description = "I am not only queen, but queen amongst women."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_71fym"]
 script = ExtResource("2_xcqsp")
 card_name = "Melanippe"
+description = "Sister you cannot be without your girdle, dont ransom me I will manage"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_pvqt1"]
@@ -2109,6 +2124,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_gn4yd"]
 script = ExtResource("1_e7ref")
 enemy_name = "Amazons"
+enemy_description = "Unsure whether to fall in love or run in fear."
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_0xkme"), SubResource("Resource_ipscd"), SubResource("Resource_kgdai"), SubResource("Resource_h2ihk"), SubResource("Resource_ok5r3"), SubResource("Resource_0lwlj"), SubResource("Resource_vxoeu"), SubResource("Resource_awqpr"), SubResource("Resource_fooao"), SubResource("Resource_nkwwd"), SubResource("Resource_3g22x"), SubResource("Resource_qp1j3"), SubResource("Resource_efvm1"), SubResource("Resource_p460b"), SubResource("Resource_71fym")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_pvqt1"), SubResource("Resource_7bpic"), SubResource("Resource_7jdex")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
@@ -2230,6 +2246,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_fcoum"]
 script = ExtResource("1_e7ref")
 enemy_name = "The Graeae"
+enemy_description = "The Grey Ones"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_3mljd"), SubResource("Resource_etni1"), SubResource("Resource_sv88j"), SubResource("Resource_ndpv3"), SubResource("Resource_0f2du"), SubResource("Resource_8yt5e"), SubResource("Resource_8r6bt"), SubResource("Resource_4lpco"), SubResource("Resource_x8k5p"), SubResource("Resource_vm3ob"), SubResource("Resource_io75k"), SubResource("Resource_x8thm"), SubResource("Resource_tyd6l"), SubResource("Resource_0v5fe"), SubResource("Resource_5sra8")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_rt4kd"), SubResource("Resource_sgvu1"), SubResource("Resource_rgx8d")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
@@ -2237,76 +2254,91 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_ji3j4"]
 script = ExtResource("2_xcqsp")
 card_name = "Agape"
+description = "Unconditional and selfless yes. But Agape can still hurt. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_j61fv"]
 script = ExtResource("2_xcqsp")
 card_name = "Phillia"
+description = "With deep friendship, comes the potential for betrayal."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_vdtsq"]
 script = ExtResource("2_xcqsp")
 card_name = "Storge"
+description = "Love for ones country, nothing bad could come from over solicitude to ones country could it?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_m3p87"]
 script = ExtResource("2_xcqsp")
 card_name = "Ludus"
+description = "Playful, flirty, fun. Trust and home wrecker all in one. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7pmn1"]
 script = ExtResource("2_xcqsp")
 card_name = "Pragma"
+description = "Realistic acceptance of a partners flaws, or co-dependence?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_13dgc"]
 script = ExtResource("2_xcqsp")
 card_name = "Agape"
+description = "Unconditional and selfless yes. But Agape can still hurt. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_5uu6l"]
 script = ExtResource("2_xcqsp")
 card_name = "Phillia"
+description = "With deep friendship, comes the potential for betrayal."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_53bvp"]
 script = ExtResource("2_xcqsp")
 card_name = "Storge"
+description = "Love for ones country, nothing bad could come from over solicitude to ones country could it?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7w5wj"]
 script = ExtResource("2_xcqsp")
 card_name = "Ludus"
+description = "Playful, flirty, fun. Trust and home wrecker all in one. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_f2b55"]
 script = ExtResource("2_xcqsp")
 card_name = "Pragma"
+description = "Realistic acceptance of a partners flaws, or co-dependence?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0gx84"]
 script = ExtResource("2_xcqsp")
 card_name = "Agape"
+description = "Unconditional and selfless yes. But Agape can still hurt. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tuc7k"]
 script = ExtResource("2_xcqsp")
 card_name = "Phillia"
+description = "With deep friendship, comes the potential for betrayal."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fufya"]
 script = ExtResource("2_xcqsp")
 card_name = "Storge"
+description = "Love for ones country, nothing bad could come from over solicitude to ones country could it?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cwvwu"]
 script = ExtResource("2_xcqsp")
 card_name = "Ludus"
+description = "Playful, flirty, fun. Trust and home wrecker all in one. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_uf8ur"]
 script = ExtResource("2_xcqsp")
 card_name = "Pragma"
+description = "Realistic acceptance of a partners flaws, or co-dependence?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ksx4d"]
@@ -2343,76 +2375,91 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_x0dbj"]
 script = ExtResource("2_xcqsp")
 card_name = "Aparte"
+description = "Lies cunningly presented as benevolent truth"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2014u"]
 script = ExtResource("2_xcqsp")
 card_name = "Geras"
+description = "Im not for the faint of heart, but the alternative isnt much fun either. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_gciji"]
 script = ExtResource("2_xcqsp")
 card_name = "Eris"
+description = "It only takes me three words to start a war"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hf3l5"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobos"
+description = "Hide it all you like, I'll still know what will have you in the corner a quivering mess. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ulagn"]
 script = ExtResource("2_xcqsp")
 card_name = "Ponos"
+description = "Some would say making this game was Ponos"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_wsx8j"]
 script = ExtResource("2_xcqsp")
 card_name = "Aparte"
+description = "Lies cunningly presented as benevolent truth"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_jih0t"]
 script = ExtResource("2_xcqsp")
 card_name = "Geras"
+description = "Im not for the faint of heart, but the alternative isnt much fun either. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_jxoag"]
 script = ExtResource("2_xcqsp")
 card_name = "Eris"
+description = "It only takes me three words to start a war"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_o7b3b"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobos"
+description = "Hide it all you like, I'll still know what will have you in the corner a quivering mess. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hylkq"]
 script = ExtResource("2_xcqsp")
 card_name = "Ponos"
+description = "Some would say making this game was Ponos"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7qrof"]
 script = ExtResource("2_xcqsp")
 card_name = "Aparte"
+description = "Lies cunningly presented as benevolent truth"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2b14q"]
 script = ExtResource("2_xcqsp")
 card_name = "Geras"
+description = "Im not for the faint of heart, but the alternative isnt much fun either. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_iicxb"]
 script = ExtResource("2_xcqsp")
 card_name = "Eris"
+description = "It only takes me three words to start a war"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2g0p6"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobos"
+description = "Hide it all you like, I'll still know what will have you in the corner a quivering mess. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ryebc"]
 script = ExtResource("2_xcqsp")
 card_name = "Ponos"
+description = "Some would say making this game was Ponos"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_asfaw"]
@@ -2442,6 +2489,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_3smum"]
 script = ExtResource("1_e7ref")
 enemy_name = "Pandora's box"
+enemy_description = "So then ends the golden age of man"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_x0dbj"), SubResource("Resource_2014u"), SubResource("Resource_gciji"), SubResource("Resource_hf3l5"), SubResource("Resource_ulagn"), SubResource("Resource_wsx8j"), SubResource("Resource_jih0t"), SubResource("Resource_jxoag"), SubResource("Resource_o7b3b"), SubResource("Resource_hylkq"), SubResource("Resource_7qrof"), SubResource("Resource_2b14q"), SubResource("Resource_iicxb"), SubResource("Resource_2g0p6"), SubResource("Resource_ryebc")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_asfaw"), SubResource("Resource_1bi7m"), SubResource("Resource_y3j3v")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
@@ -2449,76 +2497,91 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_4hn3y"]
 script = ExtResource("2_xcqsp")
 card_name = "Narcissus"
+description = "Worlds foremost practitioner of positive self talk"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_krri3"]
 script = ExtResource("2_xcqsp")
 card_name = "Hyacinthus"
+description = "See if you can throw further than me, put everything into it!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_a1d0l"]
 script = ExtResource("2_xcqsp")
 card_name = "Endymion"
+description = "Remain always as you are in this moment, I'll see you tonight"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_wvs6b"]
 script = ExtResource("2_xcqsp")
 card_name = "Helen"
+description = "Would it be I could give this face to another, but such cruelty I dont possess."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_lajff"]
 script = ExtResource("2_xcqsp")
 card_name = "Andromeda"
+description = "More beautiful than a Nereid? Mother did you really expect this to go well?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_yowfl"]
 script = ExtResource("2_xcqsp")
 card_name = "Narcissus"
+description = "Worlds foremost practitioner of positive self talk"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7lah4"]
 script = ExtResource("2_xcqsp")
 card_name = "Hyacinthus"
+description = "See if you can throw further than me, put everything into it!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_w0qee"]
 script = ExtResource("2_xcqsp")
 card_name = "Endymion"
+description = "Remain always as you are in this moment, I'll see you tonight"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_lckab"]
 script = ExtResource("2_xcqsp")
 card_name = "Helen"
+description = "Would it be I could give this face to another, but such cruelty I dont possess."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4v345"]
 script = ExtResource("2_xcqsp")
 card_name = "Andromeda"
+description = "More beautiful than a Nereid? Mother did you really expect this to go well?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_md6vc"]
 script = ExtResource("2_xcqsp")
 card_name = "Narcissus"
+description = "Worlds foremost practitioner of positive self talk"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_6i2da"]
 script = ExtResource("2_xcqsp")
 card_name = "Hyacinthus"
+description = "See if you can throw further than me, put everything into it!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hcc02"]
 script = ExtResource("2_xcqsp")
 card_name = "Endymion"
+description = "Remain always as you are in this moment, I'll see you tonight"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_jpqut"]
 script = ExtResource("2_xcqsp")
 card_name = "Helen"
+description = "Would it be I could give this face to another, but such cruelty I dont possess."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tuvfp"]
 script = ExtResource("2_xcqsp")
 card_name = "Andromeda"
+description = "More beautiful than a Nereid? Mother did you really expect this to go well?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_chfja"]
@@ -2548,6 +2611,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_7e6hb"]
 script = ExtResource("1_e7ref")
 enemy_name = "So beautiful it hurts"
+enemy_description = "A curse most comely"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_4hn3y"), SubResource("Resource_krri3"), SubResource("Resource_a1d0l"), SubResource("Resource_wvs6b"), SubResource("Resource_lajff"), SubResource("Resource_yowfl"), SubResource("Resource_7lah4"), SubResource("Resource_w0qee"), SubResource("Resource_lckab"), SubResource("Resource_4v345"), SubResource("Resource_md6vc"), SubResource("Resource_6i2da"), SubResource("Resource_hcc02"), SubResource("Resource_jpqut"), SubResource("Resource_tuvfp")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_chfja"), SubResource("Resource_ci4fy"), SubResource("Resource_kp3sj")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
@@ -2678,76 +2742,92 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_whob8"]
 script = ExtResource("2_xcqsp")
 card_name = "Acteon"
+description = "A mistake goddess, nothing more. 
+"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7pqpj"]
 script = ExtResource("2_xcqsp")
 card_name = "Lacon"
+description = "Arooooo"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_dwkjr"]
 script = ExtResource("2_xcqsp")
 card_name = "Harpalos"
+description = "Arf arf"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_p40uf"]
 script = ExtResource("2_xcqsp")
 card_name = "Labros"
+description = "Ahwooooo"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_47lgk"]
 script = ExtResource("2_xcqsp")
 card_name = "Hylactor"
+description = "bark bark "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7aepx"]
 script = ExtResource("2_xcqsp")
 card_name = "Acteon"
+description = "A mistake goddess, nothing more. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4funx"]
 script = ExtResource("2_xcqsp")
 card_name = "Lacon"
+description = "Arooooo"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_gnc0c"]
 script = ExtResource("2_xcqsp")
 card_name = "Harpalos"
+description = "Arf arf"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0yu2v"]
 script = ExtResource("2_xcqsp")
 card_name = "Labros"
+description = "Ahwooooo"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_lv34v"]
 script = ExtResource("2_xcqsp")
 card_name = "Hylactor"
+description = "bark bark "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_yenj1"]
 script = ExtResource("2_xcqsp")
 card_name = "Acteon"
+description = "A mistake goddess, nothing more. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_smtcm"]
 script = ExtResource("2_xcqsp")
 card_name = "Lacon"
+description = "Arooooo"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_3k1g8"]
 script = ExtResource("2_xcqsp")
 card_name = "Harpalos"
+description = "Arf arf"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fx736"]
 script = ExtResource("2_xcqsp")
 card_name = "Labros"
+description = "Ahwooooo"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_x4l2x"]
 script = ExtResource("2_xcqsp")
 card_name = "Hylactor"
+description = "bark bark "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4eoc3"]
@@ -2785,76 +2865,91 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_mllwu"]
 script = ExtResource("2_xcqsp")
 card_name = "Scylla"
+description = "Always high rolls "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ouj4i"]
 script = ExtResource("2_xcqsp")
 card_name = "Charybdis"
+description = "Critical success versus critical failure."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_34jyf"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
+description = "Nobody is hurting me. Nobody is killing me!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_s6suc"]
 script = ExtResource("2_xcqsp")
 card_name = "Circe"
+description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ex2ms"]
 script = ExtResource("2_xcqsp")
 card_name = "Parthenope"
+description = "Finally my love, come join me and the gals, we have been waiting for you. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_pfu7s"]
 script = ExtResource("2_xcqsp")
 card_name = "Scylla"
+description = "Always high rolls "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7c4eb"]
 script = ExtResource("2_xcqsp")
 card_name = "Charybdis"
+description = "Critical success versus critical failure."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_x1em1"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
+description = "Nobody is hurting me. Nobody is killing me!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_67nd5"]
 script = ExtResource("2_xcqsp")
 card_name = "Circe"
+description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ktebg"]
 script = ExtResource("2_xcqsp")
 card_name = "Parthenope"
+description = "Finally my love, come join me and the gals, we have been waiting for you. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_i45n1"]
 script = ExtResource("2_xcqsp")
 card_name = "Scylla"
+description = "Always high rolls "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_01hsj"]
 script = ExtResource("2_xcqsp")
 card_name = "Charybdis"
+description = "Critical success versus critical failure."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_l7lfy"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
+description = "Nobody is hurting me. Nobody is killing me!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_pxj21"]
 script = ExtResource("2_xcqsp")
 card_name = "Circe"
+description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fw6om"]
 script = ExtResource("2_xcqsp")
 card_name = "Parthenope"
+description = "Finally my love, come join me and the gals, we have been waiting for you. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_lair4"]
@@ -2884,6 +2979,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 [sub_resource type="Resource" id="Resource_5ope5"]
 script = ExtResource("1_e7ref")
 enemy_name = "The Way Home"
+enemy_description = "Sometimes you head out for a spot of war and it takes 20 years to get home."
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_mllwu"), SubResource("Resource_ouj4i"), SubResource("Resource_34jyf"), SubResource("Resource_s6suc"), SubResource("Resource_ex2ms"), SubResource("Resource_pfu7s"), SubResource("Resource_7c4eb"), SubResource("Resource_x1em1"), SubResource("Resource_67nd5"), SubResource("Resource_ktebg"), SubResource("Resource_i45n1"), SubResource("Resource_01hsj"), SubResource("Resource_l7lfy"), SubResource("Resource_pxj21"), SubResource("Resource_fw6om")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_lair4"), SubResource("Resource_vy3qu"), SubResource("Resource_0uc6h")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
@@ -3012,82 +3108,98 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
 [sub_resource type="Resource" id="Resource_bpwh1"]
 script = ExtResource("2_xcqsp")
-card_name = "Dolos"
+card_name = "Lycaon"
+description = "For you Cloud Gatherer a stew most tender. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_u77kq"]
 script = ExtResource("2_xcqsp")
 card_name = "Sisyphus"
+description = "Yes I'm still there, Yes I'm still trying, you would have given up ages ago. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_rfcos"]
 script = ExtResource("2_xcqsp")
 card_name = "Tantalus"
+description = "So close I can taste it"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7y3gw"]
 script = ExtResource("2_xcqsp")
 card_name = "Ixion"
+description = "Yeah I woke up and she was just there, its entrapment or some such."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fq1fo"]
 script = ExtResource("2_xcqsp")
 card_name = "Salmoneus"
+description = "Yes another pan to the chariot good sir, I want my next pass to really sing out!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_nqu4c"]
 script = ExtResource("2_xcqsp")
-card_name = "Dolos"
+card_name = "Lycaon"
+description = "For you Cloud Gatherer a stew most tender. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8np3j"]
 script = ExtResource("2_xcqsp")
 card_name = "Sisyphus"
+description = "Yes I'm still there, Yes I'm still trying, you would have given up ages ago. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4h7vp"]
 script = ExtResource("2_xcqsp")
 card_name = "Tantalus"
+description = "So close I can taste it"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_eoxwa"]
 script = ExtResource("2_xcqsp")
 card_name = "Ixion"
+description = "Yeah I woke up and she was just there, its entrapment or some such."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cmqdx"]
 script = ExtResource("2_xcqsp")
 card_name = "Salmoneus"
+description = "Yes another pan to the chariot good sir, I want my next pass to really sing out!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_f5fhw"]
 script = ExtResource("2_xcqsp")
-card_name = "Dolos"
+card_name = "Lycaon"
+description = "For you Cloud Gatherer a stew most tender. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2lea1"]
 script = ExtResource("2_xcqsp")
 card_name = "Sisyphus"
+description = "Yes I'm still there, Yes I'm still trying, you would have given up ages ago. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_87kaq"]
 script = ExtResource("2_xcqsp")
 card_name = "Tantalus"
+description = "So close I can taste it"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_wqxhb"]
 script = ExtResource("2_xcqsp")
 card_name = "Ixion"
+description = "Yeah I woke up and she was just there, its entrapment or some such."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_064r4"]
 script = ExtResource("2_xcqsp")
 card_name = "Salmoneus"
+description = "Yes another pan to the chariot good sir, I want my next pass to really sing out!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8j8lk"]
 script = ExtResource("1_e7ref")
 enemy_name = "Wicked Kings"
+enemy_description = "Why is it always the worst who end up in charge?"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_bpwh1"), SubResource("Resource_u77kq"), SubResource("Resource_rfcos"), SubResource("Resource_7y3gw"), SubResource("Resource_fq1fo"), SubResource("Resource_nqu4c"), SubResource("Resource_8np3j"), SubResource("Resource_4h7vp"), SubResource("Resource_eoxwa"), SubResource("Resource_cmqdx"), SubResource("Resource_f5fhw"), SubResource("Resource_2lea1"), SubResource("Resource_87kaq"), SubResource("Resource_wqxhb"), SubResource("Resource_064r4")])
 decks = null
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
