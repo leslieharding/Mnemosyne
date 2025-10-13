@@ -9,68 +9,37 @@
 [sub_resource type="Resource" id="Resource_vsx2q"]
 script = ExtResource("1_w3v8q")
 card_name = "Adonis"
-values = Array[int]([1, 1, 1, 1])
-description = ""
-abilities = Array[ExtResource("2_7roea")]([])
-level_data = Array[ExtResource("3_4nnha")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ibl3b"]
 script = ExtResource("1_w3v8q")
 card_name = "Eros"
-values = Array[int]([1, 1, 1, 1])
-description = ""
-abilities = Array[ExtResource("2_7roea")]([])
-level_data = Array[ExtResource("3_4nnha")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_p1md1"]
 script = ExtResource("1_w3v8q")
 card_name = "Anchises"
-values = Array[int]([1, 1, 1, 1])
-description = ""
-abilities = Array[ExtResource("2_7roea")]([])
-level_data = Array[ExtResource("3_4nnha")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xwof6"]
 script = ExtResource("1_w3v8q")
 card_name = "Paris"
-values = Array[int]([1, 1, 1, 1])
-description = ""
-abilities = Array[ExtResource("2_7roea")]([])
-level_data = Array[ExtResource("3_4nnha")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ps1t5"]
 script = ExtResource("1_w3v8q")
 card_name = "Eurypylus"
-values = Array[int]([1, 1, 1, 1])
-description = ""
-abilities = Array[ExtResource("2_7roea")]([])
-level_data = Array[ExtResource("3_4nnha")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ckyi3"]
 script = ExtResource("2_pep08")
 deck_name = "Fatal Attraction"
-deck_description = ""
 card_indices = Array[int]([0, 1, 2, 3, 4])
 is_starter_deck = true
-required_capture_exp = 0
-required_defense_exp = 0
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [resource]
 script = ExtResource("3_7roea")
-god_name = ""
 cards = Array[ExtResource("1_w3v8q")]([SubResource("Resource_vsx2q"), SubResource("Resource_ibl3b"), SubResource("Resource_p1md1"), SubResource("Resource_xwof6"), SubResource("Resource_ps1t5")])
 decks = Array[ExtResource("2_pep08")]([SubResource("Resource_ckyi3")])
 metadata/_custom_type_script = "uid://bdwr18g3ouvfo"

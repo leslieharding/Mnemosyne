@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=22 format=3 uid="uid://dwrds6g3whmsq"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=19 format=3 uid="uid://dwrds6g3whmsq"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_ttyo6"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_nyy1t"]
@@ -6,10 +6,8 @@
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_021ek"]
 [ext_resource type="Script" uid="uid://cbulr8qu0u1fj" path="res://Resources/Abilities/volley_ability.gd" id="3_cynoy"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_nyy1t"]
-[ext_resource type="Script" uid="uid://c4aeeb6pohv6k" path="res://Resources/Abilities/soothe_ability.gd" id="5_lnj4m"]
-[ext_resource type="Script" uid="uid://bvlqcwb0iagi4" path="res://Resources/Abilities/phalanx_ability.gd" id="6_xpt5f"]
-[ext_resource type="Script" uid="uid://dja2ta0rb7v13" path="res://Resources/Abilities/treachery_ability.gd" id="7_cynoy"]
-[ext_resource type="Script" uid="uid://cnmf4yohj44kh" path="res://Resources/Abilities/morph_ability.gd" id="7_wiuqi"]
+[ext_resource type="Script" uid="uid://b3qdfwuofelgc" path="res://Resources/Abilities/critical_strike_ability.gd" id="5_cynoy"]
+[ext_resource type="Script" uid="uid://cf0rb8uoxl6jj" path="res://Resources/Abilities/hunt_ability.gd" id="6_vobqy"]
 
 [sub_resource type="Resource" id="Resource_8h57p"]
 script = ExtResource("3_cynoy")
@@ -26,10 +24,10 @@ abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_8h57p")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_uc8ql"]
-script = ExtResource("5_lnj4m")
-ability_name = "Soothe"
-description = "Reduces the strength of the next card played by your opponent by 1"
-metadata/_custom_type_script = "uid://c4aeeb6pohv6k"
+script = ExtResource("5_cynoy")
+ability_name = "Critical Strike"
+description = " When played, regardless of direction of attack, the opponents weakest stat will be used in defense"
+metadata/_custom_type_script = "uid://b3qdfwuofelgc"
 
 [sub_resource type="Resource" id="Resource_xpt5f"]
 script = ExtResource("1_ttyo6")
@@ -40,10 +38,10 @@ abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_uc8ql")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hq4qt"]
-script = ExtResource("6_xpt5f")
-ability_name = "Phalanx"
-description = "On play if you own all 3 cards in a row or column, boost the formations stats by 2"
-metadata/_custom_type_script = "uid://bvlqcwb0iagi4"
+script = ExtResource("6_vobqy")
+ability_name = "Hunt"
+description = "After placement, select a slot to hunt.  Forces combat using your highest stat vs their lowest stat."
+metadata/_custom_type_script = "uid://cf0rb8uoxl6jj"
 
 [sub_resource type="Resource" id="Resource_wiuqi"]
 script = ExtResource("1_ttyo6")
@@ -54,10 +52,10 @@ abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_hq4qt")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_mbexa"]
-script = ExtResource("7_cynoy")
-ability_name = "Treachery"
-description = "One captured enemy will try and attack an ally"
-metadata/_custom_type_script = "uid://dja2ta0rb7v13"
+script = ExtResource("6_vobqy")
+ability_name = "Hunt"
+description = "After placement, select a slot to hunt. Forces combat using your highest stat vs their lowest stat."
+metadata/_custom_type_script = "uid://cf0rb8uoxl6jj"
 
 [sub_resource type="Resource" id="Resource_cynoy"]
 script = ExtResource("1_ttyo6")
@@ -67,19 +65,11 @@ description = "You name it, aint nothing I cant hunt and kill"
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_mbexa")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
-[sub_resource type="Resource" id="Resource_30n57"]
-script = ExtResource("7_wiuqi")
-ability_name = "Morph"
-description = "Rotate this cards stats every turn"
-trigger_condition = 3
-metadata/_custom_type_script = "uid://cnmf4yohj44kh"
-
 [sub_resource type="Resource" id="Resource_vobqy"]
 script = ExtResource("1_ttyo6")
 card_name = "Callisto "
 values = Array[int]([3, 4, 5, 6])
 description = "Artemis is that you? I'm surprised but what a honour"
-abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_30n57")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ttyo6"]
