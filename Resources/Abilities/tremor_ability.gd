@@ -4,7 +4,7 @@ extends CardAbility
 
 func _init():
 	ability_name = "Tremors"
-	description = "After placement, this card causes tremors in adjacent empty spaces for 2 turns, attacking any cards that move into those zones"
+	description = "After placement, this card causes tremors in adjacent empty spaces for 2 turns, capturing any cards in those zones on turn start"
 	trigger_condition = TriggerType.ON_PLAY
 
 func execute(context: Dictionary) -> bool:

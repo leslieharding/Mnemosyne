@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=507 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=534 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -21,7 +21,15 @@
 [ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="12_r05oc"]
 [ext_resource type="Script" uid="uid://cu3icvy8efjky" path="res://Resources/Abilities/greedy_ability.gd" id="13_0vidc"]
 [ext_resource type="Script" uid="uid://dh4c5feb2eu1v" path="res://Resources/Abilities/charge_ability.gd" id="20_1g5vp"]
+[ext_resource type="Script" uid="uid://cklxp8i7wphlo" path="res://Resources/Abilities/reckless_assault_ability.gd" id="20_efy6x"]
+[ext_resource type="Script" uid="uid://8hwwassnaxkb" path="res://Resources/Abilities/pierce_ability.gd" id="20_j1bdk"]
 [ext_resource type="Script" uid="uid://bcu6cf6gen411" path="res://Resources/Abilities/cheat_death_ability.gd" id="21_4qd0a"]
+[ext_resource type="Script" uid="uid://fgbji7hao84c" path="res://Resources/Abilities/dancer_ability.gd" id="21_57iqf"]
+[ext_resource type="Script" uid="uid://c4aeeb6pohv6k" path="res://Resources/Abilities/soothe_ability.gd" id="21_jq8at"]
+[ext_resource type="Script" uid="uid://cgrjfouc2qnld" path="res://Resources/Abilities/pursuit_ability.gd" id="22_efy6x"]
+[ext_resource type="Script" uid="uid://cm8gt3refuukf" path="res://Resources/Abilities/camouflage_ability.gd" id="23_cetws"]
+[ext_resource type="Script" uid="uid://c47tlfc0gadlo" path="res://Resources/Abilities/race_ability.gd" id="23_y0w8m"]
+[ext_resource type="Script" uid="uid://di16hrjg7ypkb" path="res://Resources/Abilities/elusive_ability.gd" id="25_unt1i"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -1082,25 +1090,46 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_wi1xk"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_ydsva")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_1trwc"]
+script = ExtResource("4_qmggo")
+ability_name = "Tremor"
+description = "After placement, this card causes tremors in adjacent empty spaces for 2 turns, capturing any cards in those zones on turn start"
+metadata/_custom_type_script = "uid://myxy4oox5wct"
+
 [sub_resource type="Resource" id="Resource_vawst"]
 script = ExtResource("2_xcqsp")
 card_name = "Fárbauti"
 values = Array[int]([5, 5, 5, 5])
 description = "He who strikes dangerous blows"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_1trwc")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_b0pjo"]
+script = ExtResource("20_j1bdk")
+ability_name = "Pierce"
+description = "This unit's attack range is 2, but can only attack through occupied squares."
+metadata/_custom_type_script = "uid://8hwwassnaxkb"
 
 [sub_resource type="Resource" id="Resource_wlj4d"]
 script = ExtResource("2_xcqsp")
 card_name = "Laufey"
 values = Array[int]([5, 5, 5, 5])
 description = "The Needle"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_b0pjo")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ynq2s"]
+script = ExtResource("21_jq8at")
+ability_name = "Soothe"
+description = "Reduces the strength of the next card played by your opponent by 1."
+metadata/_custom_type_script = "uid://c4aeeb6pohv6k"
 
 [sub_resource type="Resource" id="Resource_rf8tk"]
 script = ExtResource("2_xcqsp")
 card_name = "Sigyn"
 values = Array[int]([6, 6, 6, 6])
 description = "Oh for goodness sake whats he gone and done now"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ynq2s")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cdkae"]
@@ -1110,16 +1139,11 @@ values = Array[int]([7, 7, 7, 7])
 description = "I don't blame you Váli, we are caught in the net of ill cast by our father"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
-[sub_resource type="Resource" id="Resource_8cjcf"]
-script = ExtResource("7_oovod")
-metadata/_custom_type_script = "uid://d1cwgpmvptcjn"
-
 [sub_resource type="Resource" id="Resource_1puft"]
 script = ExtResource("2_xcqsp")
 card_name = "Váli"
 values = Array[int]([6, 6, 6, 6])
-description = "Im hungry brother, such like one has never seen, hungry like a peasant in Fimbulwinter, im sorry."
-abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_8cjcf")])
+description = "Im hungry brother, such like one has never seen, hungry like a peasant in Fimbulwinter, forgive me."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8p8y8"]
@@ -1137,25 +1161,41 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_vawst"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_8p8y8")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_8cjcf"]
+script = ExtResource("6_mxtxa")
+ability_name = "Defensive Counter"
+description = "When this card successfully defends against an enemy attack, capture the attacking card"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://b72irnrav5w53"
+
 [sub_resource type="Resource" id="Resource_lasla"]
 script = ExtResource("2_xcqsp")
 card_name = "Ratatoskr "
 values = Array[int]([2, 2, 2, 2])
 description = "Yes Níðhöggr the eagle is silly for thinking you have smelly breath, I know!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_8cjcf")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_vsd4h"]
 script = ExtResource("2_xcqsp")
 card_name = "Útgarða-Loki"
-values = Array[int]([8, 7, 8, 7])
-description = "Now I know how powerful you are, my illusions will make sure you never find me again"
+values = Array[int]([8, 9, 8, 9])
+description = "I was foolish to let you find us, never again."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_mhseg"]
+script = ExtResource("21_4qd0a")
+ability_name = "Cheat Death"
+description = "This card prevents the first time it would be captured"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://bcu6cf6gen411"
 
 [sub_resource type="Resource" id="Resource_hybsk"]
 script = ExtResource("2_xcqsp")
 card_name = "Skrymir"
 values = Array[int]([3, 4, 2, 6])
 description = "Whats that it feels like a leaf just fell on my head. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_mhseg")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_pcu0e"]
@@ -1165,11 +1205,18 @@ values = Array[int]([2, 6, 7, 4])
 description = "You can eat fast, sure. But who could eat faster than fire?"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_h3w3o"]
+script = ExtResource("23_y0w8m")
+ability_name = "Race"
+description = "When played this card races to every empty slot getting more tired with every step."
+metadata/_custom_type_script = "uid://c47tlfc0gadlo"
+
 [sub_resource type="Resource" id="Resource_8yysy"]
 script = ExtResource("2_xcqsp")
 card_name = "Hugi "
 values = Array[int]([9, 9, 2, 2])
 description = "Up for a race? Let me know if you think you can win. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_h3w3o")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_gbksv"]
@@ -1190,30 +1237,35 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_e8k06"]
 script = ExtResource("2_xcqsp")
 card_name = "Thrym"
+values = Array[int]([6, 5, 5, 6])
 description = "The hammer? I might have it I might not. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_6yfxy"]
 script = ExtResource("2_xcqsp")
 card_name = "Beli"
+values = Array[int]([4, 6, 6, 3])
 description = "Whats that you got there? A stags antler? This will be easy"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8aknj"]
 script = ExtResource("2_xcqsp")
 card_name = "Kári "
+values = Array[int]([4, 5, 6, 7])
 description = "The coolest of cool breezes"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_p5kmc"]
 script = ExtResource("2_xcqsp")
 card_name = "Frosti"
+values = Array[int]([2, 9, 9, 1])
 description = "Biting cold most bitter"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ei4g5"]
 script = ExtResource("2_xcqsp")
 card_name = "Jökull"
+values = Array[int]([8, 2, 8, 2])
 description = "cold then colder then frozen. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
@@ -1232,34 +1284,75 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_e8k06"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_7eaan")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_uon2g"]
+script = ExtResource("20_efy6x")
+ability_name = "Reckless Assault"
+description = "After combat this card's stats are reduced to 1"
+metadata/_custom_type_script = "uid://cklxp8i7wphlo"
+
 [sub_resource type="Resource" id="Resource_eeisl"]
 script = ExtResource("2_xcqsp")
 card_name = "Ullr"
+values = Array[int]([9, 9, 9, 9])
 description = "I dont need a pack, I'd take any of you alone"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_uon2g")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_aa08e"]
+script = ExtResource("20_j1bdk")
+ability_name = "Pierce"
+description = "This unit's attack range is 2, but can only attack through occupied squares."
+metadata/_custom_type_script = "uid://8hwwassnaxkb"
 
 [sub_resource type="Resource" id="Resource_axwpf"]
 script = ExtResource("2_xcqsp")
 card_name = "Skadi"
-description = "Oh what gorgeous feet, I have chosen. "
+values = Array[int]([7, 3, 3, 6])
+description = "Oh what gorgeous feet, I have chosen my husband. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_aa08e")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_brlgj"]
+script = ExtResource("21_57iqf")
+ability_name = "Flight"
+description = "After being played, will fly to another slot attacking again"
+metadata/_custom_type_script = "uid://fgbji7hao84c"
 
 [sub_resource type="Resource" id="Resource_j6smf"]
 script = ExtResource("2_xcqsp")
 card_name = "Hræsvelgr"
+values = Array[int]([4, 4, 4, 4])
 description = "From where does the wind come that passes over the ocean's surface, yet is never seen?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_brlgj")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_dosgt"]
+script = ExtResource("22_efy6x")
+ability_name = "Pursuit"
+description = "If this card can capture, it attacks cards played in the same row/column and moves adjacent to them."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cgrjfouc2qnld"
 
 [sub_resource type="Resource" id="Resource_u66db"]
 script = ExtResource("2_xcqsp")
 card_name = "Garmr"
+values = Array[int]([8, 8, 2, 2])
 description = "The hound of Hel"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_dosgt")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_m2pi7"]
+script = ExtResource("23_cetws")
+ability_name = "Stealth"
+description = "On play this card is hidden for one turn, if the opponent tries to play a card in the same slot it is captured"
+metadata/_custom_type_script = "uid://cm8gt3refuukf"
 
 [sub_resource type="Resource" id="Resource_3fk8b"]
 script = ExtResource("2_xcqsp")
 card_name = "Hati"
+values = Array[int]([2, 3, 3, 4])
 description = "Just one last effort and it will finally be mine. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_m2pi7")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_nrk2q"]
@@ -1301,10 +1394,17 @@ card_name = "Daedalus"
 description = "A bull you say Pasiphaë? No, no theres no judgement here I like a challenge"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_koufx"]
+script = ExtResource("20_efy6x")
+ability_name = "Reckless Assault"
+description = "After combat this card's stats are reduced to 1"
+metadata/_custom_type_script = "uid://cklxp8i7wphlo"
+
 [sub_resource type="Resource" id="Resource_igddo"]
 script = ExtResource("2_xcqsp")
 card_name = "Icarus"
 description = "Are the feathers meant to fall away father? Who cares its too much fun up here "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_koufx")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7vsw5"]
@@ -1331,10 +1431,17 @@ card_name = "Daedalus"
 description = "A bull you say Pasiphaë? No, no theres no judgement here I like a challenge"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_jmkeg"]
+script = ExtResource("20_efy6x")
+ability_name = "Reckless Assault"
+description = "After combat this card's stats are reduced to 1"
+metadata/_custom_type_script = "uid://cklxp8i7wphlo"
+
 [sub_resource type="Resource" id="Resource_5o4ql"]
 script = ExtResource("2_xcqsp")
 card_name = "Icarus"
 description = "Are the feathers meant to fall away father? Who cares its too much fun up here "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_jmkeg")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_gtjee"]
@@ -1361,10 +1468,17 @@ card_name = "Daedalus"
 description = "A bull you say Pasiphaë? No, no theres no judgement here I like a challenge"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_62pb8"]
+script = ExtResource("20_efy6x")
+ability_name = "Reckless Assault"
+description = "After combat this card's stats are reduced to 1"
+metadata/_custom_type_script = "uid://cklxp8i7wphlo"
+
 [sub_resource type="Resource" id="Resource_j8i2h"]
 script = ExtResource("2_xcqsp")
 card_name = "Icarus"
 description = "Are the feathers meant to fall away father? Who cares its too much fun up here "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_62pb8")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_h21fd"]
@@ -1408,7 +1522,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 [sub_resource type="Resource" id="Resource_slolt"]
 script = ExtResource("2_xcqsp")
 card_name = "Echidna"
-description = "Loves a hundred headed giants, but a hundred eyed giants will be the death of her"
+description = "Loves a hundred headed giant, but a hundred eyed giants will be the death of her"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hsh3b"]
@@ -1527,10 +1641,18 @@ card_name = "Nemian Lion"
 description = "You too would be proud if your hide was as impenetrable"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_vje7p"]
+script = ExtResource("25_unt1i")
+ability_name = "Elusive"
+description = "This card evades capture (it would take coordination to catch this)"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://di16hrjg7ypkb"
+
 [sub_resource type="Resource" id="Resource_ylqbb"]
 script = ExtResource("2_xcqsp")
 card_name = "Ceryneian Hind"
 description = "Are you to tell me my lord I brought you this Hind and you were unable to keep it? How unfortunate."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_vje7p")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_us2li"]
@@ -1539,10 +1661,18 @@ card_name = "Erymanthian Boar"
 description = "Come out Eurystheus I cant hear you from in there"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_wi1kk"]
+script = ExtResource("8_oovod")
+ability_name = "Toxic Droppings"
+description = "Captures any card that captures it"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dyur10e6s3lah"
+
 [sub_resource type="Resource" id="Resource_hagql"]
 script = ExtResource("2_xcqsp")
 card_name = "Stymphalian Birds"
 description = "Amassed, violent and filthy. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_wi1kk")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ddk83"]
@@ -1565,10 +1695,18 @@ card_name = "Nemian Lion"
 description = "You too would be proud if your hide was as impenetrable"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_tekn6"]
+script = ExtResource("25_unt1i")
+ability_name = "Elusive"
+description = "This card evades capture (it would take coordination to catch this)"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://di16hrjg7ypkb"
+
 [sub_resource type="Resource" id="Resource_iceqr"]
 script = ExtResource("2_xcqsp")
 card_name = "Ceryneian Hind"
 description = "Are you to tell me my lord I brought you this Hind and you were unable to keep it? How unfortunate."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_tekn6")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_waifj"]
@@ -1577,10 +1715,18 @@ card_name = "Erymanthian Boar"
 description = "Come out Eurystheus I cant hear you from in there"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_vqwxj"]
+script = ExtResource("8_oovod")
+ability_name = "Toxic Droppings"
+description = "Captures any card that captures it"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dyur10e6s3lah"
+
 [sub_resource type="Resource" id="Resource_dpxsw"]
 script = ExtResource("2_xcqsp")
 card_name = "Stymphalian Birds"
 description = "Amassed, violent and filthy. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_vqwxj")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xcmoy"]
@@ -1603,10 +1749,18 @@ card_name = "Nemian Lion"
 description = "You too would be proud if your hide was as impenetrable"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_8yjk7"]
+script = ExtResource("25_unt1i")
+ability_name = "Elusive"
+description = "This card evades capture (it would take coordination to catch this)"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://di16hrjg7ypkb"
+
 [sub_resource type="Resource" id="Resource_cp6g7"]
 script = ExtResource("2_xcqsp")
 card_name = "Ceryneian Hind"
 description = "Are you to tell me my lord I brought you this Hind and you were unable to keep it? How unfortunate."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_8yjk7")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_doqhv"]
@@ -1615,10 +1769,18 @@ card_name = "Erymanthian Boar"
 description = "Come out Eurystheus I cant hear you from in there"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_3xgcl"]
+script = ExtResource("8_oovod")
+ability_name = "Toxic Droppings"
+description = "Captures any card that captures it"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dyur10e6s3lah"
+
 [sub_resource type="Resource" id="Resource_ht7ut"]
 script = ExtResource("2_xcqsp")
 card_name = "Stymphalian Birds"
 description = "Amassed, violent and filthy. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_3xgcl")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_1chuv"]

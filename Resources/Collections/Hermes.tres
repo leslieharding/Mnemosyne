@@ -1,21 +1,28 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=23 format=3 uid="uid://bohl4fgw1kxqu"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=21 format=3 uid="uid://bohl4fgw1kxqu"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_36081"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_kjwo2"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_yru28"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_82qut"]
+[ext_resource type="Script" uid="uid://dsvr5f8l038ip" path="res://Resources/Abilities/backstab_ability.gd" id="3_cbhf8"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_kjwo2"]
-[ext_resource type="Script" uid="uid://c47tlfc0gadlo" path="res://Resources/Abilities/race_ability.gd" id="3_xo81a"]
 [ext_resource type="Script" uid="uid://btc6badlhckoc" path="res://Resources/Abilities/trojan_horse_ability.gd" id="5_py8us"]
-[ext_resource type="Script" uid="uid://pdcxuxfesjrk" path="res://Resources/Abilities/stand_together_ability.gd" id="6_ayhf2"]
 [ext_resource type="Script" uid="uid://dkf8lottce2c5" path="res://Resources/Abilities/trojan_horse_reversal_ability.gd" id="6_da35i"]
 [ext_resource type="Script" uid="uid://8hwwassnaxkb" path="res://Resources/Abilities/pierce_ability.gd" id="7_fmj61"]
+
+[sub_resource type="Resource" id="Resource_063ny"]
+script = ExtResource("3_cbhf8")
+ability_name = "Backstab"
+description = "This card attacks the defenders opposing stat instead of its adjacent one"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://dsvr5f8l038ip"
 
 [sub_resource type="Resource" id="Resource_py8us"]
 script = ExtResource("1_36081")
 card_name = "Autolycus"
 values = Array[int]([3, 3, 3, 3])
 description = "Something missing? Couldn't possibly be me"
+abilities = Array[ExtResource("2_kjwo2")]([SubResource("Resource_063ny")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7lkoc"]
@@ -32,32 +39,18 @@ description = "Duplicitous? Me? The plan came to me through the wisdom of Athena
 abilities = Array[ExtResource("2_kjwo2")]([SubResource("Resource_7lkoc")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
-[sub_resource type="Resource" id="Resource_08ug4"]
-script = ExtResource("6_ayhf2")
-ability_name = "Stand Together"
-description = "On play this card gains +1 stats for each friendly card in the same row or column."
-metadata/_custom_type_script = "uid://pdcxuxfesjrk"
-
 [sub_resource type="Resource" id="Resource_ayhf2"]
 script = ExtResource("1_36081")
 card_name = "Theseus"
 values = Array[int]([5, 5, 5, 5])
 description = "Ship? By heavens no. I'll be taking the road like a true Athenian. "
-abilities = Array[ExtResource("2_kjwo2")]([SubResource("Resource_08ug4")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
-
-[sub_resource type="Resource" id="Resource_iq3w0"]
-script = ExtResource("3_xo81a")
-ability_name = "Race"
-description = "When played this card races to every empty slot getting more tired with every step."
-metadata/_custom_type_script = "uid://c47tlfc0gadlo"
 
 [sub_resource type="Resource" id="Resource_fmj61"]
 script = ExtResource("1_36081")
 card_name = "Pan"
 values = Array[int]([6, 6, 5, 5])
 description = "Come along its so peaceful in the woods. No need to Panic. "
-abilities = Array[ExtResource("2_kjwo2")]([SubResource("Resource_iq3w0")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_a1wyq"]

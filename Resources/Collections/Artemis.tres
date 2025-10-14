@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=19 format=3 uid="uid://dwrds6g3whmsq"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=22 format=3 uid="uid://dwrds6g3whmsq"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_ttyo6"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_nyy1t"]
@@ -8,6 +8,8 @@
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_nyy1t"]
 [ext_resource type="Script" uid="uid://b3qdfwuofelgc" path="res://Resources/Abilities/critical_strike_ability.gd" id="5_cynoy"]
 [ext_resource type="Script" uid="uid://cf0rb8uoxl6jj" path="res://Resources/Abilities/hunt_ability.gd" id="6_vobqy"]
+[ext_resource type="Script" uid="uid://bp6f5cssscdo5" path="res://Resources/Abilities/exploit_ability.gd" id="6_wiuqi"]
+[ext_resource type="Script" uid="uid://cm2mhp17xds1o" path="res://Resources/Abilities/survival_ability.gd" id="8_cynoy"]
 
 [sub_resource type="Resource" id="Resource_8h57p"]
 script = ExtResource("3_cynoy")
@@ -38,10 +40,10 @@ abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_uc8ql")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hq4qt"]
-script = ExtResource("6_vobqy")
-ability_name = "Hunt"
-description = "After placement, select a slot to hunt.  Forces combat using your highest stat vs their lowest stat."
-metadata/_custom_type_script = "uid://cf0rb8uoxl6jj"
+script = ExtResource("6_wiuqi")
+ability_name = "Exploit"
+description = "If I am attacking the opponent's weakest stat, double my attack"
+metadata/_custom_type_script = "uid://bp6f5cssscdo5"
 
 [sub_resource type="Resource" id="Resource_wiuqi"]
 script = ExtResource("1_ttyo6")
@@ -65,11 +67,19 @@ description = "You name it, aint nothing I cant hunt and kill"
 abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_mbexa")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_30n57"]
+script = ExtResource("8_cynoy")
+ability_name = "Survival"
+description = "This card prevents the first time it would be captured, but reduces its stats to 1 to do so"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://cm2mhp17xds1o"
+
 [sub_resource type="Resource" id="Resource_vobqy"]
 script = ExtResource("1_ttyo6")
 card_name = "Callisto "
 values = Array[int]([3, 4, 5, 6])
 description = "Artemis is that you? I'm surprised but what a honour"
+abilities = Array[ExtResource("2_nyy1t")]([SubResource("Resource_30n57")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ttyo6"]

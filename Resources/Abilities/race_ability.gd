@@ -7,7 +7,7 @@ var movement_delay: float = 0.5
 
 func _init():
 	ability_name = "Race"
-	description = "When played this card it races to every empty slot getting more tired with every step."
+	description = "When played this card races to every empty slot getting more tired with every step."
 	trigger_condition = TriggerType.ON_PLAY
 
 func execute(context: Dictionary) -> bool:
