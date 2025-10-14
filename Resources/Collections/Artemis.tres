@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_nyy1t"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_swqiw"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_021ek"]
-[ext_resource type="Script" uid="uid://chy73d8fja8rm" path="res://Resources/Abilities/earthbound_ability.gd" id="3_cynoy"]
+[ext_resource type="Script" uid="uid://cbulr8qu0u1fj" path="res://Resources/Abilities/volley_ability.gd" id="3_cynoy"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_nyy1t"]
 [ext_resource type="Script" uid="uid://b3qdfwuofelgc" path="res://Resources/Abilities/critical_strike_ability.gd" id="5_cynoy"]
 [ext_resource type="Script" uid="uid://cf0rb8uoxl6jj" path="res://Resources/Abilities/hunt_ability.gd" id="6_vobqy"]
@@ -13,10 +13,9 @@
 
 [sub_resource type="Resource" id="Resource_8h57p"]
 script = ExtResource("3_cynoy")
-ability_name = "Earth Bound"
-description = "Cannot be captured in the bottom row"
-trigger_condition = 1
-metadata/_custom_type_script = "uid://chy73d8fja8rm"
+ability_name = "Volley"
+description = "At the start of your next 3 turns, this card fires an arrow in the selected direction."
+metadata/_custom_type_script = "uid://cbulr8qu0u1fj"
 
 [sub_resource type="Resource" id="Resource_lnj4m"]
 script = ExtResource("1_ttyo6")
