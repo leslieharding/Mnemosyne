@@ -23,8 +23,9 @@ func execute(context: Dictionary) -> bool:
 		print("TraitorAbility: Missing required context data")
 		return false
 	
-	# Get the new owner (the capturer)
-	var new_owner = game_manager.get_owner_at_position(captured_position)
+	# Get the new owner (the capturer) from the capturing card's position
+	# The traitor's position has already been changed, so we check the capturer instead
+	var new_owner = game_manager.get_owner_at_position(capturing_position)
 	
 	# Get adjacent positions
 	var adjacent_positions = get_orthogonal_adjacent_positions(captured_position, game_manager)

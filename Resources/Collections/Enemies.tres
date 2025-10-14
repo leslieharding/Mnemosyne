@@ -642,11 +642,19 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_svebx"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_x1kcy"), SubResource("Resource_wg2k6"), SubResource("Resource_mvnyh")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_6c0fd"]
+script = ExtResource("14_8op3g")
+ability_name = "The Hide"
+description = "This card can only be captured if surrounded"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://b5ecsh8bulpdo"
+
 [sub_resource type="Resource" id="Resource_61b1n"]
 script = ExtResource("2_xcqsp")
 card_name = "Marsyas Flayed"
 values = Array[int]([5, 6, 8, 2])
 description = "How can those judges be fair? they are your Aunts are they not?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6c0fd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bueog"]
@@ -678,19 +686,11 @@ description = "We have drunk from Pieria have we not? How could we possibly lose
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0g8v8")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
-[sub_resource type="Resource" id="Resource_6c0fd"]
-script = ExtResource("14_8op3g")
-ability_name = "The Hide"
-description = "This card can only be captured if surrounded"
-trigger_condition = 1
-metadata/_custom_type_script = "uid://b5ecsh8bulpdo"
-
 [sub_resource type="Resource" id="Resource_srqjw"]
 script = ExtResource("2_xcqsp")
 card_name = "Iynx"
 values = Array[int]([1, 3, 2, 5])
 description = "Good God its all wrong, comeon sisters we practiced this a million times!"
-abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6c0fd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_1shm4"]
