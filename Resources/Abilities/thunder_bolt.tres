@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ThunderBoltAbility" load_steps=2 format=3 uid="uid://0gghopt6dx5l"]
+
+[ext_resource type="Script" uid="uid://cn72duwwfn1i0" path="res://Resources/Abilities/thunder_bolt_ability.gd" id="1_vuht0"]
+
+[resource]
+script = ExtResource("1_vuht0")
+ability_name = "Thunder Bolt"
+description = "On play this zaps a random slot - if it contains an enemy card it is captured."
+metadata/_custom_type_script = "uid://cn72duwwfn1i0"
