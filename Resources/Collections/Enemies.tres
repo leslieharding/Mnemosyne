@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=538 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=544 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -22,7 +22,6 @@
 [ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="12_r05oc"]
 [ext_resource type="Script" uid="uid://cu3icvy8efjky" path="res://Resources/Abilities/greedy_ability.gd" id="13_0vidc"]
 [ext_resource type="Script" uid="uid://dv6bv8g2cvjdf" path="res://Resources/Abilities/traitor_ability.gd" id="13_5025t"]
-[ext_resource type="Script" uid="uid://b5ecsh8bulpdo" path="res://Resources/Abilities/the_hide_ability.gd" id="14_8op3g"]
 [ext_resource type="Script" uid="uid://dh4c5feb2eu1v" path="res://Resources/Abilities/charge_ability.gd" id="20_1g5vp"]
 [ext_resource type="Script" uid="uid://cklxp8i7wphlo" path="res://Resources/Abilities/reckless_assault_ability.gd" id="20_efy6x"]
 [ext_resource type="Script" uid="uid://8hwwassnaxkb" path="res://Resources/Abilities/pierce_ability.gd" id="20_j1bdk"]
@@ -642,48 +641,25 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_svebx"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_x1kcy"), SubResource("Resource_wg2k6"), SubResource("Resource_mvnyh")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
-[sub_resource type="Resource" id="Resource_6c0fd"]
-script = ExtResource("14_8op3g")
-ability_name = "The Hide"
-description = "This card can only be captured if surrounded"
-trigger_condition = 1
-metadata/_custom_type_script = "uid://b5ecsh8bulpdo"
-
 [sub_resource type="Resource" id="Resource_61b1n"]
 script = ExtResource("2_xcqsp")
 card_name = "Marsyas Flayed"
 values = Array[int]([5, 6, 8, 2])
 description = "How can those judges be fair? they are your Aunts are they not?"
-abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6c0fd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
-
-[sub_resource type="Resource" id="Resource_bueog"]
-script = ExtResource("12_bdmj8")
-ability_name = "Thunder Bolt"
-description = "On play this zaps a random slot - if it contains an enemy card it is captured."
-metadata/_custom_type_script = "uid://cn72duwwfn1i0"
 
 [sub_resource type="Resource" id="Resource_8k02u"]
 script = ExtResource("2_xcqsp")
 card_name = "Thamyris"
 values = Array[int]([1, 4, 4, 2])
 description = "Ho man, they actually agreed to the bet? Who first? Who last? Wait wait, who together?"
-abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_bueog")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
-
-[sub_resource type="Resource" id="Resource_0g8v8"]
-script = ExtResource("13_5025t")
-ability_name = "Traitor"
-description = "When this card is captured it also betrays one adjacent card from its old team"
-trigger_condition = 2
-metadata/_custom_type_script = "uid://dv6bv8g2cvjdf"
 
 [sub_resource type="Resource" id="Resource_2yxw7"]
 script = ExtResource("2_xcqsp")
 card_name = "Colymbas"
 values = Array[int]([3, 3, 3, 3])
 description = "We have drunk from Pieria have we not? How could we possibly lose?"
-abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0g8v8")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_srqjw"]
@@ -1187,11 +1163,19 @@ description = "Yes Níðhöggr the eagle is silly for thinking you have smelly b
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_8cjcf")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_bueog"]
+script = ExtResource("13_5025t")
+ability_name = "Traitor"
+description = "When this card is captured it also betrays one adjacent card from its old team"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dv6bv8g2cvjdf"
+
 [sub_resource type="Resource" id="Resource_vsd4h"]
 script = ExtResource("2_xcqsp")
 card_name = "Útgarða-Loki"
 values = Array[int]([8, 9, 8, 9])
 description = "I was foolish to let you find us, never again."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_bueog")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_mhseg"]
@@ -1381,22 +1365,43 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_eeisl"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_nrk2q")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_0g8v8"]
+script = ExtResource("12_bdmj8")
+ability_name = "Thunder Bolt"
+description = "On play this zaps a random slot - if it contains an enemy card it is captured."
+metadata/_custom_type_script = "uid://cn72duwwfn1i0"
+
 [sub_resource type="Resource" id="Resource_gr0xj"]
 script = ExtResource("2_xcqsp")
 card_name = "Brontes"
 description = "Crashing thunder"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0g8v8")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_6c0fd"]
+script = ExtResource("12_bdmj8")
+ability_name = "Thunder Bolt"
+description = "On play this zaps a random slot - if it contains an enemy card it is captured."
+metadata/_custom_type_script = "uid://cn72duwwfn1i0"
 
 [sub_resource type="Resource" id="Resource_s4ywq"]
 script = ExtResource("2_xcqsp")
 card_name = "Steropes"
 description = "Every bolt from the blue"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6c0fd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_fw4fn"]
+script = ExtResource("12_bdmj8")
+ability_name = "Thunder Bolt"
+description = "On play this zaps a random slot - if it contains an enemy card it is captured."
+metadata/_custom_type_script = "uid://cn72duwwfn1i0"
 
 [sub_resource type="Resource" id="Resource_hjvcs"]
 script = ExtResource("2_xcqsp")
 card_name = "Arges"
 description = "Divine brightness"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_fw4fn")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_q75w4"]
@@ -1418,22 +1423,43 @@ description = "Are the feathers meant to fall away father? Who cares its too muc
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_koufx")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_iudby"]
+script = ExtResource("12_bdmj8")
+ability_name = "Thunder Bolt"
+description = "On play this zaps a random slot - if it contains an enemy card it is captured."
+metadata/_custom_type_script = "uid://cn72duwwfn1i0"
+
 [sub_resource type="Resource" id="Resource_7vsw5"]
 script = ExtResource("2_xcqsp")
 card_name = "Brontes"
 description = "Crashing thunder"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_iudby")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_iu447"]
+script = ExtResource("12_bdmj8")
+ability_name = "Thunder Bolt"
+description = "On play this zaps a random slot - if it contains an enemy card it is captured."
+metadata/_custom_type_script = "uid://cn72duwwfn1i0"
 
 [sub_resource type="Resource" id="Resource_b8v1v"]
 script = ExtResource("2_xcqsp")
 card_name = "Steropes"
 description = "Every bolt from the blue"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_iu447")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_6jm3y"]
+script = ExtResource("12_bdmj8")
+ability_name = "Thunder Bolt"
+description = "On play this zaps a random slot - if it contains an enemy card it is captured."
+metadata/_custom_type_script = "uid://cn72duwwfn1i0"
 
 [sub_resource type="Resource" id="Resource_gysws"]
 script = ExtResource("2_xcqsp")
 card_name = "Arges"
 description = "Divine brightness"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6jm3y")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_byvew"]
@@ -1455,22 +1481,43 @@ description = "Are the feathers meant to fall away father? Who cares its too muc
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_jmkeg")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_v4aqs"]
+script = ExtResource("12_bdmj8")
+ability_name = "Thunder Bolt"
+description = "On play this zaps a random slot - if it contains an enemy card it is captured."
+metadata/_custom_type_script = "uid://cn72duwwfn1i0"
+
 [sub_resource type="Resource" id="Resource_gtjee"]
 script = ExtResource("2_xcqsp")
 card_name = "Brontes"
 description = "Crashing thunder"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_v4aqs")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_b10ml"]
+script = ExtResource("12_bdmj8")
+ability_name = "Thunder Bolt"
+description = "On play this zaps a random slot - if it contains an enemy card it is captured."
+metadata/_custom_type_script = "uid://cn72duwwfn1i0"
 
 [sub_resource type="Resource" id="Resource_1bcjg"]
 script = ExtResource("2_xcqsp")
 card_name = "Steropes"
 description = "Every bolt from the blue"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_b10ml")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_iqbex"]
+script = ExtResource("12_bdmj8")
+ability_name = "Thunder Bolt"
+description = "On play this zaps a random slot - if it contains an enemy card it is captured."
+metadata/_custom_type_script = "uid://cn72duwwfn1i0"
 
 [sub_resource type="Resource" id="Resource_1wq57"]
 script = ExtResource("2_xcqsp")
 card_name = "Arges"
 description = "Divine brightness"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_iqbex")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cmpjq"]
