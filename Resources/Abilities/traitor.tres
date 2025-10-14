@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TraitorAbility" load_steps=2 format=3 uid="uid://ddkg34gqetugj"]
+
+[ext_resource type="Script" uid="uid://dv6bv8g2cvjdf" path="res://Resources/Abilities/traitor_ability.gd" id="1_8h15r"]
+
+[resource]
+script = ExtResource("1_8h15r")
+ability_name = "Traitor"
+description = "When this card is captured it also betrays one adjacent card from its old team"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dv6bv8g2cvjdf"
