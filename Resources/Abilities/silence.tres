@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SilenceAbility" load_steps=2 format=3 uid="uid://dqvxmow8jx3hq"]
+
+[ext_resource type="Script" uid="uid://bqk772ngntv6i" path="res://Resources/Abilities/silence_ability.gd" id="1_jpibf"]
+
+[resource]
+script = ExtResource("1_jpibf")
+ability_name = "Silence"
+description = "The next card played has its abilities removed."
+metadata/_custom_type_script = "uid://bqk772ngntv6i"

@@ -21,6 +21,8 @@ var discordant_active: bool = false
 # Track Second Chance cards and their info for returning to hand
 var second_chance_cards: Dictionary = {}  # Format: {grid_position: {card: CardResource, owner: Owner, collection_index: int}}
 
+var silence_active: bool = false
+
 var aristeia_mode_active: bool = false
 var current_aristeia_position: int = -1
 var current_aristeia_owner: Owner = Owner.NONE
@@ -1600,7 +1602,21 @@ func _on_opponent_card_placed(grid_index: int):
 		# Deactivate disarray after use
 		disarray_active = false
 		print("Disarray effect has been consumed")
+	
+	# Apply Silence effect if active - remove all abilities
+	if silence_active:
+		print("Applying Silence effect to opponent card: ", opponent_card_data.card_name)
+		print("Original abilities count: ", opponent_card_data.abilities.size())
 		
+		# Clear all abilities to make the card vanilla
+		opponent_card_data.abilities.clear()
+		
+		print("Silenced - all abilities removed. Card is now vanilla.")
+		
+		# Deactivate silence after use
+		silence_active = false
+		print("Silence effect has been consumed")
+	
 	if not opponent_card_data:
 		print("Warning: Could not get opponent card data!")
 		opponent_is_thinking = false
@@ -3151,6 +3167,19 @@ func place_card_on_grid():
 		disarray_active = false
 		print("Disarray effect has been consumed")
 	
+	# Apply Silence effect if active - remove all abilities
+	if silence_active:
+		print("Applying Silence effect to player card: ", card_data.card_name)
+		print("Original abilities count: ", card_data.abilities.size())
+		
+		# Clear all abilities to make the card vanilla
+		card_data.abilities.clear()
+		
+		print("Silenced - all abilities removed. Card is now vanilla.")
+		
+		# Deactivate silence after use
+		silence_active = false
+		print("Silence effect has been consumed")
 	
 	
 	# FIXED: Apply ordain bonus to the card copy that will be placed on the grid
@@ -7434,6 +7463,7 @@ func create_battle_snapshot():
 		"darkness_shroud_active": darkness_shroud_active,
 		"discordant_active": discordant_active,
 		"soothe_active": soothe_active,
+		"silence_active": silence_active,
 		"visual_stat_inversion_active": visual_stat_inversion_active,
 		"is_hermes_boss_battle": is_hermes_boss_battle,
 		"fimbulwinter_boss_active": fimbulwinter_boss_active,
@@ -7536,6 +7566,7 @@ func restore_battle_from_snapshot() -> bool:
 		darkness_shroud_active = deck_power_state.get("darkness_shroud_active", false)
 		discordant_active = deck_power_state.get("discordant_active", false)
 		soothe_active = deck_power_state.get("soothe_active", false)
+		silence_active = deck_power_state.get("silence_active", false) 
 		visual_stat_inversion_active = deck_power_state.get("visual_stat_inversion_active", false)
 		is_hermes_boss_battle = deck_power_state.get("is_hermes_boss_battle", false)
 		fimbulwinter_boss_active = deck_power_state.get("fimbulwinter_boss_active", false)
@@ -8601,3 +8632,11 @@ func artemis_boss_return_cards_to_hand():
 	
 	print("Artemis boss counter complete - ", cards_to_return.size(), " cards returned")
 	print("This punishes the coordinate power by taking back captured cards!")
+
+
+func set_silence_active(active: bool):
+	silence_active = active
+	if active:
+		print("Silence effect activated - next card will have all abilities removed")
+	else:
+		print("Silence effect deactivated")
