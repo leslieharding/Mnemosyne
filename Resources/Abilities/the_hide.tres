@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TheHideAbility" load_steps=2 format=3 uid="uid://qgofv74idug5"]
+
+[ext_resource type="Script" uid="uid://b5ecsh8bulpdo" path="res://Resources/Abilities/the_hide_ability.gd" id="1_f80hn"]
+
+[resource]
+script = ExtResource("1_f80hn")
+ability_name = "The Hide"
+description = "This card can only be captured if surrounded"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://b5ecsh8bulpdo"
