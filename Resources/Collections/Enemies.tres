@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=582 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=585 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -2371,10 +2371,17 @@ card_name = "Phantasos"
 description = "If your fever could talk in its sleep it would ask Phantasos for directions."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_olaqh"]
+script = ExtResource("12_2v1mv")
+ability_name = "Forgetfullness"
+description = "The next card played fogets how to use its ability."
+metadata/_custom_type_script = "uid://bqk772ngntv6i"
+
 [sub_resource type="Resource" id="Resource_moy4t"]
 script = ExtResource("2_xcqsp")
 card_name = "Lethe"
 description = "About to wake up? Drink deep and forget"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_olaqh")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_1uaba"]
@@ -2416,10 +2423,17 @@ card_name = "Phantasos"
 description = "If your fever could talk in its sleep it would ask Phantasos for directions."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_dn5nk"]
+script = ExtResource("12_2v1mv")
+ability_name = "Forgetfulness"
+description = "The next card played fogets how to use its ability."
+metadata/_custom_type_script = "uid://bqk772ngntv6i"
+
 [sub_resource type="Resource" id="Resource_c0kee"]
 script = ExtResource("2_xcqsp")
 card_name = "Lethe"
 description = "About to wake up? Drink deep and forget"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_dn5nk")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_3i16t"]
@@ -2461,10 +2475,17 @@ card_name = "Phantasos"
 description = "If your fever could talk in its sleep it would ask Phantasos for directions."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_v6mik"]
+script = ExtResource("12_2v1mv")
+ability_name = "Forgetfullness"
+description = "The next card played fogets how to use its ability."
+metadata/_custom_type_script = "uid://bqk772ngntv6i"
+
 [sub_resource type="Resource" id="Resource_xd3pl"]
 script = ExtResource("2_xcqsp")
 card_name = "Lethe"
 description = "About to wake up? Drink deep and forget"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_v6mik")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_k2ri4"]
