@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=544 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=585 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -22,6 +22,7 @@
 [ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="12_r05oc"]
 [ext_resource type="Script" uid="uid://cu3icvy8efjky" path="res://Resources/Abilities/greedy_ability.gd" id="13_0vidc"]
 [ext_resource type="Script" uid="uid://dv6bv8g2cvjdf" path="res://Resources/Abilities/traitor_ability.gd" id="13_5025t"]
+[ext_resource type="Script" uid="uid://b5ecsh8bulpdo" path="res://Resources/Abilities/the_hide_ability.gd" id="14_8op3g"]
 [ext_resource type="Script" uid="uid://dh4c5feb2eu1v" path="res://Resources/Abilities/charge_ability.gd" id="20_1g5vp"]
 [ext_resource type="Script" uid="uid://cklxp8i7wphlo" path="res://Resources/Abilities/reckless_assault_ability.gd" id="20_efy6x"]
 [ext_resource type="Script" uid="uid://8hwwassnaxkb" path="res://Resources/Abilities/pierce_ability.gd" id="20_j1bdk"]
@@ -32,6 +33,12 @@
 [ext_resource type="Script" uid="uid://cm8gt3refuukf" path="res://Resources/Abilities/camouflage_ability.gd" id="23_cetws"]
 [ext_resource type="Script" uid="uid://c47tlfc0gadlo" path="res://Resources/Abilities/race_ability.gd" id="23_y0w8m"]
 [ext_resource type="Script" uid="uid://di16hrjg7ypkb" path="res://Resources/Abilities/elusive_ability.gd" id="25_unt1i"]
+[ext_resource type="Script" uid="uid://chy73d8fja8rm" path="res://Resources/Abilities/earthbound_ability.gd" id="33_m0fay"]
+[ext_resource type="Script" uid="uid://nrdoysdoyfq1" path="res://Resources/Abilities/taxation_ability.gd" id="34_skkmd"]
+[ext_resource type="Script" uid="uid://ddpmk8j43lf0m" path="res://Resources/Abilities/personal_space_ability.gd" id="35_1hj1v"]
+[ext_resource type="Script" uid="uid://dsvr5f8l038ip" path="res://Resources/Abilities/backstab_ability.gd" id="35_1v88n"]
+[ext_resource type="Script" uid="uid://cnmf4yohj44kh" path="res://Resources/Abilities/morph_ability.gd" id="37_1qrda"]
+[ext_resource type="Script" uid="uid://d1m8carhhdy0w" path="res://Resources/Abilities/disarray_ability.gd" id="38_2v1mv"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -1580,7 +1587,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 [sub_resource type="Resource" id="Resource_slolt"]
 script = ExtResource("2_xcqsp")
 card_name = "Echidna"
-description = "Loves a hundred headed giant, but a hundred eyed giants will be the death of her"
+description = "Loves hundred headed giants, but hundred eyed giants will be the death of her"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hsh3b"]
@@ -1693,10 +1700,18 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_wkbxl"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_g1csu"), SubResource("Resource_ydp47"), SubResource("Resource_g1plx")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_2q4su"]
+script = ExtResource("14_8op3g")
+ability_name = "The Hide"
+description = "This card can only be captured if surrounded"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://b5ecsh8bulpdo"
+
 [sub_resource type="Resource" id="Resource_qqdll"]
 script = ExtResource("2_xcqsp")
 card_name = "Nemian Lion"
 description = "You too would be proud if your hide was as impenetrable"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_2q4su")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_vje7p"]
@@ -1747,10 +1762,18 @@ description = "Sometimes in life you just gotta take the bull by the horns"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ddk83")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_m57ve"]
+script = ExtResource("14_8op3g")
+ability_name = "The Hide"
+description = "This card can only be captured if surrounded"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://b5ecsh8bulpdo"
+
 [sub_resource type="Resource" id="Resource_xkavt"]
 script = ExtResource("2_xcqsp")
 card_name = "Nemian Lion"
 description = "You too would be proud if your hide was as impenetrable"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_m57ve")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tekn6"]
@@ -1801,10 +1824,18 @@ description = "Sometimes in life you just gotta take the bull by the horns"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_xcmoy")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_1hk5p"]
+script = ExtResource("14_8op3g")
+ability_name = "The Hide"
+description = "This card can only be captured if surrounded"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://b5ecsh8bulpdo"
+
 [sub_resource type="Resource" id="Resource_45hcx"]
 script = ExtResource("2_xcqsp")
 card_name = "Nemian Lion"
 description = "You too would be proud if your hide was as impenetrable"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_1hk5p")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8yjk7"]
@@ -1887,10 +1918,17 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_qqdll"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_2mpk6"), SubResource("Resource_atujd"), SubResource("Resource_5fef0")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_f844l"]
+script = ExtResource("8_m5w2u")
+ability_name = "Extended Range"
+description = "This card attacks in all directions"
+metadata/_custom_type_script = "uid://43v8bwokc47i"
+
 [sub_resource type="Resource" id="Resource_0hkfq"]
 script = ExtResource("2_xcqsp")
 card_name = "Lernaean Hydra"
 description = "We can figure out how to solve this problem Iolaus, we just have to put our heads together. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_f844l")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_vdgh6"]
@@ -1899,22 +1937,46 @@ card_name = "Geryon"
 description = "Lets get them! To arms! Stay away from our cattle!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_omhq7"]
+script = ExtResource("33_m0fay")
+ability_name = "Earthbound"
+description = "Cannot be captured while in the bottom row"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://chy73d8fja8rm"
+
 [sub_resource type="Resource" id="Resource_xevch"]
 script = ExtResource("2_xcqsp")
 card_name = "Antaeus"
 description = "Throw me to the floor as hard as you can, I'll always get back up"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_omhq7")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_s53ca"]
+script = ExtResource("8_oovod")
+ability_name = "Poisoned Shirt"
+description = "When this card is captured, it also captures the card that captured it"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dyur10e6s3lah"
 
 [sub_resource type="Resource" id="Resource_2kjvc"]
 script = ExtResource("2_xcqsp")
 card_name = "Nessus"
 description = "If you ever feel your husbands love fading, give him my shirt, it is blessed. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_s53ca")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_d43ee"]
+script = ExtResource("22_efy6x")
+ability_name = "Pursuit"
+description = "If this card can capture, it attacks cards played in the same row/column and moves adjacent to them."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cgrjfouc2qnld"
 
 [sub_resource type="Resource" id="Resource_nhcai"]
 script = ExtResource("2_xcqsp")
 card_name = "Orthrus"
 description = "Whos that you smell boy? Someones coming for our cattle!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_d43ee")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_q8cq5"]
@@ -1929,22 +1991,46 @@ card_name = "Geryon"
 description = "Lets get them! To arms! Stay away from our cattle!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_ons7o"]
+script = ExtResource("33_m0fay")
+ability_name = "Earthbound"
+description = "Cannot be captured while in the bottom row"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://chy73d8fja8rm"
+
 [sub_resource type="Resource" id="Resource_ii6a8"]
 script = ExtResource("2_xcqsp")
 card_name = "Antaeus"
 description = "Throw me to the floor as hard as you can, I'll always get back up"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ons7o")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ng116"]
+script = ExtResource("8_oovod")
+ability_name = "Poisoned Shirt"
+description = "When this card is captured, it also captures the card that captured it"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dyur10e6s3lah"
 
 [sub_resource type="Resource" id="Resource_lpes6"]
 script = ExtResource("2_xcqsp")
 card_name = "Nessus"
 description = "If you ever feel your husbands love fading, give him my shirt, it is blessed. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ng116")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_x4vvi"]
+script = ExtResource("22_efy6x")
+ability_name = "Pursuit"
+description = "If this card can capture, it attacks cards played in the same row/column and moves adjacent to them."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cgrjfouc2qnld"
 
 [sub_resource type="Resource" id="Resource_otgnn"]
 script = ExtResource("2_xcqsp")
 card_name = "Orthrus"
 description = "Whos that you smell boy? Someones coming for our cattle!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_x4vvi")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_hqm4o"]
@@ -1959,22 +2045,46 @@ card_name = "Geryon"
 description = "Lets get them! To arms! Stay away from our cattle!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_qdsn3"]
+script = ExtResource("33_m0fay")
+ability_name = "Earthbound"
+description = "Cannot be captured while in the bottom row"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://chy73d8fja8rm"
+
 [sub_resource type="Resource" id="Resource_jes06"]
 script = ExtResource("2_xcqsp")
 card_name = "Antaeus"
 description = "Throw me to the floor as hard as you can, I'll always get back up"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_qdsn3")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_t3nv7"]
+script = ExtResource("8_oovod")
+ability_name = "Poisoned Shirt"
+description = "When this card is captured, it also captures the card that captured it"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dyur10e6s3lah"
 
 [sub_resource type="Resource" id="Resource_d38lb"]
 script = ExtResource("2_xcqsp")
 card_name = "Nessus"
 description = "If you ever feel your husbands love fading, give him my shirt, it is blessed. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_t3nv7")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_dj3cq"]
+script = ExtResource("22_efy6x")
+ability_name = "Pursuit"
+description = "If this card can capture, it attacks cards played in the same row/column and moves adjacent to them."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cgrjfouc2qnld"
 
 [sub_resource type="Resource" id="Resource_jh7cp"]
 script = ExtResource("2_xcqsp")
 card_name = "Orthrus"
 description = "Whos that you smell boy? Someones coming for our cattle!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_dj3cq")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ixl0x"]
@@ -2009,94 +2119,208 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_0hkfq"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_ixl0x"), SubResource("Resource_qmwuc"), SubResource("Resource_fiiis")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_5vip3"]
+script = ExtResource("13_0vidc")
+ability_name = "Greedy"
+description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cu3icvy8efjky"
+
 [sub_resource type="Resource" id="Resource_lmtjb"]
 script = ExtResource("2_xcqsp")
 card_name = "Eurystheus"
 description = "Eurystheus: Ahhh yes cousin I am technically correct, the best kind of correct. Ten becomes twelve."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_5vip3")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ok2d4"]
+script = ExtResource("34_skkmd")
+ability_name = "Taxation"
+description = "On play this card steals +1 from each enemy card"
+metadata/_custom_type_script = "uid://nrdoysdoyfq1"
 
 [sub_resource type="Resource" id="Resource_k6viv"]
 script = ExtResource("2_xcqsp")
 card_name = "Augeas"
 description = "Just to show you there are no hard feelings, would you like to meet my horses?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ok2d4")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_2get5"]
+script = ExtResource("12_r05oc")
+ability_name = "Corruption"
+description = "Decreases the stats of adjacent enemies by 1 at the start of each turn if still owned"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://btwpyhndpjg0p"
 
 [sub_resource type="Resource" id="Resource_1b7m7"]
 script = ExtResource("2_xcqsp")
 card_name = "Lycus"
 description = "I always love a good excuse to use the ol sacrifical altar."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_2get5")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_nuv6v"]
+script = ExtResource("35_1v88n")
+ability_name = "Backstab"
+description = "This card attacks the defenders opposing stat instead of its adjacent one"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://dsvr5f8l038ip"
 
 [sub_resource type="Resource" id="Resource_6hn0s"]
 script = ExtResource("2_xcqsp")
 card_name = "Neleus"
 description = "Cleanse you? So your red mist can descend on another innocent soul? Unlikely "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_nuv6v")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_w2i27"]
+script = ExtResource("35_1hj1v")
+ability_name = "Nimby"
+description = "Gains +2 to all stats for each empty adjacent space, loses -1 to all stats for each adjacent card"
+metadata/_custom_type_script = "uid://ddpmk8j43lf0m"
 
 [sub_resource type="Resource" id="Resource_4xi8q"]
 script = ExtResource("2_xcqsp")
 card_name = "Laomedon"
 description = "Why pay when you can just say no?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_w2i27")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_p0ct5"]
+script = ExtResource("13_0vidc")
+ability_name = "Greedy"
+description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cu3icvy8efjky"
 
 [sub_resource type="Resource" id="Resource_s8l0t"]
 script = ExtResource("2_xcqsp")
 card_name = "Eurystheus"
 description = "Eurystheus: Ahhh yes cousin I am technically correct, the best kind of correct. Ten becomes twelve."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_p0ct5")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_cfeee"]
+script = ExtResource("34_skkmd")
+ability_name = "Taxation"
+description = "On play this card steals +1 from each enemy card"
+metadata/_custom_type_script = "uid://nrdoysdoyfq1"
 
 [sub_resource type="Resource" id="Resource_cyy2l"]
 script = ExtResource("2_xcqsp")
 card_name = "Augeas"
 description = "Just to show you there are no hard feelings, would you like to meet my horses?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_cfeee")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_pypli"]
+script = ExtResource("12_r05oc")
+ability_name = "Corruption"
+description = "Decreases the stats of adjacent enemies by 1 at the start of each turn if still owned"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://btwpyhndpjg0p"
 
 [sub_resource type="Resource" id="Resource_1k8u1"]
 script = ExtResource("2_xcqsp")
 card_name = "Lycus"
 description = "I always love a good excuse to use the ol sacrifical altar."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_pypli")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7bw8j"]
+script = ExtResource("35_1v88n")
+ability_name = "Backstab"
+description = "This card attacks the defenders opposing stat instead of its adjacent one"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://dsvr5f8l038ip"
 
 [sub_resource type="Resource" id="Resource_psohk"]
 script = ExtResource("2_xcqsp")
 card_name = "Neleus"
 description = "Cleanse you? So your red mist can descend on another innocent soul? Unlikely "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_7bw8j")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_fpet2"]
+script = ExtResource("35_1hj1v")
+ability_name = "Nimby"
+description = "Gains +2 to all stats for each empty adjacent space, loses -1 to all stats for each adjacent card"
+metadata/_custom_type_script = "uid://ddpmk8j43lf0m"
 
 [sub_resource type="Resource" id="Resource_cs5xl"]
 script = ExtResource("2_xcqsp")
 card_name = "Laomedon"
 description = "Why pay when you can just say no?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_fpet2")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_rwyln"]
+script = ExtResource("13_0vidc")
+ability_name = "Greedy"
+description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cu3icvy8efjky"
 
 [sub_resource type="Resource" id="Resource_0n7hm"]
 script = ExtResource("2_xcqsp")
 card_name = "Eurystheus"
 description = "Eurystheus: Ahhh yes cousin I am technically correct, the best kind of correct. Ten becomes twelve."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_rwyln")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_0xppc"]
+script = ExtResource("34_skkmd")
+ability_name = "Taxation"
+description = "On play this card steals +1 from each enemy card"
+metadata/_custom_type_script = "uid://nrdoysdoyfq1"
 
 [sub_resource type="Resource" id="Resource_c8bfg"]
 script = ExtResource("2_xcqsp")
 card_name = "Augeas"
 description = "Just to show you there are no hard feelings, would you like to meet my horses?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0xppc")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_qli7y"]
+script = ExtResource("12_r05oc")
+ability_name = "Corruption"
+description = "Decreases the stats of adjacent enemies by 1 at the start of each turn if still owned"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://btwpyhndpjg0p"
 
 [sub_resource type="Resource" id="Resource_hpg3d"]
 script = ExtResource("2_xcqsp")
 card_name = "Lycus"
 description = "I always love a good excuse to use the ol sacrifical altar."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_qli7y")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_oqjif"]
+script = ExtResource("35_1v88n")
+ability_name = "Backstab"
+description = "This card attacks the defenders opposing stat instead of its adjacent one"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://dsvr5f8l038ip"
 
 [sub_resource type="Resource" id="Resource_2bmv8"]
 script = ExtResource("2_xcqsp")
 card_name = "Neleus"
 description = "Cleanse you? So your red mist can descend on another innocent soul? Unlikely "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_oqjif")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_diwap"]
+script = ExtResource("35_1hj1v")
+ability_name = "Nimby"
+description = "Gains +2 to all stats for each empty adjacent space, loses -1 to all stats for each adjacent card"
+metadata/_custom_type_script = "uid://ddpmk8j43lf0m"
 
 [sub_resource type="Resource" id="Resource_qf2wx"]
 script = ExtResource("2_xcqsp")
 card_name = "Laomedon"
 description = "Why pay when you can just say no?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_diwap")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_66kuf"]
@@ -2137,16 +2361,31 @@ card_name = "Hypnos"
 description = "Close your eyes but for a moment, just a moment and invite visions of poppy."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_2xj5d"]
+script = ExtResource("37_1qrda")
+ability_name = "Shifting"
+description = "Rotate this cards stats every turn."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cnmf4yohj44kh"
+
 [sub_resource type="Resource" id="Resource_casoc"]
 script = ExtResource("2_xcqsp")
 card_name = "Morpheus"
 description = "A message from Gods and destiny. Or just shifting slop? Who can tell?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_2xj5d")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7qky2"]
+script = ExtResource("38_2v1mv")
+ability_name = "Panic"
+description = "Your opponents next card also attacks friendly cards as well as enemies"
+metadata/_custom_type_script = "uid://d1m8carhhdy0w"
 
 [sub_resource type="Resource" id="Resource_tcg2e"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobetor"
 description = "Which Nightm--- I mean dream do you prefer? Snakes, teeth falling out, or something a bit more bespoke?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_7qky2")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xgshi"]
@@ -2167,16 +2406,31 @@ card_name = "Hypnos"
 description = "Close your eyes but for a moment, just a moment and invite visions of poppy."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_mt80g"]
+script = ExtResource("37_1qrda")
+ability_name = "Shifting"
+description = "Rotate this cards stats every turn."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cnmf4yohj44kh"
+
 [sub_resource type="Resource" id="Resource_4su5n"]
 script = ExtResource("2_xcqsp")
 card_name = "Morpheus"
 description = "A message from Gods and destiny. Or just shifting slop? Who can tell?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_mt80g")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_u5a37"]
+script = ExtResource("38_2v1mv")
+ability_name = "Panic"
+description = "Your opponents next card also attacks friendly cards as well as enemies"
+metadata/_custom_type_script = "uid://d1m8carhhdy0w"
 
 [sub_resource type="Resource" id="Resource_anro1"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobetor"
 description = "Which Nightm--- I mean dream do you prefer? Snakes, teeth falling out, or something a bit more bespoke?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_u5a37")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4tgq4"]
@@ -2197,16 +2451,31 @@ card_name = "Hypnos"
 description = "Close your eyes but for a moment, just a moment and invite visions of poppy."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_03kjp"]
+script = ExtResource("37_1qrda")
+ability_name = "Shifting"
+description = "Rotate this cards stats every turn."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cnmf4yohj44kh"
+
 [sub_resource type="Resource" id="Resource_l311s"]
 script = ExtResource("2_xcqsp")
 card_name = "Morpheus"
 description = "A message from Gods and destiny. Or just shifting slop? Who can tell?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_03kjp")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_hl432"]
+script = ExtResource("38_2v1mv")
+ability_name = "Panic"
+description = "Your opponents next card also attacks friendly cards as well as enemies"
+metadata/_custom_type_script = "uid://d1m8carhhdy0w"
 
 [sub_resource type="Resource" id="Resource_0jtkh"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobetor"
 description = "Which Nightm--- I mean dream do you prefer? Snakes, teeth falling out, or something a bit more bespoke?"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_hl432")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fd8ao"]

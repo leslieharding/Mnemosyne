@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EarthboundAbility" load_steps=2 format=3 uid="uid://owndcvpr0fow"]
+
+[ext_resource type="Script" uid="uid://chy73d8fja8rm" path="res://Resources/Abilities/earthbound_ability.gd" id="1_rniq5"]
+
+[resource]
+script = ExtResource("1_rniq5")
+ability_name = "Earthbound"
+description = "Cannot be captured while in the bottom row"
+trigger_condition = 1
+metadata/_custom_type_script = "uid://chy73d8fja8rm"
