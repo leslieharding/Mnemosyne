@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="WitherAbility" load_steps=2 format=3 uid="uid://bd5tydax6i1le"]
+
+[ext_resource type="Script" uid="uid://diutq5r3eyqn6" path="res://Resources/Abilities/wither_ability.gd" id="1_pb1nx"]
+
+[resource]
+script = ExtResource("1_pb1nx")
+ability_name = "Wither"
+description = "Each turn this card's stats are decreased"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://diutq5r3eyqn6"

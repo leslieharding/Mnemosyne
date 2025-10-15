@@ -926,6 +926,7 @@ func _on_turn_changed(is_player_turn: bool):
 	# Process cultivation abilities at the start of player's turn
 	if is_player_turn:
 		process_cultivation_turn_start()
+		process_wither_turn_start()
 	else:
 		# Process corruption abilities at the start of opponent's turn
 		process_corruption_turn_start()
@@ -933,7 +934,7 @@ func _on_turn_changed(is_player_turn: bool):
 		process_greedy_turn_start()
 		# Process Graeae ability rotation at the start of opponent's turn
 		process_graeae_rotation()
-	
+		process_wither_turn_start()
 	# Process charge abilities at the start of each turn
 	await process_charge_turn_start(is_player_turn)
 	
@@ -8672,3 +8673,55 @@ func process_graeae_rotation():
 	print("=== PROCESSING GRAEAE ROTATION ===")
 	await graeae_tracker.rotate_abilities(self)
 	print("=== GRAEAE ROTATION PROCESSED ===")
+
+# Process wither abilities at the start of owner's turn
+func process_wither_turn_start():
+	print("Processing wither abilities for turn start")
+	
+	# Determine current owner based on whose turn it is
+	var current_owner = Owner.PLAYER if turn_manager.is_player_turn() else Owner.OPPONENT
+	
+	# Check all cards on the board for wither abilities
+	for position in range(grid_slots.size()):
+		if not grid_occupied[position]:
+			continue
+		
+		# Only process cards owned by the current turn owner
+		var card_owner = get_owner_at_position(position)
+		if card_owner != current_owner:
+			continue
+		
+		var card_data = get_card_at_position(position)
+		if not card_data:
+			continue
+		
+		# Get card level for ability checks
+		var card_collection_index = get_card_collection_index(position)
+		var card_level = get_card_level(card_collection_index)
+		
+		# Check if this card has wither ability
+		var has_wither = false
+		var wither_ability = null
+		
+		if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			for ability in card_data.get_available_abilities(card_level):
+				if ability.ability_name == "Wither":
+					has_wither = true
+					wither_ability = ability
+					break
+		
+		if not has_wither or not wither_ability:
+			continue
+		
+		print("Found wither card at position ", position, ": ", card_data.card_name)
+		
+		# Execute wither turn processing
+		var context = {
+			"passive_action": "turn_start",
+			"boosting_card": card_data,
+			"boosting_position": position,
+			"game_manager": self,
+			"card_level": card_level
+		}
+		
+		wither_ability.execute(context)

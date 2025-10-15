@@ -9,7 +9,7 @@
 [ext_resource type="Script" uid="uid://bjrn1xq2fqgxo" path="res://Resources/Abilities/sun_bather_ability.gd" id="5_gowu1"]
 [ext_resource type="Script" uid="uid://cm2mhp17xds1o" path="res://Resources/Abilities/survival_ability.gd" id="7_sfw3d"]
 [ext_resource type="Script" uid="uid://cklxp8i7wphlo" path="res://Resources/Abilities/reckless_assault_ability.gd" id="8_sfw3d"]
-[ext_resource type="Script" uid="uid://d1cwgpmvptcjn" path="res://Resources/Abilities/passive_boost_ability.gd" id="8_xjxyc"]
+[ext_resource type="Script" uid="uid://diutq5r3eyqn6" path="res://Resources/Abilities/wither_ability.gd" id="8_xjxyc"]
 [ext_resource type="Script" uid="uid://cs8jo68kos2c6" path="res://Resources/Abilities/harmony_ability.gd" id="9_p7jhq"]
 [ext_resource type="Script" uid="uid://btx30eg0dkxdt" path="res://Resources/Abilities/symmetry_ability.gd" id="10_xjxyc"]
 [ext_resource type="Script" uid="uid://bfbpkrqf1u508" path="res://Resources/Abilities/finale_ability.gd" id="12_cknfu"]
@@ -105,19 +105,19 @@ description = "All the other horses of the sun wish they were Phelgon. "
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_f4r1r")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
-[sub_resource type="Resource" id="Resource_bi2ap"]
+[sub_resource type="Resource" id="Resource_sfw3d"]
 script = ExtResource("8_xjxyc")
-ability_name = "Passive Boost"
-description = "When in play and uncaptured increases the other stats of your cards by one"
+ability_name = "Wither"
+description = "Each turn this card's stats are decreased"
 trigger_condition = 3
-metadata/_custom_type_script = "uid://d1cwgpmvptcjn"
+metadata/_custom_type_script = "uid://diutq5r3eyqn6"
 
 [sub_resource type="Resource" id="Resource_bvknv"]
 script = ExtResource("1_vqrrp")
 card_name = "Eos"
 values = Array[int]([3, 4, 5, 6])
 description = "Rosey Fingered Eos throws open the doors to a new day"
-abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_bi2ap")])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_sfw3d")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_p3s3h"]
