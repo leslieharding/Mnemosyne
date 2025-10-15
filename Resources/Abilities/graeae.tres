@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="GraeaeAbility" load_steps=2 format=3 uid="uid://cd71xkro7xaia"]
+
+[ext_resource type="Script" uid="uid://cf28qiwi76rmi" path="res://Resources/Abilities/graeae_ability.gd" id="1_pjfkd"]
+
+[resource]
+script = ExtResource("1_pjfkd")
+ability_name = "Graeae"
+description = "Theres 3 of us and only one tooth and eye, you do the math."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cf28qiwi76rmi"

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=585 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=599 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -39,6 +39,8 @@
 [ext_resource type="Script" uid="uid://dsvr5f8l038ip" path="res://Resources/Abilities/backstab_ability.gd" id="35_1v88n"]
 [ext_resource type="Script" uid="uid://cnmf4yohj44kh" path="res://Resources/Abilities/morph_ability.gd" id="37_1qrda"]
 [ext_resource type="Script" uid="uid://d1m8carhhdy0w" path="res://Resources/Abilities/disarray_ability.gd" id="38_2v1mv"]
+[ext_resource type="Script" uid="uid://cf28qiwi76rmi" path="res://Resources/Abilities/graeae_ability.gd" id="39_sqqrj"]
+[ext_resource type="Script" uid="uid://dja2ta0rb7v13" path="res://Resources/Abilities/treachery_ability.gd" id="40_2u16m"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -2642,22 +2644,46 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_0xkme"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_pvqt1"), SubResource("Resource_7bpic"), SubResource("Resource_7jdex")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_wresi"]
+script = ExtResource("39_sqqrj")
+ability_name = "Graeae"
+description = "Theres 3 of us and only one tooth and eye, you do the math."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cf28qiwi76rmi"
+
 [sub_resource type="Resource" id="Resource_3mljd"]
 script = ExtResource("2_xcqsp")
 card_name = "Pamphredo"
 description = "Can you smell that sisters, it is a man among us, quickly Enyo the eye to me!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_wresi")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_tk8ui"]
+script = ExtResource("39_sqqrj")
+ability_name = "Graeae"
+description = "Theres 3 of us and only one tooth and eye, you do the math."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cf28qiwi76rmi"
 
 [sub_resource type="Resource" id="Resource_etni1"]
 script = ExtResource("2_xcqsp")
 card_name = "Deino"
 description = "Chomp them Pemphredo! Or pass the tooth to me!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_tk8ui")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_1h5xd"]
+script = ExtResource("39_sqqrj")
+ability_name = "Graeae"
+description = "Theres 3 of us and only one tooth and eye, you do the math."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cf28qiwi76rmi"
 
 [sub_resource type="Resource" id="Resource_sv88j"]
 script = ExtResource("2_xcqsp")
 card_name = "Enyo"
 description = "You sisters will say anything to have more time with tooth and eye, I'm not falling for it this time."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_1h5xd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ndpv3"]
@@ -2672,22 +2698,46 @@ card_name = "Eurayle"
 description = "Little good fame ever did her sister, but place a target upon her back, I miss her."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_rncks"]
+script = ExtResource("39_sqqrj")
+ability_name = "Graeae"
+description = "Theres 3 of us and only one tooth and eye, you do the math."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cf28qiwi76rmi"
+
 [sub_resource type="Resource" id="Resource_8yt5e"]
 script = ExtResource("2_xcqsp")
 card_name = "Pamphredo"
 description = "Can you smell that sisters, it is a man among us, quickly Enyo the eye to me!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_rncks")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_d5uet"]
+script = ExtResource("39_sqqrj")
+ability_name = "Graeae"
+description = "Theres 3 of us and only one tooth and eye, you do the math."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cf28qiwi76rmi"
 
 [sub_resource type="Resource" id="Resource_8r6bt"]
 script = ExtResource("2_xcqsp")
 card_name = "Deino"
 description = "Chomp them Pemphredo! Or pass the tooth to me!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_d5uet")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_emv2k"]
+script = ExtResource("39_sqqrj")
+ability_name = "Graeae"
+description = "Theres 3 of us and only one tooth and eye, you do the math."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cf28qiwi76rmi"
 
 [sub_resource type="Resource" id="Resource_4lpco"]
 script = ExtResource("2_xcqsp")
 card_name = "Enyo"
 description = "You sisters will say anything to have more time with tooth and eye, I'm not falling for it this time."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_emv2k")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_x8k5p"]
@@ -2702,22 +2752,46 @@ card_name = "Eurayle"
 description = "Little good fame ever did her sister, but place a target upon her back, I miss her."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_mtufa"]
+script = ExtResource("39_sqqrj")
+ability_name = "Graeae"
+description = "Theres 3 of us and only one tooth and eye, you do the math."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cf28qiwi76rmi"
+
 [sub_resource type="Resource" id="Resource_io75k"]
 script = ExtResource("2_xcqsp")
 card_name = "Pamphredo"
 description = "Can you smell that sisters, it is a man among us, quickly Enyo the eye to me!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_mtufa")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_xcn86"]
+script = ExtResource("39_sqqrj")
+ability_name = "Graeae"
+description = "Theres 3 of us and only one tooth and eye, you do the math."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cf28qiwi76rmi"
 
 [sub_resource type="Resource" id="Resource_x8thm"]
 script = ExtResource("2_xcqsp")
 card_name = "Deino"
 description = "Chomp them Pemphredo! Or pass the tooth to me!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_xcn86")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_801i8"]
+script = ExtResource("39_sqqrj")
+ability_name = "Graeae"
+description = "Theres 3 of us and only one tooth and eye, you do the math."
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cf28qiwi76rmi"
 
 [sub_resource type="Resource" id="Resource_tyd6l"]
 script = ExtResource("2_xcqsp")
 card_name = "Enyo"
 description = "You sisters will say anything to have more time with tooth and eye, I'm not falling for it this time."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_801i8")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_0v5fe"]
@@ -2885,10 +2959,17 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_ji3j4"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_ksx4d"), SubResource("Resource_dgb65"), SubResource("Resource_uwjbv")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_tvoor"]
+script = ExtResource("40_2u16m")
+ability_name = "Treachery"
+description = "One captured enemy will try and attack an ally"
+metadata/_custom_type_script = "uid://dja2ta0rb7v13"
+
 [sub_resource type="Resource" id="Resource_x0dbj"]
 script = ExtResource("2_xcqsp")
 card_name = "Aparte"
 description = "Lies cunningly presented as benevolent truth"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_tvoor")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2014u"]
@@ -2915,10 +2996,17 @@ card_name = "Ponos"
 description = "Some would say making this game was Ponos"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_4i0ub"]
+script = ExtResource("40_2u16m")
+ability_name = "Treachery"
+description = "One captured enemy will try and attack an ally"
+metadata/_custom_type_script = "uid://dja2ta0rb7v13"
+
 [sub_resource type="Resource" id="Resource_wsx8j"]
 script = ExtResource("2_xcqsp")
 card_name = "Aparte"
 description = "Lies cunningly presented as benevolent truth"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_4i0ub")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_jih0t"]
@@ -2945,10 +3033,17 @@ card_name = "Ponos"
 description = "Some would say making this game was Ponos"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_ok6eh"]
+script = ExtResource("40_2u16m")
+ability_name = "Treachery"
+description = "One captured enemy will try and attack an ally"
+metadata/_custom_type_script = "uid://dja2ta0rb7v13"
+
 [sub_resource type="Resource" id="Resource_7qrof"]
 script = ExtResource("2_xcqsp")
 card_name = "Aparte"
 description = "Lies cunningly presented as benevolent truth"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ok6eh")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2b14q"]

@@ -18,6 +18,9 @@ var grid_card_data: Array = []  # Track the actual card data for each slot
 
 var discordant_active: bool = false
 
+# Graeae ability tracking
+var graeae_tracker: GraeaeTracker = null
+
 # Track Second Chance cards and their info for returning to hand
 var second_chance_cards: Dictionary = {}  # Format: {grid_position: {card: CardResource, owner: Owner, collection_index: int}}
 
@@ -278,6 +281,11 @@ func _ready():
 	if is_tutorial_mode and tutorial_god != current_god:
 		print("Tutorial mode detected - adjusting current_god from ", current_god, " to ", tutorial_god)
 		current_god = tutorial_god
+	
+	# Initialize Graeae tracker
+	graeae_tracker = GraeaeTracker.new()
+	add_child(graeae_tracker)
+	print("Graeae tracker initialized")
 	
 	# Create styles for grid selection
 	create_grid_styles()
@@ -923,6 +931,8 @@ func _on_turn_changed(is_player_turn: bool):
 		process_corruption_turn_start()
 		# Process greedy abilities at the start of opponent's turn
 		process_greedy_turn_start()
+		# Process Graeae ability rotation at the start of opponent's turn
+		process_graeae_rotation()
 	
 	# Process charge abilities at the start of each turn
 	await process_charge_turn_start(is_player_turn)
@@ -7519,6 +7529,11 @@ func restore_battle_from_snapshot() -> bool:
 	clear_all_camouflage_effects()
 	clear_cloak_of_night_ability()
 	
+	# Reset Graeae tracker
+	if graeae_tracker:
+		graeae_tracker.reset()
+	
+	
 	# Clear the grid completely
 	for i in range(grid_slots.size()):
 		if grid_occupied[i]:
@@ -8640,3 +8655,20 @@ func set_silence_active(active: bool):
 		print("Silence effect activated - next card will have all abilities removed")
 	else:
 		print("Silence effect deactivated")
+
+func get_graeae_tracker() -> GraeaeTracker:
+	return graeae_tracker
+
+func process_graeae_rotation():
+	"""Process Graeae ability rotation at the start of opponent's turn"""
+	if not graeae_tracker:
+		return
+	
+	var graeae_count = graeae_tracker.get_graeae_count()
+	if graeae_count <= 1:
+		# No rotation with 0 or 1 Graeae
+		return
+	
+	print("=== PROCESSING GRAEAE ROTATION ===")
+	await graeae_tracker.rotate_abilities(self)
+	print("=== GRAEAE ROTATION PROCESSED ===")
