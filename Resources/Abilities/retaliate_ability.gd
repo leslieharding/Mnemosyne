@@ -4,7 +4,7 @@ extends CardAbility
 
 func _init():
 	ability_name = "Retaliate"
-	description = "When this card is captured, it weakens the attacking card's stats to 1,1,1,1"
+	description = "When this card is captured, it weakens the attacking card's stats to 1"
 	trigger_condition = TriggerType.ON_CAPTURE
 
 func execute(context: Dictionary) -> bool:

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=599 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=614 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" uid="uid://c7ndik1113xjf" path="res://Resources/Abilities/cloak_of_night_ability.gd" id="10_4qd0a"]
 [ext_resource type="Script" uid="uid://bqk772ngntv6i" path="res://Resources/Abilities/silence_ability.gd" id="12_2v1mv"]
 [ext_resource type="Script" uid="uid://cn72duwwfn1i0" path="res://Resources/Abilities/thunder_bolt_ability.gd" id="12_bdmj8"]
+[ext_resource type="Script" uid="uid://cjsf2c6w6dnrf" path="res://Resources/Abilities/coerce_ability.gd" id="12_hu0wn"]
 [ext_resource type="Script" uid="uid://btwpyhndpjg0p" path="res://Resources/Abilities/corruption_ability.gd" id="12_r05oc"]
 [ext_resource type="Script" uid="uid://cu3icvy8efjky" path="res://Resources/Abilities/greedy_ability.gd" id="13_0vidc"]
 [ext_resource type="Script" uid="uid://dv6bv8g2cvjdf" path="res://Resources/Abilities/traitor_ability.gd" id="13_5025t"]
@@ -41,6 +42,8 @@
 [ext_resource type="Script" uid="uid://d1m8carhhdy0w" path="res://Resources/Abilities/disarray_ability.gd" id="38_2v1mv"]
 [ext_resource type="Script" uid="uid://cf28qiwi76rmi" path="res://Resources/Abilities/graeae_ability.gd" id="39_sqqrj"]
 [ext_resource type="Script" uid="uid://dja2ta0rb7v13" path="res://Resources/Abilities/treachery_ability.gd" id="40_2u16m"]
+[ext_resource type="Script" uid="uid://diutq5r3eyqn6" path="res://Resources/Abilities/wither_ability.gd" id="41_5pa5w"]
+[ext_resource type="Script" uid="uid://c8h2thhm30b1n" path="res://Resources/Abilities/retaliate_ability.gd" id="42_svebx"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -2972,28 +2975,58 @@ description = "Lies cunningly presented as benevolent truth"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_tvoor")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_b5o7y"]
+script = ExtResource("41_5pa5w")
+ability_name = "Wither"
+description = "Each turn this card's stats are decreased"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://diutq5r3eyqn6"
+
 [sub_resource type="Resource" id="Resource_2014u"]
 script = ExtResource("2_xcqsp")
 card_name = "Geras"
 description = "Im not for the faint of heart, but the alternative isnt much fun either. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_b5o7y")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_g6jqo"]
+script = ExtResource("38_2v1mv")
+ability_name = "Disarray"
+description = "Your opponents next card also attacks friendly cards as well as enemies"
+metadata/_custom_type_script = "uid://d1m8carhhdy0w"
 
 [sub_resource type="Resource" id="Resource_gciji"]
 script = ExtResource("2_xcqsp")
 card_name = "Eris"
 description = "It only takes me three words to start a war"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_g6jqo")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_x81ce"]
+script = ExtResource("12_hu0wn")
+ability_name = "Scare"
+description = "On play designates a card in your opponent's hand that they must play next turn"
+metadata/_custom_type_script = "uid://cjsf2c6w6dnrf"
 
 [sub_resource type="Resource" id="Resource_hf3l5"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobos"
 description = "Hide it all you like, I'll still know what will have you in the corner a quivering mess. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_x81ce")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ouah1"]
+script = ExtResource("42_svebx")
+ability_name = "Payback"
+description = "When this card is captured, it weakens the attacking card's stats to 1"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://c8h2thhm30b1n"
 
 [sub_resource type="Resource" id="Resource_ulagn"]
 script = ExtResource("2_xcqsp")
 card_name = "Ponos"
 description = "Some would say making this game was Ponos"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ouah1")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4i0ub"]
@@ -3009,28 +3042,58 @@ description = "Lies cunningly presented as benevolent truth"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_4i0ub")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_sxfox"]
+script = ExtResource("41_5pa5w")
+ability_name = "Wither"
+description = "Each turn this card's stats are decreased"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://diutq5r3eyqn6"
+
 [sub_resource type="Resource" id="Resource_jih0t"]
 script = ExtResource("2_xcqsp")
 card_name = "Geras"
 description = "Im not for the faint of heart, but the alternative isnt much fun either. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_sxfox")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_nt1vs"]
+script = ExtResource("38_2v1mv")
+ability_name = "Disarray"
+description = "Your opponents next card also attacks friendly cards as well as enemies"
+metadata/_custom_type_script = "uid://d1m8carhhdy0w"
 
 [sub_resource type="Resource" id="Resource_jxoag"]
 script = ExtResource("2_xcqsp")
 card_name = "Eris"
 description = "It only takes me three words to start a war"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_nt1vs")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_8dvf6"]
+script = ExtResource("12_hu0wn")
+ability_name = "Scare"
+description = "On play designates a card in your opponent's hand that they must play next turn."
+metadata/_custom_type_script = "uid://cjsf2c6w6dnrf"
 
 [sub_resource type="Resource" id="Resource_o7b3b"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobos"
 description = "Hide it all you like, I'll still know what will have you in the corner a quivering mess. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_8dvf6")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_wkg3i"]
+script = ExtResource("42_svebx")
+ability_name = "Payback"
+description = "When this card is captured, it weakens the attacking card's stats to 1"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://c8h2thhm30b1n"
 
 [sub_resource type="Resource" id="Resource_hylkq"]
 script = ExtResource("2_xcqsp")
 card_name = "Ponos"
 description = "Some would say making this game was Ponos"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_wkg3i")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ok6eh"]
@@ -3046,28 +3109,58 @@ description = "Lies cunningly presented as benevolent truth"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ok6eh")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_6voa0"]
+script = ExtResource("41_5pa5w")
+ability_name = "Wither"
+description = "Each turn this card's stats are decreased"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://diutq5r3eyqn6"
+
 [sub_resource type="Resource" id="Resource_2b14q"]
 script = ExtResource("2_xcqsp")
 card_name = "Geras"
 description = "Im not for the faint of heart, but the alternative isnt much fun either. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6voa0")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_470vg"]
+script = ExtResource("38_2v1mv")
+ability_name = "Disarray"
+description = "Your opponents next card also attacks friendly cards as well as enemies"
+metadata/_custom_type_script = "uid://d1m8carhhdy0w"
 
 [sub_resource type="Resource" id="Resource_iicxb"]
 script = ExtResource("2_xcqsp")
 card_name = "Eris"
 description = "It only takes me three words to start a war"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_470vg")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_dt8d7"]
+script = ExtResource("12_hu0wn")
+ability_name = "Scare"
+description = "On play designates a card in your opponent's hand that they must play next turn."
+metadata/_custom_type_script = "uid://cjsf2c6w6dnrf"
 
 [sub_resource type="Resource" id="Resource_2g0p6"]
 script = ExtResource("2_xcqsp")
 card_name = "Phobos"
 description = "Hide it all you like, I'll still know what will have you in the corner a quivering mess. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_dt8d7")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_7i5sa"]
+script = ExtResource("42_svebx")
+ability_name = "Payback"
+description = "When this card is captured, it weakens the attacking card's stats to 1"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://c8h2thhm30b1n"
 
 [sub_resource type="Resource" id="Resource_ryebc"]
 script = ExtResource("2_xcqsp")
 card_name = "Ponos"
 description = "Some would say making this game was Ponos"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_7i5sa")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_asfaw"]
