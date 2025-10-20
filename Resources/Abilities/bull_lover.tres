@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="BullLoverAbility" load_steps=2 format=3 uid="uid://c2wqkxslnm22c"]
+
+[ext_resource type="Script" uid="uid://cgshw8nsqjxs3" path="res://Resources/Abilities/bull_lover_ability.gd" id="1_uqlt3"]
+
+[resource]
+script = ExtResource("1_uqlt3")
+ability_name = "Bull Lover"
+description = "If this card is adjacent to Cretan Bull when played it has double stats"
+metadata/_custom_type_script = "uid://cgshw8nsqjxs3"

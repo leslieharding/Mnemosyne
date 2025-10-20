@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=614 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=621 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -44,6 +44,7 @@
 [ext_resource type="Script" uid="uid://dja2ta0rb7v13" path="res://Resources/Abilities/treachery_ability.gd" id="40_2u16m"]
 [ext_resource type="Script" uid="uid://diutq5r3eyqn6" path="res://Resources/Abilities/wither_ability.gd" id="41_5pa5w"]
 [ext_resource type="Script" uid="uid://c8h2thhm30b1n" path="res://Resources/Abilities/retaliate_ability.gd" id="42_svebx"]
+[ext_resource type="Script" uid="uid://cgshw8nsqjxs3" path="res://Resources/Abilities/bull_lover_ability.gd" id="44_nvk4f"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -3317,10 +3318,17 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_4hn3y"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_chfja"), SubResource("Resource_ci4fy"), SubResource("Resource_kp3sj")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_0in7p"]
+script = ExtResource("44_nvk4f")
+ability_name = "Curse Of Poseidon"
+description = "If this card is adjacent to Cretan Bull when played it has double stats"
+metadata/_custom_type_script = "uid://cgshw8nsqjxs3"
+
 [sub_resource type="Resource" id="Resource_m3ito"]
 script = ExtResource("2_xcqsp")
 card_name = "Pasiphae"
 description = "I trust the mechanics will be optimised for pleasure Daedalus."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0in7p")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_jej5r"]
@@ -3332,16 +3340,23 @@ metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 
 [sub_resource type="Resource" id="Resource_bdu77"]
 script = ExtResource("2_xcqsp")
-card_name = "Cretan bull"
+card_name = "Cretan Bull"
 description = "Has one ever seen a more appealing bull? Such broad flanks oh my. 
 "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_jej5r")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_g2hos"]
+script = ExtResource("34_skkmd")
+ability_name = "Tribute"
+description = "On play this card steals +1 from each enemy card"
+metadata/_custom_type_script = "uid://nrdoysdoyfq1"
+
 [sub_resource type="Resource" id="Resource_yy5yo"]
 script = ExtResource("2_xcqsp")
 card_name = "King Minos"
 description = "Let me see the quality Athens has provided this year."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_g2hos")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_mqcxu"]
@@ -3356,10 +3371,17 @@ card_name = "Ariadne "
 description = "He will return, after all I’ve done he wouldn't just leave."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_3lwny"]
+script = ExtResource("44_nvk4f")
+ability_name = "Curse Of Poseidon"
+description = "If this card is adjacent to Cretan Bull when played it has double stats"
+metadata/_custom_type_script = "uid://cgshw8nsqjxs3"
+
 [sub_resource type="Resource" id="Resource_73a1l"]
 script = ExtResource("2_xcqsp")
 card_name = "Pasiphae"
 description = "I trust the mechanics will be optimised for pleasure Daedalus."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_3lwny")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_afuhd"]
@@ -3371,15 +3393,22 @@ metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 
 [sub_resource type="Resource" id="Resource_j0g3r"]
 script = ExtResource("2_xcqsp")
-card_name = "Cretan bull"
+card_name = "Cretan Bull"
 description = "Has one ever seen a more appealing bull? Such broad flanks oh my. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_afuhd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_5wpn0"]
+script = ExtResource("34_skkmd")
+ability_name = "Tribute"
+description = "On play this card steals +1 from each enemy card"
+metadata/_custom_type_script = "uid://nrdoysdoyfq1"
 
 [sub_resource type="Resource" id="Resource_40ydj"]
 script = ExtResource("2_xcqsp")
 card_name = "King Minos"
 description = "Let me see the quality Athens has provided this year."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_5wpn0")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_txako"]
@@ -3394,10 +3423,17 @@ card_name = "Ariadne "
 description = "He will return, after all I’ve done he wouldn't just leave."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_a3wo2"]
+script = ExtResource("44_nvk4f")
+ability_name = "Curse Of Poseidon"
+description = "If this card is adjacent to Cretan Bull when played it has double stats"
+metadata/_custom_type_script = "uid://cgshw8nsqjxs3"
+
 [sub_resource type="Resource" id="Resource_qvjdy"]
 script = ExtResource("2_xcqsp")
 card_name = "Pasiphae"
 description = "I trust the mechanics will be optimised for pleasure Daedalus."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_a3wo2")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ob81h"]
@@ -3409,15 +3445,22 @@ metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 
 [sub_resource type="Resource" id="Resource_81fhb"]
 script = ExtResource("2_xcqsp")
-card_name = "Cretan bull"
+card_name = "Cretan Bull"
 description = "Has one ever seen a more appealing bull? Such broad flanks oh my. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ob81h")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_jigf2"]
+script = ExtResource("34_skkmd")
+ability_name = "Tribute"
+description = "On play this card steals +1 from each enemy card"
+metadata/_custom_type_script = "uid://nrdoysdoyfq1"
 
 [sub_resource type="Resource" id="Resource_ldhch"]
 script = ExtResource("2_xcqsp")
 card_name = "King Minos"
 description = "Let me see the quality Athens has provided this year."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_jigf2")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ak5s2"]
