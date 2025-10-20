@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=621 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=625 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -45,6 +45,7 @@
 [ext_resource type="Script" uid="uid://diutq5r3eyqn6" path="res://Resources/Abilities/wither_ability.gd" id="41_5pa5w"]
 [ext_resource type="Script" uid="uid://c8h2thhm30b1n" path="res://Resources/Abilities/retaliate_ability.gd" id="42_svebx"]
 [ext_resource type="Script" uid="uid://cgshw8nsqjxs3" path="res://Resources/Abilities/bull_lover_ability.gd" id="44_nvk4f"]
+[ext_resource type="Script" uid="uid://1heklkngs5s7" path="res://Resources/Abilities/reposition_ability.gd" id="45_dgx1d"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -3363,12 +3364,21 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 script = ExtResource("2_xcqsp")
 card_name = "Asterion"
 description = "We could always leave together half brother mine, we need not fight."
+abilities = Array[ExtResource("3_lm3ty")]([null])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_ime24"]
+script = ExtResource("45_dgx1d")
+ability_name = "Reposition"
+description = "This card trades places with its attacker when captured"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://1heklkngs5s7"
 
 [sub_resource type="Resource" id="Resource_at5k1"]
 script = ExtResource("2_xcqsp")
 card_name = "Ariadne "
 description = "He will return, after all I’ve done he wouldn't just leave."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ime24")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_3lwny"]
@@ -3417,10 +3427,18 @@ card_name = "Asterion"
 description = "We could always leave together half brother mine, we need not fight."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_ivwb5"]
+script = ExtResource("45_dgx1d")
+ability_name = "Reposition"
+description = "This card trades places with its attacker when captured"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://1heklkngs5s7"
+
 [sub_resource type="Resource" id="Resource_hgi0j"]
 script = ExtResource("2_xcqsp")
 card_name = "Ariadne "
 description = "He will return, after all I’ve done he wouldn't just leave."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ivwb5")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_a3wo2"]
@@ -3469,10 +3487,18 @@ card_name = "Asterion"
 description = "We could always leave together half brother mine, we need not fight."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_o4w0j"]
+script = ExtResource("45_dgx1d")
+ability_name = "Resposition"
+description = "This card trades places with its attacker when captured"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://1heklkngs5s7"
+
 [sub_resource type="Resource" id="Resource_rsops"]
 script = ExtResource("2_xcqsp")
 card_name = "Ariadne "
 description = "He will return, after all I’ve done he wouldn't just leave."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_o4w0j")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_bdc7o"]
