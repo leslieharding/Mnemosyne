@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=629 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=633 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -47,6 +47,7 @@
 [ext_resource type="Script" uid="uid://cgshw8nsqjxs3" path="res://Resources/Abilities/bull_lover_ability.gd" id="44_nvk4f"]
 [ext_resource type="Script" uid="uid://1heklkngs5s7" path="res://Resources/Abilities/reposition_ability.gd" id="45_dgx1d"]
 [ext_resource type="Script" uid="uid://gnlr02su1oni" path="res://Resources/Abilities/blind_ability.gd" id="46_mpjhg"]
+[ext_resource type="Script" uid="uid://buhjtyfib4g6b" path="res://Resources/Abilities/charm_ability.gd" id="47_ryxg6"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -3687,10 +3688,17 @@ card_name = "Circe"
 description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_cbpem"]
+script = ExtResource("47_ryxg6")
+ability_name = "Charm"
+description = "On play this card draws in distant enemies then attacks them."
+metadata/_custom_type_script = "uid://buhjtyfib4g6b"
+
 [sub_resource type="Resource" id="Resource_ex2ms"]
 script = ExtResource("2_xcqsp")
 card_name = "Parthenope"
 description = "Finally my love, come join me and the gals, we have been waiting for you. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_cbpem")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_pfu7s"]
@@ -3724,10 +3732,17 @@ card_name = "Circe"
 description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_f1402"]
+script = ExtResource("47_ryxg6")
+ability_name = "Charm"
+description = "On play this card draws in distant enemies then attacks them."
+metadata/_custom_type_script = "uid://buhjtyfib4g6b"
+
 [sub_resource type="Resource" id="Resource_ktebg"]
 script = ExtResource("2_xcqsp")
 card_name = "Parthenope"
 description = "Finally my love, come join me and the gals, we have been waiting for you. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_f1402")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_i45n1"]
@@ -3761,10 +3776,17 @@ card_name = "Circe"
 description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_3ph7r"]
+script = ExtResource("47_ryxg6")
+ability_name = "Charm"
+description = "On play this card draws in distant enemies then attacks them."
+metadata/_custom_type_script = "uid://buhjtyfib4g6b"
+
 [sub_resource type="Resource" id="Resource_fw6om"]
 script = ExtResource("2_xcqsp")
 card_name = "Parthenope"
 description = "Finally my love, come join me and the gals, we have been waiting for you. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_3ph7r")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_lair4"]
