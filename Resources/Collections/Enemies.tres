@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=625 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=629 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -46,6 +46,7 @@
 [ext_resource type="Script" uid="uid://c8h2thhm30b1n" path="res://Resources/Abilities/retaliate_ability.gd" id="42_svebx"]
 [ext_resource type="Script" uid="uid://cgshw8nsqjxs3" path="res://Resources/Abilities/bull_lover_ability.gd" id="44_nvk4f"]
 [ext_resource type="Script" uid="uid://1heklkngs5s7" path="res://Resources/Abilities/reposition_ability.gd" id="45_dgx1d"]
+[ext_resource type="Script" uid="uid://gnlr02su1oni" path="res://Resources/Abilities/blind_ability.gd" id="46_mpjhg"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -3536,8 +3537,7 @@ metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 [sub_resource type="Resource" id="Resource_whob8"]
 script = ExtResource("2_xcqsp")
 card_name = "Acteon"
-description = "A mistake goddess, nothing more. 
-"
+description = "A mistake goddess, nothing more. "
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7pqpj"]
@@ -3668,10 +3668,17 @@ card_name = "Charybdis"
 description = "Critical success versus critical failure."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_nmjjd"]
+script = ExtResource("46_mpjhg")
+ability_name = "Blind"
+description = "This card attacks friends and foes alike"
+metadata/_custom_type_script = "uid://gnlr02su1oni"
+
 [sub_resource type="Resource" id="Resource_34jyf"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
 description = "Nobody is hurting me. Nobody is killing me!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_nmjjd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_s6suc"]
@@ -3698,10 +3705,17 @@ card_name = "Charybdis"
 description = "Critical success versus critical failure."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_782hj"]
+script = ExtResource("46_mpjhg")
+ability_name = "Blind"
+description = "This card attacks friends and foes alike"
+metadata/_custom_type_script = "uid://gnlr02su1oni"
+
 [sub_resource type="Resource" id="Resource_x1em1"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
 description = "Nobody is hurting me. Nobody is killing me!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_782hj")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_67nd5"]
@@ -3728,10 +3742,17 @@ card_name = "Charybdis"
 description = "Critical success versus critical failure."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_4huow"]
+script = ExtResource("46_mpjhg")
+ability_name = "Blind"
+description = "This card attacks friends and foes alike"
+metadata/_custom_type_script = "uid://gnlr02su1oni"
+
 [sub_resource type="Resource" id="Resource_l7lfy"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
 description = "Nobody is hurting me. Nobody is killing me!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_4huow")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_pxj21"]
