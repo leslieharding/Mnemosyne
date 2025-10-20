@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=633 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=641 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -46,7 +46,9 @@
 [ext_resource type="Script" uid="uid://c8h2thhm30b1n" path="res://Resources/Abilities/retaliate_ability.gd" id="42_svebx"]
 [ext_resource type="Script" uid="uid://cgshw8nsqjxs3" path="res://Resources/Abilities/bull_lover_ability.gd" id="44_nvk4f"]
 [ext_resource type="Script" uid="uid://1heklkngs5s7" path="res://Resources/Abilities/reposition_ability.gd" id="45_dgx1d"]
+[ext_resource type="Script" uid="uid://ckl2tjk20s1e0" path="res://Resources/Abilities/scylla_ability.gd" id="46_b1ysv"]
 [ext_resource type="Script" uid="uid://gnlr02su1oni" path="res://Resources/Abilities/blind_ability.gd" id="46_mpjhg"]
+[ext_resource type="Script" uid="uid://b136itvi12nha" path="res://Resources/Abilities/charybdis_ability.gd" id="47_jruhe"]
 [ext_resource type="Script" uid="uid://buhjtyfib4g6b" path="res://Resources/Abilities/charm_ability.gd" id="47_ryxg6"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
@@ -3657,16 +3659,30 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_whob8"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_4eoc3"), SubResource("Resource_o5fsv"), SubResource("Resource_c5pyn")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_wol5n"]
+script = ExtResource("46_b1ysv")
+ability_name = "Six Heads"
+description = "On play randomly reduce 6 enemy stats by 1"
+metadata/_custom_type_script = "uid://ckl2tjk20s1e0"
+
 [sub_resource type="Resource" id="Resource_mllwu"]
 script = ExtResource("2_xcqsp")
 card_name = "Scylla"
 description = "Always high rolls "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_wol5n")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_dkt3n"]
+script = ExtResource("47_jruhe")
+ability_name = "Whirlpool"
+description = "On play, destroys a random card from the player's hand, then destroys itself"
+metadata/_custom_type_script = "uid://b136itvi12nha"
 
 [sub_resource type="Resource" id="Resource_ouj4i"]
 script = ExtResource("2_xcqsp")
 card_name = "Charybdis"
 description = "Critical success versus critical failure."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_dkt3n")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_nmjjd"]
@@ -3701,16 +3717,30 @@ description = "Finally my love, come join me and the gals, we have been waiting 
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_cbpem")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_2ngxw"]
+script = ExtResource("46_b1ysv")
+ability_name = "Six Heads"
+description = "On play randomly reduce 6 enemy stats by 1"
+metadata/_custom_type_script = "uid://ckl2tjk20s1e0"
+
 [sub_resource type="Resource" id="Resource_pfu7s"]
 script = ExtResource("2_xcqsp")
 card_name = "Scylla"
 description = "Always high rolls "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_2ngxw")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_pyntf"]
+script = ExtResource("47_jruhe")
+ability_name = "Whirlpool"
+description = "On play, destroys a random card from the player's hand, then destroys itself"
+metadata/_custom_type_script = "uid://b136itvi12nha"
 
 [sub_resource type="Resource" id="Resource_7c4eb"]
 script = ExtResource("2_xcqsp")
 card_name = "Charybdis"
 description = "Critical success versus critical failure."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_pyntf")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_782hj"]
@@ -3745,16 +3775,30 @@ description = "Finally my love, come join me and the gals, we have been waiting 
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_f1402")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_ttouw"]
+script = ExtResource("46_b1ysv")
+ability_name = "Six Heads"
+description = "On play randomly reduce 6 enemy stats by 1"
+metadata/_custom_type_script = "uid://ckl2tjk20s1e0"
+
 [sub_resource type="Resource" id="Resource_i45n1"]
 script = ExtResource("2_xcqsp")
 card_name = "Scylla"
 description = "Always high rolls "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ttouw")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_6b8ae"]
+script = ExtResource("47_jruhe")
+ability_name = "Whirlpool"
+description = "On play, destroys a random card from the player's hand, then destroys itself"
+metadata/_custom_type_script = "uid://b136itvi12nha"
 
 [sub_resource type="Resource" id="Resource_01hsj"]
 script = ExtResource("2_xcqsp")
 card_name = "Charybdis"
 description = "Critical success versus critical failure."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6b8ae")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_4huow"]

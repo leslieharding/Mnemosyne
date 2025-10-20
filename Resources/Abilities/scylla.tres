@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ScyllaAbility" load_steps=2 format=3 uid="uid://dhf5hojcwwpi2"]
+
+[ext_resource type="Script" uid="uid://ckl2tjk20s1e0" path="res://Resources/Abilities/scylla_ability.gd" id="1_jcg0e"]
+
+[resource]
+script = ExtResource("1_jcg0e")
+ability_name = "Six Heads"
+description = "On play randomly reduce 6 enemy stats by 1"
+metadata/_custom_type_script = "uid://ckl2tjk20s1e0"

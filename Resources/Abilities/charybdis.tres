@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CharybdisAbility" load_steps=2 format=3 uid="uid://cwxhljll8sipm"]
+
+[ext_resource type="Script" uid="uid://b136itvi12nha" path="res://Resources/Abilities/charybdis_ability.gd" id="1_0vdiq"]
+
+[resource]
+script = ExtResource("1_0vdiq")
+ability_name = "Whirlpool"
+description = "On play, destroys a random card from the player's hand, then destroys itself"
+metadata/_custom_type_script = "uid://b136itvi12nha"
