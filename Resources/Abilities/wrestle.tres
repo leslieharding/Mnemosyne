@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="WrestleAbility" load_steps=2 format=3 uid="uid://i7a8338a53l6"]
+
+[ext_resource type="Script" uid="uid://doof7kcsh7nb" path="res://Resources/Abilities/wrestle_ability.gd" id="1_0nv3o"]
+
+[resource]
+script = ExtResource("1_0nv3o")
+ability_name = "Wrestle"
+description = "If this card cannot beat you in direct combat, it will also fight your other values, best out of 3 wins."
+metadata/_custom_type_script = "uid://doof7kcsh7nb"
