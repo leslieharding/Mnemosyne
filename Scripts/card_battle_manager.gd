@@ -923,6 +923,7 @@ func _on_turn_changed(is_player_turn: bool):
 	# Process morph abilities at the start of every turn (both owners)
 	process_morph_turn_start()
 	process_camouflage_turn_end()
+	process_polymorph_turn_end()
 	# Process cultivation abilities at the start of player's turn
 	if is_player_turn:
 		process_cultivation_turn_start()
@@ -1799,6 +1800,7 @@ func end_game():
 	clear_all_sanctuary_effects()
 	clear_all_trojan_horses()
 	clear_all_camouflage_effects()
+	clear_all_polymorph_effects()
 	misdirection_used = false
 	
 	var tracker = get_node("/root/BossPredictionTrackerAutoload")
@@ -8725,3 +8727,89 @@ func process_wither_turn_start():
 		}
 		
 		wither_ability.execute(context)
+
+
+func process_polymorph_turn_end():
+	"""Process polymorph effects - decrement turn counter and restore stats when expired"""
+	if not has_meta("active_polymorphs"):
+		return
+	
+	var active_polymorphs = get_meta("active_polymorphs")
+	if active_polymorphs.is_empty():
+		return
+	
+	var positions_to_restore = []
+	
+	# Decrement turn counters for all active polymorphs
+	for position in active_polymorphs.keys():
+		var polymorph_data = active_polymorphs[position]
+		polymorph_data["turns_remaining"] -= 1
+		
+		print("PolymorphTracking: Position ", position, " has ", polymorph_data["turns_remaining"], " turns remaining")
+		
+		if polymorph_data["turns_remaining"] <= 0:
+			positions_to_restore.append(position)
+	
+	# Restore cards whose polymorph has expired
+	for position in positions_to_restore:
+		restore_polymorph_effect(position)
+
+func restore_polymorph_effect(position: int):
+	"""Restore a polymorphed card's original stats when duration expires"""
+	if not has_meta("active_polymorphs"):
+		return
+	
+	var active_polymorphs = get_meta("active_polymorphs")
+	if position not in active_polymorphs:
+		return
+	
+	var polymorph_data = active_polymorphs[position]
+	var card = polymorph_data["card"]
+	var original_stats = polymorph_data["original_stats"]
+	
+	print("Polymorph expired - restoring ", card.card_name, " at position ", position)
+	print("Restoring stats from [1,1,1,1] to ", original_stats)
+	
+	# Restore original stats
+	card.values = original_stats.duplicate()
+	
+	# Clean up metadata on card
+	card.remove_meta("polymorph_original_stats")
+	card.remove_meta("polymorph_active")
+	card.remove_meta("polymorph_turns_remaining")
+	
+	# Update visual display
+	var slot = grid_slots[position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = card
+			child.update_display()
+			print("PolymorphTracking: Updated CardDisplay visual for restored card")
+			break
+	
+	# Reactivate passive abilities if the card has any
+	var card_collection_index = get_card_collection_index(position)
+	var card_level = get_card_level(card_collection_index)
+	
+	if card.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+		print("PolymorphTracking: Reactivating passive abilities for ", card.card_name)
+		handle_passive_abilities_on_place(position, card, card_level)
+	
+	# Remove from active polymorph tracking
+	active_polymorphs.erase(position)
+	set_meta("active_polymorphs", active_polymorphs)
+	
+	if notification_manager:
+		notification_manager.show_notification("🐑 " + card.card_name + " returned to normal!")
+
+func clear_all_polymorph_effects():
+	"""Clear all polymorph effects (for game end or reset)"""
+	if not has_meta("active_polymorphs"):
+		return
+	
+	var active_polymorphs = get_meta("active_polymorphs")
+	for position in active_polymorphs.keys():
+		restore_polymorph_effect(position)
+	
+	set_meta("active_polymorphs", {})
+	print("All polymorph effects cleared")

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=641 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=645 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -50,6 +50,7 @@
 [ext_resource type="Script" uid="uid://gnlr02su1oni" path="res://Resources/Abilities/blind_ability.gd" id="46_mpjhg"]
 [ext_resource type="Script" uid="uid://b136itvi12nha" path="res://Resources/Abilities/charybdis_ability.gd" id="47_jruhe"]
 [ext_resource type="Script" uid="uid://buhjtyfib4g6b" path="res://Resources/Abilities/charm_ability.gd" id="47_ryxg6"]
+[ext_resource type="Script" uid="uid://0qrqs8lrn7oh" path="res://Resources/Abilities/polymorph_ability.gd" id="49_86f4t"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -3698,10 +3699,17 @@ description = "Nobody is hurting me. Nobody is killing me!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_nmjjd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_sjjye"]
+script = ExtResource("49_86f4t")
+ability_name = "Polymorph"
+description = "On play this card changes your opponent's strongest minion into a sheep for 2 turns"
+metadata/_custom_type_script = "uid://0qrqs8lrn7oh"
+
 [sub_resource type="Resource" id="Resource_s6suc"]
 script = ExtResource("2_xcqsp")
 card_name = "Circe"
 description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_sjjye")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cbpem"]
@@ -3756,10 +3764,17 @@ description = "Nobody is hurting me. Nobody is killing me!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_782hj")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_xkk5m"]
+script = ExtResource("49_86f4t")
+ability_name = "Polymorph"
+description = "On play this card changes your opponent's strongest minion into a sheep for 2 turns"
+metadata/_custom_type_script = "uid://0qrqs8lrn7oh"
+
 [sub_resource type="Resource" id="Resource_67nd5"]
 script = ExtResource("2_xcqsp")
 card_name = "Circe"
 description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_xkk5m")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_f1402"]
@@ -3814,10 +3829,17 @@ description = "Nobody is hurting me. Nobody is killing me!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_4huow")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_qgnls"]
+script = ExtResource("49_86f4t")
+ability_name = "Polymorph"
+description = "On play this card changes your opponent's strongest minion into a sheep for 2 turns"
+metadata/_custom_type_script = "uid://0qrqs8lrn7oh"
+
 [sub_resource type="Resource" id="Resource_pxj21"]
 script = ExtResource("2_xcqsp")
 card_name = "Circe"
 description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_qgnls")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_3ph7r"]

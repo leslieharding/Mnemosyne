@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="PolymorphAbility" load_steps=2 format=3 uid="uid://crdkx2mv0mxn1"]
+
+[ext_resource type="Script" uid="uid://0qrqs8lrn7oh" path="res://Resources/Abilities/polymorph_ability.gd" id="1_kqjjj"]
+
+[resource]
+script = ExtResource("1_kqjjj")
+ability_name = "Polymorph"
+description = "On play this card changes your opponent's strongest minion into a sheep for 2 turns"
+metadata/_custom_type_script = "uid://0qrqs8lrn7oh"
