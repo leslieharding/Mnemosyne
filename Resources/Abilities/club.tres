@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ClubAbility" load_steps=2 format=3 uid="uid://b0dq33kcua0a7"]
+
+[ext_resource type="Script" uid="uid://ci2kc0sisv6o" path="res://Resources/Abilities/club_ability.gd" id="1_7jk5l"]
+
+[resource]
+script = ExtResource("1_7jk5l")
+ability_name = "Club"
+description = "On play, a random direction's attack is doubled"
+metadata/_custom_type_script = "uid://ci2kc0sisv6o"
