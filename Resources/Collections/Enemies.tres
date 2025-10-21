@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=664 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=667 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -4121,10 +4121,17 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_p8t6d"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_o8xdb"), SubResource("Resource_o3x3x"), SubResource("Resource_6hydl")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_lw2ml"]
+script = ExtResource("34_skkmd")
+ability_name = "Taxation"
+description = "On play this card steals +1 from each enemy card"
+metadata/_custom_type_script = "uid://nrdoysdoyfq1"
+
 [sub_resource type="Resource" id="Resource_bpwh1"]
 script = ExtResource("2_xcqsp")
 card_name = "Lycaon"
 description = "For you Cloud Gatherer a stew most tender. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_lw2ml")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xbnji"]
@@ -4149,7 +4156,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 [sub_resource type="Resource" id="Resource_7y3gw"]
 script = ExtResource("2_xcqsp")
 card_name = "Ixion"
-description = "Yeah I woke up and she was just there, its entrapment or some such."
+description = "I woke up and she was just there, I knew she would prefer me."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fq1fo"]
@@ -4158,10 +4165,17 @@ card_name = "Salmoneus"
 description = "Yes another pan to the chariot good sir, I want my next pass to really sing out!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_r6tny"]
+script = ExtResource("34_skkmd")
+ability_name = "Taxation"
+description = "On play this card steals +1 from each enemy card"
+metadata/_custom_type_script = "uid://nrdoysdoyfq1"
+
 [sub_resource type="Resource" id="Resource_nqu4c"]
 script = ExtResource("2_xcqsp")
 card_name = "Lycaon"
 description = "For you Cloud Gatherer a stew most tender. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_r6tny")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_25xog"]
@@ -4186,7 +4200,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 [sub_resource type="Resource" id="Resource_eoxwa"]
 script = ExtResource("2_xcqsp")
 card_name = "Ixion"
-description = "Yeah I woke up and she was just there, its entrapment or some such."
+description = "I woke up and she was just there, I knew she would prefer me."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cmqdx"]
@@ -4195,10 +4209,17 @@ card_name = "Salmoneus"
 description = "Yes another pan to the chariot good sir, I want my next pass to really sing out!"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_afpkg"]
+script = ExtResource("34_skkmd")
+ability_name = "Taxation"
+description = "On play this card steals +1 from each enemy card"
+metadata/_custom_type_script = "uid://nrdoysdoyfq1"
+
 [sub_resource type="Resource" id="Resource_f5fhw"]
 script = ExtResource("2_xcqsp")
 card_name = "Lycaon"
 description = "For you Cloud Gatherer a stew most tender. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_afpkg")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_432nf"]
@@ -4223,7 +4244,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 [sub_resource type="Resource" id="Resource_wqxhb"]
 script = ExtResource("2_xcqsp")
 card_name = "Ixion"
-description = "Yeah I woke up and she was just there, its entrapment or some such."
+description = "I woke up and she was just there, I knew she would prefer me."
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_064r4"]
