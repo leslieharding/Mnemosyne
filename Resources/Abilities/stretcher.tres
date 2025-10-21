@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="StretcherAbility" load_steps=2 format=3 uid="uid://dubrex5h6fhl0"]
+
+[ext_resource type="Script" uid="uid://bl46ipgerc0od" path="res://Resources/Abilities/stretcher_ability.gd" id="1_mmai8"]
+
+[resource]
+script = ExtResource("1_mmai8")
+ability_name = "The Stretcher"
+description = "After combat, this card either stretches you to fit, or cuts you to size"
+metadata/_custom_type_script = "uid://bl46ipgerc0od"

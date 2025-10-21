@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=656 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=664 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -52,7 +52,9 @@
 [ext_resource type="Script" uid="uid://buhjtyfib4g6b" path="res://Resources/Abilities/charm_ability.gd" id="47_ryxg6"]
 [ext_resource type="Script" uid="uid://0qrqs8lrn7oh" path="res://Resources/Abilities/polymorph_ability.gd" id="49_86f4t"]
 [ext_resource type="Script" uid="uid://ci2kc0sisv6o" path="res://Resources/Abilities/club_ability.gd" id="51_e5rwc"]
+[ext_resource type="Script" uid="uid://dao72kdl7r677" path="res://Resources/Abilities/edge_ability.gd" id="52_25gb6"]
 [ext_resource type="Script" uid="uid://doof7kcsh7nb" path="res://Resources/Abilities/wrestle_ability.gd" id="52_ueo1r"]
+[ext_resource type="Script" uid="uid://bl46ipgerc0od" path="res://Resources/Abilities/stretcher_ability.gd" id="53_2lbxq"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -3916,10 +3918,17 @@ description = "One step back and a smidge to the left, yes in the middle of thos
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_t4ttb")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_t0shl"]
+script = ExtResource("52_25gb6")
+ability_name = "Edge"
+description = "This card has double effectiveness attacking cards on non-corner board edges"
+metadata/_custom_type_script = "uid://dao72kdl7r677"
+
 [sub_resource type="Resource" id="Resource_bqojl"]
 script = ExtResource("2_xcqsp")
 card_name = "Sciron"
 description = "Ohhh feet. Yes I like mine cleaner than clean. Get to scrubbing. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_t0shl")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_26e2b"]
@@ -3935,10 +3944,17 @@ description = "Come join me for a spot of wrestling, to the winner glory, the lo
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_26e2b")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_04mi2"]
+script = ExtResource("53_2lbxq")
+ability_name = "The Stretcher"
+description = "After combat, this card either stretches you to fit, or cuts you to size"
+metadata/_custom_type_script = "uid://bl46ipgerc0od"
+
 [sub_resource type="Resource" id="Resource_gm07s"]
 script = ExtResource("2_xcqsp")
 card_name = "Procrustes"
 description = "Why yes of course you can stay the night, you will be especially taken by how comfortable the bed is, let me fit you to it.  "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_04mi2")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_tsfu7"]
@@ -3968,10 +3984,17 @@ description = "One step back and a smidge to the left, yes in the middle of thos
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_myxx6")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_iaamu"]
+script = ExtResource("52_25gb6")
+ability_name = "Edge"
+description = "This card has double effectiveness attacking cards on non-corner board edges"
+metadata/_custom_type_script = "uid://dao72kdl7r677"
+
 [sub_resource type="Resource" id="Resource_blewv"]
 script = ExtResource("2_xcqsp")
 card_name = "Sciron"
 description = "Ohhh feet. Yes I like mine cleaner than clean. Get to scrubbing. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_iaamu")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_oeipg"]
@@ -3987,10 +4010,17 @@ description = "Come join me for a spot of wrestling, to the winner glory, the lo
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_oeipg")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_1lx04"]
+script = ExtResource("53_2lbxq")
+ability_name = "The Stretcher"
+description = "After combat, this card either stretches you to fit, or cuts you to size"
+metadata/_custom_type_script = "uid://bl46ipgerc0od"
+
 [sub_resource type="Resource" id="Resource_xox7f"]
 script = ExtResource("2_xcqsp")
 card_name = "Procrustes"
 description = "Why yes of course you can stay the night, you will be especially taken by how comfortable the bed is, let me fit you to it.  "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_1lx04")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xmwyj"]
@@ -4020,10 +4050,17 @@ description = "One step back and a smidge to the left, yes in the middle of thos
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_8ouj3")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_sin7x"]
+script = ExtResource("52_25gb6")
+ability_name = "Edge"
+description = "This card has double effectiveness attacking cards on non-corner board edges"
+metadata/_custom_type_script = "uid://dao72kdl7r677"
+
 [sub_resource type="Resource" id="Resource_d2mjc"]
 script = ExtResource("2_xcqsp")
 card_name = "Sciron"
 description = "Ohhh feet. Yes I like mine cleaner than clean. Get to scrubbing. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_sin7x")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_q0y0u"]
@@ -4039,10 +4076,17 @@ description = "Come join me for a spot of wrestling, to the winner glory, the lo
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_q0y0u")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_qw10n"]
+script = ExtResource("53_2lbxq")
+ability_name = "The Stretcher"
+description = "After combat, this card either stretches you to fit, or cuts you to size"
+metadata/_custom_type_script = "uid://bl46ipgerc0od"
+
 [sub_resource type="Resource" id="Resource_2lpng"]
 script = ExtResource("2_xcqsp")
 card_name = "Procrustes"
 description = "Why yes of course you can stay the night, you will be especially taken by how comfortable the bed is, let me fit you to it.  "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_qw10n")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_o8xdb"]

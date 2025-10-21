@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EdgeAbility" load_steps=2 format=3 uid="uid://c176mr3aequk8"]
+
+[ext_resource type="Script" uid="uid://dao72kdl7r677" path="res://Resources/Abilities/edge_ability.gd" id="1_v677m"]
+
+[resource]
+script = ExtResource("1_v677m")
+ability_name = "Edge"
+description = "This card has double effectiveness attacking cards on non-corner board edges"
+metadata/_custom_type_script = "uid://dao72kdl7r677"

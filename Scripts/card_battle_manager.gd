@@ -1378,6 +1378,10 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 							
 							# Mark exploit as used
 							ExploitAbility.mark_exploit_used(attacking_card)
+							
+					# Check for Edge ability - doubles attack when targeting edge slots (1, 3, 5, 7)
+					if EdgeAbility.has_edge_active(attacking_card):
+						my_value = EdgeAbility.get_edge_attack_value(my_value, adj_index)
 					
 					if my_value > their_value:
 						print("Captured card at slot ", adj_index, "!")
