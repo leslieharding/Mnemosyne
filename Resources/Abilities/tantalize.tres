@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="TantalizeAbility" load_steps=2 format=3 uid="uid://dx4o2la3b288e"]
+
+[ext_resource type="Script" uid="uid://c561hmhfd5lln" path="res://Resources/Abilities/tantalize_ability.gd" id="1_gut1s"]
+
+[resource]
+script = ExtResource("1_gut1s")
+description = "If this card is captured the first turn it is played, it instead captures the capturing card"
+metadata/_custom_type_script = "uid://c561hmhfd5lln"

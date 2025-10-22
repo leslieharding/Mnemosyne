@@ -21,6 +21,8 @@ var discordant_active: bool = false
 # Graeae ability tracking
 var graeae_tracker: GraeaeTracker = null
 
+var tantalize_turn_counter: int = 0  # Separate counter for Tantalize ability timing
+
 # Track Second Chance cards and their info for returning to hand
 var second_chance_cards: Dictionary = {}  # Format: {grid_position: {card: CardResource, owner: Owner, collection_index: int}}
 
@@ -907,6 +909,14 @@ func _on_game_started():
 		
 
 func _on_turn_changed(is_player_turn: bool):
+	
+	# Increment tantalize turn counter
+	tantalize_turn_counter += 1
+	print("Turn changed - Tantalize turn counter now: ", tantalize_turn_counter)
+	
+	# Check for expired tantalize effects
+	TantalizeAbility.check_and_deactivate_expired_tantalize(self)
+	
 	# Process cloak of night turn tracking
 	process_cloak_of_night_turn()
 	
@@ -1197,6 +1207,19 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 			print("DISARRAY FRIENDLY FIRE: Confused card captured friendly - giving to opponent!")
 			var new_owner = Owner.OPPONENT if attacking_owner == Owner.PLAYER else Owner.PLAYER
 			attacking_owner = new_owner
+		
+		# ===== NEW: Check for Tantalize BEFORE other capture prevention checks =====
+		var tantalize_triggered = TantalizeAbility.check_tantalize_trigger(
+			captured_card_data, captured_index, 
+			attacking_card, grid_index, 
+			self
+		)
+		
+		if tantalize_triggered:
+			print("TANTALIZE! ", captured_card_data.card_name, " reversed the capture!")
+			successful_captures.append(grid_index)  # The ATTACKER is now captured
+			continue  # Skip normal capture processing for the defender
+		
 		
 		# ===== NEW: Check for Second Chance BEFORE processing capture =====
 		var second_chance_prevented = try_second_chance_rescue(captured_index, captured_card_data, grid_index, attacking_card, attacking_owner)

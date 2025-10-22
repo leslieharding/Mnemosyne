@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=667 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=671 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -55,6 +55,7 @@
 [ext_resource type="Script" uid="uid://dao72kdl7r677" path="res://Resources/Abilities/edge_ability.gd" id="52_25gb6"]
 [ext_resource type="Script" uid="uid://doof7kcsh7nb" path="res://Resources/Abilities/wrestle_ability.gd" id="52_ueo1r"]
 [ext_resource type="Script" uid="uid://bl46ipgerc0od" path="res://Resources/Abilities/stretcher_ability.gd" id="53_2lbxq"]
+[ext_resource type="Script" uid="uid://c561hmhfd5lln" path="res://Resources/Abilities/tantalize_ability.gd" id="55_7uopj"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -4147,10 +4148,17 @@ description = "Yes I'm still there, Yes I'm still trying, you would have given u
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_xbnji")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_6s4e1"]
+script = ExtResource("55_7uopj")
+ability_name = "Tantalize"
+description = "If this card is captured the first turn it is played, it instead captures the capturing card"
+metadata/_custom_type_script = "uid://c561hmhfd5lln"
+
 [sub_resource type="Resource" id="Resource_rfcos"]
 script = ExtResource("2_xcqsp")
 card_name = "Tantalus"
 description = "So close I can taste it"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6s4e1")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_7y3gw"]
@@ -4191,10 +4199,17 @@ description = "Yes I'm still there, Yes I'm still trying, you would have given u
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_25xog")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_6h226"]
+script = ExtResource("55_7uopj")
+ability_name = "Tantalize"
+description = "If this card is captured the first turn it is played, it instead captures the capturing card"
+metadata/_custom_type_script = "uid://c561hmhfd5lln"
+
 [sub_resource type="Resource" id="Resource_4h7vp"]
 script = ExtResource("2_xcqsp")
 card_name = "Tantalus"
 description = "So close I can taste it"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6h226")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_eoxwa"]
@@ -4235,10 +4250,17 @@ description = "Yes I'm still there, Yes I'm still trying, you would have given u
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_432nf")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_n0q8e"]
+script = ExtResource("55_7uopj")
+ability_name = "Tantalize"
+description = "If this card is captured the first turn it is played, it instead captures the capturing card"
+metadata/_custom_type_script = "uid://c561hmhfd5lln"
+
 [sub_resource type="Resource" id="Resource_87kaq"]
 script = ExtResource("2_xcqsp")
 card_name = "Tantalus"
 description = "So close I can taste it"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_n0q8e")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_wqxhb"]
