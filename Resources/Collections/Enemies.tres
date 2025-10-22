@@ -2670,6 +2670,7 @@ metadata/_custom_type_script = "uid://cf28qiwi76rmi"
 [sub_resource type="Resource" id="Resource_3mljd"]
 script = ExtResource("2_xcqsp")
 card_name = "Pamphredo"
+values = Array[int]([5, 5, 5, 5])
 description = "Can you smell that sisters, it is a man among us, quickly Enyo the eye to me!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_wresi")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -2684,6 +2685,7 @@ metadata/_custom_type_script = "uid://cf28qiwi76rmi"
 [sub_resource type="Resource" id="Resource_etni1"]
 script = ExtResource("2_xcqsp")
 card_name = "Deino"
+values = Array[int]([4, 4, 4, 4])
 description = "Chomp them Pemphredo! Or pass the tooth to me!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_tk8ui")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -2698,6 +2700,7 @@ metadata/_custom_type_script = "uid://cf28qiwi76rmi"
 [sub_resource type="Resource" id="Resource_sv88j"]
 script = ExtResource("2_xcqsp")
 card_name = "Enyo"
+values = Array[int]([3, 4, 3, 4])
 description = "You sisters will say anything to have more time with tooth and eye, I'm not falling for it this time."
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_1h5xd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

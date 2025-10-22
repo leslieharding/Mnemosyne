@@ -737,8 +737,18 @@ func update_panel_content(card_data: CardResource):
 	# Handle ability information
 	if card_data.abilities.size() > 0:
 		var ability = card_data.abilities[0]
-		ability_name_display.text = ability.ability_name
-		ability_description_display.text = ability.description
+		
+		# NEW: Check if this is a Graeae ability and use dynamic description
+		if ability.ability_name == "Graeae":
+			# Use the static helper functions to get state-based ability info
+			var graeae_ability_script = preload("res://Resources/Abilities/graeae_ability.gd")
+			ability_name_display.text = graeae_ability_script.get_ability_name_for_state(card_data)
+			ability_description_display.text = graeae_ability_script.get_description_for_state(card_data)
+		else:
+			# Normal ability display for non-Graeae cards
+			ability_name_display.text = ability.ability_name
+			ability_description_display.text = ability.description
+		
 		ability_name_display.visible = true
 		ability_description_display.visible = true
 	else:
@@ -1462,6 +1472,7 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 	
 	return captures
 
+
 func check_for_cheat_death(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource) -> bool:
 	print("=== CHECK_FOR_CHEAT_DEATH DEBUG ===")
 	print("Defender position: ", defender_pos)
@@ -1489,6 +1500,20 @@ func check_for_cheat_death(defender_pos: int, defending_card: CardResource, atta
 		print("=== SANCTUARY CHEAT DEATH SUCCESS ===")
 		return true
 	
+	# NEW: Check for Graeae eye defense manually (since Graeae is PASSIVE not ON_DEFEND)
+	var has_graeae_eye = defending_card.has_meta("graeae_has_eye") and defending_card.get_meta("graeae_has_eye")
+	print("Has Graeae eye metadata: ", has_graeae_eye)
+	
+	if has_graeae_eye:
+		print("GRAEAE EYE! ", defending_card.card_name, " cannot be captured!")
+		
+		# Set the prevention flag
+		set_meta("cheat_death_prevented_" + str(defender_pos), true)
+		
+		print("Graeae eye defense activated for ", defending_card.card_name, "!")
+		print("=== GRAEAE EYE DEFENSE SUCCESS ===")
+		return true
+	
 	# Execute normal defend abilities to see if any prevent capture
 	print("Checking normal defend abilities for cheat death...")
 	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, "capture_attempt")
@@ -1501,7 +1526,7 @@ func check_for_cheat_death(defender_pos: int, defending_card: CardResource, atta
 	if was_prevented:
 		remove_meta("cheat_death_prevented_" + str(defender_pos))
 	
-	print("=== CHECK_FOR_CHEAT_DEATH RESULT: ", was_prevented or has_sanctuary_cheat_death, " ===")
+	print("=== CHECK_FOR_CHEAT_DEATH RESULT: ", was_prevented or has_sanctuary_cheat_death or has_graeae_eye, " ===")
 	return was_prevented
 
 # NEW FUNCTION - Award experience for successful attack even when capture is prevented

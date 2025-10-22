@@ -12,6 +12,8 @@ enum GraeaeState {
 func _init():
 	ability_name = "Graeae"
 	description = "Theres 3 of us and only one tooth and eye, you do the math."
+	# Keep as PASSIVE so it gets applied on placement
+	# Eye defense is handled via manual check in check_for_cheat_death()
 	trigger_condition = TriggerType.PASSIVE
 
 func execute(context: Dictionary) -> bool:
@@ -145,8 +147,14 @@ func apply_tooth_effects(position: int, card: CardResource, game_manager):
 	
 	print("GraeaeAbility: TOOTH applied - stats doubled from ", base_stats, " to ", card.values)
 	
-	# Update visual display
-	game_manager.update_card_display(position, card)
+	# FIXED: Update visual display using the standard pattern
+	var slot = game_manager.grid_slots[position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = card  # Update the card data reference
+			child.update_display()  # Refresh the visual display
+			print("GraeaeAbility: Updated CardDisplay visual for tooth card at position ", position)
+			break
 
 func remove_tooth_effects(position: int, card: CardResource, game_manager):
 	"""Return stats to base values"""
@@ -164,8 +172,14 @@ func remove_tooth_effects(position: int, card: CardResource, game_manager):
 	
 	print("GraeaeAbility: TOOTH removed - stats returned to ", card.values)
 	
-	# Update visual display
-	game_manager.update_card_display(position, card)
+	# FIXED: Update visual display using the standard pattern
+	var slot = game_manager.grid_slots[position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = card  # Update the card data reference
+			child.update_display()  # Refresh the visual display
+			print("GraeaeAbility: Updated CardDisplay visual after tooth removal at position ", position)
+			break
 
 func trigger_tooth_attack(position: int, card: CardResource, game_manager):
 	"""Trigger an extra attack when receiving the tooth via rotation"""
@@ -205,9 +219,9 @@ static func get_ability_name_for_state(card: CardResource) -> String:
 # Static helper to get description based on current state
 static func get_description_for_state(card: CardResource) -> String:
 	if card.has_meta("graeae_has_tooth") and card.get_meta("graeae_has_tooth"):
-		return "The Tooth: Double stats and attacks when receiving the tooth. Rotates each turn."
+		return "Double stats and attacks when receiving the tooth. Rotates each turn."
 	elif card.has_meta("graeae_has_eye") and card.get_meta("graeae_has_eye"):
-		return "The Eye: Cannot be captured. Rotates each turn."
+		return "Cannot be captured. Rotates each turn."
 	elif card.has_meta("graeae_has_nothing") and card.get_meta("graeae_has_nothing"):
 		return "Waiting for the eye or tooth to rotate to this sister."
 	else:
