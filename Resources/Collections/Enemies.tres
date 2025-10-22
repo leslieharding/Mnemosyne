@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=671 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=674 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -4161,10 +4161,18 @@ description = "So close I can taste it"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6s4e1")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_18ae5"]
+script = ExtResource("13_0vidc")
+ability_name = "Greedy"
+description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cu3icvy8efjky"
+
 [sub_resource type="Resource" id="Resource_7y3gw"]
 script = ExtResource("2_xcqsp")
 card_name = "Ixion"
 description = "I woke up and she was just there, I knew she would prefer me."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_18ae5")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fq1fo"]
@@ -4212,10 +4220,18 @@ description = "So close I can taste it"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_6h226")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_506jn"]
+script = ExtResource("13_0vidc")
+ability_name = "Greedy"
+description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cu3icvy8efjky"
+
 [sub_resource type="Resource" id="Resource_eoxwa"]
 script = ExtResource("2_xcqsp")
 card_name = "Ixion"
 description = "I woke up and she was just there, I knew she would prefer me."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_506jn")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_cmqdx"]
@@ -4263,10 +4279,18 @@ description = "So close I can taste it"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_n0q8e")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_b4wrj"]
+script = ExtResource("13_0vidc")
+ability_name = "Greedy"
+description = "If still controlled at the start of opponents turn, steals 1 stat from each adjacent friendly card"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://cu3icvy8efjky"
+
 [sub_resource type="Resource" id="Resource_wqxhb"]
 script = ExtResource("2_xcqsp")
 card_name = "Ixion"
 description = "I woke up and she was just there, I knew she would prefer me."
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_b4wrj")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_064r4"]
