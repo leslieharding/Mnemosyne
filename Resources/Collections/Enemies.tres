@@ -3701,6 +3701,7 @@ metadata/_custom_type_script = "uid://gnlr02su1oni"
 [sub_resource type="Resource" id="Resource_34jyf"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
+values = Array[int]([6, 6, 6, 6])
 description = "Nobody is hurting me. Nobody is killing me!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_nmjjd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3766,6 +3767,7 @@ metadata/_custom_type_script = "uid://gnlr02su1oni"
 [sub_resource type="Resource" id="Resource_x1em1"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
+values = Array[int]([6, 7, 6, 7])
 description = "Nobody is hurting me. Nobody is killing me!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_782hj")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3831,6 +3833,7 @@ metadata/_custom_type_script = "uid://gnlr02su1oni"
 [sub_resource type="Resource" id="Resource_l7lfy"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
+values = Array[int]([7, 7, 7, 7])
 description = "Nobody is hurting me. Nobody is killing me!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_4huow")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"

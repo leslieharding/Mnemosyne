@@ -913,6 +913,7 @@ func _on_game_started():
 		call_deferred("opponent_take_turn")
 		
 
+
 func _on_turn_changed(is_player_turn: bool):
 	
 	# Increment tantalize turn counter
@@ -932,6 +933,12 @@ func _on_turn_changed(is_player_turn: bool):
 	# Handle ordain effect expiration - expires after one turn
 	handle_ordain_turn_expiration()
 	
+	# Process camouflage turn tracking
+	process_camouflage_turn_end()
+	
+	# Process polymorph turn tracking
+	process_polymorph_turn_end()
+	
 	# Process adaptive defense abilities on turn change
 	handle_adaptive_defense_turn_change(is_player_turn)
 	
@@ -939,6 +946,7 @@ func _on_turn_changed(is_player_turn: bool):
 	process_morph_turn_start()
 	process_camouflage_turn_end()
 	process_polymorph_turn_end()
+	
 	# Process cultivation abilities at the start of player's turn
 	if is_player_turn:
 		process_cultivation_turn_start()
@@ -951,10 +959,11 @@ func _on_turn_changed(is_player_turn: bool):
 		# Process Graeae ability rotation at the start of opponent's turn
 		process_graeae_rotation()
 		process_wither_turn_start()
+	
 	# Process charge abilities at the start of each turn
 	await process_charge_turn_start(is_player_turn)
 	
-	# Process tremors at the start of each player's turn
+	# Process tremors and volleys at the start of each player's turn
 	if is_player_turn:
 		# Reassign rhythm slot at the start of Apollo player's turn
 		if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER:
@@ -972,11 +981,44 @@ func _on_turn_changed(is_player_turn: bool):
 		process_tremors_for_player(Owner.OPPONENT)
 		process_volleys_for_player(Owner.OPPONENT)
 		disable_player_input()
-		# Only start opponent turn if not already thinking
-		if not opponent_is_thinking and not is_tutorial_mode and not game_paused_for_modal:
-			call_deferred("opponent_take_turn")
-		elif game_paused_for_modal:
-			print("Game paused for modal - deferring opponent turn until modal closes")
+	
+	# CRITICAL FIX: Check if current player has no cards when their turn starts
+	# Only end the game if BOTH players are out of cards
+	var player_has_cards = not player_deck.is_empty()
+	var opponent_has_cards = opponent_manager.has_cards()
+	
+	if is_player_turn:
+		# It's the player's turn but they have no cards
+		if not player_has_cards:
+			# Check if opponent also has no cards - if so, end game
+			if not opponent_has_cards:
+				print("Player turn started - both players out of cards - ending game")
+				end_game()
+				return
+			else:
+				# Opponent still has cards - skip player turn and give it to opponent
+				print("Player has no cards but opponent does - switching to opponent turn")
+				turn_manager.next_turn()
+				return
+	else:
+		# It's the opponent's turn but they have no cards
+		if not opponent_has_cards:
+			# Check if player also has no cards - if so, end game
+			if not player_has_cards:
+				print("Opponent turn started - both players out of cards - ending game")
+				end_game()
+				return
+			else:
+				# Player still has cards - skip opponent turn and give it to player
+				print("Opponent has no cards but player does - switching to player turn")
+				turn_manager.next_turn()
+				return
+	
+	# Normal turn flow continues...
+	# If it's opponent turn and they haven't started thinking yet, let them take their turn
+	if turn_manager.is_opponent_turn() and not opponent_is_thinking and not is_tutorial_mode:
+		print("Starting opponent turn")
+		call_deferred("opponent_take_turn")
 
 func get_card_display_at_position(grid_index: int) -> CardDisplay:
 	if grid_index < 0 or grid_index >= grid_slots.size():
