@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="BudgetThunderBoltAbility" load_steps=2 format=3 uid="uid://utjoh88nu6kb"]
+
+[ext_resource type="Script" uid="uid://b6ve1q1bclr5u" path="res://Resources/Abilities/budget_thunder_bolt.gd" id="1_kivbu"]
+
+[resource]
+script = ExtResource("1_kivbu")
+ability_name = "Budget Thunder Bolt"
+description = "On play this zaps a random slot - any card struck changes owners"
+metadata/_custom_type_script = "uid://b6ve1q1bclr5u"

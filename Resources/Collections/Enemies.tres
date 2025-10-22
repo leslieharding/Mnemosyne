@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=674 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=678 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -56,6 +56,7 @@
 [ext_resource type="Script" uid="uid://doof7kcsh7nb" path="res://Resources/Abilities/wrestle_ability.gd" id="52_ueo1r"]
 [ext_resource type="Script" uid="uid://bl46ipgerc0od" path="res://Resources/Abilities/stretcher_ability.gd" id="53_2lbxq"]
 [ext_resource type="Script" uid="uid://c561hmhfd5lln" path="res://Resources/Abilities/tantalize_ability.gd" id="55_7uopj"]
+[ext_resource type="Script" uid="uid://b6ve1q1bclr5u" path="res://Resources/Abilities/budget_thunder_bolt.gd" id="56_spvwg"]
 
 [sub_resource type="Resource" id="Resource_no17v"]
 script = ExtResource("4_qmggo")
@@ -4175,10 +4176,17 @@ description = "I woke up and she was just there, I knew she would prefer me."
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_18ae5")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_7w8p2"]
+script = ExtResource("56_spvwg")
+ability_name = "Budget Thunder Bolt"
+description = "On play this zaps a random slot - any cards struck change owners"
+metadata/_custom_type_script = "uid://b6ve1q1bclr5u"
+
 [sub_resource type="Resource" id="Resource_fq1fo"]
 script = ExtResource("2_xcqsp")
 card_name = "Salmoneus"
 description = "Yes another pan to the chariot good sir, I want my next pass to really sing out!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_7w8p2")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_r6tny"]
@@ -4234,10 +4242,17 @@ description = "I woke up and she was just there, I knew she would prefer me."
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_506jn")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_ddqyu"]
+script = ExtResource("56_spvwg")
+ability_name = "Budget Thunder Bolt"
+description = "On play this zaps a random slot - any cards struck change owners"
+metadata/_custom_type_script = "uid://b6ve1q1bclr5u"
+
 [sub_resource type="Resource" id="Resource_cmqdx"]
 script = ExtResource("2_xcqsp")
 card_name = "Salmoneus"
 description = "Yes another pan to the chariot good sir, I want my next pass to really sing out!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ddqyu")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_afpkg"]
@@ -4293,10 +4308,17 @@ description = "I woke up and she was just there, I knew she would prefer me."
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_b4wrj")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_xb6e5"]
+script = ExtResource("56_spvwg")
+ability_name = "Budget Thunder Bolt"
+description = "On play this zaps a random slot - any cards struck change owners"
+metadata/_custom_type_script = "uid://b6ve1q1bclr5u"
+
 [sub_resource type="Resource" id="Resource_064r4"]
 script = ExtResource("2_xcqsp")
 card_name = "Salmoneus"
 description = "Yes another pan to the chariot good sir, I want my next pass to really sing out!"
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_xb6e5")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_8j8lk"]
