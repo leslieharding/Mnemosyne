@@ -6,35 +6,32 @@ extends RefCounted
 var god_profiles: Dictionary = {
 	
 	"Apollo": {
-		"lore": [
-			"The radiant god of light and prophecy awaits your understanding...",
-			"Born on the floating island of Delos, Apollo emerged as one of the most powerful Olympians. His golden bow never misses its mark, and his light can both heal and destroy.",
-			"At Delphi, Apollo established his most sacred oracle. The Pythia would breathe his sacred vapors and speak prophecies that shaped the fate of heroes and kingdoms alike.",
-			"As patron of the nine Muses, Apollo governs all forms of art and knowledge. His lyre can calm savage beasts or drive mortals to divine madness with its perfect melodies.",
-			"The god of rational thought and divine order, Apollo represents the balance between wild inspiration and disciplined craft. His solar chariot brings both revelation and judgment.",
-			"In his highest aspect, Apollo embodies the eternal struggle between fate and free will. Those who achieve true mastery with him understand that prophecy does not constrain destiny—it illuminates the paths by which destiny unfolds.",
-			"You have transcended the boundary between mortal and divine understanding. Apollo's essence flows through your very being, and his light reveals truths beyond the veil of reality."
-		],
-		"tactical_advice": [
-			"", # Level 0 - no tactical info
-			"", # Level 1 - still learning basics
-			"Apollo's solar blessing enhances your ability to predict opponent movements. Focus on positioning cards to maximize his prophetic advantages.",
-			"Master the Oracle's insight: Apollo's decks excel at long-term strategy. Build your board presence gradually while using his divine foresight to counter enemy plans.",
-			"Advanced synergy: Combine Apollo's light-based cards with timing abilities. His solar chariot cards work best when you control the pace of battle through careful resource management.",
-			"Divine mastery: Apollo's true power lies in perfect timing. Learn to read three moves ahead, using his prophetic abilities to create devastating combinations that seem impossible to opponents.",
-			"Eternal wisdom: You have learned to channel Apollo's omniscience. Every card placement becomes a note in a divine symphony, every battle a perfectly orchestrated performance."
-		]
-	}
+	"lore": [
+		"The rational, logical, harmonious, musical, healing and golden god of Olympus. The tales that survive regarding him are somewhat at odds with the glowing descriptions of his character. Just ask Daphne transformed into a Laurel to escape his pursuits. Or Hyacinthus whom he accidently struck (and killed) with a discus. Or his jealous mess of a relationship with Coronis of which you will learn of in this game. Or the flaying of Marsyas the satyr after their musical competition. Or his spiteful treatment of Cassandra when she rejected him. Or his impulsive slaying of the cyclopes. Or his vicious eradication of the sons of Niobe. But you know outside of those he's a really chill, down to earth, sensible dude. I promise.",
+		"", "", "", "", ""
+	],
 	
-	# Future gods would follow this same structure:
-	# "Artemis": {
-	#     "lore": [...],
-	#     "tactical_advice": [...]
-	# },
-	# "Hermes": {
-	#     "lore": [...], 
-	#     "tactical_advice": [...]
-	# }
+},
+	"Artemis": {
+	"lore": [
+		"Ever done the wrong thing to the wrong person? Sometimes without even knowing it? Well; Actaeon, Callisto, Orion, The daughters of Niobe, the people of Calydon, Iphigenia, Otis and Ephialte, have had the pleasure. The protectress of the chase and the chaste is most clearly remembered for her aptitude for enacting revenge. At times, the direction and force of said revenge could be random, arbitrary, even nonsensical. Plain old boring tit for tat reprisal did occur regularly enough too. This dichotomy speaks to the obvious, gods are made in our image not the inverse. Who hasn't seen someone drenched in vengeance but pointed at the wrong target and blind to it?",
+		"", "", "", "", ""
+	],
+},
+	"Hermes": {
+	"lore": [
+		"Mercurial quick silver. Wildly intelligent from birth these days he would be called a; genius, phenom, prodigy, savant or some such. Mythologically he features more so as the messenger than the mess. Chaotic neutral would be a fair description. The slaying of Argus would show he's not above being directly involved and harshly lethal. He stands as a patron saint of tricksters and thieves, but specifically the sort of trickery that treads the boundary of justification. Think Robin Hood. Speaking of boundaries, his role as Archpsychopomp or chief conductor of souls finds him literally between life and death.",
+		"", "", "", "", ""
+	],
+	
+},
+	"Demeter": {
+	"lore": [
+		"Grief takes many flavours. Avoidance. A rational 'moving on'. Revenge. Escapism. But to some, Demeter included, grief can bind and imprison. That being said; can you really blame loving someone so hard their absence causes winter of the soul? Thus the natural flow of the seasons arose with grief followed by joy. Life by death by life. It's interesting to note that Demeter (and Hestia) had more shrines dedicated to them than the more glamorous gods. It doesn't take long to see that you only need Hephaestus to calm a volcano rarely but hoping the food would grow would be a more constant concern.",
+		"", "", "", "", ""
+	],
+	
+}
 }
 
 # Get complete god profile based on mastery level and achievements
