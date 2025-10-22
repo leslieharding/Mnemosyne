@@ -56,8 +56,8 @@ func execute(context: Dictionary) -> bool:
 		
 		print("  Processing adjacent enemy at position ", adjacent_pos, " in direction ", direction.name)
 		
-		# Stretch or cut all 4 stats to match stretcher's stats
-		var modifications_made = stretch_or_cut_card(placed_card, adjacent_card, adjacent_pos, game_manager)
+		# Pass the direction index so only that facing stat is modified
+		var modifications_made = stretch_or_cut_card(placed_card, adjacent_card, direction.index, adjacent_pos, game_manager)
 		
 		if modifications_made:
 			total_cards_modified += 1
@@ -71,35 +71,37 @@ func execute(context: Dictionary) -> bool:
 		print("StretcherAbility had no effect - no adjacent enemies to modify")
 		return false
 
-func stretch_or_cut_card(stretcher_card: CardResource, target_card: CardResource, target_position: int, game_manager) -> bool:
+func stretch_or_cut_card(stretcher_card: CardResource, target_card: CardResource, direction_from_stretcher: int, target_position: int, game_manager) -> bool:
 	"""
-	Modify target card's stats to match stretcher's stats
+	Modify target card's stat that faces the stretcher to match stretcher's corresponding stat
+	direction_from_stretcher: which direction the target is from the stretcher (0=N, 1=E, 2=S, 3=W)
 	Returns true if any modifications were made
 	"""
 	
-	var original_values = target_card.values.duplicate()
+	# Calculate which direction on the target card faces the stretcher
+	# If stretcher is North of target (direction 0), target's South stat (direction 2) faces it
+	var target_facing_direction = (direction_from_stretcher + 2) % 4
+	
+	var stretcher_value = stretcher_card.values[direction_from_stretcher]
+	var target_value = target_card.values[target_facing_direction]
+	
+	print("    Stretcher's ", get_direction_name(direction_from_stretcher), " stat: ", stretcher_value)
+	print("    Target's ", get_direction_name(target_facing_direction), " stat (facing stretcher): ", target_value)
+	
 	var modifications_made = false
 	
-	print("    Stretcher stats: ", stretcher_card.values)
-	print("    Target original stats: ", original_values)
-	
-	# Process each direction independently
-	for i in range(4):
-		var stretcher_value = stretcher_card.values[i]
-		var target_value = target_card.values[i]
-		
-		if target_value < stretcher_value:
-			# Stretch up
-			target_card.values[i] = stretcher_value
-			print("      Direction ", get_direction_name(i), ": ", target_value, " stretched up to ", stretcher_value)
-			modifications_made = true
-		elif target_value > stretcher_value:
-			# Cut down
-			target_card.values[i] = stretcher_value
-			print("      Direction ", get_direction_name(i), ": ", target_value, " cut down to ", stretcher_value)
-			modifications_made = true
-		else:
-			print("      Direction ", get_direction_name(i), ": ", target_value, " unchanged (already matches)")
+	if target_value < stretcher_value:
+		# Stretch up
+		target_card.values[target_facing_direction] = stretcher_value
+		print("      Stretched up to ", stretcher_value)
+		modifications_made = true
+	elif target_value > stretcher_value:
+		# Cut down
+		target_card.values[target_facing_direction] = stretcher_value
+		print("      Cut down to ", stretcher_value)
+		modifications_made = true
+	else:
+		print("      Unchanged (already matches)")
 	
 	if modifications_made:
 		print("    Target new stats: ", target_card.values)
