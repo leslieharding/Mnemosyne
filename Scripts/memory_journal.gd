@@ -583,9 +583,18 @@ func _on_god_selected(god_name: String, god_data: Dictionary):
 	for child in details_panel.get_children():
 		child.queue_free()
 	
-	# Use the simpler display function that works directly with god_data
-	# This avoids the complex god content manager which might have data structure issues
-	create_detailed_god_display(details_panel, god_name, god_data)
+	# Get detailed info from memory manager (which uses god_content_manager)
+	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
+	var detailed_info = memory_manager.get_god_detailed_info(god_name)
+	
+	if detailed_info.is_empty():
+		var error_label = Label.new()
+		error_label.text = "No detailed information available."
+		details_panel.add_child(error_label)
+		return
+	
+	# Use the enhanced display that shows lore
+	create_enhanced_god_display(details_panel, detailed_info)
 
 func create_enhanced_god_display(container: Control, info: Dictionary):
 	var main_vbox = VBoxContainer.new()

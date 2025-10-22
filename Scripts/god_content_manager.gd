@@ -47,7 +47,7 @@ func get_god_profile(god_name: String, mastery_level: int, battles_fought: int =
 		"mastery_description": get_mastery_level_description(mastery_level),
 		"battles_fought": battles_fought,
 		"description": get_description(profile, mastery_level),
-		"tactical_advice": get_tactical_advice(profile, mastery_level),
+		
 		"divine_insights": get_divine_insights(mastery_level, achievements),
 		"visible_content": get_visible_content_types(mastery_level)
 	}
@@ -67,23 +67,6 @@ func get_description(profile: Dictionary, mastery_level: int) -> String:
 	
 	return complete_lore
 
-# Get tactical advice based on mastery level
-func get_tactical_advice(profile: Dictionary, mastery_level: int) -> String:
-	if mastery_level < 2:  # No tactical advice until "Practiced" level
-		return ""
-	
-	var complete_tactical = ""
-	
-	# Build up tactical advice from level 2 to current mastery level
-	for level in range(2, mastery_level + 1):  # Start from level 2
-		if level < profile["tactical_advice"].size():
-			var level_tactical = profile["tactical_advice"][level]
-			if level_tactical != "":  # Only add non-empty tactical entries
-				if complete_tactical != "":
-					complete_tactical += "\n\n"  # Add spacing between tactical sections
-				complete_tactical += level_tactical
-	
-	return complete_tactical
 
 # Get divine insights based on mastery level and special achievements
 func get_divine_insights(mastery_level: int, achievements: Dictionary) -> String:
@@ -117,9 +100,6 @@ func get_divine_insights(mastery_level: int, achievements: Dictionary) -> String
 func get_visible_content_types(mastery_level: int) -> Array[String]:
 	var visible_types: Array[String] = ["lore"]  # Lore always visible
 	
-	if mastery_level >= 2:
-		visible_types.append("tactical_advice")
-	
 	if mastery_level >= 4:
 		visible_types.append("divine_insights")
 	
@@ -143,7 +123,6 @@ func get_default_profile(god_name: String, mastery_level: int) -> Dictionary:
 		"mastery_level": mastery_level,
 		"mastery_description": get_mastery_level_description(mastery_level),
 		"description": "A divine presence you have yet to fully understand. Fight more battles to unlock their mysteries.",
-		"tactical_advice": "",
 		"divine_insights": "",
 		"visible_content": get_visible_content_types(mastery_level)
 	}
