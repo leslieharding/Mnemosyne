@@ -555,8 +555,13 @@ func setup_opponent_from_params():
 			print("Unknown tutorial opponent, using Shadow Acolyte")
 			opponent_manager.setup_opponent("Shadow Acolyte", 0)  # Fallback
 	else:
-		# Normal mode setup...
-		if params.has("current_node"):
+		# Check if this is a test battle with explicit enemy parameters
+		if params.has("enemy_name") and params.has("enemy_difficulty"):
+			var enemy_name = params["enemy_name"]
+			var enemy_difficulty = params["enemy_difficulty"]
+			print("Setting up test battle opponent: ", enemy_name, " (difficulty ", enemy_difficulty, ")")
+			opponent_manager.setup_opponent(enemy_name, enemy_difficulty)
+		elif params.has("current_node"):
 			var current_node = params["current_node"]
 			var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
 			var enemy_difficulty = current_node.enemy_difficulty
@@ -1856,6 +1861,33 @@ func end_game():
 		_on_tutorial_finished()
 		return
 	
+	# TEST BATTLE CHECK - Handle test battle completion
+	var params = get_scene_params()
+	if params.get("is_test_battle", false):
+		print("Test battle ended - returning to GameModeSelect")
+		
+		var scores = get_current_scores()
+		if scores.player > scores.opponent:
+			game_status_label.text = "Test Battle Victory!"
+		elif scores.opponent > scores.player:
+			game_status_label.text = "Test Battle Defeat!"
+		else:
+			game_status_label.text = "Test Battle Draw! Restarting..."
+			disable_player_input()
+			opponent_is_thinking = false
+			turn_manager.end_game()
+			await get_tree().create_timer(2.0).timeout
+			restart_round()
+			return
+		
+		disable_player_input()
+		opponent_is_thinking = false
+		turn_manager.end_game()
+		
+		await get_tree().create_timer(3.0).timeout
+		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+		return
+	
 	# Calculate final scores for normal games
 	var scores = get_current_scores()
 	var winner = ""
@@ -1901,7 +1933,7 @@ func end_game():
 		await get_tree().create_timer(3.0).timeout
 		
 		# Pass data to summary screen
-		var params = get_scene_params()
+		params = get_scene_params()
 		get_tree().set_meta("scene_params", {
 			"god": params.get("god", current_god),
 			"deck_index": params.get("deck_index", 0),
@@ -1925,7 +1957,7 @@ func end_game():
 	await get_tree().create_timer(2.0).timeout
 	
 	# NEW: Check if this was the final boss battle (run complete)
-	var params = get_scene_params()
+	params = get_scene_params()
 	if params.has("current_node"):
 		var current_node = params["current_node"]
 		# If this was a boss battle, the run is complete
