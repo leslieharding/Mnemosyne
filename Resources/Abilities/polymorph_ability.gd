@@ -50,7 +50,7 @@ func execute(context: Dictionary) -> bool:
 	var original_stats = target_card.values.duplicate()
 	target_card.set_meta("polymorph_original_stats", original_stats)
 	target_card.set_meta("polymorph_active", true)
-	target_card.set_meta("polymorph_turns_remaining", 2)
+	target_card.set_meta("polymorph_turns_remaining", 8)
 	
 	# Reduce stats to sheep stats (1,1,1,1)
 	target_card.values[0] = 1
@@ -91,7 +91,7 @@ func execute(context: Dictionary) -> bool:
 	active_polymorphs[target_position] = {
 		"card": target_card,
 		"original_stats": original_stats,
-		"turns_remaining": 2,
+		"turns_remaining": 8,
 		"position": target_position
 	}
 	game_manager.set_meta("active_polymorphs", active_polymorphs)

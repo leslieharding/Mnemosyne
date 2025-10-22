@@ -3701,7 +3701,7 @@ metadata/_custom_type_script = "uid://gnlr02su1oni"
 [sub_resource type="Resource" id="Resource_34jyf"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
-values = Array[int]([6, 6, 6, 6])
+values = Array[int]([3, 3, 3, 3])
 description = "Nobody is hurting me. Nobody is killing me!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_nmjjd")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3715,6 +3715,7 @@ metadata/_custom_type_script = "uid://0qrqs8lrn7oh"
 [sub_resource type="Resource" id="Resource_s6suc"]
 script = ExtResource("2_xcqsp")
 card_name = "Circe"
+values = Array[int]([4, 4, 4, 4])
 description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_sjjye")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3767,7 +3768,7 @@ metadata/_custom_type_script = "uid://gnlr02su1oni"
 [sub_resource type="Resource" id="Resource_x1em1"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
-values = Array[int]([6, 7, 6, 7])
+values = Array[int]([4, 4, 4, 4])
 description = "Nobody is hurting me. Nobody is killing me!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_782hj")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3781,6 +3782,7 @@ metadata/_custom_type_script = "uid://0qrqs8lrn7oh"
 [sub_resource type="Resource" id="Resource_67nd5"]
 script = ExtResource("2_xcqsp")
 card_name = "Circe"
+values = Array[int]([4, 4, 4, 4])
 description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_xkk5m")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3833,7 +3835,7 @@ metadata/_custom_type_script = "uid://gnlr02su1oni"
 [sub_resource type="Resource" id="Resource_l7lfy"]
 script = ExtResource("2_xcqsp")
 card_name = "Polyphemus"
-values = Array[int]([7, 7, 7, 7])
+values = Array[int]([5, 5, 5, 5])
 description = "Nobody is hurting me. Nobody is killing me!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_4huow")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3847,6 +3849,7 @@ metadata/_custom_type_script = "uid://0qrqs8lrn7oh"
 [sub_resource type="Resource" id="Resource_pxj21"]
 script = ExtResource("2_xcqsp")
 card_name = "Circe"
+values = Array[int]([4, 4, 4, 4])
 description = "No further talk of pigs, let me seek your forgiveness and most pleasing forgiveness it shall be. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_qgnls")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3905,6 +3908,7 @@ metadata/_custom_type_script = "uid://ci2kc0sisv6o"
 [sub_resource type="Resource" id="Resource_p8t6d"]
 script = ExtResource("2_xcqsp")
 card_name = "Periphetes"
+values = Array[int]([3, 3, 3, 3])
 description = "Yes it's real bronze, I can put it closer to your face if you want proof!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_b7fqt")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3919,6 +3923,7 @@ metadata/_custom_type_script = "uid://1heklkngs5s7"
 [sub_resource type="Resource" id="Resource_uyaj5"]
 script = ExtResource("2_xcqsp")
 card_name = "Sinus"
+values = Array[int]([6, 6, 6, 6])
 description = "One step back and a smidge to the left, yes in the middle of those two pines right there"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_t4ttb")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3932,6 +3937,7 @@ metadata/_custom_type_script = "uid://dao72kdl7r677"
 [sub_resource type="Resource" id="Resource_bqojl"]
 script = ExtResource("2_xcqsp")
 card_name = "Sciron"
+values = Array[int]([3, 3, 3, 4])
 description = "Ohhh feet. Yes I like mine cleaner than clean. Get to scrubbing. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_t0shl")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3945,6 +3951,7 @@ metadata/_custom_type_script = "uid://doof7kcsh7nb"
 [sub_resource type="Resource" id="Resource_c4isu"]
 script = ExtResource("2_xcqsp")
 card_name = "Cercyon"
+values = Array[int]([3, 3, 3, 3])
 description = "Come join me for a spot of wrestling, to the winner glory, the loser death."
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_26e2b")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3958,6 +3965,7 @@ metadata/_custom_type_script = "uid://bl46ipgerc0od"
 [sub_resource type="Resource" id="Resource_gm07s"]
 script = ExtResource("2_xcqsp")
 card_name = "Procrustes"
+values = Array[int]([2, 2, 5, 5])
 description = "Why yes of course you can stay the night, you will be especially taken by how comfortable the bed is, let me fit you to it.  "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_04mi2")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3971,6 +3979,7 @@ metadata/_custom_type_script = "uid://ci2kc0sisv6o"
 [sub_resource type="Resource" id="Resource_4yhrc"]
 script = ExtResource("2_xcqsp")
 card_name = "Periphetes"
+values = Array[int]([3, 3, 3, 3])
 description = "Yes it's real bronze, I can put it closer to your face if you want proof!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_tsfu7")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3998,6 +4007,7 @@ metadata/_custom_type_script = "uid://dao72kdl7r677"
 [sub_resource type="Resource" id="Resource_blewv"]
 script = ExtResource("2_xcqsp")
 card_name = "Sciron"
+values = Array[int]([3, 3, 3, 4])
 description = "Ohhh feet. Yes I like mine cleaner than clean. Get to scrubbing. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_iaamu")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -4011,6 +4021,7 @@ metadata/_custom_type_script = "uid://doof7kcsh7nb"
 [sub_resource type="Resource" id="Resource_xb1cl"]
 script = ExtResource("2_xcqsp")
 card_name = "Cercyon"
+values = Array[int]([3, 3, 3, 3])
 description = "Come join me for a spot of wrestling, to the winner glory, the loser death."
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_oeipg")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -4037,6 +4048,7 @@ metadata/_custom_type_script = "uid://ci2kc0sisv6o"
 [sub_resource type="Resource" id="Resource_unglp"]
 script = ExtResource("2_xcqsp")
 card_name = "Periphetes"
+values = Array[int]([3, 3, 3, 3])
 description = "Yes it's real bronze, I can put it closer to your face if you want proof!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_xmwyj")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -4064,6 +4076,7 @@ metadata/_custom_type_script = "uid://dao72kdl7r677"
 [sub_resource type="Resource" id="Resource_d2mjc"]
 script = ExtResource("2_xcqsp")
 card_name = "Sciron"
+values = Array[int]([3, 3, 4, 4])
 description = "Ohhh feet. Yes I like mine cleaner than clean. Get to scrubbing. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_sin7x")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -4077,6 +4090,7 @@ metadata/_custom_type_script = "uid://doof7kcsh7nb"
 [sub_resource type="Resource" id="Resource_rrm5w"]
 script = ExtResource("2_xcqsp")
 card_name = "Cercyon"
+values = Array[int]([3, 3, 3, 3])
 description = "Come join me for a spot of wrestling, to the winner glory, the loser death."
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_q0y0u")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
