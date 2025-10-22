@@ -199,8 +199,8 @@ func load_test_battle_data():
 	if enemies_collection:
 		var enemy_names = enemies_collection.get_enemy_names()
 		for enemy_name in enemy_names:
-			# Add each difficulty level (0-3) for each enemy
-			for difficulty in range(4):
+			# Add each difficulty level (1-3) for each enemy
+			for difficulty in range(1, 4):  # Changed from range(4) to range(1, 4)
 				available_enemies.append({
 					"enemy_name": enemy_name,
 					"difficulty": difficulty
