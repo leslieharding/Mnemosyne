@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=47 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=49 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_w7xgs"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_cm1c1"]
+[ext_resource type="Script" uid="uid://gnlr02su1oni" path="res://Resources/Abilities/blind_ability.gd" id="3_xjxyc"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="4_2h7tk"]
 [ext_resource type="Script" uid="uid://bjrn1xq2fqgxo" path="res://Resources/Abilities/sun_bather_ability.gd" id="5_gowu1"]
 [ext_resource type="Script" uid="uid://doof7kcsh7nb" path="res://Resources/Abilities/wrestle_ability.gd" id="6_qbbw0"]
@@ -29,10 +30,17 @@ values = Array[int]([6, 6, 6, 6])
 description = "When attacking increases power by 1 in that direction"
 metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 
+[sub_resource type="Resource" id="Resource_bj61k"]
+script = ExtResource("3_xjxyc")
+ability_name = "Blind"
+description = "This card attacks friends and foes alike"
+metadata/_custom_type_script = "uid://gnlr02su1oni"
+
 [sub_resource type="Resource" id="Resource_gs2nm"]
 script = ExtResource("4_2h7tk")
 level = 3
 values = Array[int]([7, 7, 7, 7])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_bj61k")])
 description = "When attacking increases power by 1 in that direction"
 metadata/_custom_type_script = "uid://bmxtvlg3nqx7s"
 

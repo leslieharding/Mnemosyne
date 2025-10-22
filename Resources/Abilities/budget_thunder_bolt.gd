@@ -35,10 +35,10 @@ func execute(context: Dictionary) -> bool:
 	
 	print("BudgetThunderBoltAbility: Randomly selected slot ", target_position, " as target")
 	
-	# Show the yellow lightning flash effect first
-	var target_card_display = game_manager.get_card_display_at_position(target_position)
-	if target_card_display and game_manager.visual_effects_manager:
-		game_manager.visual_effects_manager.show_thunder_bolt_flash(target_card_display)
+	# Show the yellow lightning flash effect on the TARGET SLOT (works even if empty)
+	if game_manager.visual_effects_manager:
+		var target_slot = game_manager.grid_slots[target_position]
+		show_thunder_bolt_flash_on_slot(target_slot, game_manager.visual_effects_manager)
 	
 	# Wait for the flash to visually appear before processing capture
 	await game_manager.get_tree().create_timer(0.3).timeout
@@ -53,19 +53,29 @@ func execute(context: Dictionary) -> bool:
 	var target_card = game_manager.get_card_at_position(target_position)
 	var target_owner = game_manager.get_owner_at_position(target_position)
 	
-	# Budget version: capture ANY card regardless of owner
-	print("BudgetThunderBoltAbility: Target contains a card - changing ownership!")
-	game_manager.set_card_ownership(target_position, budget_bolt_owner)
+	# ===== CRITICAL SECTION: Budget version ALWAYS flips ownership =====
+	# This is the downside - it can backfire on friendly cards!
+	var new_owner
+	if target_owner == game_manager.Owner.PLAYER:
+		new_owner = game_manager.Owner.OPPONENT
+	else:
+		new_owner = game_manager.Owner.PLAYER
+	
+	print("BudgetThunderBoltAbility: Flipping ownership from ", target_owner, " to ", new_owner)
+	game_manager.set_card_ownership(target_position, new_owner)
+	# ===== END CRITICAL SECTION =====
 	
 	var ownership_text = ""
 	if target_owner == budget_bolt_owner:
-		ownership_text = " (oops, it was friendly!)"
+		ownership_text = " (oops, backfired on friendly card!)"
+	else:
+		ownership_text = " (successfully captured enemy card!)"
 	
 	print(ability_name, " activated! Budget thunder bolt struck and changed ownership of ", target_card.card_name, " at position ", target_position, ownership_text)
 	
 	# Award experience for capture (only if player benefits from it)
-	# Don't award exp if player zapped their own card
-	if budget_bolt_owner == game_manager.Owner.PLAYER and target_owner != budget_bolt_owner:
+	# Don't award exp if player zapped their own card (backfire)
+	if budget_bolt_owner == game_manager.Owner.PLAYER and new_owner == game_manager.Owner.PLAYER:
 		var budget_bolt_card_index = game_manager.get_card_collection_index(grid_position)
 		if budget_bolt_card_index != -1:
 			var exp_tracker = game_manager.get_node_or_null("/root/RunExperienceTrackerAutoload")
@@ -96,6 +106,33 @@ func execute(context: Dictionary) -> bool:
 	game_manager.update_board_visuals()
 	
 	return true
+
+# Show thunder bolt flash on a slot (works even if slot is empty)
+func show_thunder_bolt_flash_on_slot(slot: Control, visual_effects_manager: VisualEffectsManager):
+	if not slot or not visual_effects_manager:
+		return
+	
+	# Create a bright yellow lightning flash effect directly on the slot
+	var flash_overlay = ColorRect.new()
+	flash_overlay.color = Color("#FFFF00", 0.8)  # Bright yellow with transparency
+	flash_overlay.size = slot.size
+	flash_overlay.position = Vector2.ZERO
+	flash_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	slot.add_child(flash_overlay)
+	
+	# Animate the thunder bolt flash with a quick, electric feel
+	var tween = visual_effects_manager.create_tween()
+	tween.set_parallel(true)
+	
+	# Quick electric pulse - fast flash to simulate lightning strike
+	tween.tween_property(flash_overlay, "modulate:a", 1.0, 0.05)
+	tween.tween_property(flash_overlay, "modulate:a", 0.3, 0.05).set_delay(0.05)
+	tween.tween_property(flash_overlay, "modulate:a", 0.9, 0.05).set_delay(0.1)
+	tween.tween_property(flash_overlay, "modulate:a", 0.0, 0.15).set_delay(0.15)
+	
+	# Clean up
+	tween.tween_callback(func(): flash_overlay.queue_free()).set_delay(0.3)
 
 func can_execute(context: Dictionary) -> bool:
 	return true

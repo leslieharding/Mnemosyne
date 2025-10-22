@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=678 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=681 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -3339,6 +3339,7 @@ metadata/_custom_type_script = "uid://cgshw8nsqjxs3"
 [sub_resource type="Resource" id="Resource_m3ito"]
 script = ExtResource("2_xcqsp")
 card_name = "Pasiphae"
+values = Array[int]([3, 3, 3, 3])
 description = "I trust the mechanics will be optimised for pleasure Daedalus."
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_0in7p")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -3353,6 +3354,7 @@ metadata/_custom_type_script = "uid://dh4c5feb2eu1v"
 [sub_resource type="Resource" id="Resource_bdu77"]
 script = ExtResource("2_xcqsp")
 card_name = "Cretan Bull"
+values = Array[int]([4, 4, 4, 4])
 description = "Has one ever seen a more appealing bull? Such broad flanks oh my. 
 "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_jej5r")])
@@ -3374,8 +3376,8 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 [sub_resource type="Resource" id="Resource_mqcxu"]
 script = ExtResource("2_xcqsp")
 card_name = "Asterion"
+values = Array[int]([8, 8, 8, 8])
 description = "We could always leave together half brother mine, we need not fight."
-abilities = Array[ExtResource("3_lm3ty")]([null])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ime24"]
@@ -4149,6 +4151,7 @@ metadata/_custom_type_script = "uid://nrdoysdoyfq1"
 [sub_resource type="Resource" id="Resource_bpwh1"]
 script = ExtResource("2_xcqsp")
 card_name = "Lycaon"
+values = Array[int]([3, 3, 3, 3])
 description = "For you Cloud Gatherer a stew most tender. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_lw2ml")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -4162,6 +4165,7 @@ metadata/_custom_type_script = "uid://bcu6cf6gen411"
 [sub_resource type="Resource" id="Resource_u77kq"]
 script = ExtResource("2_xcqsp")
 card_name = "Sisyphus"
+values = Array[int]([3, 3, 3, 3])
 description = "Yes I'm still there, Yes I'm still trying, you would have given up ages ago. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_xbnji")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -4202,6 +4206,7 @@ metadata/_custom_type_script = "uid://b6ve1q1bclr5u"
 [sub_resource type="Resource" id="Resource_fq1fo"]
 script = ExtResource("2_xcqsp")
 card_name = "Salmoneus"
+values = Array[int]([2, 2, 2, 2])
 description = "Yes another pan to the chariot good sir, I want my next pass to really sing out!"
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_7w8p2")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -4338,12 +4343,36 @@ description = "Yes another pan to the chariot good sir, I want my next pass to r
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_xb6e5")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_io1lm"]
+script = ExtResource("3_601pn")
+deck_name = "Wicked Kings"
+deck_description = "Level 1"
+difficulty_level = 1
+card_indices = Array[int]([0, 1, 2, 3, 4])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_72olk"]
+script = ExtResource("3_601pn")
+deck_name = "Wicked Kings"
+deck_description = "Level 2"
+difficulty_level = 2
+card_indices = Array[int]([5, 6, 7, 8, 9])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
+[sub_resource type="Resource" id="Resource_pgeg1"]
+script = ExtResource("3_601pn")
+deck_name = "Wicked Kings"
+deck_description = "Level 3"
+difficulty_level = 3
+card_indices = Array[int]([10, 11, 12, 13, 14])
+metadata/_custom_type_script = "uid://ctv7ajt5j616m"
+
 [sub_resource type="Resource" id="Resource_8j8lk"]
 script = ExtResource("1_e7ref")
 enemy_name = "Wicked Kings"
 enemy_description = "Why is it always the worst who end up in charge?"
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_bpwh1"), SubResource("Resource_u77kq"), SubResource("Resource_rfcos"), SubResource("Resource_7y3gw"), SubResource("Resource_fq1fo"), SubResource("Resource_nqu4c"), SubResource("Resource_8np3j"), SubResource("Resource_4h7vp"), SubResource("Resource_eoxwa"), SubResource("Resource_cmqdx"), SubResource("Resource_f5fhw"), SubResource("Resource_2lea1"), SubResource("Resource_87kaq"), SubResource("Resource_wqxhb"), SubResource("Resource_064r4")])
-decks = null
+decks = Array[ExtResource("3_601pn")]([SubResource("Resource_io1lm"), SubResource("Resource_72olk"), SubResource("Resource_pgeg1")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
 [resource]
