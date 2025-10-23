@@ -7622,6 +7622,7 @@ func create_battle_snapshot():
 		"coordinate_used": coordinate_used,
 		"is_coordination_active": is_coordination_active,
 		"is_artemis_boss_battle": is_artemis_boss_battle,
+		"current_season": current_season,
 		"artemis_boss_counter_triggered": artemis_boss_counter_triggered  
 	}
 	
@@ -7732,7 +7733,14 @@ func restore_battle_from_snapshot() -> bool:
 		rhythm_slot = deck_power_state.get("rhythm_slot", -1)
 		rhythm_boost_value = deck_power_state.get("rhythm_boost_value", 1)
 		is_artemis_boss_battle = deck_power_state.get("is_artemis_boss_battle", false) 
-		artemis_boss_counter_triggered = deck_power_state.get("artemis_boss_counter_triggered", false)  
+		artemis_boss_counter_triggered = deck_power_state.get("artemis_boss_counter_triggered", false)
+		current_season = deck_power_state.get("current_season", Season.SUMMER)  
+		
+		# Update the seasons display after restoration
+		if is_seasons_power_active():
+			update_seasons_display()
+			print("Restored season state to: ", "SUMMER" if current_season == Season.SUMMER else "WINTER")
+		
 		
 		if coordinate_button and active_deck_power == DeckDefinition.DeckPowerType.COORDINATE_POWER:
 			coordinate_button.disabled = coordinate_used
