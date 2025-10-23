@@ -738,6 +738,9 @@ func update_panel_content(card_data: CardResource):
 	if card_data.abilities.size() > 0:
 		var ability = card_data.abilities[0]
 		
+		# Get the card level - check hand displays first, then grid
+		var card_level = get_card_level_for_hovered_card(card_data)
+		
 		# Check for abilities with dynamic descriptions
 		if ability.ability_name == "Graeae":
 			var graeae_ability_script = preload("res://Resources/Abilities/graeae_ability.gd")
@@ -745,17 +748,14 @@ func update_panel_content(card_data: CardResource):
 			ability_description_display.text = graeae_ability_script.get_description_for_state(card_data)
 		elif ability.ability_name == "Grow":
 			ability_name_display.text = ability.ability_name
-			var card_level = get_card_level_for_hovered_card(card_data)
 			var grow_ability_script = preload("res://Resources/Abilities/grow_ability.gd")
 			ability_description_display.text = grow_ability_script.get_description_for_level(card_level)
 		elif ability.ability_name == "Cultivate":
 			ability_name_display.text = ability.ability_name
-			var card_level = get_card_level_for_hovered_card(card_data)
 			var cultivate_ability_script = preload("res://Resources/Abilities/cultivate_ability.gd")
 			ability_description_display.text = cultivate_ability_script.get_description_for_level(card_level)
 		elif ability.ability_name == "Enrich":
 			ability_name_display.text = ability.ability_name
-			var card_level = get_card_level_for_hovered_card(card_data)
 			var enrich_ability_script = preload("res://Resources/Abilities/enrich_ability.gd")
 			ability_description_display.text = enrich_ability_script.get_description_for_level(card_level)
 		else:
@@ -1621,9 +1621,9 @@ func resolve_extended_range_combat(grid_index: int, attacking_owner: Owner, atta
 				if my_attack_value > their_defense_value:
 					print("Extended range captured card at slot ", adj_index, "!")
 					captures.append(adj_index)
-					handle_extended_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction_name)
+					handle_extended_combat_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
 				else:
-					handle_extended_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, direction_name)
+					handle_extended_defense_effects(grid_index, adj_index, attacking_owner, attacking_card, adjacent_card, pos_info)
 	
 	return captures
 # Add helper function to get collection index from grid position
