@@ -7,6 +7,17 @@ func _init():
 	description = "If still owned, this card gains 10 experience at the start of each of your turns"
 	trigger_condition = TriggerType.PASSIVE
 
+# Static helper function to get level-scaled exp amount
+static func get_exp_for_level(card_level: int) -> int:
+	# Every 3 levels: 10 * (1 + floor((level - 1) / 3))
+	# Levels 1-3: 10, Levels 4-6: 20, Levels 7-9: 30, etc.
+	return 10 * (1 + int(floor(float(card_level - 1) / 3.0)))
+
+# Static helper function to get dynamic description based on level
+static func get_description_for_level(card_level: int) -> String:
+	var exp_amount = get_exp_for_level(card_level)
+	return "If still owned, this card gains " + str(exp_amount) + " experience at the start of each of your turns"
+
 func execute(context: Dictionary) -> bool:
 	if not can_execute(context):
 		return false
@@ -36,76 +47,63 @@ func execute(context: Dictionary) -> bool:
 func apply_cultivation(position: int, card: CardResource, game_manager) -> bool:
 	print("Cultivation started for ", card.card_name, " at position ", position)
 	
-	# Only activate cultivation for player-owned cards
 	var card_owner = game_manager.get_owner_at_position(position)
 	if card_owner == game_manager.Owner.PLAYER:
-		# Mark this card as having cultivation active
 		card.set_meta("cultivation_active", true)
 		print("Cultivation activated for player-owned card")
 	else:
-		# Mark cultivation as inactive for enemy-owned cards
-		card.set_meta("cultivation_active", false)
-		print("Cultivation NOT activated for enemy-owned card")
-	
-	# Always start visual pulse effect (it will show red for enemy, purple for player)
-	var card_display = game_manager.get_card_display_at_position(position)
-	if card_display and game_manager.visual_effects_manager:
-		game_manager.visual_effects_manager.start_passive_pulse(card_display)
+		print("Cultivation not activated - card is opponent-owned")
 	
 	return true
 
 func remove_cultivation(position: int, card: CardResource, game_manager) -> bool:
 	print("Cultivation ended for ", card.card_name, " at position ", position)
 	
-	# Mark cultivation as inactive
-	card.set_meta("cultivation_active", false)
-	
-	# Stop visual pulse effect
-	var card_display = game_manager.get_card_display_at_position(position)
-	if card_display and game_manager.visual_effects_manager:
-		game_manager.visual_effects_manager.stop_passive_pulse(card_display)
+	if card.has_meta("cultivation_active"):
+		card.set_meta("cultivation_active", false)
+		print("Cultivation deactivated")
 	
 	return true
 
 func process_cultivation_turn(position: int, card: CardResource, game_manager) -> bool:
-	# Check if cultivation is still active (card might have been captured)
 	if not card.has_meta("cultivation_active") or not card.get_meta("cultivation_active"):
-		print("Cultivation not active for ", card.card_name)
+		print("CultivateAbility: Card does not have active cultivation")
 		return false
 	
-	# Get card collection index for experience tracking
+	print("CultivateAbility: Processing turn start for ", card.card_name)
+	
 	var card_collection_index = game_manager.get_card_collection_index(position)
 	if card_collection_index == -1:
-		print("CultivateAbility: Could not find collection index for card at position ", position)
+		print("CultivateAbility: Could not find collection index")
 		return false
 	
-	# Calculate experience amount based on Seasons power
-	var exp_amount = 10  # Default experience gain
+	var card_level = game_manager.get_card_level(card_collection_index)
+	
+	# Calculate level-scaled experience amount
+	var exp_amount = get_exp_for_level(card_level)
+	
+	# Check for Seasons power
 	if game_manager.has_method("is_seasons_power_active") and game_manager.is_seasons_power_active():
 		var current_season = game_manager.get_current_season()
 		match current_season:
 			game_manager.Season.SUMMER:
-				exp_amount = 20  # Double experience in Summer
-				print("CultivateAbility: Summer season - doubling experience to 20")
+				exp_amount *= 2
+				print("CultivateAbility: Summer season - doubling experience to ", exp_amount)
 			game_manager.Season.WINTER:
-				exp_amount = -10  # Negative experience in Winter
-				print("CultivateAbility: Winter season - reversing experience to -10")
+				exp_amount = -exp_amount
+				print("CultivateAbility: Winter season - reversing experience to ", exp_amount)
 	
-	# Award the experience (including negative amounts in Winter)
 	var exp_tracker = game_manager.get_node_or_null("/root/RunExperienceTrackerAutoload")
 	if exp_tracker:
 		if exp_amount > 0:
 			exp_tracker.add_total_exp(card_collection_index, exp_amount)
 			print("CultivateAbility: ", card.card_name, " gained ", exp_amount, " experience")
 		elif exp_amount < 0:
-			# Winter effect: reduce experience but not below 0
-			# Get current experience for this card in the run
 			var current_exp_data = exp_tracker.get_card_experience(card_collection_index)
 			var current_total = current_exp_data.get("total_exp", 0)
-			var reduction_amount = min(abs(exp_amount), current_total)  # Don't reduce below 0
+			var reduction_amount = min(abs(exp_amount), current_total)
 			
 			if reduction_amount > 0:
-				# Subtract experience using negative value
 				exp_tracker.add_total_exp(card_collection_index, -reduction_amount)
 				print("CultivateAbility: ", card.card_name, " lost ", reduction_amount, " experience (Winter effect)")
 			else:

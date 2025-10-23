@@ -738,14 +738,27 @@ func update_panel_content(card_data: CardResource):
 	if card_data.abilities.size() > 0:
 		var ability = card_data.abilities[0]
 		
-		# NEW: Check if this is a Graeae ability and use dynamic description
+		# Check for abilities with dynamic descriptions
 		if ability.ability_name == "Graeae":
-			# Use the static helper functions to get state-based ability info
 			var graeae_ability_script = preload("res://Resources/Abilities/graeae_ability.gd")
 			ability_name_display.text = graeae_ability_script.get_ability_name_for_state(card_data)
 			ability_description_display.text = graeae_ability_script.get_description_for_state(card_data)
+		elif ability.ability_name == "Grow":
+			ability_name_display.text = ability.ability_name
+			var card_level = get_card_level_for_hovered_card(card_data)
+			var grow_ability_script = preload("res://Resources/Abilities/grow_ability.gd")
+			ability_description_display.text = grow_ability_script.get_description_for_level(card_level)
+		elif ability.ability_name == "Cultivate":
+			ability_name_display.text = ability.ability_name
+			var card_level = get_card_level_for_hovered_card(card_data)
+			var cultivate_ability_script = preload("res://Resources/Abilities/cultivate_ability.gd")
+			ability_description_display.text = cultivate_ability_script.get_description_for_level(card_level)
+		elif ability.ability_name == "Enrich":
+			ability_name_display.text = ability.ability_name
+			var card_level = get_card_level_for_hovered_card(card_data)
+			var enrich_ability_script = preload("res://Resources/Abilities/enrich_ability.gd")
+			ability_description_display.text = enrich_ability_script.get_description_for_level(card_level)
 		else:
-			# Normal ability display for non-Graeae cards
 			ability_name_display.text = ability.ability_name
 			ability_description_display.text = ability.description
 		
@@ -8939,3 +8952,22 @@ func clear_all_polymorph_effects():
 	
 	set_meta("active_polymorphs", {})
 	print("All polymorph effects cleared")
+
+# Helper function to get the card level for a hovered card
+func get_card_level_for_hovered_card(card_data: CardResource) -> int:
+	# Try to find this card in hand displays
+	for card_display in hand_container.get_children():
+		if card_display is CardDisplay:
+			if card_display.card_data and card_display.card_data.card_name == card_data.card_name:
+				return card_display.card_level
+	
+	# Try to find this card on the grid
+	for position in range(grid_slots.size()):
+		if grid_occupied[position]:
+			var grid_card = grid_card_data[position]
+			if grid_card and grid_card.card_name == card_data.card_name:
+				var card_collection_index = get_card_collection_index(position)
+				return get_card_level(card_collection_index)
+	
+	# Default to level 1 if not found
+	return 1
