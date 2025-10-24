@@ -1822,9 +1822,10 @@ func _on_opponent_card_placed(grid_index: int):
 	print("Checking for Pursuit ability triggers...")
 	check_pursuit_triggers(grid_index, opponent_card_data)
 	
-	# If cloak of night is active, hide the newly placed card
-	if cloak_of_night_active:
+	# If cloak of night is active, hide the newly placed card (but only if still opponent-owned)
+	if cloak_of_night_active and grid_ownership[grid_index] == Owner.OPPONENT:
 		hide_opponent_card_at_position(grid_index)
+		hidden_opponent_cards.append(grid_index)  # Track this card for reveal later
 	
 	# Clear the thinking flag since opponent finished their turn
 	opponent_is_thinking = false
