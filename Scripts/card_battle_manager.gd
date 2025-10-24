@@ -2816,7 +2816,7 @@ func display_player_hand():
 		print("Setting up hand card ", i, ": ", card.card_name, " at level ", current_level, " (collection index: ", card_collection_index, ")")
 		
 		# FOR HAND DISPLAY: Create a copy of the card with level-appropriate values AND growth
-		var hand_card_data = card.duplicate()
+		var hand_card_data = card.duplicate(true)  # DEEP COPY to avoid reference issues
 		var effective_values = card.get_effective_values(current_level)
 		var effective_abilities = card.get_effective_abilities(current_level)
 		
@@ -2825,12 +2825,34 @@ func display_player_hand():
 			var growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
 			effective_values = growth_tracker.apply_growth_to_card_values(effective_values, card_collection_index)
 		
-		# Apply the level-appropriate values AND growth to the hand display copy
+		# Apply the level-appropriate values to the hand display copy
 		hand_card_data.values = effective_values.duplicate()
-		hand_card_data.abilities = effective_abilities.duplicate()
+		
+		# CRITICAL: Deep duplicate abilities and update descriptions for level-scaled abilities
+		var duplicated_abilities: Array[CardAbility] = []
+		for ability in effective_abilities:
+			var duplicated_ability = ability.duplicate(true)  # Deep duplicate the ability
+			
+			# Update description for level-scaled abilities
+			if duplicated_ability.ability_name == "Grow":
+				var grow_ability_script = preload("res://Resources/Abilities/grow_ability.gd")
+				duplicated_ability.description = grow_ability_script.get_description_for_level(current_level)
+				print("Updated Grow description for level ", current_level, ": ", duplicated_ability.description)
+			elif duplicated_ability.ability_name == "Cultivate":
+				var cultivate_ability_script = preload("res://Resources/Abilities/cultivate_ability.gd")
+				duplicated_ability.description = cultivate_ability_script.get_description_for_level(current_level)
+				print("Updated Cultivate description for level ", current_level, ": ", duplicated_ability.description)
+			elif duplicated_ability.ability_name == "Enrich":
+				var enrich_ability_script = preload("res://Resources/Abilities/enrich_ability.gd")
+				duplicated_ability.description = enrich_ability_script.get_description_for_level(current_level)
+				print("Updated Enrich description for level ", current_level, ": ", duplicated_ability.description)
+			
+			duplicated_abilities.append(duplicated_ability)
+		
+		hand_card_data.abilities = duplicated_abilities
 		
 		print("Hand card effective values (with growth): ", effective_values)
-		print("Hand card effective abilities count: ", effective_abilities.size())
+		print("Hand card effective abilities count: ", duplicated_abilities.size())
 		
 		# Setup the card with the level-appropriate data for hand display
 		card_display.setup(hand_card_data, current_level, current_god, card_collection_index)
@@ -2854,17 +2876,7 @@ func display_player_hand():
 		
 		# Connect to detect clicks on the card
 		card_display.panel.gui_input.connect(_on_card_gui_input.bind(card_display, i))
-		print("Connected panel gui_input for card ", i)
-		
-		# Test if the CardDisplay itself has input handling
-		if card_display.has_signal("input_event"):
-			card_display.input_event.connect(_on_card_input_event.bind(card_display, i))
-			print("Connected CardDisplay input_event for card ", i)
-		
-		if active_coerced_card_index != -1:
-			apply_coerced_card_styling(active_coerced_card_index)
-
-
+		print("Connected gui_input signal for card ", i)
 func _on_card_input_event(viewport, event, shape_idx, card_display, card_index):
 	print("=== CARD INPUT EVENT ===")
 	print("Event: ", event)
@@ -3467,6 +3479,8 @@ func place_card_on_grid():
 	
 	
 	# Execute ON_PLAY abilities
+	var card_was_replaced = false  # Track if card was replaced by ability (like Persephone)
+	
 	if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
 		print("Executing on-play abilities for ", card_data.card_name)
 		
@@ -3488,19 +3502,28 @@ func place_card_on_grid():
 					continue
 				
 				print("Executing ability: ", ability.ability_name, " (", ability.description, ")")
+				
+				# Check if this is Queen of the Underworld (Persephone's ability)
+				if ability.ability_name == "Queen of the Underworld":
+					card_was_replaced = true  # Mark that card will be replaced
+				
 				ability.execute(ability_context)
 		
 		# Update the visual display after abilities execute (in case stats changed)
-		update_card_display(current_grid_index, card_data)
+		# ONLY if card wasn't replaced
+		if not card_was_replaced:
+			update_card_display(current_grid_index, card_data)
 	
-	# Handle passive abilities when player places card
-	handle_passive_abilities_on_place(current_grid_index, card_data, card_level)
-	
-	# Check for couple union
-	check_for_couple_union(card_data, current_grid_index)
-	
-	# Register if this card has Second Chance
-	register_second_chance_if_needed(current_grid_index, card_data, Owner.PLAYER)
+	# Only continue with placement logic if card wasn't replaced
+	if not card_was_replaced:
+		# Handle passive abilities when player places card
+		handle_passive_abilities_on_place(current_grid_index, card_data, card_level)
+		
+		# Check for couple union
+		check_for_couple_union(card_data, current_grid_index)
+		
+		# Register if this card has Second Chance
+		register_second_chance_if_needed(current_grid_index, card_data, Owner.PLAYER)
 	
 	# Resolve combat
 	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
@@ -6321,19 +6344,19 @@ func let_player_choose_underworld_ally(underworld_allies: Array) -> CardResource
 	print("Player chose: ", underworld_allies[chosen_index].card_name)
 	return underworld_allies[chosen_index]
 
-# Replace a card with a summoned ally
-func replace_card_with_summon(grid_position: int, summoned_ally: CardResource):
+
+func replace_card_with_summon(grid_position: int, summoned_ally: CardResource) -> bool:
 	print("=== REPLACING CARD WITH SUMMON ===")
 	print("Position: ", grid_position)
 	print("Summoned ally: ", summoned_ally.card_name)
 	
 	if grid_position < 0 or grid_position >= grid_slots.size():
 		print("ERROR: Invalid grid position for replacement")
-		return
+		return false
 	
 	if not grid_occupied[grid_position]:
 		print("ERROR: No card at position to replace")
-		return
+		return false
 	
 	# Get the current owner (should be player since it's Persephone)
 	var current_owner = grid_ownership[grid_position]
@@ -6404,6 +6427,8 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource):
 		print("Summoned ally captured ", captures, " cards!")
 	else:
 		print("No captures for summoned ally")
+	
+	return true
 
 func get_persephone_level() -> int:
 	if not has_node("/root/GlobalProgressTrackerAutoload"):
