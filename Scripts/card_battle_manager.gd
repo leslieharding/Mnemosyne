@@ -738,27 +738,15 @@ func update_panel_content(card_data: CardResource):
 	if card_data.abilities.size() > 0:
 		var ability = card_data.abilities[0]
 		
-		# Get the card level - check hand displays first, then grid
-		var card_level = get_card_level_for_hovered_card(card_data)
-		
-		# Check for abilities with dynamic descriptions
+		# Check for abilities with dynamic descriptions that need special handling
 		if ability.ability_name == "Graeae":
 			var graeae_ability_script = preload("res://Resources/Abilities/graeae_ability.gd")
 			ability_name_display.text = graeae_ability_script.get_ability_name_for_state(card_data)
 			ability_description_display.text = graeae_ability_script.get_description_for_state(card_data)
-		elif ability.ability_name == "Grow":
-			ability_name_display.text = ability.ability_name
-			var grow_ability_script = preload("res://Resources/Abilities/grow_ability.gd")
-			ability_description_display.text = grow_ability_script.get_description_for_level(card_level)
-		elif ability.ability_name == "Cultivate":
-			ability_name_display.text = ability.ability_name
-			var cultivate_ability_script = preload("res://Resources/Abilities/cultivate_ability.gd")
-			ability_description_display.text = cultivate_ability_script.get_description_for_level(card_level)
-		elif ability.ability_name == "Enrich":
-			ability_name_display.text = ability.ability_name
-			var enrich_ability_script = preload("res://Resources/Abilities/enrich_ability.gd")
-			ability_description_display.text = enrich_ability_script.get_description_for_level(card_level)
 		else:
+			# For all other abilities (including Grow, Cultivate, Enrich), use the description 
+			# that's already in the card_data, which has been updated with level-appropriate values
+			# when the card was set up in display_player_hand()
 			ability_name_display.text = ability.ability_name
 			ability_description_display.text = ability.description
 		
@@ -3313,9 +3301,27 @@ func place_card_on_grid():
 		var growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
 		effective_values = growth_tracker.apply_growth_to_card_values(effective_values, card_collection_index)
 	
-	# Apply the level-appropriate values and abilities AND growth to the grid copy
+	# Apply the level-appropriate values to the grid copy
 	card_data.values = effective_values.duplicate()
-	card_data.abilities = effective_abilities.duplicate()
+
+	var duplicated_abilities: Array[CardAbility] = []
+	for ability in effective_abilities:
+		var duplicated_ability = ability.duplicate(true)  # Deep duplicate the ability
+		
+		# Update description for level-scaled abilities
+		if duplicated_ability.ability_name == "Grow":
+			var grow_ability_script = preload("res://Resources/Abilities/grow_ability.gd")
+			duplicated_ability.description = grow_ability_script.get_description_for_level(card_level)
+		elif duplicated_ability.ability_name == "Cultivate":
+			var cultivate_ability_script = preload("res://Resources/Abilities/cultivate_ability.gd")
+			duplicated_ability.description = cultivate_ability_script.get_description_for_level(card_level)
+		elif duplicated_ability.ability_name == "Enrich":
+			var enrich_ability_script = preload("res://Resources/Abilities/enrich_ability.gd")
+			duplicated_ability.description = enrich_ability_script.get_description_for_level(card_level)
+		
+		duplicated_abilities.append(duplicated_ability)
+	
+	card_data.abilities = duplicated_abilities
 	
 	# Apply Disarray effect if active - mark the card as confused
 	if disarray_active:
