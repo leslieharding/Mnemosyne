@@ -7,9 +7,9 @@
 [ext_resource type="Script" uid="uid://gnlr02su1oni" path="res://Resources/Abilities/blind_ability.gd" id="3_xjxyc"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="4_2h7tk"]
 [ext_resource type="Script" uid="uid://bjrn1xq2fqgxo" path="res://Resources/Abilities/sun_bather_ability.gd" id="5_gowu1"]
-[ext_resource type="Script" uid="uid://doof7kcsh7nb" path="res://Resources/Abilities/wrestle_ability.gd" id="6_qbbw0"]
 [ext_resource type="Script" uid="uid://dao72kdl7r677" path="res://Resources/Abilities/edge_ability.gd" id="7_qbbw0"]
 [ext_resource type="Script" uid="uid://cm2mhp17xds1o" path="res://Resources/Abilities/survival_ability.gd" id="7_sfw3d"]
+[ext_resource type="Script" uid="uid://nnfoltbs28a7" path="res://Resources/Abilities/sun_dancer_ability.gd" id="7_xjxyc"]
 [ext_resource type="Script" uid="uid://cs8jo68kos2c6" path="res://Resources/Abilities/harmony_ability.gd" id="9_p7jhq"]
 [ext_resource type="Script" uid="uid://btx30eg0dkxdt" path="res://Resources/Abilities/symmetry_ability.gd" id="10_xjxyc"]
 [ext_resource type="Script" uid="uid://bfbpkrqf1u508" path="res://Resources/Abilities/finale_ability.gd" id="12_cknfu"]
@@ -82,18 +82,18 @@ description = "Oh Phaeton dont listen to him"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_fysfy")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
-[sub_resource type="Resource" id="Resource_xjxyc"]
-script = ExtResource("6_qbbw0")
-ability_name = "Wrestle"
-description = "If this card cannot beat you in direct combat, it will also fight your other values, best out of 3 wins."
-metadata/_custom_type_script = "uid://doof7kcsh7nb"
+[sub_resource type="Resource" id="Resource_lg4ks"]
+script = ExtResource("7_xjxyc")
+ability_name = "Sun Dance"
+description = "If this card is played in a sun spot, it creates another in a random empty slot"
+metadata/_custom_type_script = "uid://nnfoltbs28a7"
 
 [sub_resource type="Resource" id="Resource_j3ax7"]
 script = ExtResource("1_vqrrp")
 card_name = "Phlegon"
 values = Array[int]([8, 8, 1, 8])
 description = "All the other horses of the sun wish they were Phelgon. "
-abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_xjxyc")])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_lg4ks")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_sfw3d"]

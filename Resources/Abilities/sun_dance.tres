@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SunDanceAbility" load_steps=2 format=3 uid="uid://i4tembfijavx"]
+
+[ext_resource type="Script" uid="uid://nnfoltbs28a7" path="res://Resources/Abilities/sun_dancer_ability.gd" id="1_givdm"]
+
+[resource]
+script = ExtResource("1_givdm")
+ability_name = "Sun Dance"
+description = "If this card is played in a sun spot, it creates another in a random empty slot"
+metadata/_custom_type_script = "uid://nnfoltbs28a7"
