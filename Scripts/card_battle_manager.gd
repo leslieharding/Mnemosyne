@@ -3520,6 +3520,12 @@ func place_card_on_grid():
 				
 				ability.execute(ability_context)
 		
+		# CRITICAL FIX: After abilities execute, get the CURRENT card data from the grid
+		# (in case Persephone was replaced with a summoned ally)
+		if card_was_replaced:
+			card_data = grid_card_data[current_grid_index]
+			print("Card was replaced - using new card data: ", card_data.card_name if card_data else "NULL")
+		
 		# Update the visual display after abilities execute (in case stats changed)
 		# ONLY if card wasn't replaced
 		if not card_was_replaced:
@@ -3536,10 +3542,13 @@ func place_card_on_grid():
 		# Register if this card has Second Chance
 		register_second_chance_if_needed(current_grid_index, card_data, Owner.PLAYER)
 	
-	# Resolve combat
-	var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
-	if captures > 0:
-		print("Player captured ", captures, " cards!")
+	# CRITICAL FIX: Don't resolve combat here if card was replaced
+	# The replace_card_with_summon function already handles combat for the summoned ally
+	if not card_was_replaced:
+		# Resolve combat
+		var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
+		if captures > 0:
+			print("Player captured ", captures, " cards!")
 		# NEW: Check if card has Aristeia ability and trigger it with captures_made
 		if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
 			var available_abilities = card_data.get_available_abilities(card_level)
@@ -6355,7 +6364,6 @@ func let_player_choose_underworld_ally(underworld_allies: Array) -> CardResource
 	print("Player chose: ", underworld_allies[chosen_index].card_name)
 	return underworld_allies[chosen_index]
 
-
 func replace_card_with_summon(grid_position: int, summoned_ally: CardResource) -> bool:
 	print("=== REPLACING CARD WITH SUMMON ===")
 	print("Position: ", grid_position)
@@ -6372,12 +6380,26 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource) -
 	# Get the current owner (should be player since it's Persephone)
 	var current_owner = grid_ownership[grid_position]
 	
-	# FIXED: Remove the old card display first
+	# FIXED: Properly disconnect and remove the old card display
 	var slot = grid_slots[grid_position]
 	for child in slot.get_children():
 		if child.has_method("setup"):  # This is a CardDisplay
 			print("Removing old card display: ", child.card_data.card_name if child.card_data else "Unknown")
+			# Disconnect all signals before freeing
+			if child.has_signal("card_hovered"):
+				if child.card_hovered.is_connected(_on_card_hovered):
+					child.card_hovered.disconnect(_on_card_hovered)
+			if child.has_signal("card_unhovered"):
+				if child.card_unhovered.is_connected(_on_card_unhovered):
+					child.card_unhovered.disconnect(_on_card_unhovered)
+			# Disconnect right-click handler if it exists
+			if child.panel and child.panel.gui_input.is_connected(_on_grid_card_right_click):
+				child.panel.gui_input.disconnect(_on_grid_card_right_click)
+			# Now it's safe to free
 			child.queue_free()
+	
+	# Wait for the old card to be fully removed
+	await get_tree().process_frame
 	
 	# Create a copy of the summoned ally for the grid
 	var ally_copy = summoned_ally.duplicate(true)
@@ -6385,7 +6407,7 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource) -
 	# Replace the card data
 	grid_card_data[grid_position] = ally_copy
 	
-	# FIXED: Create new card display properly
+	# Create new card display properly
 	var card_display_scene = preload("res://Scenes/CardDisplay.tscn")
 	var card_display = card_display_scene.instantiate()
 	slot.add_child(card_display)
