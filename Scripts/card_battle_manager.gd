@@ -6384,7 +6384,12 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource) -
 	var slot = grid_slots[grid_position]
 	for child in slot.get_children():
 		if child.has_method("setup"):  # This is a CardDisplay
+			# Validate child is still valid first
+			if not is_instance_valid(child):
+				continue
+			
 			print("Removing old card display: ", child.card_data.card_name if child.card_data else "Unknown")
+			
 			# Disconnect all signals before freeing
 			if child.has_signal("card_hovered"):
 				if child.card_hovered.is_connected(_on_card_hovered):
@@ -6392,9 +6397,13 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource) -
 			if child.has_signal("card_unhovered"):
 				if child.card_unhovered.is_connected(_on_card_unhovered):
 					child.card_unhovered.disconnect(_on_card_unhovered)
-			# Disconnect right-click handler if it exists
-			if child.panel and child.panel.gui_input.is_connected(_on_grid_card_right_click):
-				child.panel.gui_input.disconnect(_on_grid_card_right_click)
+			
+			# Disconnect right-click handler - check instance validity before accessing panel
+			if is_instance_valid(child) and child.get("panel") != null:
+				if is_instance_valid(child.panel):
+					if child.panel.gui_input.is_connected(_on_grid_card_right_click):
+						child.panel.gui_input.disconnect(_on_grid_card_right_click)
+			
 			# Now it's safe to free
 			child.queue_free()
 	
