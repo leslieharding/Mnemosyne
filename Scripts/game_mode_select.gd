@@ -199,16 +199,26 @@ func load_test_battle_data():
 	if enemies_collection:
 		var enemy_names = enemies_collection.get_enemy_names()
 		for enemy_name in enemy_names:
-			# Add each difficulty level (1-3) for each enemy
-			for difficulty in range(1, 4):  # Changed from range(4) to range(1, 4)
-				available_enemies.append({
-					"enemy_name": enemy_name,
-					"difficulty": difficulty
-				})
-				
-				# Add to dropdown
-				var display_name = enemy_name + " (Diff " + str(difficulty) + ")"
-				enemy_dropdown.add_item(display_name)
+			var enemy_data = enemies_collection.get_enemy(enemy_name)
+			if enemy_data and enemy_data.decks.size() > 0:
+				# Check if enemy has multiple difficulty decks
+				if enemy_data.decks.size() > 1:
+					# Multi-difficulty enemy - add each difficulty
+					for i in range(enemy_data.decks.size()):
+						var difficulty = enemy_data.decks[i].difficulty_level
+						available_enemies.append({
+							"enemy_name": enemy_name,
+							"difficulty": difficulty
+						})
+						var display_name = enemy_name + " (Diff " + str(difficulty) + ")"
+						enemy_dropdown.add_item(display_name)
+				else:
+					# Boss enemy with single deck - add without difficulty suffix
+					available_enemies.append({
+						"enemy_name": enemy_name,
+						"difficulty": 1  # Default to 1 for single-deck enemies
+					})
+					enemy_dropdown.add_item(enemy_name)
 		
 		print("Loaded ", available_enemies.size(), " enemy configurations for testing")
 	else:

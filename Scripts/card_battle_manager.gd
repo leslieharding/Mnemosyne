@@ -6516,11 +6516,18 @@ func setup_seasons_power():
 	var params = get_scene_params()
 	var is_fimbulwinter_boss = false
 	
+	# Check for Fimbulwinter boss in both normal and test battles
 	if params.has("current_node"):
+		# Normal battle from map
 		var current_node = params["current_node"]
 		if current_node.node_type == MapNode.NodeType.BOSS and current_node.enemy_name == BossConfig.DEMETER_BOSS_NAME:
 			is_fimbulwinter_boss = true
 			print("FIMBULWINTER BOSS DETECTED - Eternal Winter mode activated!")
+	elif params.has("enemy_name"):
+		# Test battle or direct battle setup
+		if params["enemy_name"] == BossConfig.DEMETER_BOSS_NAME:
+			is_fimbulwinter_boss = true
+			print("FIMBULWINTER BOSS DETECTED (test battle) - Eternal Winter mode activated!")
 	
 	# Set initial season
 	if is_fimbulwinter_boss:
@@ -9108,9 +9115,7 @@ func process_fimbulwinter_grow(card: CardResource, position: int, collection_ind
 	if not has_grow:
 		return
 	
-	# Calculate negative growth (same scaling as normal)
-	var growth_amount = GrowAbility.get_growth_for_level(card_level)
-	growth_amount = -growth_amount  # Make it negative for Fimbulwinter
+	var growth_amount = -1
 	
 	# Apply to tracker
 	growth_tracker.add_stat_growth(collection_index, growth_amount)
@@ -9141,9 +9146,7 @@ func process_fimbulwinter_cultivate(card: CardResource, position: int, collectio
 	if not has_cultivate:
 		return
 	
-	# Calculate negative exp (same scaling as normal)
-	var exp_amount = CultivateAbility.get_exp_for_level(card_level)
-	exp_amount = -exp_amount  # Make it negative for Fimbulwinter
+	var exp_amount = -10
 	
 	# Get current exp to ensure we don't go below 0
 	var current_exp_data = exp_tracker.get_card_experience(collection_index)
@@ -9171,9 +9174,7 @@ func process_fimbulwinter_enrich(card: CardResource, position: int, card_level: 
 	if not has_enrich:
 		return
 	
-	# Calculate negative enrichment (same scaling as normal)
-	var enrichment_amount = EnrichAbility.get_enrichment_for_level(card_level)
-	enrichment_amount = -enrichment_amount  # Make it negative for Fimbulwinter
+	var enrichment_amount = -1
 	
 	# Select a RANDOM slot on the board (0-8)
 	var random_slot = randi() % 9
