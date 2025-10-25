@@ -18,6 +18,13 @@ static func get_description_for_level(card_level: int) -> String:
 	var exp_amount = get_exp_for_level(card_level)
 	return "If still owned, this card gains " + str(exp_amount) + " experience at the start of each of your turns"
 
+# Static helper function to get base stat scaling for cards with Cultivate ability
+# This gives permanent stat increases based on card level (separate from exp gain)
+static func get_stat_bonus_for_level(card_level: int) -> int:
+	# Every 3 levels, same as exp scaling
+	# Levels 1-3: +0, Levels 4-6: +1, Levels 7-9: +2, etc.
+	return int(floor(float(card_level - 1) / 4.0))
+
 func execute(context: Dictionary) -> bool:
 	if not can_execute(context):
 		return false

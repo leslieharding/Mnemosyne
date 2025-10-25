@@ -45,96 +45,119 @@ func get_effective_values(level: int) -> Array[int]:
 	if should_use_mnemosyne_tracker():
 		return get_mnemosyne_values()
 	
-	return get_level_data(level).values.duplicate()
+	# Check if card has level_data - if so, use that (manual progression)
+	if uses_level_progression and not level_data.is_empty():
+		return get_level_data(level).values.duplicate()
+	
+	# Check if this card has any of the ramping abilities (Grow/Cultivate/Enrich)
+	# If so, apply ability-specific stat scaling
+	var scaled_values = values.duplicate()
+	var has_scaling_ability = false
+	
+	# Check each ability to see if it provides stat scaling
+	for ability in abilities:
+		if ability is GrowAbility:
+			var bonus = GrowAbility.get_stat_bonus_for_level(level)
+			for i in range(scaled_values.size()):
+				scaled_values[i] += bonus
+			has_scaling_ability = true
+			print("Applied Grow stat scaling: +", bonus, " at level ", level)
+			break  # Only apply one scaling type
+		elif ability is CultivateAbility:
+			var bonus = CultivateAbility.get_stat_bonus_for_level(level)
+			for i in range(scaled_values.size()):
+				scaled_values[i] += bonus
+			has_scaling_ability = true
+			print("Applied Cultivate stat scaling: +", bonus, " at level ", level)
+			break
+		elif ability is EnrichAbility:
+			var bonus = EnrichAbility.get_stat_bonus_for_level(level)
+			for i in range(scaled_values.size()):
+				scaled_values[i] += bonus
+			has_scaling_ability = true
+			print("Applied Enrich stat scaling: +", bonus, " at level ", level)
+			break
+	
+	return scaled_values
+
+# Execute abilities of a certain trigger type
+func execute_abilities(trigger_type: CardAbility.TriggerType, context: Dictionary, level: int):
+	var abilities_to_execute = get_effective_abilities(level)
+	
+	for ability in abilities_to_execute:
+		if ability.trigger_condition == trigger_type:
+			print("Executing ability: ", ability.ability_name)
+			ability.execute(context)
+
+# Get available abilities for a card at a given level (filters by unlock_level)
+func get_available_abilities(level: int) -> Array[CardAbility]:
+	return get_effective_abilities(level)
 
 func get_effective_abilities(level: int) -> Array[CardAbility]:
-	var base_abilities = get_level_data(level).abilities.duplicate()
-	
-	# For Mnemosyne cards, add boss-unlocked abilities
+	# Check if this is a Mnemosyne card and use tracker abilities
 	if should_use_mnemosyne_tracker():
-		var boss_abilities = get_mnemosyne_boss_abilities()
-		base_abilities.append_array(boss_abilities)
+		return get_mnemosyne_abilities()
 	
-	return base_abilities
+	var level_abilities = get_level_data(level).abilities
+	
+	# Filter abilities based on their unlock level
+	var unlocked_abilities: Array[CardAbility] = []
+	for ability in level_abilities:
+		if ability.unlock_level <= level:
+			unlocked_abilities.append(ability)
+	
+	return unlocked_abilities
 
 func get_effective_description(level: int) -> String:
-	var level_desc = get_level_data(level).description
-	return level_desc if level_desc != "" else description
+	return get_level_data(level).description
 
-# Check if card has abilities of a specific type at given level
-func has_ability_type(trigger_type: CardAbility.TriggerType, level: int = 0) -> bool:
-	var abilities = get_effective_abilities(level)
-	for ability in abilities:
+func has_ability_type(trigger_type: CardAbility.TriggerType, level: int) -> bool:
+	var abilities_at_level = get_effective_abilities(level)
+	for ability in abilities_at_level:
 		if ability.trigger_condition == trigger_type:
 			return true
 	return false
 
-# Get all available abilities for a specific level
-func get_available_abilities(level: int = 0) -> Array[CardAbility]:
+func get_abilities_for_level(level: int) -> Array[CardAbility]:
 	return get_effective_abilities(level)
 
-# Execute abilities of a specific type
-func execute_abilities(trigger_type: CardAbility.TriggerType, context: Dictionary, level: int = 0):
-	var abilities = get_effective_abilities(level)
-	for ability in abilities:
-		if ability.trigger_condition == trigger_type:
-			print("Executing ability: ", ability.ability_name, " (", ability.description, ")")
-			ability.execute(context)
+# === MNEMOSYNE CARD HANDLING ===
+
+const MNEMOSYNE_GOD_NAME = "Mnemosyne"
 
 func should_use_mnemosyne_tracker() -> bool:
-	# Check if we're dealing with a Mnemosyne card by looking for the tracker
-	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
-	if not scene_tree:
-		return false
-	
-	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
-	if not tracker:
-		return false
-	
-	# Check if this is a Mnemosyne card (based on card names)
-	var mnemosyne_cards = ["Clio", "Euterpe", "Terpsichore", "Thalia", "Melpomene"]
-	return card_name in mnemosyne_cards
+	# Check if this card is a Mnemosyne card
+	# We use metadata to identify Mnemosyne cards
+	return has_meta("is_mnemosyne_card") and get_meta("is_mnemosyne_card")
 
-# NEW: Get values from Mnemosyne tracker
 func get_mnemosyne_values() -> Array[int]:
-	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
-	if not scene_tree:
-		return [1, 1, 1, 1]
+	if not has_meta("mnemosyne_card_index"):
+		print("Warning: Mnemosyne card missing card index metadata")
+		return values.duplicate()
 	
-	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
+	var card_index = get_meta("mnemosyne_card_index")
+	
+	# Get values from MnemosyneProgressTracker
+	# Note: Can't use get_node_or_null here since CardResource is not a Node
+	var tracker = Engine.get_singleton("MnemosyneProgressTrackerAutoload")
 	if not tracker:
-		return [1, 1, 1, 1]
-	
-	# Map card names to indices
-	var card_index = -1
-	match card_name:
-		"Clio": card_index = 0
-		"Euterpe": card_index = 1
-		"Terpsichore": card_index = 2
-		"Thalia": card_index = 3
-		"Melpomene": card_index = 4
-		_: return [1, 1, 1, 1]
+		print("Warning: MnemosyneProgressTracker not found")
+		return values.duplicate()
 	
 	return tracker.get_card_values(card_index)
 
-# NEW: Get boss-unlocked abilities from Mnemosyne tracker
-func get_mnemosyne_boss_abilities() -> Array[CardAbility]:
-	var scene_tree = Engine.get_singleton("SceneTree") as SceneTree
-	if not scene_tree:
-		return []
+func get_mnemosyne_abilities() -> Array[CardAbility]:
+	if not has_meta("mnemosyne_card_index"):
+		print("Warning: Mnemosyne card missing card index metadata")
+		return abilities.duplicate()
 	
-	var tracker = scene_tree.get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
+	var card_index = get_meta("mnemosyne_card_index")
+	
+	# Get abilities from MnemosyneProgressTracker
+	# Note: Can't use get_node_or_null here since CardResource is not a Node
+	var tracker = Engine.get_singleton("MnemosyneProgressTrackerAutoload")
 	if not tracker:
-		return []
-	
-	# Map card names to indices
-	var card_index = -1
-	match card_name:
-		"Clio": card_index = 0
-		"Euterpe": card_index = 1
-		"Terpsichore": card_index = 2
-		"Thalia": card_index = 3
-		"Melpomene": card_index = 4
-		_: return []
+		print("Warning: MnemosyneProgressTracker not found")
+		return abilities.duplicate()
 	
 	return tracker.get_unlocked_abilities_for_card(card_index)

@@ -18,6 +18,13 @@ static func get_description_for_level(card_level: int) -> String:
 	var growth_amount = get_growth_for_level(card_level)
 	return "On play, this card gains +" + str(growth_amount) + " to all stats for the entire run"
 
+# Static helper function to get base stat scaling for cards with Grow ability
+# This gives permanent stat increases based on card level (separate from run growth)
+static func get_stat_bonus_for_level(card_level: int) -> int:
+	# Every 2 levels, same as growth scaling
+	# Levels 1-2: +0, Levels 3-4: +1, Levels 5-6: +2, etc.
+	return int(floor(float(card_level - 1) / 3.0))
+
 func execute(context: Dictionary) -> bool:
 	if not can_execute(context):
 		return false

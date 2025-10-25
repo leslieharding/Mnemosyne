@@ -18,6 +18,13 @@ static func get_description_for_level(card_level: int) -> String:
 	var enrichment_amount = get_enrichment_for_level(card_level)
 	return "On play, choose a slot. For the remainder of the run this slot will boost the stats of friendly cards by " + str(enrichment_amount)
 
+# Static helper function to get base stat scaling for cards with Enrich ability
+# This gives permanent stat increases based on card level (separate from enrichment bonus)
+static func get_stat_bonus_for_level(card_level: int) -> int:
+	# Every 4 levels (slowest scaling - Enrich is easiest to stack)
+	# Levels 1-4: +0, Levels 5-8: +1, Levels 9-12: +2, etc.
+	return int(floor(float(card_level - 1) / 2.0))
+
 func execute(context: Dictionary) -> bool:
 	if not can_execute(context):
 		return false
