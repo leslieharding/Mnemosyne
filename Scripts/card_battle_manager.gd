@@ -3596,10 +3596,7 @@ func place_card_on_grid():
 		restore_slot_original_styling(current_grid_index)
 	current_grid_index = -1
 
-	# Check if game should end
-	if should_game_end():
-		end_game()
-		return
+	
 
 	# DON'T switch turns if any special modes are active
 	if hunt_mode_active:
@@ -3637,6 +3634,12 @@ func place_card_on_grid():
 	if race_mode_active:
 		print("Race mode active - staying on turn until race completes")
 		return
+		
+	# Check if game should end
+	if should_game_end():
+		end_game()
+		return	
+		
 	if is_coordination_active and turn_manager.current_player == TurnManager.Player.HUMAN:
 		print("🎯 Coordination active - checking if player can take another turn")
 		
