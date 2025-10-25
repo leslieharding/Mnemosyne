@@ -59,11 +59,11 @@ func execute(context: Dictionary) -> bool:
 	
 	growth_tracker.add_stat_growth(card_collection_index, growth_amount)
 	
-	# Apply the growth immediately to the card that was just played
-	placed_card.values[0] += growth_amount  # North
-	placed_card.values[1] += growth_amount  # East
-	placed_card.values[2] += growth_amount  # South
-	placed_card.values[3] += growth_amount  # West
+	# Apply the growth immediately to the card that was just played, clamping to minimum of 0
+	placed_card.values[0] = max(0, placed_card.values[0] + growth_amount)  # North
+	placed_card.values[1] = max(0, placed_card.values[1] + growth_amount)  # East
+	placed_card.values[2] = max(0, placed_card.values[2] + growth_amount)  # South
+	placed_card.values[3] = max(0, placed_card.values[3] + growth_amount)  # West
 	
 	if growth_amount > 0:
 		print("GrowAbility activated! ", placed_card.card_name, " grew +", growth_amount, " to all stats!")

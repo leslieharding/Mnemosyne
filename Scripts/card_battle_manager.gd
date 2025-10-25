@@ -6800,6 +6800,12 @@ func select_enrich_target(target_slot: int):
 	else:
 		game_status_label.text = "Slot weakened! Friendly cards in that slot get %d to all stats." % pending_enrichment_amount
 	
+	# Check if game should end BEFORE switching turns
+	if should_game_end():
+		print("Game ending after enrich slot selection")
+		end_game()
+		return
+	
 	# Switch turns - enrich action completes the turn
 	print("Enrich target selected - switching turns")
 	turn_manager.next_turn()
@@ -6898,11 +6904,11 @@ func apply_enrichment_bonus_if_applicable(grid_position: int, card_data: CardRes
 	if enrichment_level != 0:
 		print("Applying enrichment bonus: +", enrichment_level, " to all stats")
 		
-		# Apply enrichment bonus to all directions
-		card_data.values[0] += enrichment_level  # North
-		card_data.values[1] += enrichment_level  # East
-		card_data.values[2] += enrichment_level  # South
-		card_data.values[3] += enrichment_level  # West
+		# Apply enrichment bonus to all directions, clamping to minimum of 0
+		card_data.values[0] = max(0, card_data.values[0] + enrichment_level)  # North
+		card_data.values[1] = max(0, card_data.values[1] + enrichment_level)  # East
+		card_data.values[2] = max(0, card_data.values[2] + enrichment_level)  # South
+		card_data.values[3] = max(0, card_data.values[3] + enrichment_level)  # West
 		
 		print("Card stats after enrichment: ", card_data.values)
 		
@@ -6959,11 +6965,11 @@ func apply_enrichment_bonus_to_existing_card(grid_position: int, card_data: Card
 	print("Enrichment amount: ", enrichment_amount)
 	print("Card stats before: ", card_data.values)
 	
-	# Apply enrichment bonus to all directions
-	card_data.values[0] += enrichment_amount  # North
-	card_data.values[1] += enrichment_amount  # East
-	card_data.values[2] += enrichment_amount  # South
-	card_data.values[3] += enrichment_amount  # West
+	# Apply enrichment bonus to all directions, clamping to minimum of 0
+	card_data.values[0] = max(0, card_data.values[0] + enrichment_amount)  # North
+	card_data.values[1] = max(0, card_data.values[1] + enrichment_amount)  # East
+	card_data.values[2] = max(0, card_data.values[2] + enrichment_amount)  # South
+	card_data.values[3] = max(0, card_data.values[3] + enrichment_amount)  # West
 	
 	print("Card stats after enrichment: ", card_data.values)
 	
@@ -9106,11 +9112,11 @@ func process_fimbulwinter_grow(card: CardResource, position: int, collection_ind
 	# Apply to tracker
 	growth_tracker.add_stat_growth(collection_index, growth_amount)
 	
-	# Apply immediately to the card on board
-	card.values[0] += growth_amount  # North
-	card.values[1] += growth_amount  # East
-	card.values[2] += growth_amount  # South
-	card.values[3] += growth_amount  # West
+	# Apply immediately to the card on board, clamping to minimum of 0
+	card.values[0] = max(0, card.values[0] + growth_amount)  # North
+	card.values[1] = max(0, card.values[1] + growth_amount)  # East
+	card.values[2] = max(0, card.values[2] + growth_amount)  # South
+	card.values[3] = max(0, card.values[3] + growth_amount)  # West
 	
 	# Update visual display
 	update_card_display(position, card)
