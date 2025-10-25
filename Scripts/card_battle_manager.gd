@@ -962,6 +962,10 @@ func _on_turn_changed(is_player_turn: bool):
 	if is_player_turn:
 		process_cultivation_turn_start()
 		process_wither_turn_start()
+		
+		# NEW: Process Fimbulwinter effects if boss active
+		if fimbulwinter_boss_active:
+			process_fimbulwinter_winter_effects()
 	else:
 		# Process corruption abilities at the start of opponent's turn
 		process_corruption_turn_start()
@@ -9011,3 +9015,133 @@ func get_card_level_for_hovered_card(card_data: CardResource) -> int:
 	
 	# Default to level 1 if not found
 	return 1
+
+func process_fimbulwinter_winter_effects():
+	print("=== FIMBULWINTER WINTER EFFECTS TRIGGERED ===")
+	
+	# Get trackers
+	var growth_tracker = get_node_or_null("/root/RunStatGrowthTrackerAutoload")
+	var exp_tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+	var enrichment_tracker = get_node_or_null("/root/RunEnrichmentTrackerAutoload")
+	
+	if not growth_tracker or not exp_tracker or not enrichment_tracker:
+		print("ERROR: Missing tracker autoloads")
+		return
+	
+	# Iterate through all 9 grid positions
+	for position in range(9):
+		var owner = get_owner_at_position(position)
+		
+		# Only affect player-owned cards
+		if owner != Owner.PLAYER:
+			continue
+		
+		var card = get_card_at_position(position)
+		if not card:
+			continue
+		
+		var card_collection_index = get_card_collection_index(position)
+		if card_collection_index == -1:
+			continue
+		
+		var card_level = get_card_level(card_collection_index)
+		
+		# Check each ability type and apply Fimbulwinter effect
+		process_fimbulwinter_grow(card, position, card_collection_index, card_level, growth_tracker)
+		process_fimbulwinter_cultivate(card, position, card_collection_index, card_level, exp_tracker)
+		process_fimbulwinter_enrich(card, position, card_level, enrichment_tracker)
+	
+	print("=== FIMBULWINTER EFFECTS COMPLETE ===")
+
+
+func process_fimbulwinter_grow(card: CardResource, position: int, collection_index: int, card_level: int, growth_tracker):
+	# Check if card has Grow ability
+	if not card.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
+		return
+	
+	var has_grow = false
+	for ability in card.get_abilities_for_level(card_level):
+		if ability is GrowAbility:
+			has_grow = true
+			break
+	
+	if not has_grow:
+		return
+	
+	# Calculate negative growth (same scaling as normal)
+	var growth_amount = GrowAbility.get_growth_for_level(card_level)
+	growth_amount = -growth_amount  # Make it negative for Fimbulwinter
+	
+	# Apply to tracker
+	growth_tracker.add_stat_growth(collection_index, growth_amount)
+	
+	# Apply immediately to the card on board
+	card.values[0] += growth_amount  # North
+	card.values[1] += growth_amount  # East
+	card.values[2] += growth_amount  # South
+	card.values[3] += growth_amount  # West
+	
+	# Update visual display
+	update_card_display(position, card)
+	
+	print("Fimbulwinter: ", card.card_name, " withered by ", abs(growth_amount))
+	
+	if notification_manager:
+		notification_manager.show_notification(card.card_name + " withers in the eternal cold")
+
+
+func process_fimbulwinter_cultivate(card: CardResource, position: int, collection_index: int, card_level: int, exp_tracker):
+	# Check if card has Cultivate ability
+	var has_cultivate = false
+	for ability in card.get_abilities_for_level(card_level):
+		if ability is CultivateAbility:
+			has_cultivate = true
+			break
+	
+	if not has_cultivate:
+		return
+	
+	# Calculate negative exp (same scaling as normal)
+	var exp_amount = CultivateAbility.get_exp_for_level(card_level)
+	exp_amount = -exp_amount  # Make it negative for Fimbulwinter
+	
+	# Get current exp to ensure we don't go below 0
+	var current_exp_data = exp_tracker.get_card_experience(collection_index)
+	var current_total = current_exp_data.get("total_exp", 0)
+	var reduction_amount = min(abs(exp_amount), current_total)
+	
+	if reduction_amount > 0:
+		exp_tracker.add_total_exp(collection_index, -reduction_amount)
+		print("Fimbulwinter: ", card.card_name, " lost ", reduction_amount, " experience")
+		
+		if notification_manager:
+			notification_manager.show_notification(card.card_name + " loses " + str(reduction_amount) + " experience")
+	else:
+		print("Fimbulwinter: ", card.card_name, " experience already at minimum")
+
+
+func process_fimbulwinter_enrich(card: CardResource, position: int, card_level: int, enrichment_tracker):
+	# Check if card has Enrich ability
+	var has_enrich = false
+	for ability in card.get_abilities_for_level(card_level):
+		if ability is EnrichAbility:
+			has_enrich = true
+			break
+	
+	if not has_enrich:
+		return
+	
+	# Calculate negative enrichment (same scaling as normal)
+	var enrichment_amount = EnrichAbility.get_enrichment_for_level(card_level)
+	enrichment_amount = -enrichment_amount  # Make it negative for Fimbulwinter
+	
+	# Select a RANDOM slot on the board (0-8)
+	var random_slot = randi() % 9
+	
+	# Apply enrichment to that random slot
+	enrichment_tracker.add_enrichment(random_slot, enrichment_amount)
+	
+	print("Fimbulwinter: ", card.card_name, " caused slot ", random_slot, " to lose ", abs(enrichment_amount), " enrichment")
+	
+	if notification_manager:
+		notification_manager.show_notification("Slot " + str(random_slot) + " withers from " + card.card_name)

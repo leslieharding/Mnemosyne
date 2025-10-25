@@ -84,7 +84,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_lg4ks"]
 script = ExtResource("7_xjxyc")
-ability_name = "Sun Dance"
+ability_name = "Solar Fission"
 description = "If this card is played in a sun spot, it creates another in a random empty slot"
 metadata/_custom_type_script = "uid://nnfoltbs28a7"
 
@@ -98,7 +98,7 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_sfw3d"]
 script = ExtResource("8_xjxyc")
-ability_name = "Sun Hunt"
+ability_name = "Seek Light"
 description = "This card has double attack effectiveness when attacking an enemy in a sun spot"
 metadata/_custom_type_script = "uid://c6eymtk5786om"
 
