@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SunHuntAbility" load_steps=2 format=3 uid="uid://b2n0c42qftiq"]
+
+[ext_resource type="Script" uid="uid://c6eymtk5786om" path="res://Resources/Abilities/sun_hunt_ability.gd" id="1_j2lg0"]
+
+[resource]
+script = ExtResource("1_j2lg0")
+ability_name = "Sun Hunt"
+description = "This card has double attack effectiveness when attacking an enemy in a sun spot"
+metadata/_custom_type_script = "uid://c6eymtk5786om"

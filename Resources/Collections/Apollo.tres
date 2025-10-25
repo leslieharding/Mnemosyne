@@ -7,9 +7,9 @@
 [ext_resource type="Script" uid="uid://gnlr02su1oni" path="res://Resources/Abilities/blind_ability.gd" id="3_xjxyc"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="4_2h7tk"]
 [ext_resource type="Script" uid="uid://bjrn1xq2fqgxo" path="res://Resources/Abilities/sun_bather_ability.gd" id="5_gowu1"]
-[ext_resource type="Script" uid="uid://dao72kdl7r677" path="res://Resources/Abilities/edge_ability.gd" id="7_qbbw0"]
 [ext_resource type="Script" uid="uid://cm2mhp17xds1o" path="res://Resources/Abilities/survival_ability.gd" id="7_sfw3d"]
 [ext_resource type="Script" uid="uid://nnfoltbs28a7" path="res://Resources/Abilities/sun_dancer_ability.gd" id="7_xjxyc"]
+[ext_resource type="Script" uid="uid://c6eymtk5786om" path="res://Resources/Abilities/sun_hunt_ability.gd" id="8_xjxyc"]
 [ext_resource type="Script" uid="uid://cs8jo68kos2c6" path="res://Resources/Abilities/harmony_ability.gd" id="9_p7jhq"]
 [ext_resource type="Script" uid="uid://btx30eg0dkxdt" path="res://Resources/Abilities/symmetry_ability.gd" id="10_xjxyc"]
 [ext_resource type="Script" uid="uid://bfbpkrqf1u508" path="res://Resources/Abilities/finale_ability.gd" id="12_cknfu"]
@@ -97,10 +97,10 @@ abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_lg4ks")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_sfw3d"]
-script = ExtResource("7_qbbw0")
-ability_name = "Edge"
-description = "This card has double effectiveness attacking cards on non-corner board edges"
-metadata/_custom_type_script = "uid://dao72kdl7r677"
+script = ExtResource("8_xjxyc")
+ability_name = "Sun Hunt"
+description = "This card has double attack effectiveness when attacking an enemy in a sun spot"
+metadata/_custom_type_script = "uid://c6eymtk5786om"
 
 [sub_resource type="Resource" id="Resource_bvknv"]
 script = ExtResource("1_vqrrp")
