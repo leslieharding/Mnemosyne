@@ -13,7 +13,7 @@ var progression_data: Dictionary = {
 }
 
 # Configuration
-const MAX_CONTRIBUTIONS_PER_DECK = 10
+const MAX_CONTRIBUTIONS_PER_DECK = 40
 const BASE_CARD_VALUES = [1, 1, 1, 1]  # N, E, S, W
 const MNEMOSYNE_CARD_COUNT = 5
 
@@ -47,17 +47,121 @@ const CARD_NAMES = ["Clio", "Euterpe", "Terpsichore", "Thalia", "Melpomene"]
 
 # Progression map - defines order of upgrades
 var progression_map: Dictionary = {
-	1: {"card_index": 0, "stat_index": 0},   # Clio North
-	2: {"card_index": 1, "stat_index": 1},   # Euterpe East
-	3: {"card_index": 0, "stat_index": 2},   # Clio South
-	4: {"card_index": 2, "stat_index": 3},   # Terpsichore West
-	5: {"card_index": 1, "stat_index": 0},   # Euterpe North
-	6: {"card_index": 3, "stat_index": 1},   # Thalia East
-	7: {"card_index": 0, "stat_index": 1},   # Clio East
-	8: {"card_index": 2, "stat_index": 2},   # Terpsichore South
-	9: {"card_index": 4, "stat_index": 0},   # Melpomene North
-	10: {"card_index": 1, "stat_index": 2},  # Euterpe South
+	1: {"card_index": 2, "stat_index": 3},   # Terpsichore West
+	4: {"card_index": 4, "stat_index": 3},   # Melpomene East
+	7: {"card_index": 0, "stat_index": 2},   # Clio South
+	10: {"card_index": 1, "stat_index": 0},  # Euterpe North
+	13: {"card_index": 3, "stat_index": 2},  # Thalia South
+	16: {"card_index": 2, "stat_index": 0},  # Terpsichore North
+	19: {"card_index": 4, "stat_index": 2},  # Melpomene South
+	22: {"card_index": 1, "stat_index": 1},  # Euterpe East
+	25: {"card_index": 0, "stat_index": 0},  # Clio North
+	28: {"card_index": 3, "stat_index": 1},  # Thalia East
+	31: {"card_index": 2, "stat_index": 3},  # Terpsichore West
+	34: {"card_index": 4, "stat_index": 1},  # Melpomene West
+	37: {"card_index": 1, "stat_index": 2},  # Euterpe South
+	40: {"card_index": 0, "stat_index": 2},  # Clio South
+	43: {"card_index": 3, "stat_index": 1},  # Thalia East
+	46: {"card_index": 2, "stat_index": 0},  # Terpsichore North
+	49: {"card_index": 4, "stat_index": 3},  # Melpomene East
+	52: {"card_index": 1, "stat_index": 0},  # Euterpe North
+	55: {"card_index": 0, "stat_index": 3},  # Clio East
+	58: {"card_index": 3, "stat_index": 2},  # Thalia South
+	61: {"card_index": 2, "stat_index": 3},  # Terpsichore West
+	64: {"card_index": 4, "stat_index": 2},  # Melpomene South
+	67: {"card_index": 1, "stat_index": 1},  # Euterpe East
+	70: {"card_index": 0, "stat_index": 0},  # Clio North
+	73: {"card_index": 3, "stat_index": 1},  # Thalia East
+	76: {"card_index": 2, "stat_index": 2},  # Terpsichore South
+	79: {"card_index": 4, "stat_index": 3},  # Melpomene East
+	82: {"card_index": 1, "stat_index": 2},  # Euterpe South
+	85: {"card_index": 0, "stat_index": 2},  # Clio South
+	88: {"card_index": 3, "stat_index": 2},  # Thalia South
+	91: {"card_index": 2, "stat_index": 0},  # Terpsichore North
+	94: {"card_index": 4, "stat_index": 1},  # Melpomene West
+	97: {"card_index": 1, "stat_index": 0},  # Euterpe North
+	100: {"card_index": 0, "stat_index": 0},  # Clio North
+	103: {"card_index": 3, "stat_index": 1},  # Thalia East
+	106: {"card_index": 2, "stat_index": 3},  # Terpsichore West
+	109: {"card_index": 4, "stat_index": 2},  # Melpomene South
+	112: {"card_index": 1, "stat_index": 1},  # Euterpe East
+	115: {"card_index": 0, "stat_index": 2},  # Clio South
+	118: {"card_index": 3, "stat_index": 2},  # Thalia South
+	121: {"card_index": 2, "stat_index": 3},  # Terpsichore West
+	124: {"card_index": 4, "stat_index": 3},  # Melpomene East
+	127: {"card_index": 1, "stat_index": 0},  # Euterpe North
+	130: {"card_index": 0, "stat_index": 0},  # Clio North
+	133: {"card_index": 3, "stat_index": 1},  # Thalia East
+	136: {"card_index": 2, "stat_index": 0},  # Terpsichore North
+	139: {"card_index": 4, "stat_index": 1},  # Melpomene West
+	142: {"card_index": 1, "stat_index": 2},  # Euterpe South
+	145: {"card_index": 0, "stat_index": 3},  # Clio East
+	148: {"card_index": 3, "stat_index": 2},  # Thalia South
+	151: {"card_index": 2, "stat_index": 3},  # Terpsichore West
+	154: {"card_index": 4, "stat_index": 2},  # Melpomene South
+	157: {"card_index": 1, "stat_index": 0},  # Euterpe North
+	160: {"card_index": 0, "stat_index": 2},  # Clio South
+	163: {"card_index": 3, "stat_index": 1},  # Thalia East
+	166: {"card_index": 2, "stat_index": 2},  # Terpsichore South
+	169: {"card_index": 4, "stat_index": 1},  # Melpomene West
+	172: {"card_index": 1, "stat_index": 1},  # Euterpe East
+	175: {"card_index": 0, "stat_index": 0},  # Clio North
+	178: {"card_index": 3, "stat_index": 2},  # Thalia South
+	181: {"card_index": 2, "stat_index": 0},  # Terpsichore North
+	184: {"card_index": 4, "stat_index": 3},  # Melpomene East
+	187: {"card_index": 1, "stat_index": 0},  # Euterpe North
+	190: {"card_index": 0, "stat_index": 2},  # Clio South
+	193: {"card_index": 3, "stat_index": 2},  # Thalia South
+	196: {"card_index": 2, "stat_index": 3},  # Terpsichore West
+	199: {"card_index": 4, "stat_index": 2},  # Melpomene South
+	202: {"card_index": 1, "stat_index": 2},  # Euterpe South
+	205: {"card_index": 0, "stat_index": 3},  # Clio East
+	208: {"card_index": 3, "stat_index": 1},  # Thalia East
+	211: {"card_index": 2, "stat_index": 0},  # Terpsichore North
+	214: {"card_index": 4, "stat_index": 1},  # Melpomene West
+	217: {"card_index": 1, "stat_index": 1},  # Euterpe East
+	220: {"card_index": 0, "stat_index": 0},  # Clio North
+	223: {"card_index": 3, "stat_index": 2},  # Thalia South
+	226: {"card_index": 2, "stat_index": 2},  # Terpsichore South
+	229: {"card_index": 4, "stat_index": 3},  # Melpomene East
+	232: {"card_index": 1, "stat_index": 0},  # Euterpe North
+	235: {"card_index": 0, "stat_index": 3},  # Clio East
+	238: {"card_index": 3, "stat_index": 2},  # Thalia South
+	241: {"card_index": 2, "stat_index": 2},  # Terpsichore South
+	244: {"card_index": 4, "stat_index": 2},  # Melpomene South
+	247: {"card_index": 1, "stat_index": 2},  # Euterpe South
+	250: {"card_index": 0, "stat_index": 0},  # Clio North
+	253: {"card_index": 3, "stat_index": 1},  # Thalia East
+	256: {"card_index": 2, "stat_index": 0},  # Terpsichore North
+	259: {"card_index": 4, "stat_index": 1},  # Melpomene West
+	262: {"card_index": 1, "stat_index": 1},  # Euterpe East
+	265: {"card_index": 0, "stat_index": 2},  # Clio South
+	268: {"card_index": 3, "stat_index": 2},  # Thalia South
+	271: {"card_index": 4, "stat_index": 3},  # Melpomene East
+	274: {"card_index": 1, "stat_index": 2},  # Euterpe South
+	277: {"card_index": 0, "stat_index": 3},  # Clio East
+	280: {"card_index": 3, "stat_index": 0},  # Thalia North
+	283: {"card_index": 4, "stat_index": 2},  # Melpomene South
+	286: {"card_index": 1, "stat_index": 0},  # Euterpe North
+	289: {"card_index": 0, "stat_index": 0},  # Clio North
+	292: {"card_index": 3, "stat_index": 1},  # Thalia East
+	295: {"card_index": 4, "stat_index": 3},  # Melpomene East
+	298: {"card_index": 1, "stat_index": 1},  # Euterpe East
+	301: {"card_index": 0, "stat_index": 2},  # Clio South
+	304: {"card_index": 3, "stat_index": 3},  # Thalia West
+	307: {"card_index": 4, "stat_index": 2},  # Melpomene South
+	310: {"card_index": 1, "stat_index": 2},  # Euterpe South
+	313: {"card_index": 0, "stat_index": 3},  # Clio East
+	316: {"card_index": 3, "stat_index": 0},  # Thalia North
+	319: {"card_index": 4, "stat_index": 1},  # Melpomene West
+	322: {"card_index": 4, "stat_index": 3},  # Melpomene East
+	325: {"card_index": 4, "stat_index": 3},  # Melpomene East
+	328: {"card_index": 4, "stat_index": 2},  # Melpomene South
+	331: {"card_index": 2, "stat_index": 3},  # Terpsichore West
+	334: {"card_index": 2, "stat_index": 3},  # Terpsichore West
+	337: {"card_index": 2, "stat_index": 3},  # Terpsichore West
 }
+
 
 var save_path: String = "user://mnemosyne_progress.save"
 
