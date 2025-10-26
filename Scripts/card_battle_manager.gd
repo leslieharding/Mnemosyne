@@ -4061,7 +4061,82 @@ func record_enemy_encounter(victory: bool):
 		
 		print("Checking god unlocks...")
 		print("Current unlocked gods: ", progress_tracker.get_unlocked_gods())
-
+	
+	if has_node("/root/ConversationManagerAutoload"):
+		var conv_manager = get_node("/root/ConversationManagerAutoload")
+		var boss_loss_tracker = get_node_or_null("/root/BossLossTrackerAutoload")
+		
+		if is_boss:
+			var boss_name = map_enemy_name_to_boss(enemy_name)
+			
+			if victory:
+				# Boss victory - check for conversation triggers
+				print("Checking boss victory conversation triggers for: ", boss_name)
+				
+				if boss_name == "Apollo":
+					# Check if this is first or second Apollo victory
+					var current_god = params.get("god", "")
+					var deck_index = params.get("deck_index", 0)
+					
+					if current_god == "Apollo":
+						# Player is using Apollo
+						if boss_loss_tracker:
+							var first_victory_deck = boss_loss_tracker.get_apollo_first_victory_deck()
+							
+							if first_victory_deck == -1:
+								# First Apollo boss victory
+								print("Triggering first_apollo_boss_win conversation")
+								conv_manager.trigger_conversation("first_apollo_boss_win")
+								boss_loss_tracker.record_apollo_victory(deck_index)
+							elif boss_loss_tracker.is_different_apollo_deck(deck_index):
+								# Second Apollo boss victory with different deck
+								print("Triggering second_apollo_boss_win conversation")
+								conv_manager.trigger_conversation("second_apollo_boss_win")
+			else:
+				# Boss loss - check for conversation triggers
+				print("Checking boss loss conversation triggers for: ", boss_name)
+				
+				if boss_loss_tracker:
+					# Record the loss
+					boss_loss_tracker.record_boss_loss(boss_name)
+					var loss_count = boss_loss_tracker.get_boss_loss_count(boss_name)
+					
+					print("Boss loss count for ", boss_name, ": ", loss_count)
+					
+					# Trigger appropriate conversation based on boss and loss count
+					if boss_name == "Apollo":
+						if loss_count == 1:
+							print("Triggering first_apollo_boss_loss conversation")
+							conv_manager.trigger_conversation("first_apollo_boss_loss")
+						elif loss_count == 2:
+							print("Triggering second_apollo_boss_loss conversation")
+							conv_manager.trigger_conversation("second_apollo_boss_loss")
+					
+					elif boss_name == "Hermes":
+						if loss_count == 1:
+							print("Triggering first_hermes_boss_loss conversation")
+							conv_manager.trigger_conversation("first_hermes_boss_loss")
+						elif loss_count == 2:
+							print("Triggering second_hermes_boss_loss conversation")
+							conv_manager.trigger_conversation("second_hermes_boss_loss")
+					
+					elif boss_name == "Artemis":
+						if loss_count == 1:
+							print("Triggering first_artemis_boss_loss conversation")
+							conv_manager.trigger_conversation("first_artemis_boss_loss")
+						elif loss_count == 2:
+							print("Triggering second_artemis_boss_loss conversation")
+							conv_manager.trigger_conversation("second_artemis_boss_loss")
+		
+		else:
+			# Non-boss battle
+			if not victory:
+				# Check for Demeter-specific defeat conversation
+				var current_god = params.get("god", "")
+				if current_god == "Demeter":
+					print("Triggering first_demeter_defeat conversation (Demeter non-boss loss)")
+					conv_manager.trigger_conversation("first_demeter_defeat")
+	
 func map_enemy_name_to_boss(enemy_name: String) -> String:
 	if enemy_name == null or enemy_name == "":
 		return ""

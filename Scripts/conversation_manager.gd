@@ -14,9 +14,6 @@ enum Priority {
 var conversations: Dictionary = {}
 var save_path: String = "user://conversations.save"
 
-var conversation_shown_this_run: bool = false
-var current_run_id: String = ""
-
 var defeat_count: int = 0
 
 func _ready():
@@ -25,7 +22,46 @@ func _ready():
 
 # Set up all possible conversations
 func setup_conversation_definitions():
-	# Story conversations
+	# Existing defeat conversations
+	register_conversation("first_run_defeat", Priority.STORY,
+		"Chiron offers wisdom about the nature of progress and victory.")
+	
+	register_conversation("second_run_defeat", Priority.STORY,
+		"A tale of eastern dragons and the path from weakness to strength.")
+	
+	# Boss victory conversations
+	register_conversation("first_apollo_boss_win", Priority.STORY,
+		"Victory over Apollo with your own divine power.")
+	
+	register_conversation("second_apollo_boss_win", Priority.STORY,
+		"Mastery of Apollo through varied approaches.")
+	
+	# Apollo boss loss conversations
+	register_conversation("first_apollo_boss_loss", Priority.STORY,
+		"The first encounter with a mysterious predictive foe.")
+	
+	register_conversation("second_apollo_boss_loss", Priority.STORY,
+		"Understanding the enemy who watches and predicts.")
+	
+	# Hermes boss loss conversations
+	register_conversation("first_hermes_boss_loss", Priority.STORY,
+		"Facing an illusory and deceptive opponent.")
+	
+	register_conversation("second_hermes_boss_loss", Priority.STORY,
+		"Unveiling the truth behind the deception.")
+	
+	# Artemis boss loss conversations
+	register_conversation("first_artemis_boss_loss", Priority.STORY,
+		"The hunter who stalks from the shadows.")
+	
+	register_conversation("second_artemis_boss_loss", Priority.STORY,
+		"Learning to counter the patient huntress.")
+	
+	# Demeter specific defeat
+	register_conversation("first_demeter_defeat", Priority.STORY,
+		"Patience and growth in the face of setback.")
+	
+	# Other conversations
 	register_conversation("first_boss_loss", Priority.STORY, 
 		"The weight of defeat teaches us more than the lightness of victory.")
 	
@@ -41,15 +77,9 @@ func setup_conversation_definitions():
 	
 	register_conversation("first_enemy_mastered", Priority.MILESTONE,
 		"Understanding your opponents is the path to true victory.")
-	
-	register_conversation("first_run_defeat", Priority.STORY,
-	"Chiron offers wisdom about the nature of progress and victory.")
-	
-	register_conversation("second_run_defeat", Priority.STORY,
-	"A tale of eastern dragons and the path from weakness to strength.")
 		
 	register_conversation("hermes_unlocked", Priority.STORY, 
-	"The messenger god takes notice of your growing prowess. Swift feet follow swift minds.")
+		"The messenger god takes notice of your growing prowess. Swift feet follow swift minds.")
 
 # Register a conversation definition
 func register_conversation(id: String, priority: Priority, description: String):
@@ -61,29 +91,8 @@ func register_conversation(id: String, priority: Priority, description: String):
 			"shown": false
 		}
 
-# Start a new run - reset the conversation flag
-func start_new_run():
-	conversation_shown_this_run = false
-	current_run_id = str(Time.get_unix_time_from_system())  # Generate unique run ID
-	print("ConversationManager: Started new run - conversations enabled")
-
-# Mark that a conversation has been shown this run
-func set_conversation_shown_this_run():
-	conversation_shown_this_run = true
-	print("ConversationManager: Conversation shown this run - further conversations disabled")
-
-# Check if we can show conversations this run
-func can_show_conversation_this_run() -> bool:
-	return not conversation_shown_this_run
-
-# Update the existing get_conversation_button_state() function in Scripts/conversation_manager.gd
-# Replace the entire function (around lines 95-105):
-
+# Get conversation button state for UI
 func get_conversation_button_state() -> Dictionary:
-	# Check if we've already shown a conversation this run
-	if conversation_shown_this_run:
-		return {"available": false, "priority": "", "text": "Visit Chiron"}
-	
 	var next_conv = get_next_conversation()
 	if next_conv.is_empty():
 		return {"available": false, "priority": "", "text": "Visit Chiron"}
@@ -92,7 +101,7 @@ func get_conversation_button_state() -> Dictionary:
 	return {
 		"available": true,
 		"priority": "STORY" if is_story else "MILESTONE",
-		"text": "Visit Chiron" if is_story else "Visit Chiron"
+		"text": "Visit Chiron"
 	}
 
 func increment_defeat_count():
@@ -115,6 +124,7 @@ func trigger_conversation(conversation_id: String):
 	
 	var conv = conversations[conversation_id]
 	if conv["triggered"] or conv["shown"]:
+		print("Conversation ", conversation_id, " already triggered/shown, skipping")
 		return  # Already triggered/shown
 	
 	conv["triggered"] = true
@@ -130,7 +140,7 @@ func get_next_conversation() -> Dictionary:
 	# First check for story conversations
 	var story_conversations = get_available_conversations_by_priority(Priority.STORY)
 	if story_conversations.size() > 0:
-		# Return the first story conversation (you could add more logic here)
+		# Return the first story conversation
 		return {"id": story_conversations[0], "data": conversations[story_conversations[0]]}
 	
 	# Then check for milestone conversations
@@ -163,7 +173,6 @@ func mark_conversation_shown(conversation_id: String):
 # Check if any conversations are available
 func has_available_conversations() -> bool:
 	return get_next_conversation().size() > 0
-
 
 func save_conversations():
 	var save_file = FileAccess.open(save_path, FileAccess.WRITE)

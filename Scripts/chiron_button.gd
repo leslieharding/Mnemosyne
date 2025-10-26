@@ -139,16 +139,14 @@ func _on_chiron_button_pressed():
 	# Mark as shown
 	conv_manager.mark_conversation_shown(conv_id)
 	
-	# Mark that we've shown a conversation this run (disable further conversations)
-	conv_manager.set_conversation_shown_this_run()
+	# REMOVED: No longer marking conversation_shown_this_run
+	# This allows multiple conversations to be viewed without restriction
 	
 	# Create and start the conversation cutscene
 	start_chiron_conversation(conv_id, conv_data)
 	
 	# Update button state after conversation is marked as shown
 	update_button_state()
-
-# Replace the start_chiron_conversation function in Scripts/chiron_button.gd (around lines 140-170)
 
 func start_chiron_conversation(conv_id: String, conv_data: Dictionary):
 	# Create a mapping between conversation IDs and their corresponding cutscene IDs
@@ -160,8 +158,29 @@ func start_chiron_conversation(conv_id: String, conv_data: Dictionary):
 		"second_run_defeat":
 			cutscene_id = "second_defeat_conversation"
 		"first_boss_loss":
-			cutscene_id = "first_boss_loss_conversation" 
-		
+			cutscene_id = "first_boss_loss_conversation"
+		# Apollo boss conversations
+		"first_apollo_boss_win":
+			cutscene_id = "first_apollo_boss_win_conversation"
+		"second_apollo_boss_win":
+			cutscene_id = "second_apollo_boss_win_conversation"
+		"first_apollo_boss_loss":
+			cutscene_id = "first_apollo_boss_loss_conversation"
+		"second_apollo_boss_loss":
+			cutscene_id = "second_apollo_boss_loss_conversation"
+		# Hermes boss conversations
+		"first_hermes_boss_loss":
+			cutscene_id = "first_hermes_boss_loss_conversation"
+		"second_hermes_boss_loss":
+			cutscene_id = "second_hermes_boss_loss_conversation"
+		# Artemis boss conversations
+		"first_artemis_boss_loss":
+			cutscene_id = "first_artemis_boss_loss_conversation"
+		"second_artemis_boss_loss":
+			cutscene_id = "second_artemis_boss_loss_conversation"
+		# Demeter conversations
+		"first_demeter_defeat":
+			cutscene_id = "first_demeter_defeat_conversation"
 		_:
 			print("Unknown conversation ID: ", conv_id)
 			return

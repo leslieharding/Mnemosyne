@@ -27,6 +27,7 @@ RunStatGrowthTrackerAutoload="*res://Scripts/run_stat_growth_tracker.gd"
 RunEnrichmentTrackerAutoload="*res://Scripts/run_enrichment_tracker.gd"
 MnemosyneProgressTrackerAutoload="*res://Scripts/mnemosyne_progress_tracker.gd"
 BossVictoryTrackerAutoload="*res://Scripts/boss_victory_tracker.gd"
+BossLossTrackerAutoload="*res://Scripts/boss_loss_tracker.gd"
 
 [gui]
 
