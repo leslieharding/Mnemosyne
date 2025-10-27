@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="GodEnemyPools" load_steps=2 format=3 uid="uid://b6p18jo5mymto"]
+
+[ext_resource type="Script" uid="uid://cvbbr1rua8ukn" path="res://Resources/god_enemy_pools.gd" id="1_1bcus"]
+
+[resource]
+script = ExtResource("1_1bcus")
+metadata/_custom_type_script = "uid://cvbbr1rua8ukn"

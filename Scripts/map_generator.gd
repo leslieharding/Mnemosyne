@@ -43,53 +43,104 @@ static func generate_map(god_name: String = "Apollo", deck_name: String = "") ->
 
 # Pre-assign enemies to tiers to ensure each enemy is used exactly once
 static func assign_enemies_to_tiers(god_name: String = "Apollo", deck_name: String = "") -> Dictionary:
+	print("\n==================== ENEMY ASSIGNMENT DEBUG ====================")
+	print("God: ", god_name)
+	print("Deck: ", deck_name)
+	
 	var enemies_collection: EnemiesCollection = load("res://Resources/Collections/Enemies.tres")
 	if not enemies_collection:
 		print("ERROR: Could not load enemies collection")
 		return {}
 	
 	var all_enemies = enemies_collection.get_enemy_names()
+	print("\n--- ALL ENEMIES IN COLLECTION (", all_enemies.size(), " total) ---")
+	for i in range(all_enemies.size()):
+		print("  [", i, "] ", all_enemies[i])
 	
 	# Load the enemy pool configuration
 	var enemy_pools: GodEnemyPools = load("res://Resources/god_enemy_pools.tres")
 	if not enemy_pools:
-		push_error("Could not load god enemy pools configuration")
+		print("ERROR: Could not load god enemy pools configuration")
 		return {}
+	
+	print("\n--- CHECKING ENEMY POOLS CONFIGURATION ---")
+	print("General enemies in config: ", enemy_pools.general_enemies)
+	print("God-specific enemies for ", god_name, ": ", enemy_pools.god_specific_enemies.get(god_name, []))
+	if deck_name != "":
+		print("Deck-specific enemies for ", god_name, "/", deck_name, ": ", 
+			enemy_pools.deck_specific_enemies.get(god_name, {}).get(deck_name, []))
 
-	# Get enemies for the current god and deck (includes general, god-specific, and deck-specific)
-	var god_enemies = enemy_pools.get_weighted_enemy_pool(god_name, deck_name)
+	# Get weighted enemy pool (contains duplicates for weighting)
+	var weighted_pool = enemy_pools.get_weighted_enemy_pool(god_name, deck_name)
 	
-	# Filter to only use enemies that actually exist in the collection
-	var available_enemies = []
-	for enemy_name in god_enemies:
-		if enemy_name in all_enemies:
-			available_enemies.append(enemy_name)
+	print("\n--- WEIGHTED POOL FROM god_enemy_pools.tres (", weighted_pool.size(), " total with duplicates) ---")
+	if weighted_pool.size() == 0:
+		print("!!! WEIGHTED POOL IS EMPTY !!!")
+		print("This means get_weighted_enemy_pool returned nothing")
+	else:
+		for i in range(min(20, weighted_pool.size())):  # Show first 20
+			print("  [", i, "] ", weighted_pool[i])
+		if weighted_pool.size() > 20:
+			print("  ... and ", weighted_pool.size() - 20, " more entries")
+	
+	# Deduplicate to get unique enemies
+	var unique_enemies = []
+	var skipped_enemies = []
+	
+	for enemy_name in weighted_pool:
+		if enemy_name in unique_enemies:
+			continue  # Skip duplicates
+		elif enemy_name in all_enemies:
+			unique_enemies.append(enemy_name)
 		else:
-			print("WARNING: Enemy '", enemy_name, "' not found in collection for god ", god_name)
+			if enemy_name not in skipped_enemies:
+				skipped_enemies.append(enemy_name)
+				print("WARNING: Enemy '", enemy_name, "' in pool but NOT in collection")
 	
-	# Fallback to first 5 available enemies if we don't have enough god-specific ones
-	if available_enemies.size() < 5:
-		print("Not enough god-specific enemies for ", god_name, ", using general pool")
-		available_enemies = []
-		for i in range(min(5, all_enemies.size())):
-			available_enemies.append(all_enemies[i])
+	print("\n--- UNIQUE ENEMIES AFTER DEDUPLICATION (", unique_enemies.size(), " unique) ---")
+	for i in range(unique_enemies.size()):
+		print("  [", i, "] ", unique_enemies[i])
 	
-	print(god_name, " enemies available: ", available_enemies)
+	if skipped_enemies.size() > 0:
+		print("\n--- SKIPPED ENEMIES (not in collection) ---")
+		for enemy in skipped_enemies:
+			print("  X ", enemy)
 	
-	# Shuffle the enemies randomly
-	available_enemies.shuffle()
+	# Ensure we have at least 5 unique enemies
+	if unique_enemies.size() < 5:
+		print("\n!!! NOT ENOUGH UNIQUE ENEMIES (", unique_enemies.size(), "), ADDING FROM GENERAL POOL !!!")
+		# Add enemies from the full collection that aren't already in the list
+		for enemy_name in all_enemies:
+			if enemy_name not in unique_enemies:
+				unique_enemies.append(enemy_name)
+				print("  ADDED: ", enemy_name)
+			if unique_enemies.size() >= 5:
+				break
 	
-	# Assign one enemy to each tier (0-4)
+	print("\n--- FINAL ENEMY LIST (", unique_enemies.size(), " total) ---")
+	for i in range(unique_enemies.size()):
+		print("  [", i, "] ", unique_enemies[i])
+	
+	# Shuffle for randomization
+	unique_enemies.shuffle()
+	
+	print("\n--- AFTER SHUFFLE ---")
+	for i in range(min(5, unique_enemies.size())):
+		print("  [", i, "] ", unique_enemies[i])
+	
+	# Assign one unique enemy to each tier (0-4)
 	var tier_assignments = {}
+	print("\n--- TIER ASSIGNMENTS ---")
 	for tier in range(5):
-		if tier < available_enemies.size():
-			tier_assignments[tier] = available_enemies[tier]
-			print("Tier ", tier, " assigned enemy: ", available_enemies[tier])
+		if tier < unique_enemies.size():
+			tier_assignments[tier] = unique_enemies[tier]
+			print("  Tier ", tier, " = ", unique_enemies[tier])
 		else:
 			# Fallback if we somehow don't have enough enemies
 			tier_assignments[tier] = "Shadow Acolyte"
-			print("Tier ", tier, " fallback to Shadow Acolyte")
+			print("  Tier ", tier, " = Shadow Acolyte (FALLBACK - NOT ENOUGH ENEMIES)")
 	
+	print("================================================================\n")
 	return tier_assignments
 
 # Generate nodes for a specific layer
