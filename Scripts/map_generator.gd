@@ -10,13 +10,13 @@ static var MAP_HEIGHT: float = 600.0
 static var LAYER_SPACING: float = MAP_HEIGHT / (LAYER_COUNT - 1)
 
 # Generate a complete map
-static func generate_map(god_name: String = "Apollo") -> MapData:
+static func generate_map(god_name: String = "Apollo", deck_name: String = "") -> MapData:
 	var map_data = MapData.new()
 	map_data.total_layers = LAYER_COUNT
 	map_data.layer_node_counts = NODES_PER_LAYER
 	
 	# PRE-ASSIGN ENEMIES TO TIERS
-	var tier_enemy_assignments = assign_enemies_to_tiers(god_name)
+	var tier_enemy_assignments = assign_enemies_to_tiers(god_name, deck_name)
 	print("Tier enemy assignments: ", tier_enemy_assignments)
 	
 	# Generate nodes for each layer
@@ -42,7 +42,7 @@ static func generate_map(god_name: String = "Apollo") -> MapData:
 	return map_data
 
 # Pre-assign enemies to tiers to ensure each enemy is used exactly once
-static func assign_enemies_to_tiers(god_name: String = "Apollo") -> Dictionary:
+static func assign_enemies_to_tiers(god_name: String = "Apollo", deck_name: String = "") -> Dictionary:
 	var enemies_collection: EnemiesCollection = load("res://Resources/Collections/Enemies.tres")
 	if not enemies_collection:
 		print("ERROR: Could not load enemies collection")
@@ -50,15 +50,14 @@ static func assign_enemies_to_tiers(god_name: String = "Apollo") -> Dictionary:
 	
 	var all_enemies = enemies_collection.get_enemy_names()
 	
-	# Define god-specific enemy pools
-	var god_enemy_pools = {
-		"Apollo": ["Pythons Gang", "Niobes Brood", "Cultists of Nyx", "The Wrong Note", "The Plague"],
-		"Hermes": ["Rival Merchants", "Crossroads Bandits", "Divine Messengers", "Underworld Gatekeepers", "Olympian Rivals"],
-		"Demeter": ["Pythons Gang", "Niobes Brood", "Cultists of Nyx", "The Wrong Note", "The Plague"]
-	}
-	
-	# Get enemies for the current god, fallback to Apollo's enemies if god not found
-	var god_enemies = god_enemy_pools.get(god_name, god_enemy_pools["Apollo"])
+	# Load the enemy pool configuration
+	var enemy_pools: GodEnemyPools = load("res://Resources/god_enemy_pools.tres")
+	if not enemy_pools:
+		push_error("Could not load god enemy pools configuration")
+		return {}
+
+	# Get enemies for the current god and deck (includes general, god-specific, and deck-specific)
+	var god_enemies = enemy_pools.get_enemy_pool(god_name, deck_name)
 	
 	# Filter to only use enemies that actually exist in the collection
 	var available_enemies = []

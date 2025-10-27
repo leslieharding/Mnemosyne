@@ -94,7 +94,15 @@ func setup_experience_panel():
 
 # Generate a new map for this run
 func generate_new_map():
-	current_map = MapGenerator.generate_map(selected_god)
+	# Load the god collection to get deck name
+	var collection_path = "res://Resources/Collections/" + selected_god + ".tres"
+	var collection = load(collection_path)
+	var deck_name = ""
+	
+	if collection and selected_deck_index < collection.decks.size():
+		deck_name = collection.decks[selected_deck_index].deck_name
+	
+	current_map = MapGenerator.generate_map(selected_god, deck_name)
 	display_map()
 
 # Display the map visually

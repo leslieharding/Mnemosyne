@@ -2344,7 +2344,7 @@ metadata/_custom_type_script = "uid://ctv7ajt5j616m"
 
 [sub_resource type="Resource" id="Resource_lrgju"]
 script = ExtResource("1_e7ref")
-enemy_name = "Human Foes of Heracles"
+enemy_name = "The Grudges"
 enemy_description = "Choosing the wrong person to wrong."
 cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_lmtjb"), SubResource("Resource_k6viv"), SubResource("Resource_1b7m7"), SubResource("Resource_6hn0s"), SubResource("Resource_4xi8q"), SubResource("Resource_s8l0t"), SubResource("Resource_cyy2l"), SubResource("Resource_1k8u1"), SubResource("Resource_psohk"), SubResource("Resource_cs5xl"), SubResource("Resource_0n7hm"), SubResource("Resource_c8bfg"), SubResource("Resource_hpg3d"), SubResource("Resource_2bmv8"), SubResource("Resource_qf2wx")])
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_66kuf"), SubResource("Resource_nsmj4"), SubResource("Resource_iceon")])
