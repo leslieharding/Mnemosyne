@@ -2,6 +2,11 @@
 class_name GodEnemyPools
 extends Resource
 
+# Weighting configuration
+@export var deck_specific_weight: int = 3
+@export var god_specific_weight: int = 2
+@export var general_weight: int = 1
+
 # TIER 1: General enemies - can appear in any run
 @export var general_enemies: Array[String] = ["Pythons Gang", "The Plague", "Craftsmen", "Giants", "Bestial Labours", "Creature Foes of Heracles", "The Grudges", "Sleep", "Amazons", "The Graeae", "Pandora's box", "Crete", "Wicked Kings"]
 
@@ -37,3 +42,27 @@ func get_enemy_pool(god_name: String, deck_name: String = "") -> Array[String]:
 # Helper: Get just god + general pool (when deck is unknown)
 func get_enemy_pool_for_god(god_name: String) -> Array[String]:
 	return get_enemy_pool(god_name, "")
+
+
+func get_weighted_enemy_pool(god_name: String, deck_name: String = "") -> Array[String]:
+	var weighted_pool: Array[String] = []
+	
+	# Add deck-specific enemies with highest weight
+	if deck_name != "" and god_name in deck_specific_enemies:
+		if deck_name in deck_specific_enemies[god_name]:
+			for enemy in deck_specific_enemies[god_name][deck_name]:
+				for i in range(deck_specific_weight):
+					weighted_pool.append(enemy)
+	
+	# Add god-specific enemies with medium weight
+	if god_name in god_specific_enemies:
+		for enemy in god_specific_enemies[god_name]:
+			for i in range(god_specific_weight):
+				weighted_pool.append(enemy)
+	
+	# Add general enemies with base weight
+	for enemy in general_enemies:
+		for i in range(general_weight):
+			weighted_pool.append(enemy)
+	
+	return weighted_pool

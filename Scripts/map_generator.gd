@@ -57,7 +57,7 @@ static func assign_enemies_to_tiers(god_name: String = "Apollo", deck_name: Stri
 		return {}
 
 	# Get enemies for the current god and deck (includes general, god-specific, and deck-specific)
-	var god_enemies = enemy_pools.get_enemy_pool(god_name, deck_name)
+	var god_enemies = enemy_pools.get_weighted_enemy_pool(god_name, deck_name)
 	
 	# Filter to only use enemies that actually exist in the collection
 	var available_enemies = []
