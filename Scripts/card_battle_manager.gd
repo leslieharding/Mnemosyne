@@ -168,7 +168,15 @@ var couple_definitions = {
 	"Phaeton": "Cygnus",
 	"Cygnus": "Phaeton", 
 	"Orpheus": "Eurydice",
-	"Eurydice": "Orpheus"
+	"Eurydice": "Orpheus",
+	"Theseus": "Ariadne",
+	"Ariadne": "Theseus",
+	"Pasiphae": "Cretan Bull",
+	"Cretan Bull": "Pasiphae",
+	"Nyx": "Erebus",
+	"Erebus": "Nyx",
+	"Odysseus": "Circe",
+	"Circe": "Odysseus"
 }
 # Journal button reference  
 var journal_button: JournalButton
@@ -1267,6 +1275,16 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 		
 		if is_confused and is_friendly_fire:
 			print("DISARRAY FRIENDLY FIRE: Confused card captured friendly - giving to opponent!")
+			
+			# Track trap encounter if PLAYER captured their own card due to disarray
+			if attacking_owner == Owner.PLAYER:
+				var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+				if progress_tracker:
+					progress_tracker.record_trap_fallen_for("disarray", "Player captured own card while confused")
+					
+					if progress_tracker.should_show_artemis_notification() and notification_manager:
+						notification_manager.show_notification("Artemis was watching")
+			
 			var new_owner = Owner.OPPONENT if attacking_owner == Owner.PLAYER else Owner.PLAYER
 			attacking_owner = new_owner
 		
@@ -4321,6 +4339,11 @@ func handle_standard_defense_effects(attacker_pos: int, defender_pos: int, attac
 				print("Player card at position ", defender_pos, " (collection index ", defending_card_index, ") gained 5 defense exp")
 			else:
 				print("Warning: RunExperienceTrackerAutoload not found for defense exp")
+			
+			# Track total defends for Athena unlock
+			var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+			if progress_tracker:
+				progress_tracker.increment_defends()
 	
 	# Execute ON_DEFEND abilities
 	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, direction.name)
@@ -4365,9 +4388,16 @@ func handle_extended_defense_effects(attacker_pos: int, defender_pos: int, attac
 				print("Player card at position ", defender_pos, " (collection index ", defending_card_index, ") gained 5 extended range defense exp")
 			else:
 				print("Warning: RunExperienceTrackerAutoload not found for extended defense exp")
+			
+			# Track total defends for Athena unlock
+			var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+			if progress_tracker:
+				progress_tracker.increment_defends()
 	
 	# Execute ON_DEFEND abilities
 	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, pos_info.name)
+
+
 # Helper functions for ability execution
 func execute_capture_abilities(defender_pos: int, defending_card: CardResource, attacker_pos: int, attacking_card: CardResource, direction_name: String):
 	var defending_card_collection_index = get_card_collection_index(defender_pos)
@@ -4514,7 +4544,7 @@ func process_single_tremor(tremor_id: int, tremor_data: Dictionary):
 				
 				# FIXED: Only show notification if Artemis isn't unlocked yet
 				if progress_tracker.should_show_artemis_notification() and notification_manager:
-					notification_manager.show_notification("Artemis observes your trap encounter")
+					notification_manager.show_notification("Artemis was watching")
 			
 			# Show tremor capture visual effect
 			var target_card_display = get_card_display_at_position(tremor_zone)
@@ -4808,7 +4838,7 @@ func execute_trap_hunt_combat(target_position: int, hunted_card: CardResource, h
 			
 			# FIXED: Only show notification if Artemis isn't unlocked yet
 			if progress_tracker.should_show_artemis_notification() and notification_manager:
-				notification_manager.show_notification("Artemis observes your trap encounter")
+				notification_manager.show_notification("Artemis was watching")
 		
 		# Capture the hunted card
 		set_card_ownership(target_position, hunt_data.hunter_owner)
@@ -7466,6 +7496,15 @@ func execute_camouflage_capture(camouflage_slot: int, captured_owner: Owner):
 	var camouflaged_owner = camouflage_data["owner"]
 	
 	print("Executing camouflage capture at slot ", camouflage_slot)
+	
+	# Track trap encounter if PLAYER tried to place in ENEMY camouflage slot
+	if captured_owner == Owner.PLAYER and camouflaged_owner == Owner.OPPONENT:
+		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		if progress_tracker:
+			progress_tracker.record_trap_fallen_for("stealth", "Player's card captured by hidden enemy")
+			
+			if progress_tracker.should_show_artemis_notification() and notification_manager:
+				notification_manager.show_notification("Artemis was watching")
 	
 	# Get the attacking card data that needs to be captured
 	var attacking_card_data = null

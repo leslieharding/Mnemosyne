@@ -7,7 +7,7 @@ var progress_data: Dictionary = {}
 var save_path: String = "user://card_progress.save"
 
 var traps_fallen_for: int = 0  # Track trap encounters for Artemis unlock
-
+var total_defends: int = 0  # Track total defends for Athena unlock
 
 # NEW: God unlock tracking
 var unlocked_gods: Array[String] = ["Apollo"]  # Apollo starts unlocked
@@ -31,6 +31,15 @@ var god_unlock_conditions: Dictionary = {
 		"type": "cards_leveled",
 		"required_count": 5,
 		"description": "Level up 5 different cards"
+	},
+	"Dionysus": {
+		"type": "manual",
+		"description": "Dionysus is unlocked when he feels like it"
+	},
+	"Athena": {
+		"type": "defends_completed",
+		"required_count": 100,
+		"description": "Defend 100 times"
 	}
 }
 
@@ -38,7 +47,15 @@ var couple_definitions = {
 	"Phaeton": "Cygnus",
 	"Cygnus": "Phaeton", 
 	"Orpheus": "Eurydice",
-	"Eurydice": "Orpheus"
+	"Eurydice": "Orpheus",
+	"Theseus": "Ariadne",
+	"Ariadne": "Theseus",
+	"Pasiphae": "Cretan Bull",
+	"Cretan Bull": "Pasiphae",
+	"Nyx": "Erebus",
+	"Erebus": "Nyx",
+	"Odysseus": "Circe",
+	"Circe": "Odysseus"
 }
 
 var couples_united: Array = []  # Track which couples have been united
@@ -264,6 +281,9 @@ func check_unlock_condition(condition: Dictionary) -> bool:
 		"traps_fallen_for":  # NEW CASE
 			var required = condition.get("required_count", 3)
 			return traps_fallen_for >= required
+		"defends_completed":
+			var required = condition.get("required_count", 100)
+			return total_defends >= required	
 		_:
 			return false
 
@@ -421,3 +441,21 @@ func check_aphrodite_unlock():
 		if has_node("/root/ConversationManagerAutoload"):
 			var conv_manager = get_node("/root/ConversationManagerAutoload")
 			conv_manager.trigger_conversation("aphrodite_unlocked")
+
+
+# Increment defend counter
+func increment_defends():
+	total_defends += 1
+	print("Total defends: ", total_defends)
+	
+	# Check for Athena unlock
+	if total_defends >= 100 and not is_god_unlocked("Athena"):
+		unlock_god("Athena")
+		print("Athena unlocked due to ", total_defends, " successful defends!")
+		
+		# Trigger special conversation if available
+		if has_node("/root/ConversationManagerAutoload"):
+			var conv_manager = get_node("/root/ConversationManagerAutoload")
+			conv_manager.trigger_conversation("athena_unlocked")
+	
+	save_progress()

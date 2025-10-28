@@ -61,6 +61,18 @@ func execute(context: Dictionary) -> bool:
 	capturing_card.values[2] = 1  # South
 	capturing_card.values[3] = 1  # West
 	
+	# Track trap encounter if PLAYER captured ENEMY card and got punished
+	var capturing_card_owner = game_manager.get_owner_at_position(capturing_position)
+	var captured_card_owner = game_manager.get_owner_at_position(captured_position)
+	
+	if capturing_card_owner == game_manager.Owner.PLAYER and captured_card_owner == game_manager.Owner.OPPONENT:
+		var progress_tracker = game_manager.get_node("/root/GlobalProgressTrackerAutoload")
+		if progress_tracker:
+			progress_tracker.record_trap_fallen_for("retaliate", "Player's attacking card weakened by retaliation")
+			
+			if progress_tracker.should_show_artemis_notification() and game_manager.notification_manager:
+				game_manager.notification_manager.show_notification("Artemis was watching")
+	
 	print(ability_name, " activated! ", captured_card.card_name, " was captured but retaliated against ", capturing_card.card_name, "!")
 	print("Attacking card stats weakened from ", original_values, " to ", capturing_card.values)
 	

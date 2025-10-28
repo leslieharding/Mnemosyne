@@ -50,7 +50,6 @@ card_name = "Helios"
 values = Array[int]([3, 3, 3, 3])
 description = "Mad? Me? No no no, Ive only tended the sun chariot for eons and you want the boy to do it after one day. Why would I be mad?"
 level_data = Array[ExtResource("4_2h7tk")]([SubResource("Resource_l7o3e"), SubResource("Resource_f31oe"), SubResource("Resource_gs2nm")])
-uses_level_progression = true
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_2h7tk"]

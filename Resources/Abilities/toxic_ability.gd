@@ -69,7 +69,7 @@ func execute(context: Dictionary) -> bool:
 			
 			# FIXED: Only show notification if Artemis isn't unlocked yet
 			if progress_tracker.should_show_artemis_notification() and game_manager.notification_manager:
-				game_manager.notification_manager.show_notification("Artemis observes your trap encounter")
+				game_manager.notification_manager.show_notification("Artemis was watching")
 	
 	# FIXED: The capturing card should be captured by the OPPOSITE owner of who originally captured the toxic card
 	# If player captured toxic (toxic_new_owner = PLAYER), then opponent should get the capturing card
