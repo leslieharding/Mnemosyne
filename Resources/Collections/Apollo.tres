@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=49 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=51 format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_w7xgs"]
+[ext_resource type="Script" uid="uid://dijlyaf8w46bp" path="res://Resources/Abilities/refraction_ability.gd" id="3_b0n1o"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_cm1c1"]
 [ext_resource type="Script" uid="uid://gnlr02su1oni" path="res://Resources/Abilities/blind_ability.gd" id="3_xjxyc"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="4_2h7tk"]
@@ -16,6 +17,13 @@
 [ext_resource type="Script" uid="uid://c25iupuskk6vd" path="res://Resources/Abilities/compel_ability.gd" id="14_xjxyc"]
 [ext_resource type="Script" uid="uid://b7w3v4k1roxv1" path="res://Resources/Abilities/ordain_ability.gd" id="15_b0n1o"]
 [ext_resource type="Script" uid="uid://ddbwhi0dqi1t0" path="res://Resources/Abilities/prophetic_ability.gd" id="16_tpnlu"]
+
+[sub_resource type="Resource" id="Resource_71nia"]
+script = ExtResource("3_b0n1o")
+ability_name = "Refraction"
+description = "When captured, this card generates a sun spot"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dijlyaf8w46bp"
 
 [sub_resource type="Resource" id="Resource_l7o3e"]
 script = ExtResource("4_2h7tk")
@@ -49,6 +57,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Helios"
 values = Array[int]([3, 3, 3, 3])
 description = "Mad? Me? No no no, Ive only tended the sun chariot for eons and you want the boy to do it after one day. Why would I be mad?"
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_71nia")])
 level_data = Array[ExtResource("4_2h7tk")]([SubResource("Resource_l7o3e"), SubResource("Resource_f31oe"), SubResource("Resource_gs2nm")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RefractionAbility" load_steps=2 format=3 uid="uid://rbsq0lv0683b"]
+
+[ext_resource type="Script" uid="uid://dijlyaf8w46bp" path="res://Resources/Abilities/refraction_ability.gd" id="1_7jwa3"]
+
+[resource]
+script = ExtResource("1_7jwa3")
+ability_name = "Refraction"
+description = "When captured, this card generates a sun spot"
+trigger_condition = 2
+metadata/_custom_type_script = "uid://dijlyaf8w46bp"
