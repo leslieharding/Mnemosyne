@@ -335,11 +335,7 @@ func _ready():
 	else:
 		push_error("No deck was selected!")
 	
-	# Start a new run for conversation tracking (if not tutorial)
-	if not is_tutorial_mode and has_node("/root/ConversationManagerAutoload"):
-		var conv_manager = get_node("/root/ConversationManagerAutoload")
-		conv_manager.start_new_run()
-		print("CardBattle: Started new run for conversations")
+	
 	
 	# Set up input handling (only when it's player's turn)
 	set_process_input(false)  # Start disabled
