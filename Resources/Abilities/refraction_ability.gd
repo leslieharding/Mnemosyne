@@ -4,7 +4,7 @@ extends CardAbility
 
 func _init():
 	ability_name = "Refraction"
-	description = "When captured, this card generates a sun spot"
+	description = "On capture, this card generates a random sun spot"
 	trigger_condition = TriggerType.ON_CAPTURE
 
 func execute(context: Dictionary) -> bool:
@@ -20,6 +20,15 @@ func execute(context: Dictionary) -> bool:
 	if not captured_card or captured_position == -1 or not game_manager:
 		print("RefractionAbility: Missing required context data")
 		return false
+	
+	# Prevent double execution in the same turn
+	var current_turn = game_manager.get_current_turn_number()
+	if captured_card.has_meta("refraction_used_turn") and captured_card.get_meta("refraction_used_turn") == current_turn:
+		print("RefractionAbility: Already executed this turn - skipping")
+		return false
+	
+	# Mark as used this turn
+	captured_card.set_meta("refraction_used_turn", current_turn)
 	
 	# Check if sun power is active
 	if game_manager.active_deck_power != DeckDefinition.DeckPowerType.SUN_POWER:
