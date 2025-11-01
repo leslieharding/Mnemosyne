@@ -84,13 +84,15 @@ func swap_card_positions(pos_a: int, pos_b: int, card_a: CardResource, card_b: C
 		slot_a.add_child(display_b)
 	
 	# Swap data structures
-	# Position A gets card B's data
+	# Position A gets card B's data (capturing card moves here)
 	game_manager.grid_card_data[pos_a] = card_b
+	# Position A keeps capturing card's ownership (owner_b stays at new position)
 	game_manager.grid_ownership[pos_a] = owner_b
 	
-	# Position B gets card A's data
+	# Position B gets card A's data (captured reposition card moves here)
 	game_manager.grid_card_data[pos_b] = card_a
-	game_manager.grid_ownership[pos_b] = owner_a
+	# Position B gets capturing card's ownership (captured card changes owner)
+	game_manager.grid_ownership[pos_b] = owner_b
 	
 	# Swap collection indices
 	if collection_a != -1:
@@ -103,18 +105,15 @@ func swap_card_positions(pos_a: int, pos_b: int, card_a: CardResource, card_b: C
 	else:
 		game_manager.grid_to_collection_index.erase(pos_a)
 	
-	# Update visual styling for both slots
+	# Update visual styling for both slots - both now use the capturing card's owner style
 	if owner_b == game_manager.Owner.PLAYER:
 		slot_a.add_theme_stylebox_override("panel", game_manager.player_card_style)
-	else:
-		slot_a.add_theme_stylebox_override("panel", game_manager.opponent_card_style)
-	
-	if owner_a == game_manager.Owner.PLAYER:
 		slot_b.add_theme_stylebox_override("panel", game_manager.player_card_style)
 	else:
+		slot_a.add_theme_stylebox_override("panel", game_manager.opponent_card_style)
 		slot_b.add_theme_stylebox_override("panel", game_manager.opponent_card_style)
 	
-	print("RepositionAbility: Position swap complete")
+	print("RepositionAbility: Position swap complete - both cards now owned by ", "PLAYER" if owner_b == game_manager.Owner.PLAYER else "OPPONENT")
 
 func can_execute(context: Dictionary) -> bool:
 	return true

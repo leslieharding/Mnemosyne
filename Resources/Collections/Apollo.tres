@@ -75,7 +75,7 @@ description = "Look up Epaphus, you will see me driving the sun along"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_2h7tk")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
-[sub_resource type="Resource" id="Resource_fysfy"]
+[sub_resource type="Resource" id="Resource_bi2ap"]
 script = ExtResource("7_sfw3d")
 ability_name = "Survival"
 description = "This card prevents the first time it would be captured, but reduces its stats to 1 to do so"
@@ -87,7 +87,7 @@ script = ExtResource("1_vqrrp")
 card_name = "Cygnus"
 values = Array[int]([2, 3, 3, 3])
 description = "Oh Phaeton dont listen to him"
-abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_fysfy")])
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_bi2ap")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_lg4ks"]
