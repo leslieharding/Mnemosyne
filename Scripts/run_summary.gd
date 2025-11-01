@@ -6,6 +6,7 @@ var deck_index: int = 0
 var victory: bool = true
 
 func _ready():
+	print("==================== RUNSUMMARY _READY START ====================")
 	print("RunSummary _ready() called")
 	
 	# Get parameters from previous scene first
@@ -106,18 +107,7 @@ func setup_ui_safely():
 		print("  defense_total: ", defense_total != null)
 		return
 	
-	# Connect buttons
-	if new_run_button:
-		new_run_button.pressed.connect(_on_new_run_button_pressed)
-		print("Connected new_run_button")
-	else:
-		print("Warning: new_run_button not found")
-		
-	if main_menu_button:
-		main_menu_button.pressed.connect(_on_main_menu_button_pressed)
-		print("Connected main_menu_button")
-	else:
-		print("Warning: main_menu_button not found")
+	
 	
 	print("All nodes found successfully!")
 	

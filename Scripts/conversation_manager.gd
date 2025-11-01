@@ -181,12 +181,12 @@ func load_conversations():
 					conversations = loaded_data
 					defeat_count = 0
 
-# Clear all conversation data (for new game)
 func clear_all_conversations():
 	conversations.clear()
+	defeat_count = 0  # FIXED: Reset defeat count
 	setup_conversation_definitions()  # Recreate the base definitions
 	save_conversations()
-	print("All conversations cleared")
+	print("All conversations cleared - defeat_count reset to 0")
 
 # Debug function
 func debug_conversations():
