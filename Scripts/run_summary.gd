@@ -19,6 +19,15 @@ func _ready():
 	print("  Deck Index: ", deck_index)
 	print("  Victory: ", victory)
 	
+	# Handle defeat conversations - increment defeat count on loss
+	if not victory:
+		if has_node("/root/ConversationManagerAutoload"):
+			var conv_manager = get_node("/root/ConversationManagerAutoload")
+			conv_manager.increment_defeat_count()
+			print("Defeat count incremented for conversation triggers")
+		else:
+			print("WARNING: ConversationManagerAutoload not found!")
+	
 	# Set up UI immediately without waiting
 	setup_ui_safely()
 

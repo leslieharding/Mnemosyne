@@ -63,11 +63,16 @@ func create_button_styles():
 
 func update_button_state():
 	if not has_node("/root/ConversationManagerAutoload"):
+		print("ERROR: ConversationManagerAutoload not found!")
 		disabled = true
 		return
 	
 	var conv_manager = get_node("/root/ConversationManagerAutoload")
 	var button_state = conv_manager.get_conversation_button_state()
+	
+	print("Button state available: ", button_state["available"])
+	print("Button state priority: ", button_state["priority"])
+	print("Button state text: ", button_state["text"])
 	
 	if not button_state["available"]:
 		# No conversations available

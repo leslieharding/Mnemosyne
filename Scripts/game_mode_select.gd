@@ -27,6 +27,15 @@ func _ready():
 	setup_god_buttons()
 	setup_test_battle_panel()
 	load_test_battle_data()
+	
+	if chiron_button:
+		# Use call_deferred to ensure the button's _ready() has finished
+		call_deferred("refresh_chiron_button")
+
+func refresh_chiron_button():
+	if chiron_button:
+		print("GameModeSelect: Refreshing Chiron button state")
+		chiron_button.update_button_state()
 
 func setup_journal_button():
 	if not journal_button:
