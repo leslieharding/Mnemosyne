@@ -61,25 +61,9 @@ func setup_conversation_definitions():
 	register_conversation("first_demeter_defeat", Priority.STORY,
 		"Patience and growth in the face of setback.")
 	
-	# Other conversations
-	register_conversation("first_boss_loss", Priority.STORY, 
-		"The weight of defeat teaches us more than the lightness of victory.")
 	
-	register_conversation("consciousness_breakthrough", Priority.STORY,
-		"I sense Mnemosyne's awareness expanding beyond mortal comprehension.")
 	
-	# Milestone conversations  
-	register_conversation("first_deck_unlock", Priority.MILESTONE,
-		"You've proven yourself worthy of greater challenges.")
 	
-	register_conversation("apollo_mastery", Priority.MILESTONE,
-		"The sun god's power flows through you with increasing ease.")
-	
-	register_conversation("first_enemy_mastered", Priority.MILESTONE,
-		"Understanding your opponents is the path to true victory.")
-		
-	register_conversation("hermes_unlocked", Priority.STORY, 
-		"The messenger god takes notice of your growing prowess. Swift feet follow swift minds.")
 
 # Register a conversation definition
 func register_conversation(id: String, priority: Priority, description: String):

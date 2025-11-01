@@ -80,17 +80,12 @@ func setup_individual_god_button(god_name: String, button: Button, unlocked_gods
 		button.modulate = Color(0.6, 0.6, 0.6)
 		button.text = god_name + " 🔒"
 		
-		# Set appropriate unlock hint
-		if god_name == "Hermes":
-			button.tooltip_text = "Defeat Apollo's boss to unlock"
-		elif god_name == "Artemis":
-			button.tooltip_text = "Defeat Hermes' boss to unlock"
-		elif god_name == "Demeter":
-			button.tooltip_text = "Defeat Artemis' boss to unlock"
-		elif god_name == "Aphrodite":
-			button.tooltip_text = "Defeat Demeter's boss to unlock"
+		# Get actual unlock condition from progress tracker
+		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+		if progress_tracker:
+			button.tooltip_text = progress_tracker.get_god_unlock_description(god_name)
 		else:
-			button.tooltip_text = "Complete previous gods to unlock"
+			button.tooltip_text = "Unknown unlock requirement"
 
 func setup_test_battle_panel():
 	# Create the test battle panel in top right

@@ -15,7 +15,7 @@ var god_unlock_conditions: Dictionary = {
 	"Hermes": {
 		"type": "boss_defeated",
 		"boss_name": "?????",
-		"description": "Defeat the mysterious final boss"
+		"description": "Defeat a boss as Apollo"
 	},
 	"Artemis": {
 		"type": "traps_fallen_for",  
@@ -97,28 +97,7 @@ func add_run_experience(god_name: String, run_experience: Dictionary):
 	
 	print("Added run experience for ", god_name, ": ", run_experience)
 	
-	# Check for conversation triggers based on experience gained
-	if has_node("/root/ConversationManagerAutoload"):
-		var conv_manager = get_node("/root/ConversationManagerAutoload")
-		
-		# Calculate total experience gained this run
-		var total_run_exp = 0
-		for card_exp in run_experience.values():
-			total_run_exp += card_exp.get("capture_exp", 0) + card_exp.get("defense_exp", 0)
-		
-		# Check for Apollo mastery conversation (when significant experience is gained)
-		if god_name == "Apollo" and total_run_exp >= 30:
-			print("Triggering apollo_mastery conversation")
-			conv_manager.trigger_conversation("apollo_mastery")
-		
-		# Check if any card reached a high level for first deck unlock conversation
-		for card_index in progress_data[god_name]:
-			var card_data = progress_data[god_name][card_index]
-			var total_card_exp = card_data["total_exp"]
-			if total_card_exp >= 100:  # Arbitrary threshold for "significant progress"
-				print("Triggering first_deck_unlock conversation")
-				conv_manager.trigger_conversation("first_deck_unlock")
-				break  # Only trigger once
+	
 	
 	save_progress()
 

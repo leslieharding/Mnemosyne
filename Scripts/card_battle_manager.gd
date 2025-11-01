@@ -1034,8 +1034,8 @@ func _on_turn_changed(is_player_turn: bool):
 				return
 	
 	# Normal turn flow continues...
-	# If it's opponent turn and they haven't started thinking yet, let them take their turn
-	if turn_manager.is_opponent_turn() and not opponent_is_thinking and not is_tutorial_mode:
+# If it's opponent turn and they haven't started thinking yet, let them take their turn
+	if turn_manager.is_opponent_turn() and not opponent_is_thinking:
 		print("Starting opponent turn")
 		call_deferred("opponent_take_turn")
 
