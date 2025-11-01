@@ -233,8 +233,40 @@ func clear_all_progress():
 	progress_data.clear()
 	unlocked_gods = ["Apollo"]  # Reset to only Apollo unlocked
 	couples_united = []  # Clear united couples
-	traps_fallen_for = 0  # NEW LINE
+	traps_fallen_for = 0
+	total_defends = 0  # Reset defend counter for Athena unlock
 	save_progress()
+	
+	# Clear boss victory tracker
+	if has_node("/root/BossVictoryTrackerAutoload"):
+		var boss_victory_tracker = get_node("/root/BossVictoryTrackerAutoload")
+		boss_victory_tracker.reset_all_victories()
+		print("Boss victories reset")
+	
+	# Clear boss loss tracker
+	if has_node("/root/BossLossTrackerAutoload"):
+		var boss_loss_tracker = get_node("/root/BossLossTrackerAutoload")
+		boss_loss_tracker.reset_all_losses()
+		print("Boss losses reset")
+	
+	# Clear Mnemosyne progression
+	if has_node("/root/MnemosyneProgressTrackerAutoload"):
+		var mnemosyne_tracker = get_node("/root/MnemosyneProgressTrackerAutoload")
+		mnemosyne_tracker.reset_progression()
+		print("Mnemosyne progression reset")
+	
+	# Clear run stat growth tracker (in case there's lingering data)
+	if has_node("/root/RunStatGrowthTrackerAutoload"):
+		var stat_growth_tracker = get_node("/root/RunStatGrowthTrackerAutoload")
+		stat_growth_tracker.clear_run()
+		print("Stat growth tracker cleared")
+	
+	# Clear run enrichment tracker (in case there's lingering data)
+	if has_node("/root/RunEnrichmentTrackerAutoload"):
+		var enrichment_tracker = get_node("/root/RunEnrichmentTrackerAutoload")
+		enrichment_tracker.clear_enrichment()
+		print("Enrichment tracker cleared")
+	
 	print("All progress cleared - reset to Apollo only")
 
 # Clear progress for a specific god
