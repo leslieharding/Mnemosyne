@@ -7982,25 +7982,32 @@ func restore_battle_from_snapshot() -> bool:
 func reapply_battle_visual_effects():
 	print("=== REAPPLYING BATTLE VISUAL EFFECTS ===")
 	
-	# Re-apply sunlit styling if sun power is active
-	if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER:
+	
+	# This ensures enemy powers that counter player powers work correctly
+	if active_enemy_deck_power == EnemyDeckDefinition.EnemyDeckPowerType.DARKNESS_SHROUD:
+		print("Re-applying Darkness Shroud effect BEFORE sun power")
+		setup_darkness_shroud()  # This will counter sun power
+	
+	if active_enemy_deck_power == EnemyDeckDefinition.EnemyDeckPowerType.DISCORDANT:
+		print("Re-applying Discordant effect BEFORE rhythm power")
+		setup_discordant()  # This will counter rhythm power
+	
+	# Now re-apply player deck power visuals (if not blocked by enemy powers)
+	# Re-apply sunlit styling if sun power is active AND not blocked by darkness
+	if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER and not darkness_shroud_active:
 		for position in sunlit_positions:
 			apply_sunlit_styling(position)
 		print("Re-applied sunlit styling to positions: ", sunlit_positions)
-	# Re-apply rhythm slot visual if active
-	if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER:
+	elif active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER and darkness_shroud_active:
+		print("Sun power blocked by Darkness Shroud - no sunlit positions displayed")
+	
+	# Re-apply rhythm slot visual if active AND not blocked by discordant
+	if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER and not discordant_active:
 		if rhythm_slot >= 0 and not grid_occupied[rhythm_slot]:
 			apply_rhythm_slot_visual(rhythm_slot)
 		print("Re-applied rhythm slot visual to position: ", rhythm_slot)
-	
-	# CRITICAL: Re-apply enemy deck powers that affect player powers
-	if active_enemy_deck_power == EnemyDeckDefinition.EnemyDeckPowerType.DARKNESS_SHROUD:
-		print("Re-applying Darkness Shroud effect after battle restart")
-		setup_darkness_shroud()  # This will counter sun power again
-	
-	if active_enemy_deck_power == EnemyDeckDefinition.EnemyDeckPowerType.DISCORDANT:
-		print("Re-applying Discordant effect after battle restart")
-		setup_discordant()  # This will counter rhythm power again
+	elif active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER and discordant_active:
+		print("Rhythm power blocked by Discordant - no rhythm slot displayed")
 	
 	print("Battle visual effects and enemy powers reapplied")
 
