@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://4t57vaokc158"]
+[gd_scene load_steps=3 format=3 uid="uid://4t57vaokc158"]
 
 [ext_resource type="Script" uid="uid://cnywyok0cnec8" path="res://Scripts/main_menu.gd" id="1_tt5f1"]
+[ext_resource type="AudioStream" uid="uid://bnbr4e27k848x" path="res://Assets/SoundEffects/default_on_hover.wav" id="2_853f1"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -62,6 +63,15 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Quit"
 
+[node name="HoverSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_853f1")
+
+[node name="ClickSound" type="AudioStreamPlayer" parent="."]
+
+[connection signal="mouse_entered" from="MenuContainer/NewGameButton" to="." method="_on_new_game_button_mouse_entered"]
 [connection signal="pressed" from="MenuContainer/NewGameButton" to="." method="_on_new_game_button_pressed"]
+[connection signal="mouse_entered" from="MenuContainer/ContinueButton" to="." method="_on_continue_button_mouse_entered"]
+[connection signal="mouse_entered" from="MenuContainer/SettingsButton" to="." method="_on_settings_button_mouse_entered"]
 [connection signal="pressed" from="MenuContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="mouse_entered" from="MenuContainer/QuitButton" to="." method="_on_quit_button_mouse_entered"]
 [connection signal="pressed" from="MenuContainer/QuitButton" to="." method="_on_quit_button_pressed"]
