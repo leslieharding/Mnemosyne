@@ -158,6 +158,10 @@ func setup_confirmation_dialog():
 
 # Direct new game for first-time players
 func _on_new_game_button_pressed_direct():
+	if click_sound:
+		click_sound.play()
+	
+	
 	# Trigger the tutorial sequence for first-time players
 	if has_node("/root/CutsceneManagerAutoload"):
 		get_node("/root/CutsceneManagerAutoload").play_cutscene("tutorial_intro")
@@ -171,6 +175,8 @@ func _on_new_game_button_pressed_with_confirmation():
 
 # Continue game for returning players
 func _on_continue_button_pressed():
+	if click_sound:
+		click_sound.play()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 # Replace this entire function in Scripts/main_menu.gd (around lines 95-125)

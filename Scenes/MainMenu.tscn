@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://4t57vaokc158"]
+[gd_scene load_steps=4 format=3 uid="uid://4t57vaokc158"]
 
 [ext_resource type="Script" uid="uid://cnywyok0cnec8" path="res://Scripts/main_menu.gd" id="1_tt5f1"]
 [ext_resource type="AudioStream" uid="uid://bnbr4e27k848x" path="res://Assets/SoundEffects/default_on_hover.wav" id="2_853f1"]
+[ext_resource type="AudioStream" uid="uid://dn8djgh2vqep0" path="res://Assets/SoundEffects/default_click.wav" id="3_8saeu"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -67,6 +68,7 @@ text = "Quit"
 stream = ExtResource("2_853f1")
 
 [node name="ClickSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_8saeu")
 
 [connection signal="mouse_entered" from="MenuContainer/NewGameButton" to="." method="_on_new_game_button_mouse_entered"]
 [connection signal="pressed" from="MenuContainer/NewGameButton" to="." method="_on_new_game_button_pressed"]
