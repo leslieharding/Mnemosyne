@@ -157,7 +157,7 @@ func setup_confirmation_dialog():
 
 # Direct new game for first-time players
 func _on_new_game_button_pressed_direct():
-	SoundManager.play_click()
+	SoundManagerAutoload.play_click()
 	
 	
 	# Trigger the tutorial sequence for first-time players
@@ -173,7 +173,7 @@ func _on_new_game_button_pressed_with_confirmation():
 
 # Continue game for returning players
 func _on_continue_button_pressed():
-	SoundManager.play_click()
+	SoundManagerAutoload.play_click()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 # Replace this entire function in Scripts/main_menu.gd (around lines 95-125)
@@ -223,26 +223,26 @@ func _on_new_game_confirmed():
 
 
 func _on_quit_button_pressed() -> void:
-	SoundManager.play_click()
+	SoundManagerAutoload.play_click()
 	get_tree().quit()
 
 func _on_settings_button_pressed() -> void:
-	SoundManager.play_click()
+	SoundManagerAutoload.play_click()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/SettingsMenu.tscn")
 
 
 func _on_quit_button_mouse_entered() -> void:
-	SoundManager.play_hover()
+	SoundManagerAutoload.play_hover()
 
 
 func _on_settings_button_mouse_entered() -> void:
-	SoundManager.play_hover()
+	SoundManagerAutoload.play_hover()
 
 
 func _on_continue_button_mouse_entered() -> void:
 	
-	SoundManager.play_hover()
+	SoundManagerAutoload.play_hover()
 
 
 func _on_new_game_button_mouse_entered() -> void:
-	SoundManager.play_hover()
+	SoundManagerAutoload.play_hover()
