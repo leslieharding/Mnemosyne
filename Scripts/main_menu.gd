@@ -6,8 +6,7 @@ extends Control
 @onready var continue_button = $MenuContainer/ContinueButton
 @onready var settings_button = $MenuContainer/SettingsButton
 @onready var quit_button = $MenuContainer/QuitButton
-@onready var hover_sound = $HoverSound
-@onready var click_sound = $ClickSound
+
 # Confirmation dialog for new game
 var confirmation_dialog: ConfirmationDialog
 
@@ -158,8 +157,7 @@ func setup_confirmation_dialog():
 
 # Direct new game for first-time players
 func _on_new_game_button_pressed_direct():
-	if click_sound:
-		click_sound.play()
+	SoundManager.play_click()
 	
 	
 	# Trigger the tutorial sequence for first-time players
@@ -175,8 +173,7 @@ func _on_new_game_button_pressed_with_confirmation():
 
 # Continue game for returning players
 func _on_continue_button_pressed():
-	if click_sound:
-		click_sound.play()
+	SoundManager.play_click()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 # Replace this entire function in Scripts/main_menu.gd (around lines 95-125)
@@ -226,49 +223,26 @@ func _on_new_game_confirmed():
 
 
 func _on_quit_button_pressed() -> void:
-	if click_sound:
-		click_sound.play()
+	SoundManager.play_click()
 	get_tree().quit()
 
 func _on_settings_button_pressed() -> void:
-	if click_sound:
-		click_sound.play()
+	SoundManager.play_click()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/SettingsMenu.tscn")
 
 
 func _on_quit_button_mouse_entered() -> void:
-	# Don't play if sound is already playing
-	if hover_sound and hover_sound.playing:
-		return
-	
-	if hover_sound:
-		hover_sound.play()
+	SoundManager.play_hover()
 
 
 func _on_settings_button_mouse_entered() -> void:
-	# Don't play if sound is already playing
-	if hover_sound and hover_sound.playing:
-		return
-	if hover_sound:
-		hover_sound.play()
+	SoundManager.play_hover()
 
 
 func _on_continue_button_mouse_entered() -> void:
 	
-	if hover_sound and hover_sound.playing:
-		return  # Don't restart if already playing
-	
-	# Don't play if continue button is disabled and mouse is over it
-	if continue_button.disabled and continue_button.get_global_rect().has_point(get_global_mouse_position()):
-		return
-	
-	if hover_sound:
-		hover_sound.play()
+	SoundManager.play_hover()
 
 
 func _on_new_game_button_mouse_entered() -> void:
-	# Don't play if sound is already playing
-	if hover_sound and hover_sound.playing:
-		return
-	if hover_sound:
-		hover_sound.play()
+	SoundManager.play_hover()
