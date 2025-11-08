@@ -22,12 +22,15 @@ func load_cutscenes():
 
 # Create some sample cutscenes for testing
 func create_sample_cutscenes():
+	# Load portrait textures
+	var chiron_portrait = load("res://Assets/Images/Chiron.png")
+	var mnemosyne_portrait = load("res://Assets/Images/Mnemosyne.png")
+
 	# Create Mnemosyne character
-	var mnemosyne = Character.new("Mnemosyne", Color("#DDA0DD"), null, "left")
+	var mnemosyne = Character.new("Mnemosyne", Color("#DDA0DD"), mnemosyne_portrait, "left")
 	# Create Chrion character  
-	var chiron = Character.new("Chiron", Color("#FFD700"), null, "right")
-	# Create Apollo character  
-	var apollo = Character.new("Apollo", Color("#FFD700"), null, "right")
+	var chiron = Character.new("Chiron", Color("#FFD700"), chiron_portrait, "right")
+	
 	# Create Chronos character  
 	var chronos = Character.new("Chronos", Color("#8B4513"), null, "right")
 	

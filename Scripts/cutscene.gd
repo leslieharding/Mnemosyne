@@ -12,8 +12,8 @@ extends Control
 @onready var dialogue_area = $MainContainer/DialogueArea
 @onready var speaker_name_label = $MainContainer/DialogueArea/MarginContainer/VBoxContainer/SpeakerNameLabel
 @onready var dialogue_text = $MainContainer/DialogueArea/MarginContainer/VBoxContainer/DialogueText
-@onready var skip_button = $MainContainer/Controls/SkipButton
-@onready var advance_button = $MainContainer/Controls/AdvanceButton
+@onready var advance_indicator = $MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer/AdvanceIndicator
+@onready var skip_indicator = $MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer/SkipIndicator
 
 # Cutscene data
 var cutscene_data: CutsceneData
@@ -47,9 +47,13 @@ func _ready():
 	# Set up the cutscene
 	setup_cutscene()
 	
-	# Connect signals
-	advance_button.pressed.connect(_on_advance_pressed)
-	skip_button.pressed.connect(_on_skip_pressed)
+	# Connect skip indicator signal
+	skip_indicator.gui_input.connect(_on_skip_indicator_gui_input)
+	
+	
+	# Enable mouse input for dialogue area
+	dialogue_area.mouse_filter = Control.MOUSE_FILTER_STOP
+	dialogue_area.gui_input.connect(_on_dialogue_area_gui_input)
 	
 	# Set up input handling for keyboard
 	set_process_input(true)
@@ -108,6 +112,19 @@ func create_speaker_styles():
 	inactive_speaker_style.corner_radius_bottom_left = 8
 	inactive_speaker_style.corner_radius_bottom_right = 8
 
+func _on_dialogue_area_gui_input(event: InputEvent):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			if is_typing:
+				complete_typewriter_instantly()
+			else:
+				advance_dialogue()
+
+func _on_skip_indicator_gui_input(event: InputEvent):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			_on_skip_pressed()
+
 func setup_character_panels():
 	# Initially hide both panels
 	left_speaker_panel.visible = false
@@ -130,13 +147,26 @@ func setup_speaker_panel(panel: PanelContainer, name_label: Label, portrait_area
 	# Set initial style to inactive
 	panel.add_theme_stylebox_override("panel", inactive_speaker_style)
 	
-	# Add portrait if available (future enhancement)
+	# Clear any existing portraits
+	for child in portrait_area.get_children():
+		child.queue_free()
+	
+	# Debug output
+	print("Setting up panel for: ", character.character_name)
+	print("Portrait texture: ", character.portrait_texture)
+	
+	# Add portrait if available
 	if character.portrait_texture:
+		print("Creating portrait TextureRect")
 		var portrait = TextureRect.new()
 		portrait.texture = character.portrait_texture
 		portrait.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		portrait.custom_minimum_size = Vector2(200, 200)  # Ensure it has a size
 		portrait_area.add_child(portrait)
+		print("Portrait added to portrait_area")
+	else:
+		print("No portrait texture available for ", character.character_name)
 
 func show_current_line():
 	if current_line_index >= cutscene_data.dialogue_lines.size():
@@ -163,6 +193,8 @@ func show_current_line():
 	start_typewriter_effect(current_line.text)
 
 func start_typewriter_effect(text: String):
+	
+	
 	# Stop any existing typewriter effect
 	if typewriter_tween:
 		typewriter_tween.kill()
