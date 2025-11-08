@@ -44,20 +44,21 @@ func _ready():
 	# Wait one frame to ensure all @onready variables are initialized
 	await get_tree().process_frame
 	
+	# Set indicator colors and backgrounds
+	if advance_indicator:
+		advance_indicator.add_theme_color_override("default_color", Color.WHITE)
+		advance_indicator.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+		advance_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE  # Don't intercept clicks
 	
+	if skip_indicator:
+		skip_indicator.add_theme_color_override("default_color", Color.WHITE)
+		skip_indicator.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+		skip_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE  # Don't intercept clicks
 	
 	# Set up the cutscene
 	setup_cutscene()
 	
-	# Connect skip indicator signal
-	skip_indicator.mouse_filter = Control.MOUSE_FILTER_STOP
-	skip_indicator.gui_input.connect(_on_skip_indicator_gui_input)
-	
-	# Connect advance indicator signal
-	advance_indicator.mouse_filter = Control.MOUSE_FILTER_STOP
-	advance_indicator.gui_input.connect(_on_advance_indicator_gui_input)
-	
-	# Enable mouse input for dialogue area
+	# Enable mouse input for ENTIRE dialogue area only
 	dialogue_area.mouse_filter = Control.MOUSE_FILTER_STOP
 	dialogue_area.gui_input.connect(_on_dialogue_area_gui_input)
 	
@@ -91,13 +92,6 @@ func setup_cutscene():
 	# Set up character panels
 	setup_character_panels()
 
-func _on_advance_indicator_gui_input(event: InputEvent):
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			if is_typing:
-				complete_typewriter_instantly()
-			else:
-				advance_dialogue()
 
 func create_speaker_styles():
 	# Active speaker style (highlighted)
@@ -126,19 +120,26 @@ func create_speaker_styles():
 	inactive_speaker_style.corner_radius_bottom_left = 8
 	inactive_speaker_style.corner_radius_bottom_right = 8
 
-func _on_skip_indicator_gui_input(event: InputEvent):
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			_on_skip_pressed()
 
 func _on_dialogue_area_gui_input(event: InputEvent):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			if is_typing:
-				complete_typewriter_instantly()
+			var click_pos = event.position
+			print("Click detected at: ", click_pos)
+			print("Dialogue area size: ", dialogue_area.size)
+			print("Is typing: ", is_typing)
+			
+			# Check if click is in bottom-left area for skip (rough approximation)
+			if click_pos.x < dialogue_area.size.x * 0.2 and click_pos.y > dialogue_area.size.y * 0.7:
+				print("Skip area clicked")
+				_on_skip_pressed()
 			else:
-				advance_dialogue()
-
+				print("Advance area clicked")
+				# Normal advance behavior
+				if is_typing:
+					complete_typewriter_instantly()
+				else:
+					advance_dialogue()
 
 
 func setup_character_panels():
@@ -359,12 +360,7 @@ func return_to_previous_scene():
 	else:
 		TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
 
-# Signal handlers
-func _on_advance_pressed():
-	if is_typing:
-		complete_typewriter_instantly()
-	else:
-		advance_dialogue()
+
 
 func _on_skip_pressed():
 	# Ask for confirmation before skipping

@@ -132,6 +132,7 @@ text = "[center][wave amp=5 freq=2]Skip[/wave][/center]"
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 10
+mouse_filter = 2
 bbcode_enabled = true
 text = "[wave amp=20 freq=2]Continue[/wave]"
 fit_content = true
