@@ -114,6 +114,7 @@ text = "Speaker Name"
 
 [node name="DialogueText" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 bbcode_enabled = true
 text = "This is where the dialogue would appear, click to continue....."
 fit_content = true
@@ -121,15 +122,17 @@ fit_content = true
 [node name="HBoxContainer" type="HBoxContainer" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="SkipIndicator" type="Label" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="SkipIndicator" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(300, 20)
 layout_mode = 2
-text = "Skip"
-vertical_alignment = 2
+bbcode_enabled = true
+text = "[center][wave amp=5 freq=2]Skip[/wave][/center]"
 
-[node name="AdvanceIndicator" type="Label" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="AdvanceIndicatoror" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 10
-size_flags_vertical = 3
-text = "▼"
-horizontal_alignment = 2
-vertical_alignment = 2
+bbcode_enabled = true
+text = "[wave amp=20 freq=2]Continue[/wave]"
+fit_content = true
+scroll_active = false

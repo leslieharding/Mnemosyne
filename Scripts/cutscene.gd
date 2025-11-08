@@ -44,12 +44,18 @@ func _ready():
 	# Wait one frame to ensure all @onready variables are initialized
 	await get_tree().process_frame
 	
+	
+	
 	# Set up the cutscene
 	setup_cutscene()
 	
 	# Connect skip indicator signal
+	skip_indicator.mouse_filter = Control.MOUSE_FILTER_STOP
 	skip_indicator.gui_input.connect(_on_skip_indicator_gui_input)
 	
+	# Connect advance indicator signal
+	advance_indicator.mouse_filter = Control.MOUSE_FILTER_STOP
+	advance_indicator.gui_input.connect(_on_advance_indicator_gui_input)
 	
 	# Enable mouse input for dialogue area
 	dialogue_area.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -85,6 +91,14 @@ func setup_cutscene():
 	# Set up character panels
 	setup_character_panels()
 
+func _on_advance_indicator_gui_input(event: InputEvent):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			if is_typing:
+				complete_typewriter_instantly()
+			else:
+				advance_dialogue()
+
 func create_speaker_styles():
 	# Active speaker style (highlighted)
 	active_speaker_style = StyleBoxFlat.new()
@@ -112,6 +126,11 @@ func create_speaker_styles():
 	inactive_speaker_style.corner_radius_bottom_left = 8
 	inactive_speaker_style.corner_radius_bottom_right = 8
 
+func _on_skip_indicator_gui_input(event: InputEvent):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			_on_skip_pressed()
+
 func _on_dialogue_area_gui_input(event: InputEvent):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
@@ -120,10 +139,7 @@ func _on_dialogue_area_gui_input(event: InputEvent):
 			else:
 				advance_dialogue()
 
-func _on_skip_indicator_gui_input(event: InputEvent):
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			_on_skip_pressed()
+
 
 func setup_character_panels():
 	# Initially hide both panels
