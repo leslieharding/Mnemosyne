@@ -179,7 +179,11 @@ func setup_speaker_panel(panel: PanelContainer, name_label: Label, portrait_area
 		portrait.texture = character.portrait_texture
 		portrait.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		portrait.custom_minimum_size = Vector2(200, 200)  # Ensure it has a size
+		portrait.custom_minimum_size = Vector2(400, 400)
+		# Center the portrait within the portrait_area
+		portrait.set_anchors_preset(Control.PRESET_CENTER)
+		portrait.grow_horizontal = Control.GROW_DIRECTION_BOTH
+		portrait.grow_vertical = Control.GROW_DIRECTION_BOTH
 		portrait_area.add_child(portrait)
 		print("Portrait added to portrait_area")
 	else:
