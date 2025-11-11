@@ -5,6 +5,7 @@ extends Resource
 @export var speaker_id: String = ""
 @export var text: String = ""
 @export var speaker_position: String = "auto"
+@export var tone: String = "default"
 
 # Existing timing controls
 @export var typing_speed_multiplier: float = 1.0
@@ -15,13 +16,15 @@ extends Resource
 var parsed_segments: Array = []  # Will store parsed text segments with their properties
 
 func _init(speaker: String = "", dialogue_text: String = "", position: String = "auto", 
-		   typing_speed: float = 1.0, pre_delay: float = 0.0, post_delay: float = 0.0):
+		   typing_speed: float = 1.0, pre_delay: float = 0.0, post_delay: float = 0.0, dialogue_tone: String = "default"):
 	speaker_id = speaker
 	text = dialogue_text
 	speaker_position = position
 	typing_speed_multiplier = typing_speed
 	pre_line_delay = pre_delay
 	post_line_delay = post_delay
+	tone = dialogue_tone  
+	
 	
 	# Parse the text when initialized
 	parse_text_markup()

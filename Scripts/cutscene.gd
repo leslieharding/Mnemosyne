@@ -222,6 +222,8 @@ func start_typewriter_effect(text: String):
 	
 	# Get the current dialogue line
 	var current_line = cutscene_data.dialogue_lines[current_line_index]
+	if current_line.tone != "":
+		SoundManagerAutoload.play(current_line.tone)
 	
 	# Use parsed segments if available
 	if current_line.parsed_segments.size() > 0:
@@ -318,6 +320,8 @@ func complete_typewriter_instantly():
 	if typewriter_tween:
 		typewriter_tween.kill()
 	
+	SoundManagerAutoload.play_dialogue_complete()
+	
 	is_typing = false
 	current_visible_chars = full_text.length()
 	dialogue_text.visible_characters = -1  # Show all characters
@@ -383,6 +387,7 @@ func _on_skip_pressed():
 	confirm_dialog.canceled.connect(_on_skip_canceled.bind(confirm_dialog))
 
 func _on_skip_confirmed(dialog: AcceptDialog):
+	SoundManagerAutoload.play_dialogue_skip()
 	dialog.queue_free()
 	finish_cutscene()
 
