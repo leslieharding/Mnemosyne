@@ -52,6 +52,10 @@ var current_player_index = 0
 # Dedicated music player
 var music_player: AudioStreamPlayer
 
+# Hover sound tracking
+var card_hover_player: AudioStreamPlayer = null
+var card_hover_sound_playing: bool = false
+
 func _ready():
 	# Create a pool of AudioStreamPlayer nodes
 	for i in range(max_players):
@@ -59,7 +63,13 @@ func _ready():
 		player.bus = "Sounds"
 		add_child(player)
 		sfx_players.append(player)
-		
+	
+	# Create dedicated card hover player
+	card_hover_player = AudioStreamPlayer.new()
+	card_hover_player.bus = "Sounds"
+	add_child(card_hover_player)
+	card_hover_player.finished.connect(_on_card_hover_finished)
+	
 	# Create music player
 	music_player = AudioStreamPlayer.new()
 	music_player.bus = "Music"
@@ -109,7 +119,14 @@ func play_dialogue_skip():
 	play("dialogue_skip")
 
 func play_on_card_hover():
-	play("on_card_hover")
+	# Only play if not already playing
+	if not card_hover_sound_playing and card_hover_player:
+		card_hover_player.stream = load(SOUNDS["on_card_hover"])
+		card_hover_player.play()
+		card_hover_sound_playing = true
 	
 func play_on_card_click():
 	play("on_card_click")	
+
+func _on_card_hover_finished():
+	card_hover_sound_playing = false

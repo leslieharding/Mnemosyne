@@ -1788,6 +1788,8 @@ func _on_opponent_card_placed(grid_index: int):
 	
 	# NOW setup the card display with the actual card data
 	card_display.setup(opponent_card_data, opponent_card_level, current_god, 0, true)  # true = is_opponent_card
+	# Set is_in_hand to false since card is now on the board
+	card_display.is_in_hand = false
 	
 	# EXECUTE ON-PLAY ABILITIES AFTER display setup is complete
 	if opponent_card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, opponent_card_level):
@@ -2918,6 +2920,14 @@ func handle_card_selection(card_display, card_index):
 		print("Invalid card index: ", card_index)
 		return
 	
+	# Check if this card is already selected - if so, don't do anything
+	if selected_card_index == card_index and card_display.is_selected:
+		print("Card already selected, ignoring re-selection")
+		return
+	
+	# Play the click sound since we're changing selection
+	SoundManagerAutoload.play_on_card_click()
+	
 	# NEW: Check coerce constraint - but DON'T remove it here
 	if not is_card_selectable(card_index):
 		print("Card selection blocked by coerce constraint - must select card index: ", active_coerced_card_index)
@@ -3450,6 +3460,8 @@ func place_card_on_grid():
 	
 	# NOW setup the card display with the actual card data and level
 	card_display.setup(card_data, card_level, current_god, card_collection_index)
+	# Set is_in_hand to false since card is now on the board
+	card_display.is_in_hand = false
 	
 	# Wait another frame to ensure setup is complete
 	await get_tree().process_frame

@@ -21,6 +21,10 @@ var god_name: String = ""
 var card_index: int = -1
 var is_in_hand: bool = true
 
+# Hover sound timer
+var hover_timer: Timer = null
+var hover_delay: float = 0.15  # 150ms delay before playing sound
+
 # Selection styles
 var selected_style: StyleBoxFlat
 var default_style: StyleBoxFlat
@@ -28,6 +32,12 @@ var default_style: StyleBoxFlat
 func _ready():
 	# Create selection styles
 	create_selection_styles()
+	
+	# Create hover timer
+	hover_timer = Timer.new()
+	hover_timer.wait_time = hover_delay
+	hover_timer.one_shot = true
+	add_child(hover_timer)
 	
 	# Connect hover signals
 	if panel:
@@ -123,8 +133,6 @@ func debug_card_state():
 
 # Select this card
 func select():
-	if not is_selected:  
-		SoundManagerAutoload.play_on_card_click()
 	is_selected = true
 	if panel and selected_style:
 		panel.add_theme_stylebox_override("panel", selected_style)
@@ -138,12 +146,21 @@ func deselect():
 # Handle mouse enter
 func _on_panel_mouse_entered():
 	if card_data:
-		if is_in_hand:  # ADD THIS CHECK
-			SoundManagerAutoload.play_on_card_hover()
+		# Start timer for delayed sound
+		if is_in_hand and hover_timer:
+			hover_timer.start()
+			# Connect timeout signal only once
+			if not hover_timer.timeout.is_connected(_play_hover_sound):
+				hover_timer.timeout.connect(_play_hover_sound)
+		
 		emit_signal("card_hovered", card_data)
 
 # Handle mouse exit
 func _on_panel_mouse_exited():
+	# Cancel hover sound if mouse exits before timer completes
+	if hover_timer:
+		hover_timer.stop()
+	
 	emit_signal("card_unhovered")
 
 # Get the card's resource data
@@ -158,3 +175,7 @@ func apply_special_style(style: StyleBoxFlat):
 func restore_default_style():
 	if panel:
 		panel.remove_theme_stylebox_override("panel")
+
+# Play hover sound (called by timer)
+func _play_hover_sound():
+	SoundManagerAutoload.play_on_card_hover()
