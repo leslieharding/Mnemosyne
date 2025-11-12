@@ -6,6 +6,10 @@ const SOUNDS = {
 	"click": "res://Assets/SoundEffects/default_click.wav",
 	"hover": "res://Assets/SoundEffects/default_on_hover.wav",
 	
+	# In Battle Navigation Sounds
+	"on_card_hover": "res://Assets/SoundEffects/on_card_hover.wav",
+	"on_card_click": "res://Assets/SoundEffects/on_card_click.wav",
+	
 	# Dialogue tones
 	"mnemosyne_default": "res://Assets/SoundEffects/mnemosyne_default.wav",
 	"mnemosyne_happy": "res://Assets/SoundEffects/mnemosyne_happy.wav",
@@ -103,3 +107,9 @@ func play_dialogue_complete():
 
 func play_dialogue_skip():
 	play("dialogue_skip")
+
+func play_on_card_hover():
+	play("on_card_hover")
+	
+func play_on_card_click():
+	play("on_card_click")	

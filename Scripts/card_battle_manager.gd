@@ -3245,6 +3245,7 @@ func update_card_display(grid_index: int, card_data: CardResource):
 		print("Updated card display for ", card_data.card_name, " with new values: ", card_data.values)
 
 func place_card_on_grid():
+	
 	if selected_card_index == -1 or current_grid_index == -1:
 		return
 	
@@ -3714,6 +3715,13 @@ func place_card_on_grid():
 		if notification_manager:
 			notification_manager.show_notification("🎯 Coordination complete!")
 		return
+	
+	# At the very end of place_card_on_grid(), after the card has been placed
+	var placed_slot = grid_slots[current_grid_index]
+	for child in placed_slot.get_children():
+		if child is CardDisplay:
+			child.is_in_hand = false
+			break
 	
 	# Switch turns only if no special modes are active
 	turn_manager.next_turn()

@@ -19,6 +19,7 @@ var is_selected: bool = false
 var card_level: int = 1
 var god_name: String = ""
 var card_index: int = -1
+var is_in_hand: bool = true
 
 # Selection styles
 var selected_style: StyleBoxFlat
@@ -122,6 +123,8 @@ func debug_card_state():
 
 # Select this card
 func select():
+	if not is_selected:  
+		SoundManagerAutoload.play_on_card_click()
 	is_selected = true
 	if panel and selected_style:
 		panel.add_theme_stylebox_override("panel", selected_style)
@@ -135,6 +138,8 @@ func deselect():
 # Handle mouse enter
 func _on_panel_mouse_entered():
 	if card_data:
+		if is_in_hand:  # ADD THIS CHECK
+			SoundManagerAutoload.play_on_card_hover()
 		emit_signal("card_hovered", card_data)
 
 # Handle mouse exit
