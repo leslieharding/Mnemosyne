@@ -2851,7 +2851,7 @@ func display_player_hand():
 		var arc_offset = pow(abs(offset_from_center), 2) / max(pow(center_index, 2), 1) * arc_height
 		
 		# Position the card with fan effect
-		var hand_vertical_offset = 40.0  # Adjust this to move entire hand up/down (higher = lower on screen)
+		var hand_vertical_offset = 0  # Adjust this to move entire hand up/down (higher = lower on screen)
 		card_display.position.x = start_x + i * total_spacing
 		card_display.position.y = arc_offset + hand_vertical_offset  # Lower position for outer cards
 		
@@ -2903,6 +2903,11 @@ func display_player_hand():
 		# Connect input signals
 		card_display.panel.gui_input.connect(_on_card_gui_input.bind(card_display, i))
 		print("Connected input signal for card ", i)
+		
+		# Connect hover signals explicitly for hand cards
+		card_display.card_hovered.connect(_on_card_hovered)
+		card_display.card_unhovered.connect(_on_card_unhovered)
+		print("Connected hover signals for card ", i, ": ", card.card_name)
 
 func _on_card_input_event(viewport, event, shape_idx, card_display, card_index):
 	print("=== CARD INPUT EVENT ===")
