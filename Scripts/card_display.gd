@@ -13,6 +13,10 @@ signal card_unhovered()
 @onready var west_power = $Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer/WestPower
 @onready var card_name_label = $Panel/MarginContainer/VBoxContainer/CardNameLabel
 
+# Animation
+var hover_tween: Tween
+var selection_tween: Tween
+
 # Card data and state
 var card_data: CardResource
 var is_selected: bool = false
@@ -133,15 +137,29 @@ func debug_card_state():
 
 # Select this card
 func select():
+	if not is_selected:  
+		SoundManagerAutoload.play_on_card_click()
+		play_selection_bounce()
 	is_selected = true
 	if panel and selected_style:
 		panel.add_theme_stylebox_override("panel", selected_style)
 
 # Deselect this card
 func deselect():
+	print("DESELECT called on card: ", card_data.card_name if card_data else "Unknown", " | Current scale: ", scale)
 	is_selected = false
 	if panel and default_style:
 		panel.add_theme_stylebox_override("panel", default_style)
+	
+	# Return to normal size smoothly
+	if selection_tween:
+		print("  Killing existing selection tween")
+		selection_tween.kill()
+	
+	print("  Creating reset tween to scale ", Vector2.ONE)
+	var reset_tween = create_tween()
+	reset_tween.tween_property(self, "scale", Vector2.ONE, 0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	print("  Reset tween created")
 
 # Handle mouse enter
 func _on_panel_mouse_entered():
@@ -179,3 +197,17 @@ func restore_default_style():
 # Play hover sound (called by timer)
 func _play_hover_sound():
 	SoundManagerAutoload.play_on_card_hover()
+
+# Play bounce effect when card is selected
+func play_selection_bounce():
+	# Stop any existing animation
+	if selection_tween:
+		selection_tween.kill()
+	
+	selection_tween = create_tween()
+	
+	# Squash: briefly smaller (0.95x)
+	selection_tween.tween_property(self, "scale", Vector2(0.95, 0.95), 0.08).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	
+	# Stretch: bounce to larger size (1.15x for selected cards)
+	selection_tween.tween_property(self, "scale", Vector2(1.15, 1.15), 0.15).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)

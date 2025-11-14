@@ -2781,8 +2781,18 @@ func get_card_level(card_collection_index: int) -> int:
 	return 1  # Default level
 
 func display_player_hand():
-	# First, clear existing cards
+	# First, clear existing cards and reset their state
 	for child in hand_container.get_children():
+		# If it's the CardsContainer, clean up all card displays inside it
+		if child.name == "CardsContainer":
+			for card_display in child.get_children():
+				if card_display is CardDisplay:
+					# Reset scale and kill any active tweens
+					card_display.scale = Vector2.ONE
+					if card_display.selection_tween:
+						card_display.selection_tween.kill()
+					if card_display.hover_tween:
+						card_display.hover_tween.kill()
 		child.queue_free()
 	
 	# If the deck is empty, nothing to display
@@ -2936,14 +2946,18 @@ func handle_card_selection(card_display, card_index):
 		return
 	
 	# FIRST: Deselect ALL cards before selecting the new one
-	var cards_container = hand_container.get_node_or_null("CardsContainer")
-	if cards_container:
-		print("Deselecting all cards in hand...")
-		for child in cards_container.get_children():
-			if child is CardDisplay:
-				if child.is_selected:
-					print("  Deselecting card: ", child.get_card_data().card_name if child.get_card_data() else "Unknown")
+	# Get the Node2D container (it's the only child, but has auto-generated name)
+	if hand_container.get_child_count() > 0:
+		var cards_container = hand_container.get_child(0)
+		if cards_container and cards_container is Node2D:
+			print("Deselecting all cards in hand...")
+			for child in cards_container.get_children():
+				if child is CardDisplay:
 					child.deselect()
+		else:
+			print("ERROR: First child of hand_container is not a Node2D!")
+	else:
+		print("ERROR: hand_container has no children!")
 	
 	# SECOND: Select the new card
 	print("Selecting new card: ", player_deck[card_index].card_name)
@@ -2969,7 +2983,7 @@ func _on_card_gui_input(event, card_display, card_index):
 	
 	# In tutorial mode, FORCE allow card selection regardless of turn state
 	if is_tutorial_mode:
-		print("Tutorial mode: Allowing card input")
+		pass
 	elif not turn_manager.is_player_turn():
 		print("Not tutorial and not player turn - blocking input")
 		return
@@ -2986,8 +3000,6 @@ func _on_card_gui_input(event, card_display, card_index):
 			
 			# Use the improved handle_card_selection function
 			handle_card_selection(card_display, card_index)
-	else:
-		print("Non-mouse event received: ", event.get_class())
 
 func _on_grid_mouse_entered(grid_index):
 	if not turn_manager.is_player_turn():
