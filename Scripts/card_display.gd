@@ -13,6 +13,8 @@ signal card_unhovered()
 @onready var west_power = $Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer/WestPower
 @onready var card_name_label = $Panel/MarginContainer/VBoxContainer/CardNameLabel
 
+var original_rotation: float = 0.0  # Store the card's fan rotation when in hand
+
 # Animation
 var hover_tween: Tween
 var selection_tween: Tween
@@ -135,7 +137,6 @@ func debug_card_state():
 		print("Level data count: ", card_data.level_data.size())
 	print("===========================")
 
-# Select this card
 func select():
 	if not is_selected:  
 		SoundManagerAutoload.play_on_card_click()
@@ -143,8 +144,11 @@ func select():
 	is_selected = true
 	if panel and selected_style:
 		panel.add_theme_stylebox_override("panel", selected_style)
+	
+	# Straighten out the card when selected (remove fan rotation)
+	if is_in_hand:
+		rotation = 0.0
 
-# Deselect this card
 func deselect():
 	print("DESELECT called on card: ", card_data.card_name if card_data else "Unknown", " | Current scale: ", scale)
 	is_selected = false
@@ -156,10 +160,15 @@ func deselect():
 		print("  Killing existing selection tween")
 		selection_tween.kill()
 	
-	print("  Creating reset tween to scale ", Vector2.ONE)
-	var reset_tween = create_tween()
-	reset_tween.tween_property(self, "scale", Vector2.ONE, 0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
-	print("  Reset tween created")
+	selection_tween = create_tween()
+	selection_tween.set_parallel(true)
+	selection_tween.tween_property(self, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	
+	# Restore fan rotation when deselected if in hand
+	if is_in_hand:
+		selection_tween.tween_property(self, "rotation", original_rotation, 0.2).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	
+	print("  Started deselect tween to scale: ", Vector2.ONE)
 
 # Handle mouse enter
 func _on_panel_mouse_entered():

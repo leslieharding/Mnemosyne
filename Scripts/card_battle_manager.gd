@@ -2780,6 +2780,7 @@ func get_card_level(card_collection_index: int) -> int:
 	
 	return 1  # Default level
 
+
 func display_player_hand():
 	# First, clear existing cards and reset their state
 	for child in hand_container.get_children():
@@ -2799,15 +2800,29 @@ func display_player_hand():
 	if player_deck.size() == 0:
 		print("No cards left in hand")
 		return
-		
+	
+	# Fan effect parameters
+	var hand_size = player_deck.size()
+	var max_rotation_deg = 10.0  # Maximum rotation for outermost cards in degrees
+	var arc_height = 15.0  # How much lower the outer cards should be
+	
 	# Card width and spacing parameters
 	var card_width = 110  # Base card width
-	var card_spacing = 30  # Adjust this value to increase/decrease spacing between cards
+	var base_spacing = 30  # Base spacing between cards
+	
+	# Reduce spacing for hands with multiple cards to create overlap
+	var card_spacing = base_spacing
+	if hand_size > 1:
+		card_spacing = base_spacing * 0.7  # 30% tighter spacing for overlap
+	
 	var total_spacing = card_width + card_spacing  # Total space each card takes horizontally
 	
 	# Calculate the total width needed
-	var total_width = player_deck.size() * total_spacing
+	var total_width = hand_size * total_spacing
 	var start_x = -total_width / 2 + card_width / 2  # Center the cards
+	
+	# Calculate center position for fan calculations
+	var center_index = (hand_size - 1) / 2.0
 	
 	# Create a Node2D as a container for all cards
 	var cards_container = Node2D.new()
@@ -2826,13 +2841,30 @@ func display_player_hand():
 		# Wait one frame to ensure the card display is fully ready
 		await get_tree().process_frame
 		
-		# Position the card explicitly with the new spacing
+		# Calculate fan rotation
+		var offset_from_center = i - center_index
+		var rotation_factor = offset_from_center / max(center_index, 0.5)  # Normalize to -1.0 to 1.0
+		var rotation_deg = rotation_factor * max_rotation_deg
+		var rotation_rad = deg_to_rad(rotation_deg)
+		
+		# Calculate vertical arc (parabolic curve - outer cards lower)
+		var arc_offset = pow(abs(offset_from_center), 2) / max(pow(center_index, 2), 1) * arc_height
+		
+		# Position the card with fan effect
+		var hand_vertical_offset = 40.0  # Adjust this to move entire hand up/down (higher = lower on screen)
 		card_display.position.x = start_x + i * total_spacing
+		card_display.position.y = arc_offset + hand_vertical_offset  # Lower position for outer cards
+		
+		# Apply rotation
+		card_display.rotation = rotation_rad
+		card_display.original_rotation = rotation_rad  # Store for later restoration
+		
+		
 		
 		# Get the current level for this card - UNIFIED VERSION
 		var current_level = get_card_level(card_collection_index)
 		
-		print("Setting up hand card ", i, ": ", card.card_name, " at level ", current_level, " (collection index: ", card_collection_index, ")")
+		print("Setting up hand card ", i, ": ", card.card_name, " at level ", current_level, " (collection index: ", card_collection_index, ") with rotation: ", rotation_deg, "°")
 		
 		# FOR HAND DISPLAY: Create a copy of the card with level-appropriate values AND growth
 		var hand_card_data = card.duplicate(true)  # DEEP COPY to avoid reference issues
@@ -2857,45 +2889,21 @@ func display_player_hand():
 				var grow_ability_script = preload("res://Resources/Abilities/grow_ability.gd")
 				duplicated_ability.description = grow_ability_script.get_description_for_level(current_level)
 				print("Updated Grow description for level ", current_level, ": ", duplicated_ability.description)
-			elif duplicated_ability.ability_name == "Cultivate":
-				var cultivate_ability_script = preload("res://Resources/Abilities/cultivate_ability.gd")
-				duplicated_ability.description = cultivate_ability_script.get_description_for_level(current_level)
-				print("Updated Cultivate description for level ", current_level, ": ", duplicated_ability.description)
-			elif duplicated_ability.ability_name == "Enrich":
-				var enrich_ability_script = preload("res://Resources/Abilities/enrich_ability.gd")
-				duplicated_ability.description = enrich_ability_script.get_description_for_level(current_level)
-				print("Updated Enrich description for level ", current_level, ": ", duplicated_ability.description)
 			
 			duplicated_abilities.append(duplicated_ability)
 		
 		hand_card_data.abilities = duplicated_abilities
 		
-		print("Hand card effective values (with growth): ", effective_values)
-		print("Hand card effective abilities count: ", duplicated_abilities.size())
-		
-		# Setup the card with the level-appropriate data for hand display
+		# Set up the card display with the hand version
 		card_display.setup(hand_card_data, current_level, current_god, card_collection_index)
 		
-		# ALWAYS connect hover signals for info panel (regardless of tutorial mode)
-		card_display.card_hovered.connect(_on_card_hovered)
-		card_display.card_unhovered.connect(_on_card_unhovered)
-		print("Connected hover signals for card ", i, ": ", card.card_name)
+		# Ensure it knows it's in hand for proper rotation behavior
+		card_display.is_in_hand = true
 		
-		# DEBUG: Check if panel exists and is ready
-		if not card_display.panel:
-			print("ERROR: Card display panel is null for card ", i)
-			continue
-		
-		print("Card ", i, " panel mouse filter: ", card_display.panel.mouse_filter)
-		print("Card ", i, " panel size: ", card_display.panel.size)
-		print("Card ", i, " panel position: ", card_display.panel.position)
-		
-		# Make sure the panel can receive input
-		card_display.panel.mouse_filter = Control.MOUSE_FILTER_PASS
-		
-		# Connect to detect clicks on the card
+		# Connect input signals
 		card_display.panel.gui_input.connect(_on_card_gui_input.bind(card_display, i))
-		print("Connected gui_input signal for card ", i)
+		print("Connected input signal for card ", i)
+
 func _on_card_input_event(viewport, event, shape_idx, card_display, card_index):
 	print("=== CARD INPUT EVENT ===")
 	print("Event: ", event)
