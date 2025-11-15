@@ -18,6 +18,8 @@ var grid_card_data: Array = []  # Track the actual card data for each slot
 
 var discordant_active: bool = false
 
+var is_animating_card_placement: bool = false  # Prevents multiple placements during animation
+
 # Graeae ability tracking
 var graeae_tracker: GraeaeTracker = null
 
@@ -3029,6 +3031,9 @@ func _on_grid_mouse_entered(grid_index):
 	if not turn_manager.is_player_turn():
 		return
 	
+	if is_animating_card_placement:
+		return
+	
 	# Handle enrich mode - ALL slots should be highlightable during enrich selection
 	if enrich_mode_active and current_enricher_owner == Owner.PLAYER:
 		# Clear the previous selection highlight
@@ -3295,6 +3300,9 @@ func place_card_on_grid():
 	if selected_card_index == -1 or current_grid_index == -1:
 		return
 	
+	if is_animating_card_placement:
+		return
+	
 	check_and_remove_coerce_constraint(selected_card_index)
 	
 	# Handle dance target selection FIRST (but only during dance mode setup)
@@ -3348,6 +3356,8 @@ func place_card_on_grid():
 		print("Invalid card index: ", selected_card_index)
 		selected_card_index = -1
 		return
+	
+	await animate_card_to_slot()
 	
 	# Store a reference to the original card data
 	var original_card_data = player_deck[selected_card_index]
@@ -9359,3 +9369,83 @@ func process_fimbulwinter_enrich(card: CardResource, position: int, card_level: 
 	
 	if notification_manager:
 		notification_manager.show_notification("Slot " + str(random_slot) + " withers from " + card.card_name)
+
+func animate_card_to_slot():
+	"""Animates the selected card from hand to grid slot with lift and slam effect"""
+	
+	is_animating_card_placement = true
+	
+	# ===== LOCK THE GRID INDEX - store it before animation starts =====
+	var locked_grid_index = current_grid_index
+	# ===== END OF NEW CODE =====
+	
+	# Get the selected card from hand
+	var selected_card_display = get_selected_card_from_hand()
+	if not selected_card_display:
+		print("No card display found for animation, skipping")
+		is_animating_card_placement = false
+		return
+	
+	# Get target slot using the LOCKED index
+	var target_slot = grid_slots[locked_grid_index]
+	
+	# Calculate target position (center of grid slot)
+	# We need to account for the card's size to center it properly
+	var target_global_position = target_slot.global_position + (target_slot.size / 2)
+	
+	# Adjust for card display size (assuming the card's origin is top-left)
+	if selected_card_display.panel:
+		target_global_position -= selected_card_display.panel.size / 2
+	
+	# Reparent to draw on top during animation
+	selected_card_display.reparent(self)
+	selected_card_display.z_index = 100
+	
+	# Reset rotation and set initial position over the slot
+	selected_card_display.rotation = 0  # Remove any fan rotation from hand
+	selected_card_display.scale = Vector2.ONE  # Reset any selection scaling
+	selected_card_display.global_position = target_global_position  # Start directly over slot
+	
+	# Create animation sequence
+	var tween = create_tween()
+	tween.set_parallel(false)
+	
+	# Step 3: Lift up slightly (20 pixels up)
+	var lift_position = target_global_position - Vector2(0, 20)
+	tween.tween_property(selected_card_display, "global_position", lift_position, 0.15) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	
+	# Brief pause at the top
+	tween.tween_interval(0.08)
+	
+	# Step 4: Slam down into the slot with bounce
+	tween.tween_property(selected_card_display, "global_position", target_global_position, 0.25) \
+		.set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	
+	# Wait for animation to finish
+	await tween.finished
+	
+	# Clean up animated card
+	selected_card_display.queue_free()
+	
+	# ===== RESTORE THE LOCKED INDEX after animation =====
+	current_grid_index = locked_grid_index
+	# ===== END OF NEW CODE =====
+	
+	is_animating_card_placement = false
+
+func get_selected_card_from_hand() -> CardDisplay:
+	"""Returns the CardDisplay node for the currently selected card in hand"""
+	if hand_container.get_child_count() == 0:
+		return null
+	
+	var cards_container = hand_container.get_child(0)
+	if not cards_container or not cards_container is Node2D:
+		return null
+	
+	# Simply find whichever card is currently selected
+	for child in cards_container.get_children():
+		if child is CardDisplay and child.is_selected:
+			return child
+	
+	return null
