@@ -138,9 +138,11 @@ func debug_card_state():
 	print("===========================")
 
 func select():
-	if not is_selected:  
-		SoundManagerAutoload.play_on_card_click()
-		play_selection_bounce()
+	if is_selected:  
+		deselect()
+		return
+	SoundManagerAutoload.play_on_card_click()
+	play_selection_bounce()
 	is_selected = true
 	if panel and selected_style:
 		panel.add_theme_stylebox_override("panel", selected_style)
@@ -173,6 +175,9 @@ func deselect():
 		selection_tween.tween_property(self, "rotation", original_rotation, 0.2).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	
 	print("  Started deselect tween to scale: ", Vector2.ONE)
+
+
+
 
 # Handle mouse enter
 func _on_panel_mouse_entered():

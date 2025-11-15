@@ -2810,7 +2810,7 @@ func display_player_hand():
 	
 	# Card width and spacing parameters
 	var card_width = 120  # Base card width
-	var base_spacing = -10  # Negative spacing creates overlap
+	var base_spacing = -20  # Negative spacing creates overlap
 
 	# Increase overlap slightly for larger hands
 	var card_spacing = base_spacing
@@ -2956,9 +2956,11 @@ func handle_card_selection(card_display, card_index):
 		print("Invalid card index: ", card_index)
 		return
 	
-	# Check if this card is already selected - if so, don't do anything
+	# Check if this card is already selected - if so, unselect it
 	if selected_card_index == card_index and card_display.is_selected:
-		print("Card already selected, ignoring re-selection")
+		print("Card already selected, unselecting it")
+		card_display.deselect()
+		selected_card_index = -1
 		return
 	
 	# Play the click sound since we're changing selection
