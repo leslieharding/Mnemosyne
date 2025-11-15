@@ -2807,19 +2807,20 @@ func display_player_hand():
 	var arc_height = 15.0  # How much lower the outer cards should be
 	
 	# Card width and spacing parameters
-	var card_width = 110  # Base card width
-	var base_spacing = 30  # Base spacing between cards
-	
-	# Reduce spacing for hands with multiple cards to create overlap
+	var card_width = 120  # Base card width
+	var base_spacing = -10  # Negative spacing creates overlap
+
+	# Increase overlap slightly for larger hands
 	var card_spacing = base_spacing
-	if hand_size > 1:
-		card_spacing = base_spacing * 0.7  # 30% tighter spacing for overlap
+	if hand_size > 3:
+		card_spacing = base_spacing * 1.2  # Even tighter for 4+ cards
 	
 	var total_spacing = card_width + card_spacing  # Total space each card takes horizontally
 	
 	# Calculate the total width needed
 	var total_width = hand_size * total_spacing
-	var start_x = -total_width / 2 + card_width / 2  # Center the cards
+	var horizontal_offset = -55  # Shift entire hand left (negative = left, positive = right)
+	var start_x = -total_width / 2 + card_width / 2 + horizontal_offset
 	
 	# Calculate center position for fan calculations
 	var center_index = (hand_size - 1) / 2.0
@@ -2850,14 +2851,24 @@ func display_player_hand():
 		# Calculate vertical arc (parabolic curve - outer cards lower)
 		var arc_offset = pow(abs(offset_from_center), 2) / max(pow(center_index, 2), 1) * arc_height
 		
-		# Position the card with fan effect
-		var hand_vertical_offset = 0  # Adjust this to move entire hand up/down (higher = lower on screen)
-		card_display.position.x = start_x + i * total_spacing
-		card_display.position.y = arc_offset + hand_vertical_offset  # Lower position for outer cards
+		# Add subtle random variations for organic feel
+		var rotation_variation = randf_range(-1.5, 1.5)  # ±1.5 degrees
+		var x_variation = randf_range(-2.0, 2.0)  # ±2 pixels horizontal
+		var y_variation = randf_range(-3.0, 3.0)  # ±3 pixels vertical
+		var scale_variation = randf_range(0.98, 1.01)  # 0.98x to 1.01x scale
 		
-		# Apply rotation
-		card_display.rotation = rotation_rad
-		card_display.original_rotation = rotation_rad  # Store for later restoration
+		# Position the card with fan effect plus random variations
+		var hand_vertical_offset = 0  # Adjust this to move entire hand up/down (higher = lower on screen)
+		card_display.position.x = start_x + i * total_spacing + x_variation
+		card_display.position.y = arc_offset + hand_vertical_offset + y_variation  # Lower position for outer cards
+		
+		# Apply rotation with variation
+		var final_rotation = rotation_rad + deg_to_rad(rotation_variation)
+		card_display.rotation = final_rotation
+		card_display.original_rotation = final_rotation  # Store for later restoration
+		
+		# Apply subtle scale variation
+		card_display.scale = Vector2(scale_variation, scale_variation)
 		
 		
 		

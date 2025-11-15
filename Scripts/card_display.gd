@@ -145,6 +145,10 @@ func select():
 	if panel and selected_style:
 		panel.add_theme_stylebox_override("panel", selected_style)
 	
+	# Bring card to front by moving it to the end of parent's children
+	if get_parent():
+		get_parent().move_child(self, -1)
+	
 	# Straighten out the card when selected (remove fan rotation)
 	if is_in_hand:
 		rotation = 0.0
