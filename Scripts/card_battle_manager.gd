@@ -1781,17 +1781,55 @@ func _on_opponent_card_placed(grid_index: int):
 	
 	# Create a card display for the opponent's card
 	var card_display = preload("res://Scenes/CardDisplay.tscn").instantiate()
-	
-	# Add the card as a child of the slot panel FIRST
-	slot.add_child(card_display)
-	
-	# Wait one frame to ensure _ready() is called and @onready variables are initialized
+
+	# Add to scene FIRST so get_tree() works
+	add_child(card_display)
+
+	# Wait one frame to ensure _ready() is called
 	await get_tree().process_frame
-	
-	# NOW setup the card display with the actual card data
-	card_display.setup(opponent_card_data, opponent_card_level, current_god, 0, true)  # true = is_opponent_card
-	# Set is_in_hand to false since card is now on the board
+
+	# NOW setup can safely call get_tree().get_first_node_in_group()
+	card_display.setup(opponent_card_data, opponent_card_level, current_god, 0, true)
 	card_display.is_in_hand = false
+
+	# Apply opponent styling IMMEDIATELY (before animation) so it shows red during animation
+	if card_display.panel:
+		card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+
+	# Calculate target position for animation
+	var target_global_position = slot.global_position + (slot.size / 2)
+	if card_display.panel:
+		target_global_position -= card_display.panel.size / 2
+
+	# Position for animation
+	card_display.z_index = 100
+	card_display.global_position = target_global_position
+	card_display.rotation = 0
+	card_display.scale = Vector2.ONE
+
+	# Create animation sequence
+	var tween = create_tween()
+	tween.set_parallel(false)
+
+	# Lift up
+	var lift_position = target_global_position - Vector2(0, 20)
+	tween.tween_property(card_display, "global_position", lift_position, 0.15) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	# Pause
+	tween.tween_interval(0.08)
+
+	# Slam down
+	tween.tween_property(card_display, "global_position", target_global_position, 0.25) \
+		.set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+
+	await tween.finished
+
+	# After animation, reparent to slot
+	card_display.reparent(slot)
+	card_display.z_index = 0
+	
+	
 	
 	# EXECUTE ON-PLAY ABILITIES AFTER display setup is complete
 	if opponent_card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, opponent_card_level):
@@ -9414,15 +9452,15 @@ func animate_card_to_slot():
 	
 	# Step 3: Lift up slightly (20 pixels up)
 	var lift_position = target_global_position - Vector2(0, 20)
-	tween.tween_property(selected_card_display, "global_position", lift_position, 0.15) \
+	tween.tween_property(selected_card_display, "global_position", lift_position, 0.3) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	
 	# Brief pause at the top
 	tween.tween_interval(0.08)
 	
 	# Step 4: Slam down into the slot with bounce
-	tween.tween_property(selected_card_display, "global_position", target_global_position, 0.25) \
-		.set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(selected_card_display, "global_position", target_global_position, 0.05) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	
 	# Wait for animation to finish
 	await tween.finished
