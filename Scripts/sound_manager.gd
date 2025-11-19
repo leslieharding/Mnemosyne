@@ -35,6 +35,11 @@ const SOUNDS = {
 	# Dialogue actions
 	"dialogue_complete": "res://Assets/SoundEffects/dialogue_complete.wav",
 	"dialogue_skip": "res://Assets/SoundEffects/dialogue_skip.wav",
+	
+	# God Mod Select Sounds
+	"apollo_hover": "res://Assets/SoundEffects/apollo_hover.wav",
+	
+	
 }
 
 # Music paths

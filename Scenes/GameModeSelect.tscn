@@ -21,7 +21,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Button" type="Button" parent="Background"]
-layout_mode = 2
+layout_mode = 0
 offset_left = 836.0
 offset_top = 595.0
 offset_right = 946.0
@@ -94,6 +94,13 @@ grow_horizontal = 0
 grow_vertical = 0
 text = "Visit Chiron"
 script = ExtResource("2_1fq1s")
+
+[node name="UnlockInfoPanel" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = -200.0
+offset_right = -160.0
+offset_bottom = 40.0
+metadata/_edit_use_anchors_ = true
 
 [connection signal="pressed" from="Background/Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/ApolloButton" to="." method="_on_apollo_button_pressed"]
