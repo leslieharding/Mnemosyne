@@ -102,9 +102,14 @@ offset_right = -160.0
 offset_bottom = 40.0
 metadata/_edit_use_anchors_ = true
 
+[connection signal="mouse_entered" from="Background/Button" to="." method="_on_button_mouse_entered"]
 [connection signal="pressed" from="Background/Button" to="." method="_on_button_pressed"]
+[connection signal="mouse_entered" from="VBoxContainer/HBoxContainer/ApolloButton" to="." method="_on_apollo_button_mouse_entered"]
+[connection signal="mouse_exited" from="VBoxContainer/HBoxContainer/ApolloButton" to="." method="_on_apollo_button_mouse_exited"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/ApolloButton" to="." method="_on_apollo_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/HermesButton" to="." method="_on_hermes_button_pressed"]
+[connection signal="mouse_entered" from="VBoxContainer/HBoxContainer/ArtemisButton" to="." method="_on_artemis_button_mouse_entered"]
+[connection signal="mouse_exited" from="VBoxContainer/HBoxContainer/ArtemisButton" to="." method="_on_artemis_button_mouse_exited"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/ArtemisButton" to="." method="_on_artemis_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/DemeterButton" to="." method="_on_demeter_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/AphroditeButton" to="." method="_on_aphrodite_button_pressed"]

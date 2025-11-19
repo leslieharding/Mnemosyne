@@ -267,6 +267,7 @@ func _on_test_battle_button_pressed():
 	TransitionManagerAutoload.change_scene_to("res://Scenes/CardBattle.tscn")
 
 func _on_button_pressed():
+	SoundManagerAutoload.play_click()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
 
 func _on_apollo_button_pressed():
@@ -336,3 +337,23 @@ func _on_dionysus_button_pressed():
 
 func _on_athena_button_pressed():
 	print("Athena scene not yet implemented!")
+
+
+func _on_apollo_button_mouse_entered() -> void:
+	SoundManagerAutoload.play_god_hover("Apollo")
+
+
+func _on_apollo_button_mouse_exited() -> void:
+	SoundManagerAutoload.stop_god_hover_with_fade(0.5,1.5)
+
+
+func _on_button_mouse_entered() -> void:
+	SoundManagerAutoload.play_hover()
+
+
+func _on_artemis_button_mouse_entered() -> void:
+	SoundManagerAutoload.play_god_hover("Artemis")
+
+
+func _on_artemis_button_mouse_exited() -> void:
+	SoundManagerAutoload.stop_god_hover_with_fade(0.5,1.5)

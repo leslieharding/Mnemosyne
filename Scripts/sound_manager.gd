@@ -38,6 +38,7 @@ const SOUNDS = {
 	
 	# God Mod Select Sounds
 	"apollo_hover": "res://Assets/SoundEffects/apollo_hover.wav",
+	"artemis_hover": "res://Assets/SoundEffects/artemis_hover.wav",
 	
 	
 }
@@ -60,6 +61,8 @@ var music_player: AudioStreamPlayer
 # Hover sound tracking
 var card_hover_player: AudioStreamPlayer = null
 var card_hover_sound_playing: bool = false
+var god_hover_player: AudioStreamPlayer = null
+var god_hover_fade_tween: Tween = null
 
 func _ready():
 	# Create a pool of AudioStreamPlayer nodes
@@ -74,6 +77,13 @@ func _ready():
 	card_hover_player.bus = "Sounds"
 	add_child(card_hover_player)
 	card_hover_player.finished.connect(_on_card_hover_finished)
+	
+	
+	# Create dedicated god hover player
+	god_hover_player = AudioStreamPlayer.new()
+	god_hover_player.bus = "Sounds"
+	add_child(god_hover_player)
+	
 	
 	# Create music player
 	music_player = AudioStreamPlayer.new()
@@ -135,3 +145,56 @@ func play_on_card_click():
 
 func _on_card_hover_finished():
 	card_hover_sound_playing = false
+
+func play_god_hover(god_name: String):
+	var sound_key = god_name.to_lower() + "_hover"
+	
+	# Check if this sound exists
+	if not SOUNDS.has(sound_key):
+		push_error("God hover sound not found: " + sound_key)
+		return
+	
+	# If fade tween exists, we need to check if we're in grace period or actually fading
+	if god_hover_fade_tween:
+		# Check current volume - if it's still at 0db, we're in grace period
+		if god_hover_player.volume_db >= -1:
+			print("In grace period - cancelling fade, keeping sound")
+			god_hover_fade_tween.kill()
+			god_hover_fade_tween = null
+			return  # Keep the existing sound playing
+		else:
+			# Volume has started changing - we're fading out, need fresh start
+			print("Fade in progress - stopping and restarting")
+			god_hover_fade_tween.kill()
+			god_hover_fade_tween = null
+			god_hover_player.stop()
+			god_hover_player.volume_db = 0
+			god_hover_player.stream = load(SOUNDS[sound_key])
+			god_hover_player.play()
+			return
+	
+	# Only restart if not currently playing
+	if not god_hover_player.playing:
+		print("Starting new god hover sound")
+		god_hover_player.stream = load(SOUNDS[sound_key])
+		god_hover_player.volume_db = 0
+		god_hover_player.play()
+	else:
+		print("God hover already playing, keeping it")
+
+func stop_god_hover_with_fade(delay: float = 0.8, fade_duration: float = 1.3):
+	if not god_hover_player or not god_hover_player.playing:
+		return
+	
+	# Kill any existing fade tween
+	if god_hover_fade_tween:
+		god_hover_fade_tween.kill()
+	
+	# Create fade-out sequence
+	god_hover_fade_tween = create_tween()
+	god_hover_fade_tween.tween_interval(delay)
+	god_hover_fade_tween.tween_property(god_hover_player, "volume_db", -80, fade_duration)
+	god_hover_fade_tween.tween_callback(func(): 
+		god_hover_player.stop()
+		god_hover_player.volume_db = 0
+	)
