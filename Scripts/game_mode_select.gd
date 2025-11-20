@@ -279,6 +279,7 @@ func _on_apollo_button_pressed():
 	var unlocked_gods = progress_tracker.get_unlocked_gods()
 	
 	if "Apollo" in unlocked_gods:
+		SoundManagerAutoload.play_click()
 		TransitionManagerAutoload.change_scene_to("res://Scenes/Apollo.tscn")
 	else:
 		print("Apollo is locked!")
@@ -291,6 +292,7 @@ func _on_hermes_button_pressed():
 	var unlocked_gods = progress_tracker.get_unlocked_gods()
 	
 	if "Hermes" in unlocked_gods:
+		SoundManagerAutoload.play_click()
 		TransitionManagerAutoload.change_scene_to("res://Scenes/Hermes.tscn")
 	else:
 		print("Hermes is locked!")
@@ -304,6 +306,7 @@ func _on_artemis_button_pressed():
 	var unlocked_gods = progress_tracker.get_unlocked_gods()
 	
 	if "Artemis" in unlocked_gods:
+		SoundManagerAutoload.play_click()
 		TransitionManagerAutoload.change_scene_to("res://Scenes/Artemis.tscn")
 	else:
 		print("Artemis is locked!")
@@ -316,6 +319,7 @@ func _on_demeter_button_pressed():
 	var unlocked_gods = progress_tracker.get_unlocked_gods()
 	
 	if "Demeter" in unlocked_gods:
+		SoundManagerAutoload.play_click()
 		TransitionManagerAutoload.change_scene_to("res://Scenes/Demeter.tscn")
 	else:
 		print("Demeter is locked!")
@@ -328,6 +332,7 @@ func _on_aphrodite_button_pressed():
 	var unlocked_gods = progress_tracker.get_unlocked_gods()
 	
 	if "Aphrodite" in unlocked_gods:
+		SoundManagerAutoload.play_click()
 		TransitionManagerAutoload.change_scene_to("res://Scenes/Aphrodite.tscn")
 	else:
 		print("Aphrodite is locked!")

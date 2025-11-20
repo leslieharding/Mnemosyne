@@ -106,6 +106,7 @@ func _on_deck_1_button_pressed() -> void:
 
 
 func _on_button_pressed() -> void:
+	SoundManagerAutoload.play_click()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 func setup_journal_button():

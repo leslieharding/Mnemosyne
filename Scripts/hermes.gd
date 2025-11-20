@@ -98,6 +98,7 @@ func _on_start_game_button_pressed() -> void:
 		TransitionManagerAutoload.change_scene_to("res://Scenes/RunMap.tscn")
 
 func _on_button_pressed() -> void:
+	SoundManagerAutoload.play_click()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 

@@ -173,6 +173,7 @@ func setup_deck_buttons():
 
 # Back button
 func _on_button_pressed() -> void:
+	SoundManagerAutoload.play_click()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 # Connect these in the editor or use the existing connections
