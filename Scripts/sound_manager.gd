@@ -42,6 +42,10 @@ const SOUNDS = {
 	"hermes_hover": "res://Assets/SoundEffects/hermes_hover.wav",
 	"demeter_hover": "res://Assets/SoundEffects/demeter_hover.wav",
 	
+	#Memory Journal Navigation
+	"light_page_turn": "res://Assets/SoundEffects/light_page_turn.wav",
+	"heavy_page_turn": "res://Assets/SoundEffects/heavy_page_turn.wav",
+	
 	
 }
 
