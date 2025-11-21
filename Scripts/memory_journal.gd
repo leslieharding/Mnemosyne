@@ -19,6 +19,8 @@ signal journal_closed()
 # Animation
 var journal_tween: Tween
 
+var is_first_tab_change: bool = true
+
 func _ready():
 	# Wait one frame to ensure all @onready variables are initialized
 	await get_tree().process_frame
@@ -36,6 +38,7 @@ func _ready():
 	
 	# Connect signals
 	close_button.pressed.connect(_on_close_pressed)
+	
 	
 	# Set up initial state (hidden)
 	modulate.a = 0.0
@@ -56,6 +59,7 @@ func show_journal(initial_tab: String = ""):
 	refresh_all_content()
 	
 	# Always default to Bestiary tab (index 0)
+	is_first_tab_change = true
 	tab_container.current_tab = 0
 	
 	# Animate in
@@ -221,6 +225,7 @@ func refresh_bestiary_tab():
 		print("Button size after adding: ", button.size)
 		
 		# Connect to show details
+		button.pressed.connect(play_light_page_turn)
 		button.pressed.connect(_on_enemy_selected.bind(enemy_name, enemy_data))
 	
 	# Force layout updates
@@ -486,7 +491,8 @@ func refresh_gods_tab():
 		var button = create_god_list_button(god_name, god_data, memory_manager)
 		god_list.add_child(button)
 		
-		# Connect to show details
+		 #Connect to show details
+		button.pressed.connect(play_light_page_turn)
 		button.pressed.connect(_on_god_selected.bind(god_name, god_data))
 	
 	# Force layout updates
@@ -1239,3 +1245,15 @@ func create_compact_card_display(card: CardResource) -> Control:
 		values_container.add_child(value_container)
 	
 	return card_panel
+
+
+func _on_tab_container_tab_changed(tab: int) -> void:
+	# Skip sound on first tab change (when journal opens)
+	if is_first_tab_change:
+		is_first_tab_change = false
+		return
+	
+	SoundManagerAutoload.play("heavy_page_turn")
+
+func play_light_page_turn():
+	SoundManagerAutoload.play("light_page_turn")

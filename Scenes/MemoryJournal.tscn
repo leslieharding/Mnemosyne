@@ -133,3 +133,5 @@ horizontal_alignment = 1
 [node name="CardContainer" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne"]
 layout_mode = 2
 size_flags_vertical = 3
+
+[connection signal="tab_changed" from="MainContainer/VBox/TabContainer" to="." method="_on_tab_container_tab_changed"]
