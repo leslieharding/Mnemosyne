@@ -39,6 +39,8 @@ const SOUNDS = {
 	# God Mod Select Sounds
 	"apollo_hover": "res://Assets/SoundEffects/apollo_hover.wav",
 	"artemis_hover": "res://Assets/SoundEffects/artemis_hover.wav",
+	"hermes_hover": "res://Assets/SoundEffects/hermes_hover.wav",
+	"demeter_hover": "res://Assets/SoundEffects/demeter_hover.wav",
 	
 	
 }

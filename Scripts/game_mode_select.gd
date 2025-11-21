@@ -362,3 +362,19 @@ func _on_artemis_button_mouse_entered() -> void:
 
 func _on_artemis_button_mouse_exited() -> void:
 	SoundManagerAutoload.stop_god_hover_with_fade(0.5,1.5)
+
+
+func _on_hermes_button_mouse_entered() -> void:
+	SoundManagerAutoload.play_god_hover("Hermes")
+
+
+func _on_hermes_button_mouse_exited() -> void:
+	SoundManagerAutoload.stop_god_hover_with_fade(0.5,1.5)
+
+
+func _on_demeter_button_mouse_entered() -> void:
+	SoundManagerAutoload.play_god_hover("Demeter")
+
+
+func _on_demeter_button_mouse_exited() -> void:
+	SoundManagerAutoload.stop_god_hover_with_fade(0.5,1.5)
