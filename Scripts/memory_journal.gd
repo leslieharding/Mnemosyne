@@ -96,6 +96,7 @@ func close_journal():
 
 # Handle close button
 func _on_close_pressed():
+	SoundManagerAutoload.play("memory_journal_close")
 	close_journal()
 
 # Refresh all tab content

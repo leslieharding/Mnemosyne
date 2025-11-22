@@ -89,6 +89,7 @@ func setup_notification_indicator():
 	add_child(notification_indicator)
 
 func _on_journal_button_pressed():
+	SoundManagerAutoload.play("memory_journal_open")
 	# Create journal if it doesn't exist
 	if not journal_instance:
 		# Create a dedicated CanvasLayer for the journal to ensure proper positioning

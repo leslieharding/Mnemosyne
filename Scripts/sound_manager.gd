@@ -45,6 +45,8 @@ const SOUNDS = {
 	#Memory Journal Navigation
 	"light_page_turn": "res://Assets/SoundEffects/light_page_turn.wav",
 	"heavy_page_turn": "res://Assets/SoundEffects/heavy_page_turn.wav",
+	"memory_journal_close": "res://Assets/SoundEffects/memory_journal_close.wav",
+	"memory_journal_open": "res://Assets/SoundEffects/memory_journal_open.wav",
 	
 	
 }
