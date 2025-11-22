@@ -182,12 +182,8 @@ func deselect():
 # Handle mouse enter
 func _on_panel_mouse_entered():
 	if card_data:
-		# Start timer for delayed sound
-		if is_in_hand and hover_timer:
-			hover_timer.start()
-			# Connect timeout signal only once
-			if not hover_timer.timeout.is_connected(_play_hover_sound):
-				hover_timer.timeout.connect(_play_hover_sound)
+		
+			
 		
 		emit_signal("card_hovered", card_data)
 
@@ -212,9 +208,7 @@ func restore_default_style():
 	if panel:
 		panel.remove_theme_stylebox_override("panel")
 
-# Play hover sound (called by timer)
-func _play_hover_sound():
-	SoundManagerAutoload.play_on_card_hover()
+
 
 # Play bounce effect when card is selected
 func play_selection_bounce():

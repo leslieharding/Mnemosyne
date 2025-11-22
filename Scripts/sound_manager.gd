@@ -7,7 +7,7 @@ const SOUNDS = {
 	"hover": "res://Assets/SoundEffects/default_on_hover.wav",
 	
 	# In Battle Navigation Sounds
-	"on_card_hover": "res://Assets/SoundEffects/on_card_hover.wav",
+	
 	"on_card_click": "res://Assets/SoundEffects/on_card_click.wav",
 	
 	# Dialogue tones
@@ -146,13 +146,7 @@ func play_dialogue_complete():
 func play_dialogue_skip():
 	play("dialogue_skip")
 
-func play_on_card_hover():
-	# Only play if not already playing
-	if not card_hover_sound_playing and card_hover_player:
-		card_hover_player.stream = load(SOUNDS["on_card_hover"])
-		card_hover_player.play()
-		card_hover_sound_playing = true
-	
+
 func play_on_card_click():
 	play("on_card_click")	
 
