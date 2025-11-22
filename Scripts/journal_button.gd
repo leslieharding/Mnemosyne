@@ -89,12 +89,21 @@ func setup_notification_indicator():
 	add_child(notification_indicator)
 
 func _on_journal_button_pressed():
+	# If journal already exists and is visible, close it
+	if journal_instance and journal_instance.visible:
+		journal_instance.close_journal()
+		# Move button back to normal layer
+		get_parent().layer = 10
+		return
+	
+	# Otherwise, open the journal
 	SoundManagerAutoload.play("memory_journal_open")
+	
 	# Create journal if it doesn't exist
 	if not journal_instance:
-		# Create a dedicated CanvasLayer for the journal to ensure proper positioning
+		# Create a dedicated CanvasLayer for the journal
 		var journal_canvas = CanvasLayer.new()
-		journal_canvas.layer = 50  # Higher than button layer to be on top
+		journal_canvas.layer = 50  # High layer to block everything
 		journal_canvas.name = "JournalCanvas"
 		get_tree().current_scene.add_child(journal_canvas)
 		
@@ -110,8 +119,11 @@ func _on_journal_button_pressed():
 		
 		print("Journal created with dedicated CanvasLayer at position: ", journal_instance.position, " size: ", journal_instance.size)
 	
+	# Move button above journal
+	get_parent().layer = 100
+	
 	# Show journal with proper animation by calling its show_journal method
-	journal_instance.show_journal("")  # Start on Mnemosyne tab
+	journal_instance.show_journal("")
 	
 	# Hide notifications when opened
 	hide_notification()
@@ -124,6 +136,9 @@ func show_journal():
 	print("Memory journal opened")
 
 func _on_journal_closed():
+	# Move button back to normal layer
+	get_parent().layer = 10
+	
 	# Clean up the journal and its canvas layer when closed
 	if journal_instance:
 		var journal_canvas = journal_instance.get_parent()

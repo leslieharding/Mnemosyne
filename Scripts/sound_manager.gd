@@ -48,6 +48,11 @@ const SOUNDS = {
 	"memory_journal_close": "res://Assets/SoundEffects/memory_journal_close.wav",
 	"memory_journal_open": "res://Assets/SoundEffects/memory_journal_open.wav",
 	
+	#Deck Selection Screen Navigation
+	"deck_sun_unlocked": "res://Assets/SoundEffects/deck_sun_unlocked.wav",
+	"deck_music_unlocked": "res://Assets/SoundEffects/deck_music_unlocked.wav",
+	"deck_prophecy_unlocked": "res://Assets/SoundEffects/deck_prophecy_unlocked.wav",
+	"deck_locked": "res://Assets/SoundEffects/deck_locked.wav",
 	
 }
 

@@ -178,12 +178,42 @@ func _on_button_pressed() -> void:
 
 # Connect these in the editor or use the existing connections
 func _on_deck_1_button_pressed() -> void:
+	var deck_def = apollo_collection.decks[0]
+	var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	var god_progress = progress_tracker.get_god_progress("Apollo")
+	var is_unlocked = deck_def.is_unlocked("Apollo", god_progress)
+	
+	if is_unlocked:
+		SoundManagerAutoload.play("deck_sun_unlocked")
+	else:
+		SoundManagerAutoload.play("deck_locked")
+	
 	select_deck(0)
 
 func _on_deck_2_button_pressed() -> void:
+	var deck_def = apollo_collection.decks[1]
+	var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	var god_progress = progress_tracker.get_god_progress("Apollo")
+	var is_unlocked = deck_def.is_unlocked("Apollo", god_progress)
+	
+	if is_unlocked:
+		SoundManagerAutoload.play("deck_music_unlocked")
+	else:
+		SoundManagerAutoload.play("deck_locked")
+	
 	select_deck(1)
 
 func _on_deck_3_button_pressed() -> void:
+	var deck_def = apollo_collection.decks[2]
+	var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	var god_progress = progress_tracker.get_god_progress("Apollo")
+	var is_unlocked = deck_def.is_unlocked("Apollo", god_progress)
+	
+	if is_unlocked:
+		SoundManagerAutoload.play("deck_prophecy_unlocked")
+	else:
+		SoundManagerAutoload.play("deck_locked")
+	
 	select_deck(2)
 	
 func _on_start_game_button_pressed() -> void:
@@ -229,6 +259,7 @@ func _on_start_game_button_pressed() -> void:
 	
 # Helper function to handle deck selection - now handles both locked and unlocked decks
 func select_deck(index: int) -> void:
+	
 	var deck_def = apollo_collection.decks[index]
 	var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
 	var god_progress = progress_tracker.get_god_progress("Apollo")

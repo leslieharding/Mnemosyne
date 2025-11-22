@@ -77,6 +77,7 @@ func show_journal(initial_tab: String = ""):
 
 # Close the journal with animation
 func close_journal():
+	SoundManagerAutoload.play("memory_journal_close")
 	if journal_tween:
 		journal_tween.kill()
 	
@@ -96,7 +97,7 @@ func close_journal():
 
 # Handle close button
 func _on_close_pressed():
-	SoundManagerAutoload.play("memory_journal_close")
+	
 	close_journal()
 
 # Refresh all tab content
