@@ -32,6 +32,10 @@ const SOUNDS = {
 	"odin_angry": "res://Assets/SoundEffects/odin_angry.wav",
 	"odin_sad": "res://Assets/SoundEffects/odin_sad.wav",
 	
+	
+	# Run Map Actions
+	"battle_entered": "res://Assets/SoundEffects/battle_entered.wav",
+	
 	# Dialogue actions
 	"dialogue_complete": "res://Assets/SoundEffects/dialogue_complete.wav",
 	"dialogue_skip": "res://Assets/SoundEffects/dialogue_skip.wav",

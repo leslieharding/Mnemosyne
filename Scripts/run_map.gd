@@ -222,6 +222,7 @@ func style_map_node_button(button: Button, map_node: MapNode):
 
 # Handle map node button press
 func _on_map_node_pressed(map_node: MapNode):
+	SoundManagerAutoload.play("battle_entered")
 	print("Selected map node: ", map_node.display_name, " (ID: ", map_node.node_id, ")")
 	
 	# Check if the node is actually available
@@ -279,6 +280,7 @@ func _on_new_run_pressed():
 
 # Handle back button press
 func _on_back_button_pressed():
+	SoundManagerAutoload.play("default_click")
 	# Return to god selection
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
