@@ -217,6 +217,7 @@ func _on_deck_3_button_pressed() -> void:
 	select_deck(2)
 	
 func _on_start_game_button_pressed() -> void:
+	SoundManagerAutoload.play("run_start")
 	if selected_deck_index >= 0:
 		# Only allow starting if deck is unlocked
 		var deck_def = apollo_collection.decks[selected_deck_index]

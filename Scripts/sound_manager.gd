@@ -57,6 +57,7 @@ const SOUNDS = {
 	"deck_music_unlocked": "res://Assets/SoundEffects/deck_music_unlocked.wav",
 	"deck_prophecy_unlocked": "res://Assets/SoundEffects/deck_prophecy_unlocked.wav",
 	"deck_locked": "res://Assets/SoundEffects/deck_locked.wav",
+	"run_start": "res://Assets/SoundEffects/run_start.wav",
 	
 }
 
