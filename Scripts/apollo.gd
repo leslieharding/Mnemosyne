@@ -217,7 +217,7 @@ func _on_deck_3_button_pressed() -> void:
 	select_deck(2)
 	
 func _on_start_game_button_pressed() -> void:
-	SoundManagerAutoload.play("run_start")
+	SoundManagerAutoload.play_click()
 	if selected_deck_index >= 0:
 		# Only allow starting if deck is unlocked
 		var deck_def = apollo_collection.decks[selected_deck_index]
@@ -611,3 +611,15 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 		exp_container.add_child(next_level_label)
 	
 	return card_panel
+
+
+func _on_deck_1_button_mouse_exited() -> void:
+	SoundManagerAutoload.stop_deck_select_with_fade(0.2, 1.2)
+
+
+func _on_deck_2_button_mouse_exited() -> void:
+	SoundManagerAutoload.stop_deck_select_with_fade(0.2, 1.2)
+
+
+func _on_deck_3_button_mouse_exited() -> void:
+	SoundManagerAutoload.stop_deck_select_with_fade(0.2, 1.2)

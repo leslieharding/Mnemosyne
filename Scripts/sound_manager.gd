@@ -82,6 +82,10 @@ var card_hover_sound_playing: bool = false
 var god_hover_player: AudioStreamPlayer = null
 var god_hover_fade_tween: Tween = null
 
+# Deck selection sound tracking
+var deck_select_player: AudioStreamPlayer = null
+var deck_select_fade_tween: Tween = null
+
 func _ready():
 	# Create a pool of AudioStreamPlayer nodes
 	for i in range(max_players):
@@ -102,6 +106,10 @@ func _ready():
 	god_hover_player.bus = "Sounds"
 	add_child(god_hover_player)
 	
+	# Create dedicated deck selection player
+	deck_select_player = AudioStreamPlayer.new()
+	deck_select_player.bus = "Sounds"
+	add_child(deck_select_player)
 	
 	# Create music player
 	music_player = AudioStreamPlayer.new()
@@ -113,7 +121,19 @@ func play(sound_name: String):
 		push_error("Sound not found: " + sound_name)
 		return
 	
-	# Get next available player (round-robin)
+	# Check if this is a deck selection sound - route to dedicated player
+	if sound_name.begins_with("deck_"):
+		# Stop any existing fade
+		if deck_select_fade_tween:
+			deck_select_fade_tween.kill()
+			deck_select_fade_tween = null
+		
+		deck_select_player.volume_db = 0
+		deck_select_player.stream = load(SOUNDS[sound_name])
+		deck_select_player.play()
+		return
+	
+	# Get next available player (round-robin) for other sounds
 	var player = sfx_players[current_player_index]
 	current_player_index = (current_player_index + 1) % max_players
 	
@@ -209,4 +229,21 @@ func stop_god_hover_with_fade(delay: float = 0.8, fade_duration: float = 1.3):
 	god_hover_fade_tween.tween_callback(func(): 
 		god_hover_player.stop()
 		god_hover_player.volume_db = 0
+	)
+
+func stop_deck_select_with_fade(delay: float = 1, fade_duration: float = 1.8):
+	if not deck_select_player or not deck_select_player.playing:
+		return
+	
+	# Kill any existing fade tween
+	if deck_select_fade_tween:
+		deck_select_fade_tween.kill()
+	
+	# Create fade-out sequence
+	deck_select_fade_tween = create_tween()
+	deck_select_fade_tween.tween_interval(delay)
+	deck_select_fade_tween.tween_property(deck_select_player, "volume_db", -40, fade_duration)
+	deck_select_fade_tween.tween_callback(func(): 
+		deck_select_player.stop()
+		deck_select_player.volume_db = 0
 	)

@@ -77,8 +77,11 @@ text = "Cards in Deck"
 [node name="CardContainer" type="VBoxContainer" parent="MainContainer/RightPanel/CardsContainer"]
 layout_mode = 2
 
+[connection signal="mouse_exited" from="MainContainer/LeftPanel/Deck1Button" to="." method="_on_deck_1_button_mouse_exited"]
 [connection signal="pressed" from="MainContainer/LeftPanel/Deck1Button" to="." method="_on_deck_1_button_pressed"]
+[connection signal="mouse_exited" from="MainContainer/LeftPanel/Deck2Button" to="." method="_on_deck_2_button_mouse_exited"]
 [connection signal="pressed" from="MainContainer/LeftPanel/Deck2Button" to="." method="_on_deck_2_button_pressed"]
+[connection signal="mouse_exited" from="MainContainer/LeftPanel/Deck3Button" to="." method="_on_deck_3_button_mouse_exited"]
 [connection signal="pressed" from="MainContainer/LeftPanel/Deck3Button" to="." method="_on_deck_3_button_pressed"]
 [connection signal="pressed" from="MainContainer/LeftPanel/Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="MainContainer/LeftPanel/StartGameButton" to="." method="_on_start_game_button_pressed"]
