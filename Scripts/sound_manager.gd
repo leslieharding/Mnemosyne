@@ -10,7 +10,7 @@ const SOUNDS = {
 	
 	# God-specific card click variations
 	"apollo_card_click_1": "res://Assets/SoundEffects/apollo_card_click_1.wav",
-	
+	"on_card_clicked": "res://Assets/SoundEffects/on_card_clicked.wav",
 	
 	# Dialogue tones
 	"mnemosyne_default": "res://Assets/SoundEffects/mnemosyne_default.wav",
@@ -138,6 +138,10 @@ func play(sound_name: String):
 	# Get next available player (round-robin) for other sounds
 	var player = sfx_players[current_player_index]
 	current_player_index = (current_player_index + 1) % max_players
+	
+	# CRITICAL: Reset to default values for non-randomized sounds
+	player.pitch_scale = 1.0
+	player.volume_db = 0.0
 	
 	# Load and play the sound
 	player.stream = load(SOUNDS[sound_name])
@@ -272,7 +276,7 @@ func play_randomized(sound_name: String):
 func play_god_card_click(god_name: String):
 	# Define how many variations each god has
 	var click_counts = {
-		"apollo": 1,
+		#"apollo": 1,
 		# Add other gods as you create their sounds
 	}
 	
@@ -281,7 +285,7 @@ func play_god_card_click(god_name: String):
 	# Check if this god has custom click sounds
 	if not click_counts.has(god_key):
 		# Fallback to generic click with subtle randomization
-		play("on_card_click")
+		play_randomized_subtle("on_card_clicked")
 		return
 	
 	# Pick random variation from the pool
@@ -289,4 +293,21 @@ func play_god_card_click(god_name: String):
 	var sound_key = god_key + "_card_click_" + str(variation)
 	
 	# Play with subtle randomization on top
-	play(sound_key)
+	play_randomized_subtle(sound_key)
+
+func play_randomized_subtle(sound_name: String):
+	if not SOUNDS.has(sound_name):
+		push_error("Sound not found: " + sound_name)
+		return
+	
+	# Get next available player (round-robin)
+	var player = sfx_players[current_player_index]
+	current_player_index = (current_player_index + 1) % max_players
+	
+	# Subtle randomization - much smaller variation
+	player.pitch_scale = randf_range(0.96, 1.04)  # ±5% instead of ±20%
+	player.volume_db = randf_range(-0.9, 0.9)  # ±1 dB instead of ±4 dB
+	
+	# Load and play the sound
+	player.stream = load(SOUNDS[sound_name])
+	player.play()
