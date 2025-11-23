@@ -99,7 +99,7 @@ func _on_start_game_button_pressed() -> void:
 
 
 func _on_button_pressed() -> void:
-	SoundManagerAutoload.play_click()
+	SoundManagerAutoload.play_randomized('click')
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 

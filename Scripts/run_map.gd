@@ -222,7 +222,7 @@ func style_map_node_button(button: Button, map_node: MapNode):
 
 # Handle map node button press
 func _on_map_node_pressed(map_node: MapNode):
-	SoundManagerAutoload.play_click()
+	SoundManagerAutoload.play_randomized('click')
 	print("Selected map node: ", map_node.display_name, " (ID: ", map_node.node_id, ")")
 	
 	# Check if the node is actually available

@@ -3002,7 +3002,7 @@ func handle_card_selection(card_display, card_index):
 		return
 	
 	# Play the click sound since we're changing selection
-	SoundManagerAutoload.play_on_card_click()
+	SoundManagerAutoload.play_god_card_click(current_god)
 	
 	# NEW: Check coerce constraint - but DON'T remove it here
 	if not is_card_selectable(card_index):

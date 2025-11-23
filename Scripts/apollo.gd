@@ -173,7 +173,7 @@ func setup_deck_buttons():
 
 # Back button
 func _on_button_pressed() -> void:
-	SoundManagerAutoload.play_click()
+	SoundManagerAutoload.play_randomized('click')
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 # Connect these in the editor or use the existing connections
@@ -217,7 +217,7 @@ func _on_deck_3_button_pressed() -> void:
 	select_deck(2)
 	
 func _on_start_game_button_pressed() -> void:
-	SoundManagerAutoload.play_click()
+	SoundManagerAutoload.play_randomized('click')
 	if selected_deck_index >= 0:
 		# Only allow starting if deck is unlocked
 		var deck_def = apollo_collection.decks[selected_deck_index]

@@ -8,7 +8,9 @@ const SOUNDS = {
 	
 	# In Battle Navigation Sounds
 	
-	"on_card_click": "res://Assets/SoundEffects/on_card_click.wav",
+	# God-specific card click variations
+	"apollo_card_click_1": "res://Assets/SoundEffects/apollo_card_click_1.wav",
+	
 	
 	# Dialogue tones
 	"mnemosyne_default": "res://Assets/SoundEffects/mnemosyne_default.wav",
@@ -247,3 +249,44 @@ func stop_deck_select_with_fade(delay: float = 1, fade_duration: float = 1.8):
 		deck_select_player.stop()
 		deck_select_player.volume_db = 0
 	)
+
+func play_randomized(sound_name: String):
+	if not SOUNDS.has(sound_name):
+		push_error("Sound not found: " + sound_name)
+		return
+	
+	# Get next available player (round-robin)
+	var player = sfx_players[current_player_index]
+	current_player_index = (current_player_index + 1) % max_players
+	
+	# Randomize pitch (±10% variation)
+	player.pitch_scale = randf_range(0.8, 1.2)
+	
+	# Randomize volume (±2 dB variation)
+	player.volume_db = randf_range(-4.0, 4.0)
+	
+	# Load and play the sound
+	player.stream = load(SOUNDS[sound_name])
+	player.play()
+
+func play_god_card_click(god_name: String):
+	# Define how many variations each god has
+	var click_counts = {
+		"apollo": 1,
+		# Add other gods as you create their sounds
+	}
+	
+	var god_key = god_name.to_lower()
+	
+	# Check if this god has custom click sounds
+	if not click_counts.has(god_key):
+		# Fallback to generic click with subtle randomization
+		play("on_card_click")
+		return
+	
+	# Pick random variation from the pool
+	var variation = randi_range(1, click_counts[god_key])
+	var sound_key = god_key + "_card_click_" + str(variation)
+	
+	# Play with subtle randomization on top
+	play(sound_key)

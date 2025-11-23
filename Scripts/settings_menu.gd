@@ -149,5 +149,5 @@ func load_settings():
 
 
 func _on_back_button_pressed() -> void:
-	SoundManagerAutoload.play_click()
+	SoundManagerAutoload.play_randomized('click')
 	TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
