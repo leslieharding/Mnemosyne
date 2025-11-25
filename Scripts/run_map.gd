@@ -280,7 +280,7 @@ func _on_new_run_pressed():
 
 # Handle back button press
 func _on_back_button_pressed():
-	SoundManagerAutoload.play("default_click")
+	SoundManagerAutoload.play("click")
 	# Return to god selection
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
