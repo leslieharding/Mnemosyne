@@ -136,6 +136,13 @@ func execute_pierce_combat(attacker_pos: int, defender_pos: int, direction: int,
 	print("    Combat: ", attacker_card.card_name, " (", pierce_attack_value, ") vs ", defender_card.card_name, " (", defense_value, ")")
 	
 	if pierce_attack_value > defense_value:
+		# Check for cheat death / survival BEFORE capturing
+		var cheat_death_prevented = game_manager.check_for_cheat_death(defender_pos, defender_card, attacker_pos, attacker_card)
+		
+		if cheat_death_prevented:
+			print("    Capture prevented by Survival/Cheat Death!")
+			return 0
+		
 		# Execute the capture using game manager's ownership change method
 		var attacking_owner = game_manager.get_owner_at_position(attacker_pos)
 		game_manager.set_card_ownership(defender_pos, attacking_owner)
