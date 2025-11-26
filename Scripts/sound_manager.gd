@@ -12,27 +12,8 @@ const SOUNDS = {
 	"apollo_card_click_1": "res://Assets/SoundEffects/apollo_card_click_1.wav",
 	"on_card_clicked": "res://Assets/SoundEffects/on_card_clicked.wav",
 	
-	# Dialogue tones
-	"mnemosyne_default": "res://Assets/SoundEffects/mnemosyne_default.wav",
-	"mnemosyne_happy": "res://Assets/SoundEffects/mnemosyne_happy.wav",
-	"mnemosyne_funny": "res://Assets/SoundEffects/mnemosyne_funny.wav",
-	"mnemosyne_angry": "res://Assets/SoundEffects/mnemosyne_angry.wav",
-	"mnemosyne_sad": "res://Assets/SoundEffects/mnemosyne_sad.wav",
-	"chiron_default": "res://Assets/SoundEffects/chiron_default.wav",
-	"chiron_happy": "res://Assets/SoundEffects/chiron_happy.wav",
-	"chiron_funny": "res://Assets/SoundEffects/chiron_funny.wav",
-	"chiron_angry": "res://Assets/SoundEffects/chiron_angry.wav",
-	"chiron_sad": "res://Assets/SoundEffects/chiron_sad.wav",
-	"chronos_default": "res://Assets/SoundEffects/chronos_default.wav",
-	"chronos_happy": "res://Assets/SoundEffects/chronos_happy.wav",
-	"chronos_funny": "res://Assets/SoundEffects/chronos_funny.wav",
-	"chronos_angry": "res://Assets/SoundEffects/chronos_angry.wav",
-	"chronos_sad": "res://Assets/SoundEffects/chronos_sad.wav",
-	"odin_default": "res://Assets/SoundEffects/odin_default.wav",
-	"odin_happy": "res://Assets/SoundEffects/odin_happy.wav",
-	"odin_funny": "res://Assets/SoundEffects/odin_funny.wav",
-	"odin_angry": "res://Assets/SoundEffects/odin_angry.wav",
-	"odin_sad": "res://Assets/SoundEffects/odin_sad.wav",
+	# Dialogue sounds
+	
 	
 	
 	# Run Map Actions
@@ -60,6 +41,12 @@ const SOUNDS = {
 	"deck_prophecy_unlocked": "res://Assets/SoundEffects/deck_prophecy_unlocked.wav",
 	"deck_locked": "res://Assets/SoundEffects/deck_locked.wav",
 	"run_start": "res://Assets/SoundEffects/run_start.wav",
+	
+	# Card Ability Sounds
+	"refraction": "res://Assets/SoundEffects/refraction.wav",
+	"sun_dance": "res://Assets/SoundEffects/sun_dance.wav",
+	"sun_bather": "res://Assets/SoundEffects/sun_bather.wav",
+	
 	
 }
 

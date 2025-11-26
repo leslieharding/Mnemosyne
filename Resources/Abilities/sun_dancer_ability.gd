@@ -63,6 +63,9 @@ func execute(context: Dictionary) -> bool:
 	# Apply the visual styling to the new sun spot
 	game_manager.apply_sunlit_styling(new_sunlit_position)
 	
+	# Play sun dance sound effect
+	SoundManagerAutoload.play("sun_dance")
+	
 	return true
 
 func can_execute(context: Dictionary) -> bool:

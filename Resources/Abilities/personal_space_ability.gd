@@ -40,11 +40,11 @@ func execute(context: Dictionary) -> bool:
 	
 	print("PersonalSpaceAbility: Net stat change = (+", empty_count * 2, " from empty) - (", occupied_count, " from occupied) = ", stat_change)
 	
-	# Apply the stat change to all directions
-	placed_card.values[0] += stat_change  # North
-	placed_card.values[1] += stat_change  # East
-	placed_card.values[2] += stat_change  # South
-	placed_card.values[3] += stat_change  # West
+	# Apply the stat change to all directions (minimum 0)
+	placed_card.values[0] = max(0, placed_card.values[0] + stat_change)  # North
+	placed_card.values[1] = max(0, placed_card.values[1] + stat_change)  # East
+	placed_card.values[2] = max(0, placed_card.values[2] + stat_change)  # South
+	placed_card.values[3] = max(0, placed_card.values[3] + stat_change)  # West
 	
 	print("PersonalSpaceAbility: Stats changed from ", original_values, " to ", placed_card.values)
 	print(ability_name, " activated! ", placed_card.card_name, " adjusted stats by ", stat_change, " (", empty_count, " empty spaces, ", occupied_count, " occupied)")

@@ -55,8 +55,11 @@ func execute(context: Dictionary) -> bool:
 			child.update_display()         # Refresh the visual display
 			print("SunBatherAbility: Updated CardDisplay visual for sun-bathing card")
 			break
-	
+	# Play sun bather sound effect
+	SoundManagerAutoload.play("sun_bather")
 	return true
-
+	
+	
+	
 func can_execute(context: Dictionary) -> bool:
 	return true

@@ -3505,6 +3505,14 @@ func place_card_on_grid():
 			# Trigger the notification
 			if notification_manager:
 				notification_manager.show_notification("I knew you would go there")
+			
+			# Record trap encounter for Artemis unlock
+			var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+			if progress_tracker:
+				progress_tracker.record_trap_fallen_for("apollo_prediction", "Player's move was predicted by Apollo boss")
+				
+				if progress_tracker.should_show_artemis_notification() and notification_manager:
+					notification_manager.show_notification("Artemis was watching")
 	
 	# Check for deck power boosts and apply them to the card
 	var sun_boosted = false
