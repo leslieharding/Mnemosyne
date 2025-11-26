@@ -2456,8 +2456,8 @@ func setup_empty_board():
 		slot.mouse_filter = Control.MOUSE_FILTER_PASS
 		
 		# Add some margin to the grid container
-		board_container.add_theme_constant_override("h_separation", 10)  # Horizontal space between slots
-		board_container.add_theme_constant_override("v_separation", 10)  # Vertical space between slots
+		board_container.add_theme_constant_override("h_separation", 0)  # Horizontal space between slots
+		board_container.add_theme_constant_override("v_separation", 0)  # Vertical space between slots
 		
 		# Connect mouse signals for hover and click (only for player turns)
 		slot.mouse_entered.connect(_on_grid_mouse_entered.bind(i))
