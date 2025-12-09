@@ -968,7 +968,8 @@ func _on_turn_changed(is_player_turn: bool):
 	if is_player_turn:
 		process_cultivation_turn_start()
 		process_wither_turn_start()
-		
+		# Process awakening attacks at start of player turn
+		process_awakening_turn_start(true)
 		# NEW: Process Fimbulwinter effects if boss active
 		if fimbulwinter_boss_active:
 			process_fimbulwinter_winter_effects()
@@ -980,6 +981,8 @@ func _on_turn_changed(is_player_turn: bool):
 		# Process Graeae ability rotation at the start of opponent's turn
 		process_graeae_rotation()
 		process_wither_turn_start()
+		# Process awakening attacks at start of opponent turn
+		process_awakening_turn_start(false)
 	
 	# Process charge abilities at the start of each turn
 	await process_charge_turn_start(is_player_turn)
@@ -1535,6 +1538,12 @@ func check_for_cheat_death(defender_pos: int, defending_card: CardResource, atta
 		print("=== GRAEAE EYE DEFENSE SUCCESS ===")
 		return true
 	
+	# Check for dormant Awakening
+	if AwakeningAbility.is_dormant_awakening(defending_card):
+		print("AWAKENING IMMUNITY! ", defending_card.card_name, " cannot be captured while dormant!")
+		set_meta("cheat_death_prevented_" + str(defender_pos), true)
+		return true
+	
 	# Execute normal defend abilities to see if any prevent capture
 	print("Checking normal defend abilities for cheat death...")
 	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, "capture_attempt")
@@ -1881,6 +1890,8 @@ func _on_opponent_card_placed(grid_index: int):
 	# NEW: CHECK FOR PURSUIT TRIGGERS AFTER OPPONENT'S TURN IS COMPLETE
 	print("Checking for Pursuit ability triggers...")
 	check_pursuit_triggers(grid_index, opponent_card_data)
+	# Check for awakening triggers after opponent places card
+	check_for_awakening_triggers(grid_index, Owner.OPPONENT)
 	
 	# If cloak of night is active, hide the newly placed card (but only if still opponent-owned)
 	if cloak_of_night_active and grid_ownership[grid_index] == Owner.OPPONENT:
@@ -3670,6 +3681,8 @@ func place_card_on_grid():
 		var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 		if captures > 0:
 			print("Player captured ", captures, " cards!")
+		# Check for awakening triggers after player places card
+		check_for_awakening_triggers(current_grid_index, Owner.PLAYER)	
 		# NEW: Check if card has Aristeia ability and trigger it with captures_made
 		if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
 			var available_abilities = card_data.get_available_abilities(card_level)
@@ -5859,6 +5872,9 @@ func execute_dance_move(from_position: int, to_position: int, dancer_card: CardR
 	var captures = resolve_combat(to_position, dancing_owner, dancer_card)
 	if captures > 0:
 		print("Dancer captured ", captures, " cards after dancing!")
+	
+	# Check for awakening triggers after Dancer movement
+	check_for_awakening_triggers(to_position, dancing_owner)
 	
 	# Update displays
 	update_card_display(to_position, dancer_card)
@@ -8958,7 +8974,10 @@ func execute_aristeia_move(from_position: int, to_position: int, aristeia_card: 
 					
 					ability.execute(aristeia_context)
 					return  # Keep mode active for next move
-
+	
+	# Check for awakening triggers after Aristeia movement
+	check_for_awakening_triggers(to_position, aristeia_owner)
+	
 	# No more captures - end aristeia
 	aristeia_mode_active = false
 	current_aristeia_position = -1
@@ -9497,3 +9516,68 @@ func get_selected_card_from_hand() -> CardDisplay:
 			return child
 	
 	return null
+
+
+func check_for_awakening_triggers(placed_position: int, placed_owner: Owner):
+	"""Check if any adjacent cards have dormant awakening and trigger them"""
+	print("Checking for awakening triggers at position ", placed_position)
+	
+	var grid_size = 3
+	var grid_x = placed_position % grid_size
+	var grid_y = placed_position / grid_size
+	
+	var directions = [
+		{"dx": 0, "dy": -1, "name": "North"},
+		{"dx": 1, "dy": 0, "name": "East"},
+		{"dx": 0, "dy": 1, "name": "South"},
+		{"dx": -1, "dy": 0, "name": "West"}
+	]
+	
+	for dir_info in directions:
+		var adj_x = grid_x + dir_info.dx
+		var adj_y = grid_y + dir_info.dy
+		var adj_index = adj_y * grid_size + adj_x
+		
+		if adj_x >= 0 and adj_x < grid_size and adj_y >= 0 and adj_y < grid_size:
+			if grid_occupied[adj_index]:
+				var adjacent_owner = get_owner_at_position(adj_index)
+				
+				if adjacent_owner != Owner.NONE and adjacent_owner != placed_owner:
+					var adjacent_card = get_card_at_position(adj_index)
+					
+					if adjacent_card and AwakeningAbility.is_dormant_awakening(adjacent_card):
+						print("AWAKENING TRIGGER! Enemy placed adjacent to dormant awakening card at ", adj_index)
+						
+						var card_collection_index = get_card_collection_index(adj_index)
+						var card_level = get_card_level(card_collection_index)
+						var available_abilities = adjacent_card.get_available_abilities(card_level)
+						
+						for ability in available_abilities:
+							if ability is AwakeningAbility:
+								ability.check_and_trigger_awakening(adj_index, adjacent_card, self)
+								break
+
+func process_awakening_turn_start(is_player_turn: bool):
+	"""Process awakening attacks at the start of each turn"""
+	print("Processing awakening attacks for ", "player" if is_player_turn else "opponent", " turn")
+	
+	for position in active_passive_abilities.keys():
+		var abilities_at_position = active_passive_abilities[position]
+		var card_at_position = get_card_at_position(position)
+		var owner_at_position = get_owner_at_position(position)
+		
+		# Only process if it's this owner's turn
+		if (is_player_turn and owner_at_position == Owner.PLAYER) or (not is_player_turn and owner_at_position == Owner.OPPONENT):
+			for ability in abilities_at_position:
+				if ability is AwakeningAbility:
+					if card_at_position and card_at_position.has_meta("awakening_awakened") and card_at_position.get_meta("awakening_awakened"):
+						print("Processing awakening turn start attack at position ", position)
+						
+						var passive_context = {
+							"passive_action": "turn_start",
+							"boosting_card": card_at_position,
+							"boosting_position": position,
+							"game_manager": self
+						}
+						
+						ability.execute(passive_context)

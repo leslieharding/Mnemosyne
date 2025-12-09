@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="AwakeningAbility" load_steps=2 format=3 uid="uid://6gei8dwdd8gw"]
+
+[ext_resource type="Script" uid="uid://u34cve51dbeq" path="res://Resources/Abilities/awakening_ability.gd" id="1_0sc0m"]
+
+[resource]
+script = ExtResource("1_0sc0m")
+ability_name = "Awakening"
+description = "Do not under any circumstances disturb"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://u34cve51dbeq"

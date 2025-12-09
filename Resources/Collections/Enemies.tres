@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=684 format=3 uid="uid://btiibds602ikf"]
+[gd_resource type="Resource" script_class="EnemiesCollection" load_steps=688 format=3 uid="uid://btiibds602ikf"]
 
 [ext_resource type="Script" uid="uid://cy5vuexkeqnvg" path="res://Resources/enemy_card_collection.gd" id="1_e7ref"]
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="2_xcqsp"]
@@ -34,6 +34,7 @@
 [ext_resource type="Script" uid="uid://cm8gt3refuukf" path="res://Resources/Abilities/camouflage_ability.gd" id="23_cetws"]
 [ext_resource type="Script" uid="uid://c47tlfc0gadlo" path="res://Resources/Abilities/race_ability.gd" id="23_y0w8m"]
 [ext_resource type="Script" uid="uid://di16hrjg7ypkb" path="res://Resources/Abilities/elusive_ability.gd" id="25_unt1i"]
+[ext_resource type="Script" uid="uid://u34cve51dbeq" path="res://Resources/Abilities/awakening_ability.gd" id="29_x1kcy"]
 [ext_resource type="Script" uid="uid://chy73d8fja8rm" path="res://Resources/Abilities/earthbound_ability.gd" id="33_m0fay"]
 [ext_resource type="Script" uid="uid://nrdoysdoyfq1" path="res://Resources/Abilities/taxation_ability.gd" id="34_skkmd"]
 [ext_resource type="Script" uid="uid://ddpmk8j43lf0m" path="res://Resources/Abilities/personal_space_ability.gd" id="35_1hj1v"]
@@ -1588,11 +1589,19 @@ cards = Array[ExtResource("2_xcqsp")]([SubResource("Resource_gr0xj"), SubResourc
 decks = Array[ExtResource("3_601pn")]([SubResource("Resource_h21fd"), SubResource("Resource_tetdj"), SubResource("Resource_6d3gv")])
 metadata/_custom_type_script = "uid://cy5vuexkeqnvg"
 
+[sub_resource type="Resource" id="Resource_ix0su"]
+script = ExtResource("29_x1kcy")
+ability_name = "Awakening"
+description = "Do not under any circumstances disturb"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://u34cve51dbeq"
+
 [sub_resource type="Resource" id="Resource_wkbxl"]
 script = ExtResource("2_xcqsp")
 card_name = "Typhon"
-values = Array[int]([6, 6, 5, 5])
+values = Array[int]([2, 2, 2, 2])
 description = "The father of all monsters, hes probably not trying his hardest. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ix0su")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_slolt"]
@@ -1623,11 +1632,19 @@ values = Array[int]([2, 2, 8, 8])
 description = "You think a mountain can keep me down? My rage will be back to visit you"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_gucqx"]
+script = ExtResource("29_x1kcy")
+ability_name = "Awakening"
+description = "Do not under any circumstances disturb"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://u34cve51dbeq"
+
 [sub_resource type="Resource" id="Resource_thrr0"]
 script = ExtResource("2_xcqsp")
 card_name = "Typhon"
-values = Array[int]([7, 7, 5, 5])
+values = Array[int]([2, 2, 2, 2])
 description = "The father of all monsters, hes probably not trying his hardest. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_gucqx")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_b5g45"]
@@ -1658,11 +1675,19 @@ values = Array[int]([3, 3, 8, 8])
 description = "You think a mountain can keep me down? My rage will be back to visit you"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_x7t01"]
+script = ExtResource("29_x1kcy")
+ability_name = "Awakening"
+description = "Do not under any circumstances disturb"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://u34cve51dbeq"
+
 [sub_resource type="Resource" id="Resource_mt8hw"]
 script = ExtResource("2_xcqsp")
 card_name = "Typhon"
-values = Array[int]([8, 7, 6, 5])
+values = Array[int]([2, 2, 2, 2])
 description = "The father of all monsters, hes probably not trying his hardest. "
+abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_x7t01")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_mjsp8"]
