@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ShapeshiftAbility" load_steps=2 format=3 uid="uid://d4bbx3jli11nd"]
+
+[ext_resource type="Script" uid="uid://bne5xmmeraoyg" path="res://Resources/Abilities/shapeshift_ability.gd" id="1_x07cv"]
+
+[resource]
+script = ExtResource("1_x07cv")
+ability_name = "Shapeshift"
+description = "After one turn transforms unless captured"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://bne5xmmeraoyg"

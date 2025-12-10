@@ -1,14 +1,24 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=12 format=3 uid="uid://bm2hknx6xrlvk"]
+[gd_resource type="Resource" script_class="GodCardCollection" load_steps=14 format=3 uid="uid://bm2hknx6xrlvk"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_w3v8q"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_7roea"]
 [ext_resource type="Script" uid="uid://c4u8pww3jsm12" path="res://Resources/deck_definition.gd" id="2_pep08"]
 [ext_resource type="Script" uid="uid://bmxtvlg3nqx7s" path="res://Resources/level_data.gd" id="3_4nnha"]
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_7roea"]
+[ext_resource type="Script" uid="uid://bne5xmmeraoyg" path="res://Resources/Abilities/shapeshift_ability.gd" id="3_vsx2q"]
+
+[sub_resource type="Resource" id="Resource_m328b"]
+script = ExtResource("3_vsx2q")
+ability_name = "Shapeshift"
+description = "After one turn transforms if not captured"
+trigger_condition = 3
+metadata/_custom_type_script = "uid://bne5xmmeraoyg"
 
 [sub_resource type="Resource" id="Resource_vsx2q"]
 script = ExtResource("1_w3v8q")
 card_name = "Adonis"
+values = Array[int]([9, 9, 9, 9])
+abilities = Array[ExtResource("2_7roea")]([SubResource("Resource_m328b")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ibl3b"]

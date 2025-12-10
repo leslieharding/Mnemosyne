@@ -961,6 +961,7 @@ func _on_turn_changed(is_player_turn: bool):
 	
 	# Process morph abilities at the start of every turn (both owners)
 	process_morph_turn_start()
+	process_shapeshift_turn_start()
 	process_camouflage_turn_end()
 	process_polymorph_turn_end()
 	
@@ -9581,3 +9582,47 @@ func process_awakening_turn_start(is_player_turn: bool):
 						}
 						
 						ability.execute(passive_context)
+
+# Process shapeshift abilities at the start of every turn (both player and opponent)
+func process_shapeshift_turn_start():
+	print("Processing shapeshift abilities for turn start")
+	
+	# Check all cards on the board for shapeshift abilities
+	for position in range(grid_slots.size()):
+		if not grid_occupied[position]:
+			continue
+		
+		var card_data = get_card_at_position(position)
+		if not card_data:
+			continue
+		
+		# Get card level for ability checks
+		var card_collection_index = get_card_collection_index(position)
+		var card_level = get_card_level(card_collection_index)
+		
+		# Check if this card has shapeshift ability
+		var has_shapeshift = false
+		var shapeshift_ability = null
+		
+		if card_data.has_ability_type(CardAbility.TriggerType.PASSIVE, card_level):
+			for ability in card_data.get_available_abilities(card_level):
+				if ability.ability_name == "Shapeshift":
+					has_shapeshift = true
+					shapeshift_ability = ability
+					break
+		
+		if not has_shapeshift or not shapeshift_ability:
+			continue
+		
+		print("Found shapeshift card at position ", position, ": ", card_data.card_name)
+		
+		# Execute shapeshift check for transformation
+		var context = {
+			"passive_action": "turn_start",
+			"boosting_card": card_data,
+			"boosting_position": position,
+			"game_manager": self,
+			"card_level": card_level
+		}
+		
+		shapeshift_ability.execute(context)

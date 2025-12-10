@@ -11,75 +11,43 @@
 script = ExtResource("3_mehp5")
 ability_name = "Phalanx"
 description = "On play if you own all 3 cards in a row or column, boost the formations stats by 2"
-unlock_level = 0
-trigger_condition = 0
 metadata/_custom_type_script = "uid://bvlqcwb0iagi4"
 
 [sub_resource type="Resource" id="Resource_mehp5"]
 script = ExtResource("1_7jwg8")
 card_name = "Pallace"
-values = Array[int]([1, 1, 1, 1])
-description = ""
 abilities = Array[ExtResource("2_3heas")]([SubResource("Resource_n2ake")])
-level_data = Array[ExtResource("3_uh4yu")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_xwh41"]
 script = ExtResource("1_7jwg8")
 card_name = "Metis"
-values = Array[int]([1, 1, 1, 1])
-description = ""
-abilities = Array[ExtResource("2_3heas")]([])
-level_data = Array[ExtResource("3_uh4yu")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_k33q7"]
 script = ExtResource("1_7jwg8")
 card_name = "Erichthonius"
-values = Array[int]([1, 1, 1, 1])
-description = ""
-abilities = Array[ExtResource("2_3heas")]([])
-level_data = Array[ExtResource("3_uh4yu")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_gu5ms"]
 script = ExtResource("1_7jwg8")
 card_name = "Diomedes"
-values = Array[int]([1, 1, 1, 1])
-description = ""
-abilities = Array[ExtResource("2_3heas")]([])
-level_data = Array[ExtResource("3_uh4yu")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_fylbm"]
 script = ExtResource("1_7jwg8")
 card_name = "Perseus"
-values = Array[int]([1, 1, 1, 1])
-description = ""
-abilities = Array[ExtResource("2_3heas")]([])
-level_data = Array[ExtResource("3_uh4yu")]([])
-uses_level_progression = false
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_o7jhk"]
 script = ExtResource("2_fc4ui")
 deck_name = "Aegis"
-deck_description = ""
 card_indices = Array[int]([0, 1, 2, 3, 4])
 is_starter_deck = true
-required_capture_exp = 0
-required_defense_exp = 0
-deck_power_type = 0
-power_config = {}
 metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 
 [resource]
 script = ExtResource("3_3heas")
-god_name = ""
 cards = Array[ExtResource("1_7jwg8")]([SubResource("Resource_mehp5"), SubResource("Resource_xwh41"), SubResource("Resource_k33q7"), SubResource("Resource_gu5ms"), SubResource("Resource_fylbm")])
 decks = Array[ExtResource("2_fc4ui")]([SubResource("Resource_o7jhk")])
 metadata/_custom_type_script = "uid://bdwr18g3ouvfo"
