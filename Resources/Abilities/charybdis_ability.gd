@@ -23,7 +23,7 @@ func execute(context: Dictionary) -> bool:
 	
 	print("CharybdisAbility activated! The whirlpool opens...")
 	
-	# STEP 1: Destroy a random card from player's hand
+	# STEP 1: Destroy a random card from player's hand WITH BURN EFFECT
 	if game_manager.player_deck.size() > 0:
 		# Pick a random card from player's hand
 		var random_index = randi() % game_manager.player_deck.size()
@@ -31,10 +31,15 @@ func execute(context: Dictionary) -> bool:
 		
 		print("CharybdisAbility: Whirlpool swallows ", destroyed_card.card_name, " from player's hand!")
 		
-		# Remove the card from hand
-		game_manager.remove_card_from_hand(random_index)
+		# MODIFIED: Use burn animation instead of instant removal
+		# The whirlpool burns from the center, so use default center position
+		game_manager.burn_and_remove_card_from_hand(random_index, Vector2(0.5, 0.5))
 		
-		print("CharybdisAbility: ", destroyed_card.card_name, " has been destroyed!")
+		print("CharybdisAbility: ", destroyed_card.card_name, " is being consumed by flames!")
+		
+		# Wait for burn animation to complete (1 second)
+		await game_manager.get_tree().create_timer(1.0).timeout
+		
 	else:
 		print("CharybdisAbility: Player has no cards in hand - whirlpool finds nothing to destroy")
 	

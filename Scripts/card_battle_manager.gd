@@ -9680,3 +9680,72 @@ func hide_dotted_highlight():
 	"""Hide the single dotted highlight instance"""
 	if dotted_highlight:
 		dotted_highlight.visible = false
+
+# Burn and remove a card from hand with visual effect
+func burn_and_remove_card_from_hand(card_index: int, click_position: Vector2 = Vector2(0.5, 0.5)):
+	# Check if the index is valid
+	if card_index < 0 or card_index >= player_deck.size():
+		print("Invalid card index to burn:", card_index)
+		return
+	
+	# Get the CardsContainer that holds the card displays
+	var cards_container = hand_container.get_node_or_null("CardsContainer")
+	if not cards_container or cards_container.get_child_count() <= card_index:
+		print("Could not find card display to burn")
+		# Fallback to normal removal
+		remove_card_from_hand(card_index)
+		return
+	
+	# Get the specific CardDisplay we're burning
+	var card_display = cards_container.get_child(card_index)
+	if not card_display or not card_display is CardDisplay:
+		print("Invalid card display for burning")
+		remove_card_from_hand(card_index)
+		return
+	
+	# Store the card we're removing for reference
+	var played_card = player_deck[card_index]
+	print("Burning card from hand: ", played_card.card_name)
+	
+	# Load the burn shader material
+	var burn_material = load("res://burn_card_material.tres")
+	if not burn_material:
+		print("Could not load burn shader material, using normal removal")
+		remove_card_from_hand(card_index)
+		return
+	
+	# Create a duplicate of the material so we can animate it independently
+	var card_burn_material = burn_material.duplicate()
+	
+	# Apply the shader to the card's panel
+	if card_display.panel:
+		card_display.panel.material = card_burn_material
+		
+		# Set the burn position (center of card by default, or use click position)
+		card_burn_material.set_shader_parameter("position", click_position)
+		
+		# Create tween to animate the burn radius
+		var tween = create_tween()
+		
+		# Update function for burn radius animation
+		var update_burn_radius = func(value: float):
+			if is_instance_valid(card_display) and is_instance_valid(card_display.panel):
+				card_burn_material.set_shader_parameter("radius", value)
+		
+		tween.tween_method(update_burn_radius, 0.0, 2.0, 1.0)  # 1 second burn duration
+		
+		# Wait for burn animation to complete, then remove the card
+		tween.tween_callback(
+			func():
+				# Now actually remove the card from arrays
+				player_deck.remove_at(card_index)
+				deck_card_indices.remove_at(card_index)
+				selected_card_index = -1
+				
+				# Redisplay the hand to update visuals
+				display_player_hand()
+				print("Card burn complete and removed from hand")
+		)
+	else:
+		print("Card display has no panel, using normal removal")
+		remove_card_from_hand(card_index)

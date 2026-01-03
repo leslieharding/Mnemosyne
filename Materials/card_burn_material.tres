@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://c54dr7j8r7kgq"]
+
+[ext_resource type="Shader" uid="uid://cqhdkey0lad2y" path="res://Shaders/burn_card.gdshader" id="1_a0r5o"]
+[ext_resource type="Texture2D" uid="uid://d2s6o0mg14iw1" path="res://Textures/noise_texture.tres" id="2_rqsve"]
+
+[resource]
+shader = ExtResource("1_a0r5o")
+shader_parameter/position = Vector2(0.5, 0.5)
+shader_parameter/radius = 0.0
+shader_parameter/borderWidth = 0.02
+shader_parameter/burnMult = 0.135
+shader_parameter/noiseTexture = ExtResource("2_rqsve")
+shader_parameter/burnColor = Color(1, 0.4, 0, 1)
