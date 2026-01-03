@@ -16,6 +16,9 @@ var grid_occupied: Array = []  # Track which slots have cards
 var grid_ownership: Array = []  # Track who owns each card (can change via combat)
 var grid_card_data: Array = []  # Track the actual card data for each slot
 
+var highlight_shader: Shader
+var highlight_material: ShaderMaterial
+
 var discordant_active: bool = false
 
 var is_animating_card_placement: bool = false  # Prevents multiple placements during animation
@@ -2435,6 +2438,19 @@ func create_grid_styles():
 	enrich_highlight_style.border_color = Color("#00FF44")  # Green border for enrich selection
 	
 	create_coerced_card_style()
+	
+	# Setup highlight shader
+	highlight_shader = preload("res://shaders/dotted_outline.gdshader")
+	highlight_material = ShaderMaterial.new()
+	highlight_material.shader = highlight_shader
+	
+	# Configure shader parameters for slot highlighting
+	highlight_material.set_shader_parameter("color", Color(0.27, 0.67, 1.0, 1.0))  # Blue highlight color
+	highlight_material.set_shader_parameter("inner_stroke_thickness", 3.0)
+	highlight_material.set_shader_parameter("inner_stroke_opacity", 1.0)
+	highlight_material.set_shader_parameter("inside_opacity", 0.0)
+	highlight_material.set_shader_parameter("frequency", 12.0)
+	highlight_material.set_shader_parameter("phase_speed", 4.0)
 
 # Helper to get passed parameters from previous scene
 func get_scene_params() -> Dictionary:
@@ -3151,12 +3167,14 @@ func apply_enrich_selection_highlight(grid_index: int):
 	if grid_occupied[grid_index]:
 		add_enrich_card_overlay(slot)
 
-
 func restore_slot_original_styling(grid_index: int):
 	if grid_index < 0 or grid_index >= grid_slots.size():
 		return
 	
 	var slot = grid_slots[grid_index]
+	
+	# Remove shader material first
+	slot.material = null
 	
 	# Check for rhythm slot first (before other effects)
 	if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER and grid_index == rhythm_slot and not grid_occupied[grid_index]:
@@ -3205,20 +3223,13 @@ func apply_selection_highlight(grid_index: int):
 	elif grid_index in active_hunts:
 		return
 	elif grid_index in sunlit_positions:
-		# Create a combined sunlit + selected style
-		var sunlit_selected_style = StyleBoxFlat.new()
-		sunlit_selected_style.bg_color = Color("#444444")
-		sunlit_selected_style.border_width_left = 4
-		sunlit_selected_style.border_width_top = 4
-		sunlit_selected_style.border_width_right = 4
-		sunlit_selected_style.border_width_bottom = 4
-		sunlit_selected_style.border_color = Color("#44AAFF")
-		sunlit_selected_style.bg_color = Color("#554422")
-		
-		slot.add_theme_stylebox_override("panel", sunlit_selected_style)
+		# For sunlit slots, apply shader with golden color
+		var sunlit_material = highlight_material.duplicate()
+		sunlit_material.set_shader_parameter("color", Color(1.0, 0.84, 0.0, 1.0))  # Gold
+		slot.material = sunlit_material
 	else:
-		# Regular selection styling for non-special slots
-		slot.add_theme_stylebox_override("panel", selected_grid_style)
+		# Regular selection - apply shader
+		slot.material = highlight_material
 
 func _on_grid_gui_input(event, grid_index):
 	
