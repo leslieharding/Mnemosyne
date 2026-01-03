@@ -2654,8 +2654,6 @@ func setup_sun_power():
 	# Apply visual styling to sunlit grid slots
 	for position in sunlit_positions:
 		apply_sunlit_styling(position)
-	
-
 
 func apply_sunlit_styling(grid_index: int):
 	if grid_index < 0 or grid_index >= grid_slots.size():
@@ -2663,20 +2661,68 @@ func apply_sunlit_styling(grid_index: int):
 	
 	var slot = grid_slots[grid_index]
 	
-	# Create sunlit style - golden/yellow border
-	var sunlit_style = StyleBoxFlat.new()
-	sunlit_style.bg_color = Color("#444444")  # Same as default
-	sunlit_style.border_width_left = 3
-	sunlit_style.border_width_top = 3
-	sunlit_style.border_width_right = 3
-	sunlit_style.border_width_bottom = 3
-	sunlit_style.border_color = Color("#FFD700")  # Gold border
+	# Check if we already have god rays
+	var existing_rays = slot.get_node_or_null("GodRays")
+	if existing_rays:
+		return
 	
-	# Apply the sunlit styling
-	slot.add_theme_stylebox_override("panel", sunlit_style)
+	# Create TextureRect for god rays
+	var god_rays = TextureRect.new()
+	god_rays.name = "GodRays"
+	god_rays.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
-	# No sun icon - just the golden border
-	print("Applied sunlit golden border to slot ", grid_index)
+	# Create a simple SOLID gradient (not a visible gradient, just a base texture)
+	var gradient = Gradient.new()
+	gradient.set_color(0, Color(1, 1, 1, 1))  # White
+	gradient.set_color(1, Color(1, 1, 1, 1))  # White - both same = solid
+	
+	var gradient_texture = GradientTexture2D.new()
+	gradient_texture.gradient = gradient
+	gradient_texture.width = 64
+	gradient_texture.height = 64
+	gradient_texture.fill_from = Vector2(0.5, 0.5)
+	gradient_texture.fill_to = Vector2(0.5, 0.5)  # Same position = no gradient
+	
+	god_rays.texture = gradient_texture
+	
+	# Create and assign the shader material
+	var shader_material = ShaderMaterial.new()
+	shader_material.shader = load("res://Shaders/god_rays.gdshader")
+	
+	# Set shader parameters for natural god rays
+	shader_material.set_shader_parameter("angle", 0.0)  # Straight down
+	shader_material.set_shader_parameter("position", 0.5)  # Centered horizontally
+	shader_material.set_shader_parameter("spread", 0.3)  # More parallel (less fan out)
+	shader_material.set_shader_parameter("cutoff", -0.8)  # WIDE beam (negative = wider)
+	shader_material.set_shader_parameter("falloff", 0.5)  # Gentle fade at top
+	shader_material.set_shader_parameter("edge_fade", 0.4)  # Soft, blurry edges
+	shader_material.set_shader_parameter("speed", 0.6)  # Gentle shimmer
+	shader_material.set_shader_parameter("ray1_density", 4.0)  # Wide spacing (fewer rays)
+	shader_material.set_shader_parameter("ray2_density", 15.0)  # More compact detail layer
+	shader_material.set_shader_parameter("ray2_intensity", 0.6)  # Strong second layer for blending
+	shader_material.set_shader_parameter("color", Color(1.0, 0.95, 0.7, 0.85))
+	shader_material.set_shader_parameter("hdr", false)
+	shader_material.set_shader_parameter("seed", randf() * 10.0)
+	
+	god_rays.material = shader_material
+	
+	# Set anchors to fill the slot
+	god_rays.set_anchors_preset(Control.PRESET_FULL_RECT)
+	god_rays.stretch_mode = TextureRect.STRETCH_SCALE
+	god_rays.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	
+	# Enable clipping to prevent overflow
+	god_rays.clip_contents = true
+	slot.clip_contents = true
+	
+	# Add to slot
+	slot.add_child(god_rays)
+	
+	# Move god rays behind any card displays
+	slot.move_child(god_rays, 0)
+	
+	print("Applied god rays effect to sun slot ", grid_index)
+
 
 func apply_deck_power_effects(card_data: CardResource, grid_position: int) -> bool:
 	print("DEBUG: apply_deck_power_effects called for position ", grid_position)
