@@ -8,6 +8,8 @@ var selected_card_index: int = -1
 
 var battle_snapshot: Dictionary = {}
 
+var dotted_highlight: DottedBorder = null  # Single reusable highlight instance
+
 # Grid navigation variables
 var current_grid_index: int = -1  # Current selected grid position
 var grid_size: int = 3  # 3x3 grid
@@ -15,9 +17,6 @@ var grid_slots: Array = []  # References to grid slot panels
 var grid_occupied: Array = []  # Track which slots have cards
 var grid_ownership: Array = []  # Track who owns each card (can change via combat)
 var grid_card_data: Array = []  # Track the actual card data for each slot
-
-var highlight_shader: Shader
-var highlight_material: ShaderMaterial
 
 var discordant_active: bool = false
 
@@ -2438,19 +2437,13 @@ func create_grid_styles():
 	enrich_highlight_style.border_color = Color("#00FF44")  # Green border for enrich selection
 	
 	create_coerced_card_style()
+	# Create single reusable dotted highlight
+	dotted_highlight = DottedBorder.new()
+	dotted_highlight.name = "DottedBorderHighlight"
+	dotted_highlight.visible = false
+	dotted_highlight.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(dotted_highlight)
 	
-	# Setup highlight shader
-	highlight_shader = preload("res://shaders/dotted_outline.gdshader")
-	highlight_material = ShaderMaterial.new()
-	highlight_material.shader = highlight_shader
-	
-	# Configure shader parameters for slot highlighting
-	highlight_material.set_shader_parameter("color", Color(0.27, 0.67, 1.0, 1.0))  # Blue highlight color
-	highlight_material.set_shader_parameter("inner_stroke_thickness", 3.0)
-	highlight_material.set_shader_parameter("inner_stroke_opacity", 1.0)
-	highlight_material.set_shader_parameter("inside_opacity", 0.0)
-	highlight_material.set_shader_parameter("frequency", 12.0)
-	highlight_material.set_shader_parameter("phase_speed", 4.0)
 
 # Helper to get passed parameters from previous scene
 func get_scene_params() -> Dictionary:
@@ -3099,24 +3092,13 @@ func _on_grid_mouse_entered(grid_index):
 	if not turn_manager.is_player_turn():
 		return
 	
-	if is_animating_card_placement:
-		return
-	
-	# Handle enrich mode - ALL slots should be highlightable during enrich selection
+	# Handle enrich mode
 	if enrich_mode_active and current_enricher_owner == Owner.PLAYER:
-		# Clear the previous selection highlight
-		if current_grid_index != -1:
-			# Restore the previous slot's original styling
-			restore_slot_original_styling(current_grid_index)
-		
-		current_grid_index = grid_index
-		
-		# Apply enrich highlight to ANY slot (occupied or empty)
 		apply_enrich_selection_highlight(grid_index)
 		return
 	
-	# Only apply selection highlight if a card is selected and slot is not occupied
-	if selected_card_index != -1 and (not grid_occupied[grid_index] or is_slot_camouflaged(grid_index)):
+	# Only highlight empty slots or camouflaged slots during normal play
+	if not grid_occupied[grid_index] or (grid_occupied[grid_index] and is_slot_camouflaged(grid_index)):
 		# Clear the previous selection highlight
 		if current_grid_index != -1:
 			# Restore the previous slot's original styling
@@ -3173,8 +3155,8 @@ func restore_slot_original_styling(grid_index: int):
 	
 	var slot = grid_slots[grid_index]
 	
-	# Remove shader material first
-	slot.material = null
+	# Hide the single dotted highlight instance
+	hide_dotted_highlight()
 	
 	# Check for rhythm slot first (before other effects)
 	if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER and grid_index == rhythm_slot and not grid_occupied[grid_index]:
@@ -3212,24 +3194,34 @@ func apply_selection_highlight(grid_index: int):
 	
 	# Don't override rhythm styling with selection highlight
 	if active_deck_power == DeckDefinition.DeckPowerType.RHYTHM_POWER and grid_index == rhythm_slot:
+		hide_dotted_highlight()
 		return
 	# Don't override ordain styling with selection highlight
 	elif grid_index == active_ordain_slot:
+		hide_dotted_highlight()
 		return
 	# Don't override compel styling with selection highlight
 	elif grid_index == active_compel_slot:
+		hide_dotted_highlight()
 		return
 	# Don't override hunt trap styling with selection highlight
 	elif grid_index in active_hunts:
+		hide_dotted_highlight()
 		return
-	elif grid_index in sunlit_positions:
-		# For sunlit slots, apply shader with golden color
-		var sunlit_material = highlight_material.duplicate()
-		sunlit_material.set_shader_parameter("color", Color(1.0, 0.84, 0.0, 1.0))  # Gold
-		slot.material = sunlit_material
-	else:
-		# Regular selection - apply shader
-		slot.material = highlight_material
+	
+	# Move the single highlight instance to this slot
+	var current_parent = dotted_highlight.get_parent()
+	if current_parent:
+		current_parent.remove_child(dotted_highlight)
+	
+	slot.add_child(dotted_highlight)
+	dotted_highlight.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dotted_highlight.size = slot.size  # Ensure it matches slot size
+	
+	# Always use white border
+	dotted_highlight.border_color = Color(1.0, 1.0, 1.0, 1.0)  # White
+	
+	dotted_highlight.visible = true
 
 func _on_grid_gui_input(event, grid_index):
 	
@@ -9637,3 +9629,8 @@ func process_shapeshift_turn_start():
 		}
 		
 		shapeshift_ability.execute(context)
+
+func hide_dotted_highlight():
+	"""Hide the single dotted highlight instance"""
+	if dotted_highlight:
+		dotted_highlight.visible = false
