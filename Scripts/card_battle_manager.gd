@@ -94,6 +94,40 @@ var pending_enrichment_amount = 1
 # Enrich visual style
 var enrich_highlight_style: StyleBoxFlat
 
+# Fimbulwinter snow effect system
+var snow_overlay: ColorRect = null
+var snow_material: ShaderMaterial = null
+var current_snow_intensity: String = "LIGHT"
+var current_snow_values: Dictionary = {}
+var base_snow_values: Dictionary = {} 
+var wind_gust_timer: Timer = null      
+var is_wind_gusting: bool = false 
+
+const SNOW_INTENSITY_LIGHT = {
+	"num_of_layers": 10, "spread": 0.2, "speed": 1.0,
+	"wind": 0.2, "size": 0.3, "snow_transparency": 0.1
+}
+const SNOW_INTENSITY_MEDIUM = {
+	"num_of_layers": 30, "spread": 0.6, "speed": 3.0,
+	"wind": 0.6, "size": 0.6, "snow_transparency": 0.3
+}
+const SNOW_INTENSITY_HEAVY = {
+	"num_of_layers": 60, "spread": 1.0, "speed": 6.0,
+	"wind": 1.0, "size": 0.8, "snow_transparency": 0.5
+}
+
+# Wind gust configuration
+const WIND_GUST_CONFIG = {
+	"min_time_between": 3.0,    # Minimum seconds between gusts
+	"max_time_between": 8.0,    # Maximum seconds between gusts
+	"min_duration": 1.0,         # Minimum gust duration
+	"max_duration": 2.5,         # Maximum gust duration
+	"min_speed_boost": 1.5,      # Minimum speed multiplier
+	"max_speed_boost": 2.5,      # Maximum speed multiplier
+	"min_wind_boost": 0.3,       # Minimum added wind
+	"max_wind_boost": 0.6        # Maximum added wind
+}
+
 # Coerce tracking system
 var coerce_mode_active: bool = false
 var current_coercer_position: int = -1
@@ -468,16 +502,32 @@ func setup_boss_prediction_tracker():
 				game_status_label.text = "The trickster's illusions warp your perception..."
 			elif current_node.enemy_name == BossConfig.DEMETER_BOSS_NAME:
 				print("Demeter boss battle detected!")
+				fimbulwinter_boss_active = true
 				game_status_label.text = "Winter will follow winter which follows winter"
+				setup_fimbulwinter_snow_overlay()
 			elif current_node.enemy_name == BossConfig.ARTEMIS_BOSS_NAME:
 				is_artemis_boss_battle = true
 				artemis_boss_counter_triggered = false
 				print("Artemis boss battle detected - Coordinate counter activated!")
-				game_status_label.text = "The hunter's prey becomes the predator..."
-		
-		print("Boss battle detected: ", is_boss_battle)
-	
-	print("Boss prediction tracker initialized")
+	elif params.has("enemy_name"):
+		# Test battle detection
+		if params["enemy_name"] == BossConfig.DEMETER_BOSS_NAME:
+			print("Demeter boss battle detected (test battle)!")
+			fimbulwinter_boss_active = true
+			game_status_label.text = "Winter will follow winter which follows winter"
+			setup_fimbulwinter_snow_overlay()
+		elif params["enemy_name"] == BossConfig.APOLLO_BOSS_NAME:
+			print("Apollo boss battle detected (test battle)!")
+			game_status_label.text = "The oracle's gaze pierces through time..."
+		elif params["enemy_name"] == BossConfig.HERMES_BOSS_NAME:
+			is_hermes_boss_battle = true
+			visual_stat_inversion_active = true
+			print("Hermes boss battle detected (test battle)!")
+			game_status_label.text = "The trickster's illusions warp your perception..."
+		elif params["enemy_name"] == BossConfig.ARTEMIS_BOSS_NAME:
+			is_artemis_boss_battle = true
+			artemis_boss_counter_triggered = false
+			print("Artemis boss battle detected (test battle)!")
 
 func setup_card_info_panel():
 	if card_info_panel:
@@ -966,6 +1016,10 @@ func _on_turn_changed(is_player_turn: bool):
 	process_shapeshift_turn_start()
 	process_camouflage_turn_end()
 	process_polymorph_turn_end()
+	
+	# Update Fimbulwinter snow intensity based on battle progress
+	if fimbulwinter_boss_active and is_player_turn:
+		update_fimbulwinter_snow_intensity()
 	
 	# Process cultivation abilities at the start of player's turn
 	if is_player_turn:
@@ -2129,6 +2183,12 @@ func end_game():
 	
 	# Clear the battle snapshot since the battle is over
 	clear_battle_snapshot()
+	
+	# Clean up Fimbulwinter snow overlay
+	if snow_overlay:
+		snow_overlay.queue_free()
+		snow_overlay = null
+		snow_material = null
 
 func restart_round():
 	print("=== RESTARTING ROUND DUE TO DRAW ===")
@@ -9777,3 +9837,219 @@ func burn_and_remove_card_from_hand(card_index: int, click_position: Vector2 = V
 			display_player_hand()
 			print("Card burn complete and removed from hand")
 	)
+
+func setup_fimbulwinter_snow_overlay():
+	"""Create the snow overlay effect for Fimbulwinter boss battle"""
+	print("=== SETTING UP FIMBULWINTER SNOW OVERLAY ===")
+	
+	# Load the snow shader
+	var snow_shader = load("res://Shaders/snow.gdshader")
+	if not snow_shader:
+		print("ERROR: Could not load snow shader!")
+		return
+	print("Snow shader loaded successfully")
+	
+	# Create shader material
+	snow_material = ShaderMaterial.new()
+	snow_material.shader = snow_shader
+	
+	# Create CanvasLayer for the snow overlay (layer 5, above game but below UI)
+	var snow_canvas = CanvasLayer.new()
+	snow_canvas.layer = 5
+	add_child(snow_canvas)
+	
+	# Create fullscreen ColorRect for the shader
+	snow_overlay = ColorRect.new()
+	snow_overlay.material = snow_material
+	snow_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE  # Don't block clicks
+	snow_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	snow_canvas.add_child(snow_overlay)
+	
+	print("Snow overlay added to CanvasLayer")
+	print("Snow overlay size: ", snow_overlay.size)
+	
+	# Start with light intensity
+	apply_snow_intensity_preset(SNOW_INTENSITY_LIGHT)
+	
+	# Initialize tracked values
+	current_snow_values = SNOW_INTENSITY_LIGHT.duplicate()
+	base_snow_values = SNOW_INTENSITY_LIGHT.duplicate()
+	
+	# Setup wind gust timer
+	wind_gust_timer = Timer.new()
+	add_child(wind_gust_timer)
+	wind_gust_timer.one_shot = true
+	wind_gust_timer.timeout.connect(_on_wind_gust_timer_timeout)
+	
+	# Start the wind gust cycle
+	schedule_next_wind_gust()
+	
+	print("Fimbulwinter snow overlay created successfully")
+
+func apply_snow_intensity_preset(preset: Dictionary):
+	"""Apply a complete set of snow parameters"""
+	if not snow_material:
+		return
+	
+	print("!!! APPLY_SNOW_INTENSITY_PRESET CALLED !!!")
+	print("!!! STACK TRACE: ")
+	for i in range(get_stack().size()):
+		var frame = get_stack()[i]
+		print("  ", i, ": ", frame.source, ":", frame.line, " in ", frame.function)
+	
+	for key in preset:
+		snow_material.set_shader_parameter(key, preset[key])
+		print("  Set ", key, " = ", preset[key])
+
+func update_fimbulwinter_snow_intensity():
+	"""Update snow intensity based on battle progress"""
+	if not fimbulwinter_boss_active or not snow_material:
+		return
+	
+	var cards_played = 5 - opponent_manager.get_remaining_cards()
+	
+	print("=== FIMBULWINTER SNOW INTENSITY UPDATE ===")
+	print("Cards played by opponent: ", cards_played, " / 5")
+	
+	var target_intensity: Dictionary
+	var intensity_name: String
+	
+	if cards_played >= 4:
+		target_intensity = SNOW_INTENSITY_HEAVY
+		intensity_name = "HEAVY"
+	elif cards_played >= 2:
+		target_intensity = SNOW_INTENSITY_MEDIUM
+		intensity_name = "MEDIUM"
+	else:
+		target_intensity = SNOW_INTENSITY_LIGHT
+		intensity_name = "LIGHT"
+	
+	if intensity_name == current_snow_intensity:
+		print("Already at ", intensity_name, " intensity - skipping change")
+		return
+	
+	print("Intensity changing from ", current_snow_intensity, " → ", intensity_name)
+	current_snow_intensity = intensity_name
+	
+	# INSTANT change - no transition!
+	apply_snow_intensity_instant(target_intensity)
+
+func apply_snow_intensity_instant(intensity: Dictionary):
+	"""Instantly apply snow intensity without transition"""
+	if not snow_material:
+		return
+	
+	print("=== APPLYING SNOW INTENSITY INSTANTLY ===")
+	
+	for key in intensity:
+		snow_material.set_shader_parameter(key, intensity[key])
+		current_snow_values[key] = intensity[key]
+		print("  Set ", key, " = ", intensity[key])
+	
+	# Store base values (without any gust modifications)
+	base_snow_values = intensity.duplicate()
+	
+	print("Snow intensity applied instantly")
+
+func schedule_next_wind_gust():
+	"""Schedule the next random wind gust"""
+	if not wind_gust_timer or not fimbulwinter_boss_active:
+		return
+	
+	var wait_time = randf_range(
+		WIND_GUST_CONFIG["min_time_between"],
+		WIND_GUST_CONFIG["max_time_between"]
+	)
+	
+	wind_gust_timer.start(wait_time)
+	print("Next wind gust scheduled in ", snappedf(wait_time, 0.1), " seconds")
+	
+func _on_wind_gust_timer_timeout():
+	"""Trigger a wind gust"""
+	if not fimbulwinter_boss_active or is_wind_gusting:
+		return
+	
+	trigger_wind_gust()
+	
+func trigger_wind_gust():
+	"""Create a wind gust effect"""
+	if not snow_material or not base_snow_values.has("speed"):
+		return
+	
+	is_wind_gusting = true
+	
+	# Randomize gust parameters
+	var speed_multiplier = randf_range(
+		WIND_GUST_CONFIG["min_speed_boost"],
+		WIND_GUST_CONFIG["max_speed_boost"]
+	)
+	var wind_boost = randf_range(
+		WIND_GUST_CONFIG["min_wind_boost"],
+		WIND_GUST_CONFIG["max_wind_boost"]
+	)
+	var gust_duration = randf_range(
+		WIND_GUST_CONFIG["min_duration"],
+		WIND_GUST_CONFIG["max_duration"]
+	)
+	
+	# Calculate gust values
+	var gust_speed = base_snow_values["speed"] * speed_multiplier
+	var gust_wind = base_snow_values["wind"] + wind_boost
+	
+	print("🌬️ WIND GUST! Speed: ", base_snow_values["speed"], " → ", snappedf(gust_speed, 0.1), 
+		  " | Wind: ", base_snow_values["wind"], " → ", snappedf(gust_wind, 0.1),
+		  " | Duration: ", snappedf(gust_duration, 0.1), "s")
+	
+	# Tween UP to gust (fast, 0.3s)
+	var tween_up = create_tween()
+	tween_up.set_parallel(true)
+	tween_up.set_trans(Tween.TRANS_QUAD)
+	tween_up.set_ease(Tween.EASE_OUT)
+	
+	tween_up.tween_method(
+		func(value): snow_material.set_shader_parameter("speed", value),
+		current_snow_values["speed"],
+		gust_speed,
+		0.3
+	)
+	tween_up.tween_method(
+		func(value): snow_material.set_shader_parameter("wind", value),
+		current_snow_values["wind"],
+		gust_wind,
+		0.3
+	)
+	
+	# After gust peaks, tween DOWN
+	tween_up.finished.connect(func():
+		current_snow_values["speed"] = gust_speed
+		current_snow_values["wind"] = gust_wind
+		
+		# Wait for gust duration
+		await get_tree().create_timer(gust_duration).timeout
+		
+		# Tween back down to base values
+		var tween_down = create_tween()
+		tween_down.set_parallel(true)
+		tween_down.set_trans(Tween.TRANS_QUAD)
+		tween_down.set_ease(Tween.EASE_IN)
+		
+		tween_down.tween_method(
+			func(value): snow_material.set_shader_parameter("speed", value),
+			gust_speed,
+			base_snow_values["speed"],
+			0.5
+		)
+		tween_down.tween_method(
+			func(value): snow_material.set_shader_parameter("wind", value),
+			gust_wind,
+			base_snow_values["wind"],
+			0.5
+		)
+		
+		tween_down.finished.connect(func():
+			current_snow_values["speed"] = base_snow_values["speed"]
+			current_snow_values["wind"] = base_snow_values["wind"]
+			is_wind_gusting = false
+			schedule_next_wind_gust()  # Schedule next gust
+		)
+	)	
