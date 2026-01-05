@@ -1,9 +1,19 @@
 # res://Scripts/run_summary.gd
 extends Control
 
+# Constants for progress bar animation
+const XP_PER_LEVEL = 50
+const SEGMENT_COUNT = 10
+const BASE_ANIMATION_DURATION = 1.5
+const LEVEL_UP_PAUSE = 0.3
+const CARD_ANIMATION_STAGGER = 0.2
+
 var god_name: String = "Apollo"
 var deck_index: int = 0
 var victory: bool = true
+
+# Track animation index for staggering
+var card_animation_index: int = 0
 
 func _ready():
 	print("==================== RUNSUMMARY _READY START ====================")
@@ -28,6 +38,9 @@ func _ready():
 			print("Defeat count incremented for conversation triggers")
 		else:
 			print("WARNING: ConversationManagerAutoload not found!")
+	
+	# Reset animation index
+	card_animation_index = 0
 	
 	# Set up UI immediately without waiting
 	setup_ui_safely()
@@ -171,6 +184,9 @@ func setup_card_displays_panel(container: VBoxContainer):
 	print("\n=== Setting up card displays panel ===")
 	print("Container: ", container.name if container else "null")
 	
+	# Reset animation index for this batch of cards
+	card_animation_index = 0
+	
 	# Clear any existing content
 	if container:
 		for child in container.get_children():
@@ -276,6 +292,7 @@ func setup_card_displays_panel(container: VBoxContainer):
 		
 		container.add_child(card_container)
 		cards_with_exp += 1
+		card_animation_index += 1  # Increment for next card's stagger
 		
 		print("    Added card container for: ", card.card_name)
 	
@@ -288,7 +305,183 @@ func setup_card_displays_panel(container: VBoxContainer):
 		no_exp_label.add_theme_color_override("font_color", Color("#888888"))
 		container.add_child(no_exp_label)
 	
-	print("Card displays panel setup complete! Created ", cards_with_exp, " displays")
+	print("Card displays panel setup complete!")
+	print("Created ", cards_with_exp, " displays")
+
+func create_gradient_texture(color1: Color, color2: Color) -> GradientTexture1D:
+	var gradient = Gradient.new()
+	gradient.set_color(0, color1)
+	gradient.set_color(1, color2)
+	
+	var gradient_texture = GradientTexture1D.new()
+	gradient_texture.gradient = gradient
+	gradient_texture.width = 256
+	
+	return gradient_texture
+
+func create_progress_bar() -> ColorRect:
+	var progress_bar = ColorRect.new()
+	progress_bar.custom_minimum_size = Vector2(0, 25)
+	
+	# Load shader
+	var shader = load("res://Shaders/segmented_progress_bar.gdshader")
+	if not shader:
+		print("ERROR: Failed to load progress bar shader!")
+		return progress_bar
+	
+	# Create shader material
+	var material = ShaderMaterial.new()
+	material.shader = shader
+	
+	# Set shader parameters
+	material.set_shader_parameter("stepify", true)
+	material.set_shader_parameter("value", 0.0)
+	material.set_shader_parameter("count", SEGMENT_COUNT)
+	material.set_shader_parameter("margin", Vector2(0.02, 0.15))
+	material.set_shader_parameter("shear_angle", 0.0)
+	material.set_shader_parameter("use_value_gradient", false)
+	material.set_shader_parameter("invert", false)
+	
+	# Create gradient textures
+	var gradient_x = create_gradient_texture(Color("#4A8A4A"), Color("#6AFF6A"))
+	var gradient_y = create_gradient_texture(Color.WHITE, Color.WHITE)
+	
+	material.set_shader_parameter("gradient_x", gradient_x)
+	material.set_shader_parameter("gradient_y", gradient_y)
+	
+	progress_bar.material = material
+	
+	return progress_bar
+
+func animate_progress_bar(
+	progress_bar: ColorRect, 
+	before_total: int, 
+	after_total: int, 
+	level_label: Label, 
+	card_name: String, 
+	current_index: int
+):
+	# Calculate level info
+	var before_level = ExperienceHelpers.calculate_level(before_total)
+	var after_level = ExperienceHelpers.calculate_level(after_total)
+	var before_progress = ExperienceHelpers.calculate_progress(before_total)
+	var after_progress = ExperienceHelpers.calculate_progress(after_total)
+	
+	var level_ups = after_level - before_level
+	var total_gain = after_total - before_total
+	
+	print("Animating progress bar for ", card_name)
+	print("  Before: Lv.", before_level, " (", before_progress, "/", XP_PER_LEVEL, ")")
+	print("  After: Lv.", after_level, " (", after_progress, "/", XP_PER_LEVEL, ")")
+	print("  Level ups: ", level_ups)
+	
+	# Handle 0 XP case - just show static bar
+	if total_gain <= 0:
+		var static_value = before_progress / float(XP_PER_LEVEL)
+		progress_bar.material.set_shader_parameter("value", static_value)
+		print("  Static bar at ", static_value)
+		return
+	
+	# Calculate speed multiplier
+	var speed_multiplier = 1.0 + (level_ups * 0.2)
+	print("  Speed multiplier: ", speed_multiplier)
+	
+	# Calculate stagger delay for this card
+	var stagger_delay = current_index * CARD_ANIMATION_STAGGER
+	print("  Stagger delay: ", stagger_delay, "s")
+	
+	# Wait for stagger delay
+	await get_tree().create_timer(stagger_delay).timeout
+	
+	# Create tween
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_LINEAR)
+	tween.set_ease(Tween.EASE_IN_OUT)
+	
+	if level_ups == 0:
+		# Simple case: no level-up, just animate within same level
+		var start_value = before_progress / float(XP_PER_LEVEL)
+		var end_value = after_progress / float(XP_PER_LEVEL)
+		var duration = BASE_ANIMATION_DURATION / speed_multiplier
+		
+		print("  Single segment animation from ", start_value, " to ", end_value)
+		
+		tween.tween_method(
+			func(val): progress_bar.material.set_shader_parameter("value", val),
+			start_value,
+			end_value,
+			duration
+		)
+	else:
+		# Complex case: one or more level-ups
+		print("  Multi-segment animation with ", level_ups, " level-ups")
+		
+		var current_level = before_level
+		
+		# First segment: from current progress to 50 (fill current level)
+		var xp_to_first_levelup = XP_PER_LEVEL - before_progress
+		var first_segment_duration = (xp_to_first_levelup / float(XP_PER_LEVEL)) * BASE_ANIMATION_DURATION / speed_multiplier
+		
+		print("  Segment 1: Fill to level-up (", before_progress, " to ", XP_PER_LEVEL, ")")
+		tween.tween_method(
+			func(val): progress_bar.material.set_shader_parameter("value", val),
+			before_progress / float(XP_PER_LEVEL),
+			1.0,
+			first_segment_duration
+		)
+		
+		# Pause and level up
+		tween.tween_interval(LEVEL_UP_PAUSE)
+		tween.tween_callback(func():
+			current_level += 1
+			level_label.text = card_name + " (Lv." + str(current_level) + ")"
+			print("  Level up! Now Lv.", current_level)
+		)
+		
+		# Reset bar
+		tween.tween_callback(func():
+			progress_bar.material.set_shader_parameter("value", 0.0)
+		)
+		
+		# Middle segments: full levels (0 to 50) for each additional level-up
+		for i in range(level_ups - 1):
+			var full_level_duration = BASE_ANIMATION_DURATION / speed_multiplier
+			
+			print("  Segment ", i + 2, ": Full level (0 to ", XP_PER_LEVEL, ")")
+			tween.tween_method(
+				func(val): progress_bar.material.set_shader_parameter("value", val),
+				0.0,
+				1.0,
+				full_level_duration
+			)
+			
+			# Pause and level up
+			tween.tween_interval(LEVEL_UP_PAUSE)
+			tween.tween_callback(func():
+				current_level += 1
+				level_label.text = card_name + " (Lv." + str(current_level) + ")"
+				print("  Level up! Now Lv.", current_level)
+			)
+			
+			# Reset bar
+			tween.tween_callback(func():
+				progress_bar.material.set_shader_parameter("value", 0.0)
+			)
+		
+		# Final segment: from 0 to final progress
+		if after_progress > 0:
+			var final_segment_duration = (after_progress / float(XP_PER_LEVEL)) * BASE_ANIMATION_DURATION / speed_multiplier
+			
+			print("  Final segment: Fill to final progress (0 to ", after_progress, ")")
+			tween.tween_method(
+				func(val): progress_bar.material.set_shader_parameter("value", val),
+				0.0,
+				after_progress / float(XP_PER_LEVEL),
+				final_segment_duration
+			)
+	
+	tween.play()
+	print("  Animation started!")
 
 func create_apollo_style_card_display(card: CardResource, card_index: int, before_total: int, after_total: int, total_gain: int) -> Control:
 	print("Creating card display for: ", card.card_name)
@@ -375,7 +568,7 @@ func create_apollo_style_card_display(card: CardResource, card_index: int, befor
 	var v_separator = VSeparator.new()
 	h_container.add_child(v_separator)
 	
-	# Right side - Experience info (similar to apollo.gd but focused on run results)
+	# Right side - Experience info with animated progress bar
 	var right_side = VBoxContainer.new()
 	right_side.size_flags_horizontal = Control.SIZE_SHRINK_END
 	right_side.custom_minimum_size.x = 200
@@ -400,23 +593,38 @@ func create_apollo_style_card_display(card: CardResource, card_index: int, befor
 	total_exp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	run_exp_container.add_child(total_exp_label)
 	
-	# Show level progression
+	# Create and add animated progress bar (replaces the progression_label)
+	var progress_bar = create_progress_bar()
+	run_exp_container.add_child(progress_bar)
+	
+	# Add small spacing
+	var spacer = Control.new()
+	spacer.custom_minimum_size.y = 5
+	run_exp_container.add_child(spacer)
+	
+	# Add level progression text (shows current state, will be updated by animation)
 	var before_level = ExperienceHelpers.calculate_level(before_total)
 	var after_level = ExperienceHelpers.calculate_level(after_total)
+	var before_progress = ExperienceHelpers.calculate_progress(before_total)
+	var after_progress = ExperienceHelpers.calculate_progress(after_total)
 	
 	var progression_label = Label.new()
 	if after_level > before_level:
-		progression_label.text = "Lv." + str(before_level) + " → Lv." + str(after_level) + " 🎉"
+		# Show level-up range
+		progression_label.text = "Lv." + str(before_level) + " → Lv." + str(after_level)
 		progression_label.add_theme_color_override("font_color", Color("#00FF00"))
 	else:
-		var before_progress = ExperienceHelpers.calculate_progress(before_total)
-		var after_progress = ExperienceHelpers.calculate_progress(after_total)
-		progression_label.text = "Lv." + str(before_level) + " (" + str(before_progress) + "→" + str(after_progress) + "/50)"
+		# Show progress within level
+		progression_label.text = str(before_progress) + " → " + str(after_progress) + " / " + str(XP_PER_LEVEL) + " XP"
 		progression_label.add_theme_color_override("font_color", Color("#CCCCCC"))
 	
 	progression_label.add_theme_font_size_override("font_size", 10)
 	progression_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	run_exp_container.add_child(progression_label)
+	
+	# Start the animation (with current card's index for staggering)
+	var current_card_index = card_animation_index
+	animate_progress_bar(progress_bar, before_total, after_total, name_label, card.card_name, current_card_index)
 	
 	print("  Card display created successfully")
 	return card_panel
