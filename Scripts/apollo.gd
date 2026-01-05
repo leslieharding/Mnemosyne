@@ -485,6 +485,8 @@ func display_deck_cards(deck_index: int) -> void:
 			var card_display = create_deck_card_display(card, card_index)
 			card_container.add_child(card_display)
 
+
+
 # Create a card display panel for deck preview - UNIFIED EXPERIENCE VERSION
 func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	# Main container for this card
@@ -565,64 +567,47 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	right_side.custom_minimum_size.x = 180
 	h_container.add_child(right_side)
 	
-	# Experience title
-	var exp_title = Label.new()
-	exp_title.text = "Experience"
-	exp_title.add_theme_font_size_override("font_size", 14)
-	exp_title.add_theme_color_override("font_color", Color("#CCCCCC"))
-	exp_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	right_side.add_child(exp_title)
-	
 	# Get experience data from GlobalProgressTracker - UNIFIED VERSION
 	var total_exp = 0
-	
 	if has_node("/root/GlobalProgressTrackerAutoload"):
 		var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
 		var exp_data = progress_tracker.get_card_total_experience("Apollo", card_index)
 		total_exp = exp_data.get("total_exp", 0)
 	
-	# Show unified experience and level
-	var exp_container = VBoxContainer.new()
-	right_side.add_child(exp_container)
+	# Create a container for the experience section
+	var exp_section = VBoxContainer.new()
+	right_side.add_child(exp_section)
 	
-	var total_exp_label = Label.new()
-	total_exp_label.text = "⚡ " + str(total_exp) + " Total XP"
-	total_exp_label.add_theme_font_size_override("font_size", 12)
-	total_exp_label.add_theme_color_override("font_color", Color("#FFD700"))
-	total_exp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	exp_container.add_child(total_exp_label)
+	# Show just the level number
+	var level_label = Label.new()
+	level_label.text = "Lv." + str(current_level)
+	level_label.add_theme_font_size_override("font_size", 14)
+	level_label.add_theme_color_override("font_color", Color("#CCCCCC"))
+	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	exp_section.add_child(level_label)
 	
-	# Show level and progress
-	var level_text = Label.new()
-	level_text.text = ExperienceHelpers.format_level_display(total_exp)
-	level_text.add_theme_font_size_override("font_size", 10)
-	level_text.add_theme_color_override("font_color", Color("#CCCCCC"))
-	level_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	exp_container.add_child(level_text)
+	# Add small spacing before progress bar
+	var spacer = Control.new()
+	spacer.custom_minimum_size.y = 3
+	exp_section.add_child(spacer)
 	
 	# Add progress bar showing current level progress
 	var current_progress = ExperienceHelpers.calculate_progress(total_exp)
 	var max_progress = 50  # XP per level
-		
-	# Add small spacing before progress bar
-	var spacer = Control.new()
-	spacer.custom_minimum_size.y = 3
-	exp_container.add_child(spacer)
-		
+	
 	# Create and add the static progress bar
 	var progress_bar = create_static_progress_bar(current_progress, max_progress)
-	exp_container.add_child(progress_bar)
-		
+	exp_section.add_child(progress_bar)
+	
 	# Add text showing XP progress below the bar
 	var progress_text = Label.new()
 	progress_text.text = str(current_progress) + " / " + str(max_progress) + " XP"
-	progress_text.add_theme_font_size_override("font_size", 9)
+	progress_text.add_theme_font_size_override("font_size", 15)
 	progress_text.add_theme_color_override("font_color", Color("#AAAAAA"))
 	progress_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	exp_container.add_child(progress_text)
-
+	exp_section.add_child(progress_text)
+	
 	return card_panel
-
 
 func _on_deck_1_button_mouse_exited() -> void:
 	SoundManagerAutoload.stop_deck_select_with_fade(0.2, 1.2)
@@ -648,32 +633,46 @@ func create_gradient_texture(color1: Color, color2: Color) -> GradientTexture1D:
 	
 	return gradient_texture
 
-# Helper function to create a static progress bar (no animation)
-func create_static_progress_bar(current_progress: int, max_progress: int) -> ColorRect:
+# Helper function to create a static progress bar (no animation) with border
+func create_static_progress_bar(current_progress: int, max_progress: int) -> Control:
+	# Create a container panel for the border
+	var progress_container = PanelContainer.new()
+	progress_container.custom_minimum_size = Vector2(0, 20)
+	
+	# Create border style for the container
+	var border_style = StyleBoxFlat.new()
+	border_style.bg_color = Color("#222222")  # Dark background
+	border_style.border_color = Color("#666666")  # Border color
+	border_style.border_width_left = 1
+	border_style.border_width_top = 1
+	border_style.border_width_right = 1
+	border_style.border_width_bottom = 1
+	progress_container.add_theme_stylebox_override("panel", border_style)
+	
+	# Create the actual progress bar ColorRect
 	var progress_bar = ColorRect.new()
-	progress_bar.custom_minimum_size = Vector2(0, 20)
+	progress_bar.custom_minimum_size = Vector2(0, 18)  # Slightly smaller to account for border
 	
 	# Load shader
 	var shader = load("res://Shaders/segmented_progress_bar.gdshader")
 	if not shader:
 		print("ERROR: Failed to load progress bar shader!")
-		return progress_bar
+		return progress_container
 	
 	# Create shader material
 	var material = ShaderMaterial.new()
 	material.shader = shader
 	
 	# Set shader parameters
-	material.set_shader_parameter("stepify", true)
-	material.set_shader_parameter("count", 10)  # 10 segments
+	material.set_shader_parameter("stepify", false)
 	material.set_shader_parameter("margin", Vector2(0.02, 0.15))
 	material.set_shader_parameter("shear_angle", 0.0)
 	material.set_shader_parameter("use_value_gradient", false)
 	material.set_shader_parameter("invert", false)
 	
 	# Create gradient textures
-	var gradient_x = create_gradient_texture(Color("#4A8A4A"), Color("#6AFF6A"))
-	var gradient_y = create_gradient_texture(Color.WHITE, Color.WHITE)
+	var gradient_x = create_gradient_texture(Color("#B8860B"), Color("#FFD700"))
+	var gradient_y = create_gradient_texture(Color("#B8860B"), Color("#FFD700"))
 	
 	material.set_shader_parameter("gradient_x", gradient_x)
 	material.set_shader_parameter("gradient_y", gradient_y)
@@ -684,4 +683,7 @@ func create_static_progress_bar(current_progress: int, max_progress: int) -> Col
 	
 	progress_bar.material = material
 	
-	return progress_bar
+	# Add the progress bar to the container
+	progress_container.add_child(progress_bar)
+	
+	return progress_container
