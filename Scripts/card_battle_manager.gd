@@ -2968,36 +2968,22 @@ func display_player_hand():
 		print("No cards left in hand")
 		return
 	
-	# Fan effect parameters
+	# Simple line layout parameters
 	var hand_size = player_deck.size()
-	var max_rotation_deg = 10.0  # Maximum rotation for outermost cards in degrees
-	var arc_height = 15.0  # How much lower the outer cards should be
+	var card_width = 120
+	var card_spacing = 10  # Gap between cards (adjust this for wider/narrower gaps)
 	
-	# Card width and spacing parameters
-	var card_width = 120  # Base card width
-	var base_spacing = -20  # Negative spacing creates overlap
-
-	# Increase overlap slightly for larger hands
-	var card_spacing = base_spacing
-	if hand_size > 3:
-		card_spacing = base_spacing * 1.2  # Even tighter for 4+ cards
-	
-	var total_spacing = card_width + card_spacing  # Total space each card takes horizontally
-	
-	# Calculate the total width needed
-	var total_width = hand_size * total_spacing
-	var horizontal_offset = -55  # Shift entire hand left (negative = left, positive = right)
-	var start_x = -total_width / 2 + card_width / 2 + horizontal_offset
-	
-	# Calculate center position for fan calculations
-	var center_index = (hand_size - 1) / 2.0
+	var total_spacing = card_width + card_spacing
+	var total_width = hand_size * total_spacing - card_spacing
+	var horizontal_offset = 0  # Shift entire hand left/right if needed
+	var start_x = -total_width / 2 + horizontal_offset
 	
 	# Create a Node2D as a container for all cards
 	var cards_container = Node2D.new()
 	cards_container.name = "CardsContainer"
 	hand_container.add_child(cards_container)
 	
-	# Add each card from the deck with explicit positioning and proper leveling
+	# Add each card from the deck with simple horizontal positioning
 	for i in range(player_deck.size()):
 		var card = player_deck[i]
 		var card_collection_index = deck_card_indices[i]
@@ -3009,40 +2995,17 @@ func display_player_hand():
 		# Wait one frame to ensure the card display is fully ready
 		await get_tree().process_frame
 		
-		# Calculate fan rotation
-		var offset_from_center = i - center_index
-		var rotation_factor = offset_from_center / max(center_index, 0.5)  # Normalize to -1.0 to 1.0
-		var rotation_deg = rotation_factor * max_rotation_deg
-		var rotation_rad = deg_to_rad(rotation_deg)
-		
-		# Calculate vertical arc (parabolic curve - outer cards lower)
-		var arc_offset = pow(abs(offset_from_center), 2) / max(pow(center_index, 2), 1) * arc_height
-		
-		# Add subtle random variations for organic feel
-		var rotation_variation = randf_range(-1.5, 1.5)  # ±1.5 degrees
-		var x_variation = randf_range(-2.0, 2.0)  # ±2 pixels horizontal
-		var y_variation = randf_range(-3.0, 3.0)  # ±3 pixels vertical
-		var scale_variation = randf_range(0.98, 1.01)  # 0.98x to 1.01x scale
-		
-		# Position the card with fan effect plus random variations
-		var hand_vertical_offset = 0  # Adjust this to move entire hand up/down (higher = lower on screen)
-		card_display.position.x = start_x + i * total_spacing + x_variation
-		card_display.position.y = arc_offset + hand_vertical_offset + y_variation  # Lower position for outer cards
-		
-		# Apply rotation with variation
-		var final_rotation = rotation_rad + deg_to_rad(rotation_variation)
-		card_display.rotation = final_rotation
-		card_display.original_rotation = final_rotation  # Store for later restoration
-		
-		# Apply subtle scale variation
-		card_display.scale = Vector2(scale_variation, scale_variation)
-		
-		
+		# Position the card in a simple line
+		card_display.position.x = start_x + i * total_spacing
+		card_display.position.y = 20
+		card_display.rotation = 0
+		card_display.original_rotation = 0
+		card_display.scale = Vector2.ONE
 		
 		# Get the current level for this card - UNIFIED VERSION
 		var current_level = get_card_level(card_collection_index)
 		
-		print("Setting up hand card ", i, ": ", card.card_name, " at level ", current_level, " (collection index: ", card_collection_index, ") with rotation: ", rotation_deg, "°")
+		print("Setting up hand card ", i, ": ", card.card_name, " at level ", current_level, " (collection index: ", card_collection_index, ")")
 		
 		# FOR HAND DISPLAY: Create a copy of the card with level-appropriate values AND growth
 		var hand_card_data = card.duplicate(true)  # DEEP COPY to avoid reference issues
