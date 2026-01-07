@@ -78,9 +78,13 @@ stream = SubResource("AudioStreamWAV_tt5f1")
 stream = SubResource("AudioStreamWAV_853f1")
 
 [connection signal="mouse_entered" from="MenuContainer/NewGameButton" to="." method="_on_new_game_button_mouse_entered"]
+[connection signal="mouse_exited" from="MenuContainer/NewGameButton" to="." method="_on_new_game_button_mouse_exited"]
 [connection signal="pressed" from="MenuContainer/NewGameButton" to="." method="_on_new_game_button_pressed"]
 [connection signal="mouse_entered" from="MenuContainer/ContinueButton" to="." method="_on_continue_button_mouse_entered"]
+[connection signal="mouse_exited" from="MenuContainer/ContinueButton" to="." method="_on_continue_button_mouse_exited"]
 [connection signal="mouse_entered" from="MenuContainer/SettingsButton" to="." method="_on_settings_button_mouse_entered"]
+[connection signal="mouse_exited" from="MenuContainer/SettingsButton" to="." method="_on_settings_button_mouse_exited"]
 [connection signal="pressed" from="MenuContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
 [connection signal="mouse_entered" from="MenuContainer/QuitButton" to="." method="_on_quit_button_mouse_entered"]
+[connection signal="mouse_exited" from="MenuContainer/QuitButton" to="." method="_on_quit_button_mouse_exited"]
 [connection signal="pressed" from="MenuContainer/QuitButton" to="." method="_on_quit_button_pressed"]

@@ -10,8 +10,27 @@ extends Control
 # Confirmation dialog for new game
 var confirmation_dialog: ConfirmationDialog
 
+var continue_button_ripple: ButtonRipple
+var new_game_ripple: ButtonRipple
+var settings_ripple: ButtonRipple
+var quit_ripple: ButtonRipple
+
+func _process(_delta):
+	if continue_button_ripple:
+		continue_button_ripple.update_mouse_position()
+	if new_game_ripple:
+		new_game_ripple.update_mouse_position()
+	if settings_ripple:
+		settings_ripple.update_mouse_position()
+	if quit_ripple:
+		quit_ripple.update_mouse_position()
+
 func _ready():
 	setup_menu_based_on_save_data()
+	continue_button_ripple = ButtonRipple.new(continue_button)
+	new_game_ripple = ButtonRipple.new(new_game_button)
+	settings_ripple = ButtonRipple.new(settings_button)
+	quit_ripple = ButtonRipple.new(quit_button)
 	setup_confirmation_dialog()
 	print("=== EXPORT DEBUG START ===")
 	
@@ -158,6 +177,7 @@ func setup_confirmation_dialog():
 # Direct new game for first-time players
 func _on_new_game_button_pressed_direct():
 	SoundManagerAutoload.play_randomized('click')
+	continue_button_ripple.on_pressed()
 	
 	
 	# Trigger the tutorial sequence for first-time players
@@ -173,6 +193,7 @@ func _on_new_game_button_pressed_with_confirmation():
 
 # Continue game for returning players
 func _on_continue_button_pressed():
+	continue_button_ripple.on_pressed()
 	SoundManagerAutoload.play_randomized("click")
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
@@ -227,22 +248,43 @@ func _on_quit_button_pressed() -> void:
 	get_tree().quit()
 
 func _on_settings_button_pressed() -> void:
+	settings_ripple.on_pressed()
 	SoundManagerAutoload.play_randomized('click')
 	TransitionManagerAutoload.change_scene_to("res://Scenes/SettingsMenu.tscn")
 
 
 func _on_quit_button_mouse_entered() -> void:
 	SoundManagerAutoload.play_hover()
+	quit_ripple.on_mouse_entered()
 
 
 func _on_settings_button_mouse_entered() -> void:
 	SoundManagerAutoload.play_hover()
+	settings_ripple.on_mouse_entered()
 
 
 func _on_continue_button_mouse_entered() -> void:
-	
+	continue_button_ripple.on_mouse_entered()
 	SoundManagerAutoload.play_hover()
 
 
 func _on_new_game_button_mouse_entered() -> void:
 	SoundManagerAutoload.play_hover()
+	new_game_ripple.on_mouse_entered()
+	
+
+
+func _on_continue_button_mouse_exited() -> void:
+	continue_button_ripple.on_mouse_exited() 
+
+
+func _on_new_game_button_mouse_exited() -> void:
+	new_game_ripple.on_mouse_exited()
+
+
+func _on_settings_button_mouse_exited() -> void:
+	settings_ripple.on_mouse_exited()
+
+
+func _on_quit_button_mouse_exited() -> void:
+	quit_ripple.on_mouse_exited()
