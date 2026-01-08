@@ -2658,7 +2658,7 @@ func load_player_deck(deck_index: int):
 			else:
 				print("Player card ", i, ": NULL")
 		
-		setup_experience_panel()
+		#setup_experience_panel()
 		display_player_hand()
 	else:
 		push_error("Failed to load collection: " + collection_path)
