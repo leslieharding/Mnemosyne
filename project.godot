@@ -32,7 +32,7 @@ SoundManagerAutoload="*res://Scripts/sound_manager.gd"
 
 [gui]
 
-theme/custom_font="uid://dj5vq1reygw03"
+theme/custom_font="uid://c318hpjgni131"
 
 [input]
 
