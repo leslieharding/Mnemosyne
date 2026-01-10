@@ -6,7 +6,7 @@
 script = ExtResource("1_3afop")
 
 [node name="MainContainer" type="HBoxContainer" parent="."]
-offset_left = 165.0
+offset_left = 61.0
 offset_top = 16.0
 offset_right = 1013.0
 offset_bottom = 616.0
