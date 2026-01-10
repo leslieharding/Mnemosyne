@@ -78,7 +78,7 @@ func update_button_state():
 		# No conversations available
 		disabled = true
 		modulate.a = 0.6
-		text = "Speak with Chiron"
+		text = "Visit Chiron"
 		add_theme_stylebox_override("normal", disabled_style)
 		add_theme_stylebox_override("hover", disabled_style)
 		add_theme_stylebox_override("pressed", disabled_style)
