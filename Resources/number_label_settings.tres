@@ -1,0 +1,6 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://cxdn8jvqlxou6"]
+
+[ext_resource type="FontFile" uid="uid://dhav1fcbvg4d5" path="res://Fonts/minicaps.ttf" id="1_edkx5"]
+
+[resource]
+font = ExtResource("1_edkx5")
