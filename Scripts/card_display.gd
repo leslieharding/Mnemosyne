@@ -58,7 +58,7 @@ func create_selection_styles():
 	default_style.border_width_top = 4
 	default_style.border_width_right = 4
 	default_style.border_width_bottom = 4
-	default_style.border_color = Color("#133333", 0.666667)
+	default_style.border_color = Color(0.133333, 0.4, 0.666667, 1)
 	default_style.corner_radius_top_left = 4
 	default_style.corner_radius_top_right = 4
 	default_style.corner_radius_bottom_right = 4

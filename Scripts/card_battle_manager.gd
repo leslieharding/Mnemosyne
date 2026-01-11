@@ -2440,7 +2440,7 @@ func create_grid_styles():
 	player_card_style.border_width_top = 2
 	player_card_style.border_width_right = 2
 	player_card_style.border_width_bottom = 2
-	player_card_style.border_color = Color("#4444FF")  # Blue for player
+	player_card_style.border_color = Color(0.133333, 0.4, 0.666667, 1)
 	
 	# Opponent card style (red border)
 	opponent_card_style = StyleBoxFlat.new()
@@ -9540,7 +9540,13 @@ func animate_card_to_slot():
 	# Reparent to draw on top during animation
 	selected_card_display.reparent(self)
 	selected_card_display.z_index = 100
-	
+
+	# Deselect the card immediately to remove highlighting
+	selected_card_display.deselect()
+	# Kill the deselect tween since we'll handle positioning manually
+	if selected_card_display.selection_tween:
+		selected_card_display.selection_tween.kill()
+
 	# Reset rotation and set initial position over the slot
 	selected_card_display.rotation = 0  # Remove any fan rotation from hand
 	selected_card_display.scale = Vector2.ONE  # Reset any selection scaling
@@ -9552,15 +9558,24 @@ func animate_card_to_slot():
 	
 	# Step 3: Lift up slightly (20 pixels up)
 	var lift_position = target_global_position - Vector2(0, 20)
-	tween.tween_property(selected_card_display, "global_position", lift_position, 0.3) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(selected_card_display, "global_position", lift_position, 0.15) \
+		.set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 	
 	# Brief pause at the top
-	tween.tween_interval(0.08)
+	tween.tween_interval(0.09)
 	
-	# Step 4: Slam down into the slot with bounce
-	tween.tween_property(selected_card_display, "global_position", target_global_position, 0.05) \
-		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	# Step 4: Drop down fast
+	tween.tween_property(selected_card_display, "global_position", target_global_position, 0.15) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+
+	# Step 5: Bounce UP slightly after impact
+	var bounce_up_position = target_global_position - Vector2(0, 8)
+	tween.tween_property(selected_card_display, "global_position", bounce_up_position, 0.07) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	# Step 6: Settle back down
+	tween.tween_property(selected_card_display, "global_position", target_global_position, 0.12) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	
 	# Wait for animation to finish
 	await tween.finished
