@@ -10,6 +10,7 @@ var journal_button: JournalButton
 @onready var aphrodite_button: Button = $VBoxContainer/HBoxContainer/AphroditeButton
 @onready var demeter_button: Button = $VBoxContainer/HBoxContainer/DemeterButton  
 @onready var chiron_button: ChironButton = $ChironButton
+@onready var chronos_button: ChronosButton = $ChronosButton
 
 # Test Battle UI References
 var test_battle_panel: PanelContainer
@@ -31,11 +32,19 @@ func _ready():
 	if chiron_button:
 		# Use call_deferred to ensure the button's _ready() has finished
 		call_deferred("refresh_chiron_button")
+	if chronos_button:
+		# Use call_deferred to ensure the button's _ready() has finished
+		call_deferred("refresh_chronos_button")
 
 func refresh_chiron_button():
 	if chiron_button:
 		print("GameModeSelect: Refreshing Chiron button state")
 		chiron_button.update_button_state()
+
+func refresh_chronos_button():
+	if chronos_button:
+		print("GameModeSelect: Refreshing Chronos button state")
+		chronos_button.update_button_state()
 
 func setup_journal_button():
 	if not journal_button:

@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://vha8ujknia5b"]
+[gd_scene load_steps=4 format=3 uid="uid://vha8ujknia5b"]
 
 [ext_resource type="Script" uid="uid://bhy4ca4xh6wgg" path="res://Scripts/game_mode_select.gd" id="1_3aue6"]
 [ext_resource type="Script" uid="uid://cww2cxqfgy5s5" path="res://Scripts/chiron_button.gd" id="2_1fq1s"]
+[ext_resource type="Script" uid="uid://uriqrs6jmhvb" path="res://Scripts/chronos_button.gd" id="3_cn38a"]
 
 [node name="GameModeSelect" type="Control"]
 layout_mode = 3
@@ -101,6 +102,22 @@ offset_left = -200.0
 offset_right = -160.0
 offset_bottom = 40.0
 metadata/_edit_use_anchors_ = true
+
+[node name="ChronosButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -92.0
+offset_top = -53.0
+offset_right = 92.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Challenge Chronos"
+script = ExtResource("3_cn38a")
 
 [connection signal="mouse_entered" from="Background/Button" to="." method="_on_button_mouse_entered"]
 [connection signal="pressed" from="Background/Button" to="." method="_on_button_pressed"]

@@ -2057,9 +2057,36 @@ func end_game():
 		
 		_on_tutorial_finished()
 		return
+	# Get params once for both checks
+	var params = get_scene_params()
+	# CHRONOS CHALLENGE CHECK - Handle Chronos challenge completion
+	if params.get("is_chronos_challenge", false):
+		print("Chronos challenge ended")
+		
+		var scores = get_current_scores()
+		if scores.player > scores.opponent:
+			game_status_label.text = "Victory over Chronos!"
+		elif scores.opponent > scores.player:
+			game_status_label.text = "Chronos prevails..."
+		else:
+			game_status_label.text = "Draw with Chronos! Restarting..."
+			disable_player_input()
+			opponent_is_thinking = false
+			turn_manager.end_game()
+			await get_tree().create_timer(2.0).timeout
+			restart_round()
+			return
+		
+		disable_player_input()
+		opponent_is_thinking = false
+		turn_manager.end_game()
+		
+		await get_tree().create_timer(3.0).timeout
+		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+		return
 	
 	# TEST BATTLE CHECK - Handle test battle completion
-	var params = get_scene_params()
+	
 	if params.get("is_test_battle", false):
 		print("Test battle ended - returning to GameModeSelect")
 		
@@ -4275,6 +4302,9 @@ func record_enemy_encounter(victory: bool):
 		
 		print("Checking god unlocks...")
 		print("Current unlocked gods: ", progress_tracker.get_unlocked_gods())
+	# Check for Chronos rechallenge unlock conditions
+	if victory:
+		check_chronos_rechallenge_unlock()	
 	
 	if has_node("/root/ConversationManagerAutoload"):
 		var conv_manager = get_node("/root/ConversationManagerAutoload")
@@ -4413,6 +4443,12 @@ func check_god_unlocks():
 			# This conversation would need to be defined in conversation_manager.gd
 			conv_manager.trigger_conversation("hermes_unlocked")
 
+func check_chronos_rechallenge_unlock():
+	if not has_node("/root/GlobalProgressTrackerAutoload"):
+		return
+	
+	var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+	progress_tracker.check_chronos_rechallenge_conditions()
 
 # Replace the check_for_couple_union function in Scripts/card_battle_manager.gd
 func check_for_couple_union(placed_card: CardResource, grid_position: int):

@@ -9,6 +9,9 @@ var save_path: String = "user://card_progress.save"
 var traps_fallen_for: int = 0  # Track trap encounters for Artemis unlock
 var total_defends: int = 0  # Track total defends for Athena unlock
 
+var chronos_rechallenge_visible: bool = false
+var chronos_rechallenge_unlocked: bool = false
+
 # NEW: God unlock tracking
 var unlocked_gods: Array[String] = ["Apollo"]  # Apollo starts unlocked
 var god_unlock_conditions: Dictionary = {
@@ -134,7 +137,9 @@ func save_progress():
 			"progress_data": progress_data,
 			"unlocked_gods": unlocked_gods,
 			"couples_united": couples_united,
-			"traps_fallen_for": traps_fallen_for  # NEW LINE
+			"traps_fallen_for": traps_fallen_for,
+			"chronos_rechallenge_visible": chronos_rechallenge_visible,
+			"chronos_rechallenge_unlocked": chronos_rechallenge_unlocked
 		}
 		save_file.store_var(save_data)
 		save_file.close()
@@ -142,7 +147,7 @@ func save_progress():
 	else:
 		print("Failed to save progress!")
 
-# Load progress from disk - with migration support
+
 # Load progress from disk - with migration support
 func load_progress():
 	if FileAccess.file_exists(save_path):
@@ -157,7 +162,8 @@ func load_progress():
 				unlocked_gods = loaded_data.get("unlocked_gods", ["Apollo"])
 				couples_united = loaded_data.get("couples_united", [])
 				traps_fallen_for = loaded_data.get("traps_fallen_for", 0)  # NEW LINE
-				
+				chronos_rechallenge_visible = loaded_data.get("chronos_rechallenge_visible", false)
+				chronos_rechallenge_unlocked = loaded_data.get("chronos_rechallenge_unlocked", false)
 				# Migrate old capture_exp/defense_exp format to unified total_exp
 				progress_data = migrate_experience_data(old_progress_data)
 			else:
@@ -212,6 +218,8 @@ func clear_all_progress():
 	progress_data.clear()
 	unlocked_gods = ["Apollo"]  # Reset to only Apollo unlocked
 	couples_united = []  # Clear united couples
+	chronos_rechallenge_visible = false
+	chronos_rechallenge_unlocked = false
 	traps_fallen_for = 0
 	total_defends = 0  # Reset defend counter for Athena unlock
 	save_progress()
@@ -470,3 +478,38 @@ func increment_defends():
 			conv_manager.trigger_conversation("athena_unlocked")
 	
 	save_progress()
+
+
+func check_chronos_rechallenge_conditions():
+	# State 2 condition: Visible but locked - player has defeated any boss
+	if not chronos_rechallenge_visible:
+		var boss_wins = get_total_boss_wins()
+		if boss_wins >= 1:
+			chronos_rechallenge_visible = true
+			print("Chronos rechallenge button now visible")
+	
+	# State 3 condition: Unlocked - player has defeated 3 bosses
+	if not chronos_rechallenge_unlocked and chronos_rechallenge_visible:
+		var boss_wins = get_total_boss_wins()
+		if boss_wins >= 3:
+			chronos_rechallenge_unlocked = true
+			print("Chronos rechallenge button now unlocked!")
+			save_progress()
+
+
+func get_total_boss_wins() -> int:
+	if not has_node("/root/MemoryJournalManagerAutoload"):
+		return 0
+	
+	var memory_manager = get_node("/root/MemoryJournalManagerAutoload")
+	var enemy_memories = memory_manager.get_all_enemy_memories()
+	
+	var total_wins = 0
+	var boss_names = ["?????", "Hermes Boss", "Fimbulwinter", "Artemis Boss"]
+	
+	for boss_name in boss_names:
+		if boss_name in enemy_memories:
+			var boss_data = enemy_memories[boss_name]
+			total_wins += boss_data.get("wins", 0)
+	
+	return total_wins
