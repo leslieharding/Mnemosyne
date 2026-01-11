@@ -35,71 +35,67 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
-layout_mode = 2
-
-[node name="CardNameLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
+[node name="CardNameLabel" type="Label" parent="Panel/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
+size_flags_vertical = 0
 theme_override_font_sizes/font_size = 12
 text = "Card Name"
 
-[node name="PowerDisplayContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(36, 36)
+[node name="PowerDisplayContainer" type="CenterContainer" parent="Panel/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-size_flags_vertical = 6
+size_flags_vertical = 10
 
-[node name="GridContainer" type="GridContainer" parent="Panel/MarginContainer/VBoxContainer/PowerDisplayContainer"]
-custom_minimum_size = Vector2(60, 60)
+[node name="GridContainer" type="GridContainer" parent="Panel/MarginContainer/PowerDisplayContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-size_flags_vertical = 4
+size_flags_vertical = 8
 theme_override_constants/h_separation = 2
 theme_override_constants/v_separation = 2
 columns = 3
 
-[node name="Label" type="Label" parent="Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer"]
+[node name="Label" type="Label" parent="Panel/MarginContainer/PowerDisplayContainer/GridContainer"]
 custom_minimum_size = Vector2(6, 6)
 layout_mode = 2
 
-[node name="NorthPower" type="Label" parent="Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer"]
+[node name="NorthPower" type="Label" parent="Panel/MarginContainer/PowerDisplayContainer/GridContainer"]
 custom_minimum_size = Vector2(12, 12)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "5"
 
-[node name="Label2" type="Label" parent="Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer"]
+[node name="Label2" type="Label" parent="Panel/MarginContainer/PowerDisplayContainer/GridContainer"]
 custom_minimum_size = Vector2(6, 6)
 layout_mode = 2
 
-[node name="WestPower" type="Label" parent="Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer"]
+[node name="WestPower" type="Label" parent="Panel/MarginContainer/PowerDisplayContainer/GridContainer"]
 custom_minimum_size = Vector2(12, 12)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "5"
 
-[node name="Label3" type="Label" parent="Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer"]
+[node name="Label3" type="Label" parent="Panel/MarginContainer/PowerDisplayContainer/GridContainer"]
 custom_minimum_size = Vector2(6, 6)
 layout_mode = 2
 
-[node name="EastPower" type="Label" parent="Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer"]
+[node name="EastPower" type="Label" parent="Panel/MarginContainer/PowerDisplayContainer/GridContainer"]
 custom_minimum_size = Vector2(12, 12)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "5"
 
-[node name="Label4" type="Label" parent="Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer"]
+[node name="Label4" type="Label" parent="Panel/MarginContainer/PowerDisplayContainer/GridContainer"]
 custom_minimum_size = Vector2(6, 6)
 layout_mode = 2
 
-[node name="SouthPower" type="Label" parent="Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer"]
+[node name="SouthPower" type="Label" parent="Panel/MarginContainer/PowerDisplayContainer/GridContainer"]
 custom_minimum_size = Vector2(12, 12)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "5"
 
-[node name="Label5" type="Label" parent="Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer"]
+[node name="Label5" type="Label" parent="Panel/MarginContainer/PowerDisplayContainer/GridContainer"]
 custom_minimum_size = Vector2(6, 6)
 layout_mode = 2
 

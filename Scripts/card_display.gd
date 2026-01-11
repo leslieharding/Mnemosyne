@@ -7,11 +7,11 @@ signal card_unhovered()
 
 # UI References
 @onready var panel = $Panel
-@onready var north_power = $Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer/NorthPower
-@onready var east_power = $Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer/EastPower
-@onready var south_power = $Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer/SouthPower
-@onready var west_power = $Panel/MarginContainer/VBoxContainer/PowerDisplayContainer/GridContainer/WestPower
-@onready var card_name_label = $Panel/MarginContainer/VBoxContainer/CardNameLabel
+@onready var north_power = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/NorthPower
+@onready var east_power = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/EastPower
+@onready var south_power = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/SouthPower
+@onready var west_power = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/WestPower
+@onready var card_name_label = $Panel/MarginContainer/CardNameLabel
 
 var original_rotation: float = 0.0  # Store the card's fan rotation when in hand
 
