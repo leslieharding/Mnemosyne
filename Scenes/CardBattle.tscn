@@ -1,9 +1,24 @@
-[gd_scene load_steps=2 format=3 uid="uid://cynrsrhislb68"]
+[gd_scene load_steps=3 format=3 uid="uid://cynrsrhislb68"]
 
 [ext_resource type="Script" uid="uid://bu3s8gjaukbo6" path="res://Scripts/card_battle_manager.gd" id="1_xcrvx"]
+[ext_resource type="Texture2D" uid="uid://b71s1dsanmfh4" path="res://Assets/Images/UI_02.png" id="2_8owk5"]
 
 [node name="ApolloGame" type="Node2D"]
 script = ExtResource("1_xcrvx")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 672.0
+offset_bottom = 405.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1.7142857, 1.6)
+size_flags_horizontal = 10
+size_flags_vertical = 3
+texture = ExtResource("2_8owk5")
+expand_mode = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchors_preset = 15
