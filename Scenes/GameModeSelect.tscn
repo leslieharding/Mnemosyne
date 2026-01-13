@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://vha8ujknia5b"]
+[gd_scene load_steps=5 format=3 uid="uid://vha8ujknia5b"]
 
 [ext_resource type="Script" uid="uid://bhy4ca4xh6wgg" path="res://Scripts/game_mode_select.gd" id="1_3aue6"]
 [ext_resource type="Script" uid="uid://cww2cxqfgy5s5" path="res://Scripts/chiron_button.gd" id="2_1fq1s"]
+[ext_resource type="Texture2D" uid="uid://hp1jmoxcxohl" path="res://Assets/Images/Hero_Selection-export.png" id="2_x5d8l"]
 [ext_resource type="Script" uid="uid://uriqrs6jmhvb" path="res://Scripts/chronos_button.gd" id="3_cn38a"]
 
 [node name="GameModeSelect" type="Control"]
@@ -20,6 +21,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = ExtResource("2_x5d8l")
+expand_mode = 3
+stretch_mode = 4
 
 [node name="Button" type="Button" parent="Background"]
 layout_mode = 0
