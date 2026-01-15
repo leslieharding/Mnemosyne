@@ -357,10 +357,12 @@ func _on_athena_button_pressed():
 
 func _on_apollo_button_mouse_entered() -> void:
 	SoundManagerAutoload.play_god_hover("Apollo")
+	$Apollo.material.set_shader_parameter("type", 2)
 
 
 func _on_apollo_button_mouse_exited() -> void:
 	SoundManagerAutoload.stop_god_hover_with_fade(0.5,1.5)
+	$Apollo.material.set_shader_parameter("type", 0)
 
 
 func _on_button_mouse_entered() -> void:
@@ -369,23 +371,29 @@ func _on_button_mouse_entered() -> void:
 
 func _on_artemis_button_mouse_entered() -> void:
 	SoundManagerAutoload.play_god_hover("Artemis")
+	$Artemis.material.set_shader_parameter("type", 2)
 
 
 func _on_artemis_button_mouse_exited() -> void:
 	SoundManagerAutoload.stop_god_hover_with_fade(0.5,1.5)
+	$Artemis.material.set_shader_parameter("type", 0)
 
 
 func _on_hermes_button_mouse_entered() -> void:
 	SoundManagerAutoload.play_god_hover("Hermes")
+	$Hermes.material.set_shader_parameter("type", 2)
 
 
 func _on_hermes_button_mouse_exited() -> void:
 	SoundManagerAutoload.stop_god_hover_with_fade(0.5,1.5)
+	$Hermes.material.set_shader_parameter("type", 0)
 
 
 func _on_demeter_button_mouse_entered() -> void:
 	SoundManagerAutoload.play_god_hover("Demeter")
+	$Demeter.material.set_shader_parameter("type", 2)
 
 
 func _on_demeter_button_mouse_exited() -> void:
 	SoundManagerAutoload.stop_god_hover_with_fade(0.5,1.5)
+	$Demeter.material.set_shader_parameter("type", 0)

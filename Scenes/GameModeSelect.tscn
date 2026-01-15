@@ -1,13 +1,91 @@
-[gd_scene load_steps=9 format=3 uid="uid://vha8ujknia5b"]
+[gd_scene load_steps=17 format=3 uid="uid://vha8ujknia5b"]
 
 [ext_resource type="Script" uid="uid://bhy4ca4xh6wgg" path="res://Scripts/game_mode_select.gd" id="1_3aue6"]
 [ext_resource type="Script" uid="uid://cww2cxqfgy5s5" path="res://Scripts/chiron_button.gd" id="2_1fq1s"]
 [ext_resource type="Texture2D" uid="uid://hp1jmoxcxohl" path="res://Assets/Images/Hero_Selection-export.png" id="2_x5d8l"]
 [ext_resource type="Script" uid="uid://uriqrs6jmhvb" path="res://Scripts/chronos_button.gd" id="3_cn38a"]
 [ext_resource type="Texture2D" uid="uid://c745weacrxsys" path="res://Assets/Images/Apollo.png" id="5_7djtl"]
+[ext_resource type="Shader" uid="uid://cj06coiouh3vc" path="res://Shaders/hover_highlight.gdshader" id="5_u4vls"]
 [ext_resource type="Texture2D" uid="uid://bssiar0i1k30c" path="res://Assets/Images/Hermes.png" id="6_u4vls"]
 [ext_resource type="Texture2D" uid="uid://d0cto01b1xsql" path="res://Assets/Images/Artemis.png" id="7_qbekx"]
 [ext_resource type="Texture2D" uid="uid://btvbpdy7pwk5x" path="res://Assets/Images/Demeter.png" id="8_ok7rk"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qbekx"]
+shader = ExtResource("5_u4vls")
+shader_parameter/clr = Color(1, 0.84313726, 0, 1)
+shader_parameter/type = 0
+shader_parameter/thickness = 3.0
+shader_parameter/glow_layers = 4
+shader_parameter/glow_falloff = 0.4
+shader_parameter/pulse_speed = 0.4
+shader_parameter/pulse_intensity = 0.8
+shader_parameter/pulse_thickness_range = 0.5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u4vls"]
+shader = ExtResource("5_u4vls")
+shader_parameter/clr = Color(0.7529412, 0.7529412, 0.7529412, 1)
+shader_parameter/type = 0
+shader_parameter/thickness = 2.0
+shader_parameter/glow_layers = 4
+shader_parameter/glow_falloff = 0.4
+shader_parameter/pulse_speed = 0.8
+shader_parameter/pulse_intensity = 1.0
+shader_parameter/pulse_thickness_range = 0.5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ok7rk"]
+shader = ExtResource("5_u4vls")
+shader_parameter/clr = Color(0.18431373, 0.30980393, 0.18431373, 1)
+shader_parameter/type = 0
+shader_parameter/thickness = 3.0
+shader_parameter/glow_layers = 4
+shader_parameter/glow_falloff = 0.4
+shader_parameter/pulse_speed = 0.4
+shader_parameter/pulse_intensity = 1.0
+shader_parameter/pulse_thickness_range = 0.5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ohc70"]
+shader = ExtResource("5_u4vls")
+shader_parameter/clr = Color(0.72156864, 0.5254902, 0.043137256, 1)
+shader_parameter/type = 0
+shader_parameter/thickness = 3.0
+shader_parameter/glow_layers = 6
+shader_parameter/glow_falloff = 0.4
+shader_parameter/pulse_speed = 0.4
+shader_parameter/pulse_intensity = 1.0
+shader_parameter/pulse_thickness_range = 0.5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jvq57"]
+shader = ExtResource("5_u4vls")
+shader_parameter/clr = Color(1, 0.7137255, 0.75686276, 1)
+shader_parameter/type = 0
+shader_parameter/thickness = 2.0
+shader_parameter/glow_layers = 3
+shader_parameter/glow_falloff = 0.5
+shader_parameter/pulse_speed = 2.0
+shader_parameter/pulse_intensity = 0.5
+shader_parameter/pulse_thickness_range = 0.3
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_64ylo"]
+shader = ExtResource("5_u4vls")
+shader_parameter/clr = Color(0.44705883, 0.18431373, 0.21568628, 1)
+shader_parameter/type = 0
+shader_parameter/thickness = 2.0
+shader_parameter/glow_layers = 3
+shader_parameter/glow_falloff = 0.5
+shader_parameter/pulse_speed = 2.0
+shader_parameter/pulse_intensity = 0.5
+shader_parameter/pulse_thickness_range = 0.3
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ec8fm"]
+shader = ExtResource("5_u4vls")
+shader_parameter/clr = Color(0.4392157, 0.5019608, 0.5647059, 1)
+shader_parameter/type = 0
+shader_parameter/thickness = 2.0
+shader_parameter/glow_layers = 3
+shader_parameter/glow_falloff = 0.5
+shader_parameter/pulse_speed = 2.0
+shader_parameter/pulse_intensity = 0.5
+shader_parameter/pulse_thickness_range = 0.3
 
 [node name="GameModeSelect" type="Control"]
 layout_mode = 3
@@ -77,6 +155,7 @@ text = "Challenge Chronos"
 script = ExtResource("3_cn38a")
 
 [node name="Apollo" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_qbekx")
 layout_mode = 0
 offset_left = 54.0
 offset_top = 256.0
@@ -85,6 +164,7 @@ offset_bottom = 573.0
 texture = ExtResource("5_7djtl")
 
 [node name="Hermes" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_u4vls")
 layout_mode = 0
 offset_left = 220.0
 offset_top = 256.0
@@ -93,6 +173,7 @@ offset_bottom = 574.0
 texture = ExtResource("6_u4vls")
 
 [node name="Artemis" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_ok7rk")
 layout_mode = 0
 offset_left = 375.0
 offset_top = 266.0
@@ -101,6 +182,7 @@ offset_bottom = 576.0
 texture = ExtResource("7_qbekx")
 
 [node name="Demeter" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_ohc70")
 layout_mode = 0
 offset_left = 496.0
 offset_top = 262.0
@@ -109,16 +191,19 @@ offset_bottom = 574.0
 texture = ExtResource("8_ok7rk")
 
 [node name="Aphrodite" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_jvq57")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="Dionysus" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_64ylo")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="Athena" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_ec8fm")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
