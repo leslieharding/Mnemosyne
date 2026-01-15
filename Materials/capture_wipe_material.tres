@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://bshecwesuralj"]
+
+[ext_resource type="Shader" uid="uid://c6og21kf7clkv" path="res://Shaders/capture_wipe.gdshader" id="1_wufn2"]
+
+[resource]
+shader = ExtResource("1_wufn2")
+shader_parameter/wipe_direction = 0
+shader_parameter/old_color = Color(1, 0, 0, 1)
+shader_parameter/new_color = Color(0, 0, 1, 1)
+shader_parameter/progress = 0.0
+shader_parameter/line_thickness = 0.03
+shader_parameter/line_color = Color(1, 1, 1, 1)

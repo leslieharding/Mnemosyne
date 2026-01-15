@@ -1384,11 +1384,30 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 		
 		# CAPTURE SUCCESSFUL - Show visual effects
 		var attacking_card_display = get_card_display_at_position(grid_index)
+		var captured_card_display = get_card_display_at_position(captured_index)
+
 		if attacking_card_display and visual_effects_manager:
 			var is_player_attack = (attacking_owner == Owner.PLAYER)
 			var attack_direction = get_direction_between_positions(grid_index, captured_index)
 			if attack_direction != -1:
+				# Show the flash on the attacking card
 				visual_effects_manager.show_capture_flash(attacking_card_display, attack_direction, is_player_attack)
+
+		# Show capture highlight animation on the captured card
+		if captured_card_display and visual_effects_manager:
+			var attack_direction = get_direction_between_positions(grid_index, captured_index)
+			if attack_direction != -1:
+				# Determine old and new owners for color animation
+				var old_owner_was_player = (grid_ownership[captured_index] == Owner.PLAYER)
+				var new_owner_is_player = (attacking_owner == Owner.PLAYER)
+				
+				# Show the directional capture highlight
+				visual_effects_manager.show_capture_highlight(
+					captured_card_display,
+					attack_direction,
+					old_owner_was_player,
+					new_owner_is_player
+				)
 		
 		# Normal capture processing - Remove passive abilities BEFORE changing ownership
 		handle_passive_abilities_on_capture(captured_index, captured_card_data)
