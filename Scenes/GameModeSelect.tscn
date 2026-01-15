@@ -1,9 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://vha8ujknia5b"]
+[gd_scene load_steps=9 format=3 uid="uid://vha8ujknia5b"]
 
 [ext_resource type="Script" uid="uid://bhy4ca4xh6wgg" path="res://Scripts/game_mode_select.gd" id="1_3aue6"]
 [ext_resource type="Script" uid="uid://cww2cxqfgy5s5" path="res://Scripts/chiron_button.gd" id="2_1fq1s"]
 [ext_resource type="Texture2D" uid="uid://hp1jmoxcxohl" path="res://Assets/Images/Hero_Selection-export.png" id="2_x5d8l"]
 [ext_resource type="Script" uid="uid://uriqrs6jmhvb" path="res://Scripts/chronos_button.gd" id="3_cn38a"]
+[ext_resource type="Texture2D" uid="uid://c745weacrxsys" path="res://Assets/Images/Apollo.png" id="5_7djtl"]
+[ext_resource type="Texture2D" uid="uid://bssiar0i1k30c" path="res://Assets/Images/Hermes.png" id="6_u4vls"]
+[ext_resource type="Texture2D" uid="uid://d0cto01b1xsql" path="res://Assets/Images/Artemis.png" id="7_qbekx"]
+[ext_resource type="Texture2D" uid="uid://btvbpdy7pwk5x" path="res://Assets/Images/Demeter.png" id="8_ok7rk"]
 
 [node name="GameModeSelect" type="Control"]
 layout_mode = 3
@@ -32,6 +36,92 @@ offset_top = 595.0
 offset_right = 946.0
 offset_bottom = 626.0
 text = "Back"
+
+[node name="ChironButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -142.0
+offset_top = -53.0
+offset_right = -31.0
+offset_bottom = -22.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Visit Chiron"
+script = ExtResource("2_1fq1s")
+
+[node name="UnlockInfoPanel" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = -200.0
+offset_right = -160.0
+offset_bottom = 40.0
+metadata/_edit_use_anchors_ = true
+
+[node name="ChronosButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -92.0
+offset_top = -53.0
+offset_right = 92.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Challenge Chronos"
+script = ExtResource("3_cn38a")
+
+[node name="Apollo" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 54.0
+offset_top = 256.0
+offset_right = 221.0
+offset_bottom = 573.0
+texture = ExtResource("5_7djtl")
+
+[node name="Hermes" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 256.0
+offset_right = 354.0
+offset_bottom = 574.0
+texture = ExtResource("6_u4vls")
+
+[node name="Artemis" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 375.0
+offset_top = 266.0
+offset_right = 490.0
+offset_bottom = 576.0
+texture = ExtResource("7_qbekx")
+
+[node name="Demeter" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 496.0
+offset_top = 262.0
+offset_right = 642.0
+offset_bottom = 574.0
+texture = ExtResource("8_ok7rk")
+
+[node name="Aphrodite" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Dionysus" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Athena" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
 [node name="ApolloButton" type="Button" parent="."]
 modulate = Color(1, 1, 1, 0)
@@ -95,45 +185,6 @@ offset_left = 946.0
 offset_top = 245.0
 offset_right = 1070.0
 offset_bottom = 488.0
-
-[node name="ChironButton" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -142.0
-offset_top = -53.0
-offset_right = -31.0
-offset_bottom = -22.0
-grow_horizontal = 0
-grow_vertical = 0
-text = "Visit Chiron"
-script = ExtResource("2_1fq1s")
-
-[node name="UnlockInfoPanel" type="PanelContainer" parent="."]
-layout_mode = 0
-offset_left = -200.0
-offset_right = -160.0
-offset_bottom = 40.0
-metadata/_edit_use_anchors_ = true
-
-[node name="ChronosButton" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -92.0
-offset_top = -53.0
-offset_right = 92.0
-offset_bottom = -25.0
-grow_horizontal = 2
-grow_vertical = 0
-text = "Challenge Chronos"
-script = ExtResource("3_cn38a")
 
 [connection signal="mouse_entered" from="Background/Button" to="." method="_on_button_mouse_entered"]
 [connection signal="pressed" from="Background/Button" to="." method="_on_button_pressed"]
