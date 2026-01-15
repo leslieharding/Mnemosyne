@@ -4,11 +4,13 @@ extends Control
 var journal_button: JournalButton
 
 # God button references
-@onready var apollo_button: Button = $VBoxContainer/HBoxContainer/ApolloButton
-@onready var hermes_button: Button = $VBoxContainer/HBoxContainer/HermesButton
-@onready var artemis_button: Button = $VBoxContainer/HBoxContainer/ArtemisButton
-@onready var aphrodite_button: Button = $VBoxContainer/HBoxContainer/AphroditeButton
-@onready var demeter_button: Button = $VBoxContainer/HBoxContainer/DemeterButton  
+@onready var apollo_button: Button = $ApolloButton
+@onready var hermes_button: Button = $HermesButton
+@onready var artemis_button: Button = $ArtemisButton
+@onready var aphrodite_button: Button = $AphroditeButton
+@onready var demeter_button: Button =  $DemeterButton
+@onready var dionysus_button: Button =  $DionysusButton
+@onready var athena_button: Button =  $AthenaButton
 @onready var chiron_button: ChironButton = $ChironButton
 @onready var chronos_button: ChronosButton = $ChronosButton
 
