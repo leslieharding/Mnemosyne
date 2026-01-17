@@ -18,6 +18,16 @@ var grid_occupied: Array = []  # Track which slots have cards
 var grid_ownership: Array = []  # Track who owns each card (can change via combat)
 var grid_card_data: Array = []  # Track the actual card data for each slot
 
+# Typewriter effect variables
+var typewriter_timer: Timer
+var typewriter_full_text: String = ""
+var typewriter_current_index: int = 0
+const TYPEWRITER_SPEED: float = 0.03  # Time between each character 
+var label_fade_tween: Tween
+const LABEL_FADE_DURATION: float = 0.5  # Duration of fade-in effect
+const POWER_FADE_DURATION: float = 0.8  # Slightly slower fade for power values
+
+
 var discordant_active: bool = false
 
 var is_animating_card_placement: bool = false  # Prevents multiple placements during animation
@@ -783,16 +793,40 @@ func _on_card_unhovered():
 
 func update_panel_content(card_data: CardResource):
 	"""Update the panel content without affecting visibility"""
-	card_name_display.text = card_data.card_name
-	card_description_display.text = card_data.description
+	# Start typewriter effect for card name
+	start_typewriter_effect(card_name_display, card_data.card_name)
 	
-	# Update power numbers in D-pad layout
+	# Kill any existing fade tween
+	if label_fade_tween and label_fade_tween.is_valid():
+		label_fade_tween.kill()
+	
+	# Create a new tween for all fades
+	label_fade_tween = create_tween()
+	label_fade_tween.set_parallel(true)
+	
+	# Fade in description
+	card_description_display.text = card_data.description
+	card_description_display.visible = true
+	card_description_display.modulate.a = 0.0
+	label_fade_tween.tween_property(card_description_display, "modulate:a", 1.0, LABEL_FADE_DURATION)
+	
+	# Fade in power numbers with slightly slower animation
 	north_power_display.text = str(card_data.values[0])
 	east_power_display.text = str(card_data.values[1])
 	south_power_display.text = str(card_data.values[2])
 	west_power_display.text = str(card_data.values[3])
 	
-	# Handle ability information
+	north_power_display.modulate.a = 0.0
+	east_power_display.modulate.a = 0.0
+	south_power_display.modulate.a = 0.0
+	west_power_display.modulate.a = 0.0
+	
+	label_fade_tween.tween_property(north_power_display, "modulate:a", 1.0, POWER_FADE_DURATION)
+	label_fade_tween.tween_property(east_power_display, "modulate:a", 1.0, POWER_FADE_DURATION)
+	label_fade_tween.tween_property(south_power_display, "modulate:a", 1.0, POWER_FADE_DURATION)
+	label_fade_tween.tween_property(west_power_display, "modulate:a", 1.0, POWER_FADE_DURATION)
+	
+	# Handle ability information with fade-in
 	if card_data.abilities.size() > 0:
 		var ability = card_data.abilities[0]
 		
@@ -802,14 +836,16 @@ func update_panel_content(card_data: CardResource):
 			ability_name_display.text = graeae_ability_script.get_ability_name_for_state(card_data)
 			ability_description_display.text = graeae_ability_script.get_description_for_state(card_data)
 		else:
-			# For all other abilities (including Grow, Cultivate, Enrich), use the description 
-			# that's already in the card_data, which has been updated with level-appropriate values
-			# when the card was set up in display_player_hand()
 			ability_name_display.text = ability.ability_name
 			ability_description_display.text = ability.description
 		
+		# Make visible and fade in
 		ability_name_display.visible = true
 		ability_description_display.visible = true
+		ability_name_display.modulate.a = 0.0
+		ability_description_display.modulate.a = 0.0
+		label_fade_tween.tween_property(ability_name_display, "modulate:a", 1.0, LABEL_FADE_DURATION)
+		label_fade_tween.tween_property(ability_description_display, "modulate:a", 1.0, LABEL_FADE_DURATION)
 	else:
 		ability_name_display.visible = false
 		ability_description_display.visible = false
@@ -10086,3 +10122,55 @@ func trigger_wind_gust():
 			schedule_next_wind_gust()  # Schedule next gust
 		)
 	)	
+
+func start_typewriter_effect(label: Label, text: String):
+	"""Start a typewriter animation for the card name"""
+	# Stop any existing typewriter effect
+	if typewriter_timer and typewriter_timer.time_left > 0:
+		typewriter_timer.stop()
+	
+	# Store the full text and reset
+	typewriter_full_text = text
+	typewriter_current_index = 0
+	
+	# Start with empty text
+	label.text = ""
+	
+	# Create timer if it doesn't exist
+	if not typewriter_timer:
+		typewriter_timer = Timer.new()
+		typewriter_timer.timeout.connect(_on_typewriter_tick)
+		add_child(typewriter_timer)
+	
+	# Start the timer
+	typewriter_timer.wait_time = TYPEWRITER_SPEED
+	typewriter_timer.start()
+
+func _on_typewriter_tick():
+	"""Add one character to the card name label"""
+	if typewriter_current_index < typewriter_full_text.length():
+		typewriter_current_index += 1
+		card_name_display.text = typewriter_full_text.substr(0, typewriter_current_index)
+	else:
+		# Animation complete
+		typewriter_timer.stop()
+
+func fade_in_label(label: Label, text: String):
+	"""Fade in a label with text"""
+	# Set the text
+	label.text = text
+	
+	# Make sure the label is visible
+	label.visible = true
+	
+	# Start invisible
+	label.modulate.a = 0.0
+	
+	# Kill existing tween if any
+	if label_fade_tween and label_fade_tween.is_valid():
+		label_fade_tween.kill()
+	
+	# Create and start fade-in tween with parallel mode
+	label_fade_tween = create_tween()
+	label_fade_tween.set_parallel(true)  # Allow multiple labels to fade simultaneously
+	label_fade_tween.tween_property(label, "modulate:a", 1.0, LABEL_FADE_DURATION)
