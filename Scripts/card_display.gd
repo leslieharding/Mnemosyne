@@ -168,6 +168,7 @@ func update_display():
 	# Update card name
 	if card_name_label:
 		card_name_label.text = card_data.card_name
+		adjust_card_name_size() 
 	
 	print("CardDisplay final values displayed: ", values_to_use)
 
@@ -295,3 +296,43 @@ func setup_hover_shader():
 	
 	# Apply to panel
 	panel.material = shader_material
+
+
+
+
+func adjust_card_name_size() -> void:
+	if not card_name_label:
+		return
+	
+	var max_width = 84  # Card width (100) - margins (8*2)
+	var original_font_size = 12
+	var min_font_size = 8
+	
+	# Reset to original size first
+	card_name_label.add_theme_font_size_override("font_size", original_font_size)
+	
+	# Check if it's a multi-word name (contains spaces)
+	if " " in card_name_label.text:
+		# Multi-word names: allow wrapping, keep normal font size
+		card_name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		return
+	
+	# Single-word name: disable wrapping and shrink if needed
+	card_name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	
+	# Force layout update
+	await get_tree().process_frame
+	
+	# Get the actual text size
+	var font = card_name_label.get_theme_font("font")
+	if not font:
+		font = ThemeDB.fallback_font
+	
+	var font_size = card_name_label.get_theme_font_size("font_size")
+	var text_width = font.get_string_size(card_name_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+	
+	# If text is too wide, shrink it
+	while text_width > max_width and font_size > min_font_size:
+		font_size -= 1
+		card_name_label.add_theme_font_size_override("font_size", font_size)
+		text_width = font.get_string_size(card_name_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
