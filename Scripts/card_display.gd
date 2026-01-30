@@ -298,8 +298,6 @@ func setup_hover_shader():
 	panel.material = shader_material
 
 
-
-
 func adjust_card_name_size() -> void:
 	if not card_name_label:
 		return
@@ -311,28 +309,39 @@ func adjust_card_name_size() -> void:
 	# Reset to original size first
 	card_name_label.add_theme_font_size_override("font_size", original_font_size)
 	
-	# Check if it's a multi-word name (contains spaces)
+	# Always enable wrapping for multi-word names
 	if " " in card_name_label.text:
-		# Multi-word names: allow wrapping, keep normal font size
 		card_name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		return
-	
-	# Single-word name: disable wrapping and shrink if needed
-	card_name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	else:
+		card_name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	
 	# Force layout update
 	await get_tree().process_frame
 	
-	# Get the actual text size
+	# Get the font
 	var font = card_name_label.get_theme_font("font")
 	if not font:
 		font = ThemeDB.fallback_font
 	
 	var font_size = card_name_label.get_theme_font_size("font_size")
-	var text_width = font.get_string_size(card_name_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
 	
-	# If text is too wide, shrink it
-	while text_width > max_width and font_size > min_font_size:
+	# Split into words and check each one
+	var words = card_name_label.text.split(" ")
+	var longest_word_width = 0
+	
+	for word in words:
+		var word_width = font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		if word_width > longest_word_width:
+			longest_word_width = word_width
+	
+	# If the longest word is too wide, shrink the font until it fits
+	while longest_word_width > max_width and font_size > min_font_size:
 		font_size -= 1
 		card_name_label.add_theme_font_size_override("font_size", font_size)
-		text_width = font.get_string_size(card_name_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		
+		# Recalculate longest word width at new font size
+		longest_word_width = 0
+		for word in words:
+			var word_width = font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+			if word_width > longest_word_width:
+				longest_word_width = word_width
