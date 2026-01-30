@@ -7754,10 +7754,6 @@ func complete_race():
 	if should_game_end():
 		end_game()
 		return
-	
-	# Switch turns after race is complete
-	print("Race complete - switching turns")
-	turn_manager.next_turn()
 
 func clear_all_race_constraints():
 	if race_mode_active:
