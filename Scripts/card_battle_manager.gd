@@ -18,6 +18,8 @@ var grid_occupied: Array = []  # Track which slots have cards
 var grid_ownership: Array = []  # Track who owns each card (can change via combat)
 var grid_card_data: Array = []  # Track the actual card data for each slot
 
+var misdirection_button: Button
+
 # Typewriter effect variables
 var typewriter_timer: Timer
 var typewriter_full_text: String = ""
@@ -2785,6 +2787,7 @@ func initialize_deck_power(deck_def: DeckDefinition):
 func setup_misdirection_power():
 	print("=== SETTING UP MISDIRECTION POWER ===")
 	misdirection_used = false
+	create_misdirection_button()
 	print("Misdirection power ready - right-click enemy cards to invert their stats")
 
 func setup_prophecy_power():
@@ -8367,7 +8370,7 @@ func create_coordinate_button():
 	coordinate_button.add_theme_color_override("font_color", Color.WHITE)
 	
 	# Position it in the same area as seasons label (around position 10, 100)
-	coordinate_button.position = Vector2(10, 100)
+	coordinate_button.position = Vector2(10, 20)
 	
 	# Connect the button signal
 	coordinate_button.pressed.connect(_on_coordinate_button_pressed)
@@ -10193,3 +10196,30 @@ func fade_in_label(label: Label, text: String):
 	label_fade_tween = create_tween()
 	label_fade_tween.set_parallel(true)  # Allow multiple labels to fade simultaneously
 	label_fade_tween.tween_property(label, "modulate:a", 1.0, LABEL_FADE_DURATION)
+
+func create_misdirection_button():
+	# Create misdirection button similar to coordinate button
+	misdirection_button = Button.new()
+	misdirection_button.name = "MisdirectionButton"
+	misdirection_button.text = "🃏 Misdirection"
+	misdirection_button.custom_minimum_size = Vector2(150, 40)
+	misdirection_button.add_theme_font_size_override("font_size", 14)
+	misdirection_button.add_theme_color_override("font_color", Color.WHITE)
+	
+	# Position it below coordinate button if it exists, otherwise at (10, 100)
+	if coordinate_button:
+		misdirection_button.position = Vector2(10, 70)
+	else:
+		misdirection_button.position = Vector2(10, 20)
+	
+	# Add tooltip
+	misdirection_button.tooltip_text = "Right-click an enemy card to invert its stats (N↔S, E↔W)"
+	
+	# Add to scene
+	add_child(misdirection_button)
+	
+	# Initially enabled
+	misdirection_button.disabled = false
+	misdirection_button.modulate = Color(1, 1, 1)
+	
+	print("Misdirection button created and added to battle scene")
