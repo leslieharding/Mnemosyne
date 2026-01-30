@@ -65,8 +65,6 @@ func execute(context: Dictionary) -> bool:
 	print("TrojanHorseReversalAbility: Removing trojan horse from board")
 	game_manager.remove_trojan_horse(defending_position)
 	
-	# Update board visuals to reflect the changes
-	game_manager.update_board_visuals()
 	
 	print("TrojanHorseReversalAbility: Trap executed successfully! The ", attacking_card.card_name, " fell for the trojan horse!")
 	

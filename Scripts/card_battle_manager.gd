@@ -1394,6 +1394,19 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 			successful_captures.append(grid_index)  # The ATTACKER is now captured
 			continue  # Skip normal capture processing for the defender
 		
+		# ===== NEW: Check for Trojan Horse Reversal BEFORE other capture prevention checks =====
+		var trojan_reversal_triggered = check_trojan_horse_reversal(
+			captured_index,  # defender position (the horse)
+			captured_card_data,  # defender card (the horse)
+			grid_index,  # attacker position
+			attacking_card,  # attacker card
+			attacking_owner  # attacker owner
+		)
+		
+		if trojan_reversal_triggered:
+			print("TROJAN HORSE REVERSAL! Skipping normal capture of the horse.")
+			# Don't add anything to successful_captures - the ability already handled everything
+			continue  # Skip normal capture processing for the horse
 		
 		# ===== NEW: Check for Second Chance BEFORE processing capture =====
 		var second_chance_prevented = try_second_chance_rescue(captured_index, captured_card_data, grid_index, attacking_card, attacking_owner)
@@ -3360,10 +3373,20 @@ func apply_selection_highlight(grid_index: int):
 		hide_dotted_highlight()
 		return
 	
+	# NEW: Safety check - verify dotted_highlight is valid before trying to move it
+	if not is_instance_valid(dotted_highlight):
+		print("ERROR: dotted_highlight is not valid!")
+		return
+	
 	# Move the single highlight instance to this slot
 	var current_parent = dotted_highlight.get_parent()
-	if current_parent:
+	if current_parent and is_instance_valid(current_parent):
 		current_parent.remove_child(dotted_highlight)
+	
+	# NEW: Safety check - make sure slot is still valid before adding child
+	if not is_instance_valid(slot):
+		print("ERROR: Slot at index ", grid_index, " is not valid!")
+		return
 	
 	slot.add_child(dotted_highlight)
 	dotted_highlight.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -6227,10 +6250,10 @@ func remove_trojan_horse(horse_position: int):
 	grid_occupied[horse_position] = false
 	grid_ownership[horse_position] = Owner.NONE
 	
-	# Clear the visual display
+	# Clear the visual display - USE FREE() NOT QUEUE_FREE()
 	var slot = grid_slots[horse_position]
 	for child in slot.get_children():
-		child.queue_free()
+		child.free()  # Changed from queue_free() to free()
 	
 	# Restore default slot styling
 	slot.add_theme_stylebox_override("panel", default_grid_style)
