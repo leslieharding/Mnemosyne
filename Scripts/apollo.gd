@@ -130,31 +130,7 @@ func setup_deck_buttons():
 		print("Button text set to: ", button.text)
 		
 		# Check unlock status
-		var is_unlocked = true  # Default unlocked if no progress tracker
-		
-		if progress_tracker:
-			# Manual unlock calculation with debug
-			var total_capture_exp = 0
-			var total_defense_exp = 0
-			
-			for card_index in god_progress:
-				var card_exp = god_progress[card_index]
-				total_capture_exp += card_exp.get("capture_exp", 0)
-				total_defense_exp += card_exp.get("defense_exp", 0)
-			
-			print("Total capture exp: ", total_capture_exp)
-			print("Total defense exp: ", total_defense_exp)
-			
-			# Check requirements
-			var capture_met = deck_def.required_capture_exp == 0 or total_capture_exp >= deck_def.required_capture_exp
-			var defense_met = deck_def.required_defense_exp == 0 or total_defense_exp >= deck_def.required_defense_exp
-			
-			is_unlocked = capture_met and defense_met
-			
-			print("Capture requirement met: ", capture_met)
-			print("Defense requirement met: ", defense_met)
-		
-		print("Final unlock status: ", is_unlocked)
+		var is_unlocked = deck_def.is_unlocked("Apollo", god_progress)
 		
 		# Apply button styling
 		if not is_unlocked:
@@ -272,7 +248,7 @@ func select_deck(index: int) -> void:
 	for i in range(apollo_collection.decks.size()):
 		var button = [deck1_button, deck2_button, deck3_button][i]
 		var deck = apollo_collection.decks[i]
-		if deck.is_unlocked("Apollo"):
+		if deck.is_unlocked("Apollo", god_progress):
 			button.disabled = false
 			button.modulate = Color.WHITE
 		else:
