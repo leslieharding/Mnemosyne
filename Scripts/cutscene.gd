@@ -184,6 +184,23 @@ func setup_speaker_panel(panel: PanelContainer, name_label: Label, portrait_area
 		portrait.set_anchors_preset(Control.PRESET_CENTER)
 		portrait.grow_horizontal = Control.GROW_DIRECTION_BOTH
 		portrait.grow_vertical = Control.GROW_DIRECTION_BOTH
+		
+		# Apply breathing shader if configured for this character
+		var BreathingConfig = preload("res://Scripts/portrait_breathing_config.gd")
+		if BreathingConfig.has_breathing(character.character_name):
+			var params = BreathingConfig.get_params(character.character_name)
+			var breathing_shader = load("res://Shaders/portrait_breathing.gdshader")
+			var shader_material = ShaderMaterial.new()
+			shader_material.shader = breathing_shader
+			shader_material.set_shader_parameter("face_center", params["face_center"])
+			shader_material.set_shader_parameter("face_radius", params["face_radius"])
+			shader_material.set_shader_parameter("breath_speed", params["breath_speed"])
+			shader_material.set_shader_parameter("breath_strength_min", params["breath_strength_min"])
+			shader_material.set_shader_parameter("breath_strength_max", params["breath_strength_max"])
+			shader_material.set_shader_parameter("variation_speed", params["variation_speed"])
+			portrait.material = shader_material
+			print("Applied breathing shader to %s" % character.character_name)
+		
 		portrait_area.add_child(portrait)
 		print("Portrait added to portrait_area")
 	else:
