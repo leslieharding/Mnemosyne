@@ -599,7 +599,11 @@ func setup_managers():
 	# Create visual effects manager
 	visual_effects_manager = VisualEffectsManager.new()
 	add_child(visual_effects_manager)
-	
+	# Setup screen shake - shake the entire scene root
+	await get_tree().process_frame
+	var shake_target = self  # Shake the root Node2D (entire scene)
+	visual_effects_manager.setup_screen_shake(shake_target)
+		
 	# Connect opponent manager signals
 	opponent_manager.opponent_card_placed.connect(_on_opponent_card_placed)
 	
@@ -1459,6 +1463,10 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 					old_owner_was_player,
 					new_owner_is_player
 				)
+		
+		# Trigger screen shake on capture
+		if visual_effects_manager:
+			visual_effects_manager.screen_shake(4.0, 0.3, 25.0)		
 		
 		# Normal capture processing - Remove passive abilities BEFORE changing ownership
 		handle_passive_abilities_on_capture(captured_index, captured_card_data)

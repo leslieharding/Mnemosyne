@@ -11,6 +11,11 @@ const FLASH_COLOR: Color = Color.WHITE
 const PLAYER_FLASH_COLOR: Color = Color("#4499FF")  # Blue for player
 const OPPONENT_FLASH_COLOR: Color = Color("#FF4444")  # Red for opponent
 
+# Screen shake configuration
+var screen_shake_target: Node = null
+var shake_tween: Tween = null
+var original_position: Vector2 = Vector2.ZERO
+
 # Passive pulse configuration
 const PASSIVE_PULSE_DURATION: float = 2.0  # Full pulse cycle duration
 const PASSIVE_PULSE_COLOR: Color = Color("#9966FF")  # Purple for passive abilities
@@ -756,4 +761,88 @@ func show_capture_highlight(
 		if is_instance_valid(card_display) and is_instance_valid(card_display.panel):
 			card_display.panel.material = null
 			print("VisualEffectsManager: Capture wipe complete")
+	)
+
+# Initialize screen shake with the target node to shake
+func setup_screen_shake(target_node: Node):
+	screen_shake_target = target_node
+	if screen_shake_target is Node2D:
+		original_position = screen_shake_target.position
+	elif screen_shake_target is Control:
+		original_position = screen_shake_target.position
+	print("VisualEffects: Screen shake initialized for node: ", target_node.name)
+
+# Trigger screen shake effect with radial intensity (stronger at edges)
+func screen_shake(intensity: float = 4.0, duration: float = 0.3, frequency: float = 25.0):
+	if not screen_shake_target:
+		print("VisualEffects: Cannot shake - no target set")
+		return
+	
+	if shake_tween:
+		shake_tween.kill()
+	
+	if original_position == Vector2.ZERO:
+		if screen_shake_target is Node2D:
+			original_position = screen_shake_target.position
+		elif screen_shake_target is Control:
+			original_position = screen_shake_target.position
+	
+	# Add +/- 10% randomness to intensity and duration
+	var randomized_intensity = intensity * randf_range(0.9, 1.1)
+	var randomized_duration = duration * randf_range(0.9, 1.1)
+	
+	# Get viewport center for radial calculation
+	var viewport_size = get_viewport().get_visible_rect().size
+	var center = viewport_size / 2.0
+	
+	var elapsed = 0.0
+	shake_tween = create_tween()
+	
+	shake_tween.tween_method(
+		func(progress: float):
+			elapsed += get_process_delta_time()
+			var current_intensity = randomized_intensity * (1.0 - progress)
+			
+			# Create radial shake - calculate direction from center
+			var angle = elapsed * frequency
+			var shake_dir = Vector2(cos(angle), sin(angle * 1.3))
+			
+			# Get current position relative to screen center
+			var current_pos = original_position
+			if screen_shake_target is Control:
+				current_pos = screen_shake_target.global_position
+			
+			var offset_from_center = current_pos - center
+			var distance_from_center = offset_from_center.length()
+			var max_distance = center.length()  # Corner distance
+			
+			# Radial multiplier: 0.5 at center, 1.5 at edges (adjust these values to taste)
+			var radial_multiplier = 0.5 + (distance_from_center / max_distance)
+			
+			# Apply radial intensity
+			var radial_intensity = current_intensity * radial_multiplier
+			
+			# Add some outward bias to the shake direction
+			var outward_dir = offset_from_center.normalized()
+			shake_dir = (shake_dir + outward_dir * 0.3).normalized()
+			
+			# Calculate final shake offset
+			var shake_offset = shake_dir * randf_range(-radial_intensity, radial_intensity)
+			
+			if screen_shake_target is Node2D:
+				screen_shake_target.position = original_position + shake_offset
+			elif screen_shake_target is Control:
+				screen_shake_target.position = original_position + shake_offset,
+		0.0,
+		1.0,
+		randomized_duration
+	).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	
+	shake_tween.tween_callback(func():
+		if is_instance_valid(screen_shake_target):
+			if screen_shake_target is Node2D:
+				screen_shake_target.position = original_position
+			elif screen_shake_target is Control:
+				screen_shake_target.position = original_position
+		shake_tween = null
 	)
