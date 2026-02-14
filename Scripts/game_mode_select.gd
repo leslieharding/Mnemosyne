@@ -89,11 +89,18 @@ func setup_individual_god_button(god_name: String, button: Button, unlocked_gods
 		print("Button not found for god: ", god_name)
 		return
 	
+	# Get the corresponding TextureRect portrait for this god
+	var god_portrait = get_node_or_null(god_name)
+	
 	if god_name in unlocked_gods:
 		# God is unlocked - normal appearance and functionality
 		button.disabled = false
 		button.modulate = Color.WHITE
 		button.tooltip_text = "Play as " + god_name
+		
+		# Set portrait to full brightness
+		if god_portrait:
+			god_portrait.modulate = Color.WHITE
 	else:
 		# God is locked - gray out and show unlock condition
 		button.disabled = false  # Keep clickable to show unlock info
@@ -106,6 +113,10 @@ func setup_individual_god_button(god_name: String, button: Button, unlocked_gods
 			button.tooltip_text = progress_tracker.get_god_unlock_description(god_name)
 		else:
 			button.tooltip_text = "Unknown unlock requirement"
+		
+		# Darken the portrait significantly
+		if god_portrait:
+			god_portrait.modulate = Color(0.15, 0.15, 0.15)  # Very dark, almost silhouette
 
 func setup_test_battle_panel():
 	# Create the test battle panel in top right
