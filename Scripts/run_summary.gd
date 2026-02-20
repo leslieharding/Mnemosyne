@@ -656,8 +656,43 @@ func save_run_to_global_progress():
 		
 	var run_exp = tracker.get_all_experience()
 	
-	if run_exp.size() > 0:
-		global_tracker.add_run_experience(god_name, run_exp)
-		print("Saved run experience to global progress for ", god_name)
-	else:
+	if run_exp.size() == 0:
 		print("No run experience to save")
+		return
+	
+	# Apply main level multiplier to all card XP before committing
+	var main_level_manager = get_node_or_null("/root/MainLevelAutoload")
+	var scaled_run_exp: Dictionary = {}
+	
+	for card_index in run_exp:
+		var card_data = run_exp[card_index]
+		var base_total = card_data.get("capture_exp", 0) + card_data.get("defense_exp", 0)
+		var scaled_total = main_level_manager.apply_xp(base_total) if main_level_manager else base_total
+		scaled_run_exp[card_index] = {
+			"capture_exp": scaled_total,
+			"defense_exp": 0,
+			"total_exp": scaled_total
+		}
+		if scaled_total != base_total:
+			print("MainLevel scaling: card ", card_index, " ", base_total, " → ", scaled_total, " exp")
+	
+	# Commit scaled exp to global tracker
+	global_tracker.add_run_experience(god_name, scaled_run_exp)
+	print("Saved scaled run experience to global progress for ", god_name)
+	
+	# Award main level exp for each card level gained this run
+	if main_level_manager:
+		var collection_path = "res://Resources/Collections/" + god_name + ".tres"
+		var collection: GodCardCollection = load(collection_path)
+		if collection:
+			for card_index in scaled_run_exp:
+				var scaled_total = scaled_run_exp[card_index].get("total_exp", 0)
+				if scaled_total <= 0:
+					continue
+				var after_exp = global_tracker.get_card_total_experience(god_name, card_index).get("total_exp", 0)
+				var before_exp = after_exp - scaled_total
+				var levels_gained = ExperienceHelpers.levels_gained(before_exp, after_exp)
+				if levels_gained > 0:
+					var main_exp_award = levels_gained * MainLevelManager.EXP_CARD_LEVEL_UP
+					main_level_manager.add_main_exp(main_exp_award)
+					print("MainLevel: +", main_exp_award, " exp from ", levels_gained, " card level-up(s) on card ", card_index)

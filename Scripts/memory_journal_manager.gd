@@ -53,7 +53,8 @@ func _ready():
 
 func record_enemy_encounter(enemy_name: String, victory: bool, enemy_difficulty: int = 0):
 	# Calculate experience gained
-	var exp_gained = WIN_EXPERIENCE if victory else LOSS_EXPERIENCE
+	var base_exp = WIN_EXPERIENCE if victory else LOSS_EXPERIENCE
+	var exp_gained = MainLevelAutoload.apply_xp(base_exp)
 	
 	if not enemy_name in memory_data["bestiary"]:
 		memory_data["bestiary"][enemy_name] = {

@@ -239,6 +239,10 @@ func _on_new_game_confirmed():
 		get_node("/root/CutsceneManagerAutoload").play_cutscene("tutorial_intro")
 	else:
 		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+		
+	if has_node("/root/MainLevelAutoload"):
+		get_node("/root/MainLevelAutoload").reset()
+		print("Main level reset")	
 
 
 

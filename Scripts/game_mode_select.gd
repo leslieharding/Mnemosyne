@@ -30,6 +30,7 @@ func _ready():
 	setup_god_buttons()
 	setup_test_battle_panel()
 	load_test_battle_data()
+	setup_main_level_banner()
 	
 	if chiron_button:
 		# Use call_deferred to ensure the button's _ready() has finished
@@ -408,3 +409,71 @@ func _on_demeter_button_mouse_entered() -> void:
 func _on_demeter_button_mouse_exited() -> void:
 	SoundManagerAutoload.stop_god_hover_with_fade(0.5,1.5)
 	$Demeter.material.set_shader_parameter("type", 0)
+
+
+func setup_main_level_banner():
+	if not has_node("/root/MainLevelAutoload"):
+		return
+	
+	var main_level_manager = get_node("/root/MainLevelAutoload")
+	
+	# Use a CanvasLayer so it sits on top of everything
+	var canvas_layer = CanvasLayer.new()
+	canvas_layer.layer = 10
+	canvas_layer.name = "MainLevelLayer"
+	add_child(canvas_layer)
+	
+	# Outer container - anchored top centre
+	var banner = PanelContainer.new()
+	banner.name = "MainLevelBanner"
+	
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.08, 0.08, 0.12, 0.85)
+	style.border_color = Color("#8A7A4A")
+	style.border_width_left = 1
+	style.border_width_right = 1
+	style.border_width_top = 1
+	style.border_width_bottom = 1
+	style.corner_radius_top_left = 6
+	style.corner_radius_top_right = 6
+	style.corner_radius_bottom_left = 6
+	style.corner_radius_bottom_right = 6
+	style.content_margin_left = 12
+	style.content_margin_right = 12
+	style.content_margin_top = 6
+	style.content_margin_bottom = 6
+	banner.add_theme_stylebox_override("panel", style)
+	
+	# Anchor to top left
+	banner.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	banner.position = Vector2(12, 12)
+	
+	canvas_layer.add_child(banner)
+	
+	# Inner layout
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 2)
+	banner.add_child(vbox)
+	
+	# Level label
+	var level_label = Label.new()
+	level_label.name = "LevelLabel"
+	level_label.text = "World Level  " + str(main_level_manager.main_level)
+	level_label.add_theme_font_size_override("font_size", 13)
+	level_label.add_theme_color_override("font_color", Color("#FFD700"))
+	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(level_label)
+	
+	# XP and multiplier label
+	var exp_label = Label.new()
+	exp_label.name = "ExpLabel"
+	var xp_to_next = main_level_manager.get_exp_to_next_level()
+	var multiplier = main_level_manager.get_multiplier()
+	if main_level_manager.main_level >= main_level_manager.MAX_LEVEL:
+		exp_label.text = "MAX  ·  " + str(multiplier) + "x XP"
+	else:
+		exp_label.text = str(xp_to_next) + " XP to next  ·  " + str(multiplier) + "x XP"
+	exp_label.add_theme_font_size_override("font_size", 10)
+	exp_label.add_theme_color_override("font_color", Color("#AAAAAA"))
+	exp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(exp_label)

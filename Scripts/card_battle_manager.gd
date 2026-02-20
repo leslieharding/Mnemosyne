@@ -2230,6 +2230,8 @@ func end_game():
 		record_enemy_encounter(false)  
 		record_god_experience()
 		check_god_unlocks()
+		if has_node("/root/MainLevelAutoload"):
+			get_node("/root/MainLevelAutoload").add_main_exp(MainLevelManager.EXP_LOSS)
 		
 		# Add a delay then go to run summary
 		await get_tree().create_timer(3.0).timeout
@@ -2270,6 +2272,9 @@ func end_game():
 			record_enemy_encounter(true)  # true = victory
 			record_god_experience()
 			check_god_unlocks()
+			
+			if has_node("/root/MainLevelAutoload"):
+				get_node("/root/MainLevelAutoload").add_main_exp(MainLevelManager.EXP_WIN)
 			
 			# Pass data to summary screen with victory
 			get_tree().set_meta("scene_params", {
@@ -4292,6 +4297,9 @@ func show_reward_screen():
 	record_enemy_encounter(true)  # true = victory since we only reach rewards on victory
 	record_god_experience()
 	check_god_unlocks()
+	
+	if has_node("/root/MainLevelAutoload"):
+		get_node("/root/MainLevelAutoload").add_main_exp(MainLevelManager.EXP_WIN)
 	
 	var params = get_scene_params()
 	

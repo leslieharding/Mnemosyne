@@ -33,6 +33,7 @@ MnemosyneProgressTrackerAutoload="*res://Scripts/mnemosyne_progress_tracker.gd"
 BossVictoryTrackerAutoload="*res://Scripts/boss_victory_tracker.gd"
 BossLossTrackerAutoload="*res://Scripts/boss_loss_tracker.gd"
 SoundManagerAutoload="*res://Scripts/sound_manager.gd"
+MainLevelAutoload="*uid://6p4xlo11nsn8"
 
 [gui]
 
