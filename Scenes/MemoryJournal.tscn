@@ -146,7 +146,9 @@ text = "Remember
 "
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Remember" unique_id=1396820478]
+custom_minimum_size = Vector2(0, 400)
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="CutsceneList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Remember/ScrollContainer" unique_id=319886566]
 layout_mode = 2

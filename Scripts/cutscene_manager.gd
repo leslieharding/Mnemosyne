@@ -870,7 +870,7 @@ func return_to_previous_scene():
 	# If replaying from journal, skip all special handling and return to source scene
 	if replay_from_journal:
 		replay_from_journal = false
-		get_tree().set_meta("reopen_memory_journal", true)
+		get_tree().set_meta("reopen_memory_journal", "remember")
 		if return_scene_path != "":
 			if not return_scene_params.is_empty():
 				get_tree().set_meta("scene_params", return_scene_params)

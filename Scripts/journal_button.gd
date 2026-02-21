@@ -39,9 +39,10 @@ func _ready():
 	
 	# Reopen journal if returning from a journal replay
 	if get_tree().has_meta("reopen_memory_journal"):
+		var tab = get_tree().get_meta("reopen_memory_journal")
 		get_tree().remove_meta("reopen_memory_journal")
 		await get_tree().process_frame
-		_on_journal_button_pressed()
+		_on_journal_button_pressed(tab)
 
 func setup_button_style():
 	# Set button properties
@@ -94,7 +95,7 @@ func setup_notification_indicator():
 	notification_indicator.add_theme_stylebox_override("panel", circle_style)
 	add_child(notification_indicator)
 
-func _on_journal_button_pressed():
+func _on_journal_button_pressed(initial_tab: String = ""):
 	# If journal already exists and is visible, close it
 	if journal_instance and journal_instance.visible:
 		journal_instance.close_journal()

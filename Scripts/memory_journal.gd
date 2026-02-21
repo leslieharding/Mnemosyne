@@ -61,7 +61,10 @@ func show_journal(initial_tab: String = ""):
 	
 	# Always default to Bestiary tab (index 0)
 	is_first_tab_change = true
-	tab_container.current_tab = 0
+	if initial_tab == "remember":
+		tab_container.current_tab = 3
+	else:
+		tab_container.current_tab = 0
 	
 	# Animate in
 	if journal_tween:
@@ -1263,15 +1266,24 @@ func play_light_page_turn():
 	SoundManagerAutoload.play("light_page_turn")
 
 func refresh_remember_tab():
+	
+	
+	print("=== REFRESH REMEMBER TAB ===")
 	if not remember_tab:
+		print("EARLY RETURN: remember_tab is null")
 		return
 	if not has_node("/root/CutsceneManagerAutoload"):
+		print("EARLY RETURN: CutsceneManagerAutoload not found")
 		return
 
 	var cutscene_manager = get_node("/root/CutsceneManagerAutoload")
 	var list = remember_tab.get_node_or_null("ScrollContainer/CutsceneList")
 	if not list:
+		print("EARLY RETURN: CutsceneList node not found")
+		print("Remember tab children: ", remember_tab.get_children())
 		return
+	
+	print("viewed_cutscenes: ", cutscene_manager.viewed_cutscenes)
 
 	# Clear existing entries
 	for child in list.get_children():
@@ -1303,6 +1315,7 @@ func refresh_remember_tab():
 
 		any_shown = true
 		var display_name = display_names.get(cutscene_id, cutscene_id)
+		print("Creating row for: ", cutscene_id)
 
 		var row = HBoxContainer.new()
 		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1318,6 +1331,7 @@ func refresh_remember_tab():
 		row.add_child(btn)
 
 		list.add_child(row)
+		print("Row added, list child count: ", list.get_child_count())
 
 	if not any_shown:
 		var empty_label = Label.new()
