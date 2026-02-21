@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://tx1ipeivmntw"]
+[gd_scene format=3 uid="uid://tx1ipeivmntw"]
 
 [ext_resource type="Script" uid="uid://der57mv5vo48a" path="res://Scripts/memory_journal.gd" id="1_fi0jc"]
 
-[node name="MemoryJournal" type="Control"]
+[node name="MemoryJournal" type="Control" unique_id=1477791454]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_fi0jc")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=123643043]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.00392157)
 
-[node name="MainContainer" type="PanelContainer" parent="."]
+[node name="MainContainer" type="PanelContainer" parent="." unique_id=274977276]
 custom_minimum_size = Vector2(800, 600)
 layout_mode = 1
 anchors_preset = 8
@@ -35,103 +35,120 @@ offset_bottom = 42.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBox" type="VBoxContainer" parent="MainContainer"]
+[node name="VBox" type="VBoxContainer" parent="MainContainer" unique_id=146130026]
 layout_mode = 2
 
-[node name="Header" type="HBoxContainer" parent="MainContainer/VBox"]
+[node name="Header" type="HBoxContainer" parent="MainContainer/VBox" unique_id=1951982255]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="MainContainer/VBox/Header"]
+[node name="TitleLabel" type="Label" parent="MainContainer/VBox/Header" unique_id=511504755]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Memory Journal"
 horizontal_alignment = 1
 
-[node name="CloseButton" type="Button" parent="MainContainer/VBox/Header"]
+[node name="CloseButton" type="Button" parent="MainContainer/VBox/Header" unique_id=1110010651]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
 text = "X"
 
-[node name="TabContainer" type="TabContainer" parent="MainContainer/VBox"]
+[node name="TabContainer" type="TabContainer" parent="MainContainer/VBox" unique_id=1605147862]
 layout_mode = 2
 current_tab = 2
 
-[node name="Bestiary" type="HSplitContainer" parent="MainContainer/VBox/TabContainer"]
+[node name="Bestiary" type="HSplitContainer" parent="MainContainer/VBox/TabContainer" unique_id=410306672]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary"]
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary" unique_id=1080110878]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Bestiary/LeftPanel"]
+[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Bestiary/LeftPanel" unique_id=105895363]
 layout_mode = 2
 text = "Encountered Enemies"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Bestiary/LeftPanel"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Bestiary/LeftPanel" unique_id=663708754]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="EnemyList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary/LeftPanel/ScrollContainer"]
+[node name="EnemyList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary/LeftPanel/ScrollContainer" unique_id=6344241]
 layout_mode = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Bestiary"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Bestiary" unique_id=844973829]
 layout_mode = 2
 
-[node name="RightPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary/ScrollContainer"]
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Bestiary/ScrollContainer" unique_id=528802432]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Bestiary/ScrollContainer/RightPanel"]
+[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Bestiary/ScrollContainer/RightPanel" unique_id=2134204185]
 layout_mode = 2
 text = "Select an enemy to view details"
 horizontal_alignment = 1
 
-[node name="Gods" type="HSplitContainer" parent="MainContainer/VBox/TabContainer"]
+[node name="Gods" type="HSplitContainer" parent="MainContainer/VBox/TabContainer" unique_id=1534416453]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
-[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods"]
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods" unique_id=825691972]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Gods/LeftPanel"]
+[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Gods/LeftPanel" unique_id=1116223908]
 layout_mode = 2
 text = "Divine Connections"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Gods/LeftPanel"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Gods/LeftPanel" unique_id=983479564]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="GodList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods/LeftPanel/ScrollContainer"]
+[node name="GodList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods/LeftPanel/ScrollContainer" unique_id=136330322]
 layout_mode = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Gods"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Gods" unique_id=178544028]
 layout_mode = 2
 
-[node name="RightPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods/ScrollContainer"]
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Gods/ScrollContainer" unique_id=1083321766]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Gods/ScrollContainer/RightPanel"]
+[node name="Label" type="Label" parent="MainContainer/VBox/TabContainer/Gods/ScrollContainer/RightPanel" unique_id=1236932080]
 layout_mode = 2
 text = "Select a god to view mastery details"
 horizontal_alignment = 1
 
-[node name="Mnemosyne" type="VBoxContainer" parent="MainContainer/VBox/TabContainer"]
+[node name="Mnemosyne" type="VBoxContainer" parent="MainContainer/VBox/TabContainer" unique_id=561996861]
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="TitleLabel" type="Label" parent="MainContainer/VBox/TabContainer/Mnemosyne"]
+[node name="TitleLabel" type="Label" parent="MainContainer/VBox/TabContainer/Mnemosyne" unique_id=130261883]
 layout_mode = 2
 text = "Your Deck"
 horizontal_alignment = 1
 
-[node name="CardContainer" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne"]
+[node name="CardContainer" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Mnemosyne" unique_id=1269693904]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="Remember" type="VBoxContainer" parent="MainContainer/VBox/TabContainer" unique_id=1625297954]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="TitleLabel" type="Label" parent="MainContainer/VBox/TabContainer/Remember" unique_id=2070933407]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Remember
+"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Remember" unique_id=1396820478]
+layout_mode = 2
+
+[node name="CutsceneList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Remember/ScrollContainer" unique_id=319886566]
+layout_mode = 2
 
 [connection signal="tab_changed" from="MainContainer/VBox/TabContainer" to="." method="_on_tab_container_tab_changed"]

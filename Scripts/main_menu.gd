@@ -242,7 +242,12 @@ func _on_new_game_confirmed():
 		
 	if has_node("/root/MainLevelAutoload"):
 		get_node("/root/MainLevelAutoload").reset()
-		print("Main level reset")	
+		print("Main level reset")
+		
+	# Clear viewed cutscenes
+	if has_node("/root/CutsceneManagerAutoload"):
+		get_node("/root/CutsceneManagerAutoload").clear_viewed_cutscenes()
+		print("Viewed cutscenes cleared")		
 
 
 

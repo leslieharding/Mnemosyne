@@ -2,9 +2,11 @@
 extends Node
 class_name CutsceneManager
 
-# Store all available cutscenes
 var cutscenes: Dictionary = {}
 var viewed_cutscenes: Array[String] = []
+var replay_from_journal: bool = false
+
+var save_path: String = "user://viewed_cutscenes.save"
 
 # Scene management
 var return_scene_path: String = ""
@@ -13,6 +15,7 @@ var return_scene_params: Dictionary = {}
 func _ready():
 	# Load all cutscenes
 	load_cutscenes()
+	load_viewed_cutscenes()
 
 # Load and register all cutscenes
 func load_cutscenes():
@@ -851,9 +854,9 @@ func play_cutscene(cutscene_id: String):
 		if get_tree().has_meta("scene_params"):
 			return_scene_params = get_tree().get_meta("scene_params")
 	
-	# Mark as viewed
 	if not cutscene_id in viewed_cutscenes:
 		viewed_cutscenes.append(cutscene_id)
+		save_viewed_cutscenes()
 	
 	# Set cutscene data for the cutscene scene
 	get_tree().set_meta("cutscene_data", cutscenes[cutscene_id])
@@ -864,16 +867,30 @@ func play_cutscene(cutscene_id: String):
 	TransitionManagerAutoload.change_scene_to("res://Scenes/Cutscene.tscn")
 
 func return_to_previous_scene():
-	# Special handling for tutorial flow
+	# If replaying from journal, skip all special handling and return to source scene
+	if replay_from_journal:
+		replay_from_journal = false
+		get_tree().set_meta("reopen_memory_journal", true)
+		if return_scene_path != "":
+			if not return_scene_params.is_empty():
+				get_tree().set_meta("scene_params", return_scene_params)
+			print("Returning from journal replay to: ", return_scene_path)
+			TransitionManagerAutoload.change_scene_to(return_scene_path)
+			return_scene_path = ""
+			return_scene_params.clear()
+		else:
+			TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
+		return
+
+	# Normal flow special handling
 	var last_played = viewed_cutscenes[-1] if viewed_cutscenes.size() > 0 else ""
-	
+
 	if last_played == "tutorial_intro":
 		print("Completed tutorial intro cutscene, starting tutorial battle")
-		# FIXED: Set up tutorial battle parameters more explicitly
 		get_tree().set_meta("scene_params", {
 			"is_tutorial": true,
-			"god": "Mnemosyne",  # This should be the player's god
-			"deck_index": 0,     # Add deck index for consistency
+			"god": "Mnemosyne",
+			"deck_index": 0,
 			"opponent": "Chronos"
 		})
 		print("Tutorial params set: ", get_tree().get_meta("scene_params"))
@@ -883,16 +900,12 @@ func return_to_previous_scene():
 		print("Completed post-tutorial cutscene, going to god select")
 		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 		return
-	
+
 	if return_scene_path != "":
-		# Restore scene parameters if they existed
 		if not return_scene_params.is_empty():
 			get_tree().set_meta("scene_params", return_scene_params)
-		
 		print("Returning to: ", return_scene_path)
 		TransitionManagerAutoload.change_scene_to(return_scene_path)
-		
-		# Clear stored data
 		return_scene_path = ""
 		return_scene_params.clear()
 	else:
@@ -914,3 +927,28 @@ func add_cutscene(cutscene_data: CutsceneData):
 # Get list of all available cutscenes
 func get_available_cutscenes() -> Array[String]:
 	return cutscenes.keys()
+
+
+func save_viewed_cutscenes():
+	var save_file = FileAccess.open(save_path, FileAccess.WRITE)
+	if save_file:
+		save_file.store_var(viewed_cutscenes)
+		save_file.close()
+		print("Viewed cutscenes saved")
+	else:
+		print("Failed to save viewed cutscenes!")
+
+func load_viewed_cutscenes():
+	if FileAccess.file_exists(save_path):
+		var save_file = FileAccess.open(save_path, FileAccess.READ)
+		if save_file:
+			viewed_cutscenes = save_file.get_var()
+			save_file.close()
+			print("Viewed cutscenes loaded: ", viewed_cutscenes)
+		else:
+			print("Failed to load viewed cutscenes!")
+
+func clear_viewed_cutscenes():
+	viewed_cutscenes.clear()
+	save_viewed_cutscenes()
+	print("Viewed cutscenes cleared")

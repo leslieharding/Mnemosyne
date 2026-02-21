@@ -36,6 +36,12 @@ func _ready():
 	
 	
 	print("Journal button ready - Position: ", position, " Size: ", size, " Visible: ", visible)
+	
+	# Reopen journal if returning from a journal replay
+	if get_tree().has_meta("reopen_memory_journal"):
+		get_tree().remove_meta("reopen_memory_journal")
+		await get_tree().process_frame
+		_on_journal_button_pressed()
 
 func setup_button_style():
 	# Set button properties

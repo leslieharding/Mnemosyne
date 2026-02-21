@@ -15,6 +15,7 @@ signal journal_closed()
 @onready var bestiary_tab = $MainContainer/VBox/TabContainer/Bestiary
 @onready var gods_tab = $MainContainer/VBox/TabContainer/Gods
 @onready var mnemosyne_tab = $MainContainer/VBox/TabContainer/Mnemosyne
+@onready var remember_tab = $MainContainer/VBox/TabContainer/Remember
 
 # Animation
 var journal_tween: Tween
@@ -106,6 +107,7 @@ func refresh_all_content():
 	refresh_bestiary_tab()
 	refresh_gods_tab()
 	refresh_mnemosyne_tab()
+	refresh_remember_tab()
 
 func update_header():
 	if not has_node("/root/MemoryJournalManagerAutoload"):
@@ -1259,3 +1261,74 @@ func _on_tab_container_tab_changed(tab: int) -> void:
 
 func play_light_page_turn():
 	SoundManagerAutoload.play("light_page_turn")
+
+func refresh_remember_tab():
+	if not remember_tab:
+		return
+	if not has_node("/root/CutsceneManagerAutoload"):
+		return
+
+	var cutscene_manager = get_node("/root/CutsceneManagerAutoload")
+	var list = remember_tab.get_node_or_null("ScrollContainer/CutsceneList")
+	if not list:
+		return
+
+	# Clear existing entries
+	for child in list.get_children():
+		child.queue_free()
+
+	# Human-readable display names
+	var display_names: Dictionary = {
+		"tutorial_intro": "Tutorial: First Meeting",
+		"opening_awakening": "The Awakening",
+		"first_defeat_conversation": "First Defeat",
+		"second_defeat_conversation": "Second Defeat",
+		"first_boss_loss_conversation": "First Boss Encounter",
+		"first_apollo_boss_win_conversation": "Apollo Defeated",
+		"second_apollo_boss_win_conversation": "Apollo's Second Fall",
+		"first_apollo_boss_loss_conversation": "Fallen to Apollo",
+		"second_apollo_boss_loss_conversation": "Apollo Strikes Again",
+		"first_hermes_boss_loss_conversation": "Fallen to Hermes",
+		"second_hermes_boss_loss_conversation": "Hermes Strikes Again",
+		"first_artemis_boss_loss_conversation": "Fallen to Artemis",
+		"second_artemis_boss_loss_conversation": "Artemis Strikes Again",
+		"first_demeter_defeat_conversation": "Fallen to Demeter",
+	}
+
+	# Only show cutscenes that have been viewed
+	var any_shown = false
+	for cutscene_id in display_names.keys():
+		if not cutscene_manager.has_viewed_cutscene(cutscene_id):
+			continue
+
+		any_shown = true
+		var display_name = display_names.get(cutscene_id, cutscene_id)
+
+		var row = HBoxContainer.new()
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+		var label = Label.new()
+		label.text = display_name
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(label)
+
+		var btn = Button.new()
+		btn.text = "Replay"
+		btn.pressed.connect(_on_replay_cutscene_pressed.bind(cutscene_id))
+		row.add_child(btn)
+
+		list.add_child(row)
+
+	if not any_shown:
+		var empty_label = Label.new()
+		empty_label.text = "No memories to revisit yet."
+		empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		list.add_child(empty_label)
+
+func _on_replay_cutscene_pressed(cutscene_id: String):
+	if not has_node("/root/CutsceneManagerAutoload"):
+		return
+	var cutscene_manager = get_node("/root/CutsceneManagerAutoload")
+	cutscene_manager.replay_from_journal = true
+	close_journal()
+	cutscene_manager.play_cutscene(cutscene_id)
