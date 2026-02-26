@@ -2276,11 +2276,17 @@ func end_game():
 			if has_node("/root/MainLevelAutoload"):
 				get_node("/root/MainLevelAutoload").add_main_exp(MainLevelManager.EXP_WIN)
 			
+			# Award leather scraps for boss kill
+			var scraps_earned = 1
+			if has_node("/root/GlobalProgressTrackerAutoload"):
+				get_node("/root/GlobalProgressTrackerAutoload").award_leather_scraps(scraps_earned)
+			
 			# Pass data to summary screen with victory
 			get_tree().set_meta("scene_params", {
 				"god": params.get("god", current_god),
 				"deck_index": params.get("deck_index", 0),
-				"victory": true
+				"victory": true,
+				"leather_scraps_earned": scraps_earned
 			})
 			TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
 			

@@ -24,6 +24,8 @@ func _ready():
 	god_name = params.get("god", "Apollo")
 	deck_index = params.get("deck_index", 0)
 	victory = params.get("victory", true)
+	var leather_scraps_earned: int = params.get("leather_scraps_earned", 0)
+
 	
 	print("Run Summary parameters:")
 	print("  God: ", god_name)
@@ -125,12 +127,13 @@ func setup_ui_safely():
 	print("All nodes found successfully!")
 	
 	# Set up left panel content
-	setup_left_panel_content(title, god_deck_info, outcome_label, capture_total, defense_total)
+	var scraps_earned: int = get_scene_params().get("leather_scraps_earned", 0)
+	setup_left_panel_content(title, god_deck_info, outcome_label, capture_total, defense_total, scraps_earned)
 	
 	# Set up right panel with card displays
 	setup_card_displays_panel(card_display_container)
 
-func setup_left_panel_content(title_node: Label, god_deck_node: Label, outcome_node: Label, capture_node: Label, defense_node: Label):
+func setup_left_panel_content(title_node: Label, god_deck_node: Label, outcome_node: Label, capture_node: Label, defense_node: Label, scraps_earned: int = 0):
 	print("\n=== Setting up left panel content ===")
 	
 	# Set title
@@ -170,6 +173,16 @@ func setup_left_panel_content(title_node: Label, god_deck_node: Label, outcome_n
 		print("Warning: RunExperienceTrackerAutoload not found")
 		capture_node.text = "⚡ Experience data unavailable"
 		defense_node.visible = false
+	
+	# Show leather scraps reward if any were earned this run
+	if scraps_earned > 0:
+		var scraps_label = Label.new()
+		scraps_label.text = "🪡 +" + str(scraps_earned) + " Leather Scrap" + ("s" if scraps_earned > 1 else "") + " earned!"
+		scraps_label.add_theme_font_size_override("font_size", 18)
+		scraps_label.add_theme_color_override("font_color", Color("#C8A45A"))
+		scraps_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		title_node.get_parent().add_child(scraps_label)
+	
 	
 	print("Left panel content setup complete")
 

@@ -920,6 +920,16 @@ func refresh_mnemosyne_tab():
 	
 	await get_tree().process_frame
 	
+	# Show leather scraps total above the deck - only if player has earned some
+	var progress_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
+	if progress_tracker and progress_tracker.get_leather_scraps() > 0:
+		var scraps_label = Label.new()
+		scraps_label.text = "🪡 Leather Scraps: " + str(progress_tracker.get_leather_scraps())
+		scraps_label.add_theme_font_size_override("font_size", 16)
+		scraps_label.add_theme_color_override("font_color", Color("#C8A45A"))
+		scraps_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		card_container.add_child(scraps_label)
+	
 	# Load and display Mnemosyne deck with progression
 	populate_mnemosyne_cards_with_progression(card_container)
 	

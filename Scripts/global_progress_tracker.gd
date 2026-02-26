@@ -8,6 +8,7 @@ var save_path: String = "user://card_progress.save"
 
 var traps_fallen_for: int = 0  # Track trap encounters for Artemis unlock
 var total_defends: int = 0  # Track total defends for Athena unlock
+var leather_scraps: int = 0  # Track leather scraps earned from boss kills
 
 var chronos_rechallenge_visible: bool = false
 var chronos_rechallenge_unlocked: bool = false
@@ -139,7 +140,8 @@ func save_progress():
 			"couples_united": couples_united,
 			"traps_fallen_for": traps_fallen_for,
 			"chronos_rechallenge_visible": chronos_rechallenge_visible,
-			"chronos_rechallenge_unlocked": chronos_rechallenge_unlocked
+			"chronos_rechallenge_unlocked": chronos_rechallenge_unlocked,
+			"leather_scraps": leather_scraps
 		}
 		save_file.store_var(save_data)
 		save_file.close()
@@ -161,7 +163,8 @@ func load_progress():
 				var old_progress_data = loaded_data.get("progress_data", {})
 				unlocked_gods = loaded_data.get("unlocked_gods", ["Apollo"])
 				couples_united = loaded_data.get("couples_united", [])
-				traps_fallen_for = loaded_data.get("traps_fallen_for", 0)  # NEW LINE
+				traps_fallen_for = loaded_data.get("traps_fallen_for", 0)
+				leather_scraps = loaded_data.get("leather_scraps", 0)
 				chronos_rechallenge_visible = loaded_data.get("chronos_rechallenge_visible", false)
 				chronos_rechallenge_unlocked = loaded_data.get("chronos_rechallenge_unlocked", false)
 				# Migrate old capture_exp/defense_exp format to unified total_exp
@@ -171,7 +174,8 @@ func load_progress():
 				var old_progress_data = loaded_data if loaded_data is Dictionary else {}
 				unlocked_gods = ["Apollo"]  # Default to just Apollo
 				couples_united = []
-				traps_fallen_for = 0  # NEW LINE
+				traps_fallen_for = 0
+				leather_scraps = 0
 				progress_data = migrate_experience_data(old_progress_data)
 			
 			save_file.close()
@@ -222,6 +226,7 @@ func clear_all_progress():
 	chronos_rechallenge_unlocked = false
 	traps_fallen_for = 0
 	total_defends = 0  # Reset defend counter for Athena unlock
+	leather_scraps = 0
 	save_progress()
 	
 	# Clear boss victory tracker
@@ -513,3 +518,11 @@ func get_total_boss_wins() -> int:
 			total_wins += boss_data.get("wins", 0)
 	
 	return total_wins
+
+func award_leather_scraps(amount: int = 1):
+	leather_scraps += amount
+	save_progress()
+	print("Leather scraps awarded: +", amount, " (total: ", leather_scraps, ")")
+
+func get_leather_scraps() -> int:
+	return leather_scraps
