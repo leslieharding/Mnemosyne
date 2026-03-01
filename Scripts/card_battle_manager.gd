@@ -288,6 +288,7 @@ var active_passive_abilities: Dictionary = {}  # position -> array of passive ab
 
 # Boss prediction system
 var is_boss_battle: bool = false
+var is_apollo_boss_battle: bool = false
 var current_boss_prediction: Dictionary = {}
 
 # Card info panel state management
@@ -505,6 +506,7 @@ func setup_boss_prediction_tracker():
 		# Check for specific boss types using centralized config
 		if is_boss_battle:
 			if current_node.enemy_name == BossConfig.APOLLO_BOSS_NAME:
+				is_apollo_boss_battle = true
 				print("Apollo boss battle detected - prediction system activated!")
 				game_status_label.text = "The oracle's gaze pierces through time..."
 			elif current_node.enemy_name == BossConfig.HERMES_BOSS_NAME:
@@ -529,6 +531,7 @@ func setup_boss_prediction_tracker():
 			game_status_label.text = "Winter will follow winter which follows winter"
 			setup_fimbulwinter_snow_overlay()
 		elif params["enemy_name"] == BossConfig.APOLLO_BOSS_NAME:
+			is_apollo_boss_battle = true
 			print("Apollo boss battle detected (test battle)!")
 			game_status_label.text = "The oracle's gaze pierces through time..."
 		elif params["enemy_name"] == BossConfig.HERMES_BOSS_NAME:
@@ -3538,13 +3541,12 @@ func update_card_display(grid_index: int, card_data: CardResource):
 		return
 	
 	var slot = grid_slots[grid_index]
-	var card_display = slot.get_child(0) if slot.get_child_count() > 0 else null
-	
-	if card_display and card_display.has_method("update_display"):
-		# Just update the display without losing the existing setup
-		card_display.card_data = card_data  # Update the card data reference
-		card_display.update_display()       # Refresh the visual display
-		print("Updated card display for ", card_data.card_name, " with new values: ", card_data.values)
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.card_data = card_data
+			child.update_display()
+			print("Updated card display for ", card_data.card_name, " with new values: ", card_data.values)
+			break
 
 func place_card_on_grid():
 	
@@ -3701,7 +3703,7 @@ func place_card_on_grid():
 	
 	# Check boss prediction if this is a boss battle
 	var boss_prediction_hit = false
-	if is_boss_battle and current_boss_prediction.has("card") and current_boss_prediction.has("position"):
+	if is_apollo_boss_battle and current_boss_prediction.has("card") and current_boss_prediction.has("position"):
 		if current_boss_prediction["card"] == card_collection_index and current_boss_prediction["position"] == current_grid_index:
 			boss_prediction_hit = true
 			print("BOSS PREDICTION HIT! The boss anticipated your move!")

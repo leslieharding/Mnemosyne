@@ -693,6 +693,11 @@ func save_run_to_global_progress():
 	global_tracker.add_run_experience(god_name, scaled_run_exp)
 	print("Saved scaled run experience to global progress for ", god_name)
 	
+	# Check for god unlocks now that experience is committed  
+	var newly_unlocked = global_tracker.check_god_unlocks()
+	for unlocked_god in newly_unlocked:
+		print("🎉 God unlocked after run: ", unlocked_god)
+	
 	# Award main level exp for each card level gained this run
 	if main_level_manager:
 		var collection_path = "res://Resources/Collections/" + god_name + ".tres"
