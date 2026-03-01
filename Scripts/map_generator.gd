@@ -143,23 +143,20 @@ static func assign_enemies_to_tiers(god_name: String = "Apollo", deck_name: Stri
 	print("================================================================\n")
 	return tier_assignments
 
-# Generate nodes for a specific layer
 static func generate_layer_nodes(layer: int, starting_id: int, tier_enemy_assignments: Dictionary, god_name: String = "Apollo") -> Array[MapNode]:
 	var layer_nodes: Array[MapNode] = []
 	var node_count = NODES_PER_LAYER[layer]
 	
-	# Get actual screen width dynamically
-	var screen_width = DisplayServer.window_get_size().x
-	var screen_center_x = screen_width / 2.0
+	# Use MAP_WIDTH instead of DisplayServer so positions are in viewport coordinate space
+	var screen_width = MAP_WIDTH
+	var screen_center_x = MAP_WIDTH / 2.0
 	
-	# Calculate horizontal spacing for this layer
-	var horizontal_spacing = (screen_width * 0.8) / (node_count + 1)  # Use 80% of screen width
-	var start_x = screen_width * 0.1  # Start at 10% from left edge
+	var horizontal_spacing = (screen_width * 0.8) / (node_count + 1)
+	var start_x = screen_width * 0.1
 	
-	# Position layers so layer 0 (starting enemies) is at the top and boss is at the bottom
 	var button_height = 60
-	var top_padding = button_height / 2  # Less space at top for starting enemies
-	var bottom_padding = button_height  # More space at bottom for boss
+	var top_padding = button_height / 2
+	var bottom_padding = button_height
 	var usable_height = MAP_HEIGHT - top_padding - bottom_padding
 	var layer_spacing = usable_height / (LAYER_COUNT - 1) if LAYER_COUNT > 1 else 0
 	var y_position = top_padding + (LAYER_COUNT - 1 - layer) * layer_spacing
@@ -167,16 +164,9 @@ static func generate_layer_nodes(layer: int, starting_id: int, tier_enemy_assign
 	for i in range(node_count):
 		var x_position = start_x + (i + 1) * horizontal_spacing
 		var position = Vector2(x_position, y_position)
-		
-		# Determine node type based on layer
 		var node_type = determine_node_type(layer, i)
-		
-		# Create the node
 		var node = MapNode.new(starting_id + i, node_type, position)
-		
-		# Assign enemy to this node using the pre-assigned tier enemies
 		assign_enemy_to_node_with_tier_assignments(node, layer, tier_enemy_assignments, god_name)
-		
 		layer_nodes.append(node)
 	
 	return layer_nodes

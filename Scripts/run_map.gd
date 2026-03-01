@@ -92,9 +92,13 @@ func setup_experience_panel():
 		var deck_def = apollo_collection.decks[params.deck_index]
 		exp_panel.setup_deck(deck, deck_def.card_indices)
 
-# Generate a new map for this run
 func generate_new_map():
-	# Load the god collection to get deck name
+	# Sync generator dimensions to viewport coordinate space
+	var viewport_size = get_viewport().get_visible_rect().size
+	MapGenerator.MAP_WIDTH = viewport_size.x
+	MapGenerator.MAP_HEIGHT = viewport_size.y
+	MapGenerator.LAYER_SPACING = MapGenerator.MAP_HEIGHT / (MapGenerator.LAYER_COUNT - 1)
+	
 	var collection_path = "res://Resources/Collections/" + selected_god + ".tres"
 	var collection = load(collection_path)
 	var deck_name = ""
@@ -121,34 +125,24 @@ func clear_map_display():
 			button.queue_free()
 	map_node_buttons.clear()
 
-# Create a visual button for a map node
 func create_map_node_button(map_node: MapNode):
-	# Create the button
 	var button = Button.new()
 	button.text = map_node.display_name
 	
-	# Use consistent size for both properties
 	var button_size = Vector2(180, 60)
 	button.custom_minimum_size = button_size
 	button.size = button_size
 	
-	# Disable auto-sizing so the button stays at our fixed size
 	button.clip_contents = true
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	
-	# Position the button so its center is at the map node position
 	button.position = Vector2(
-		map_node.position.x - button_size.x / 2,  # Half of actual width
-		map_node.position.y - button_size.y / 2   # Half of actual height
+		map_node.position.x - button_size.x / 2,
+		map_node.position.y - button_size.y / 2
 	)
 	
-	# Style the button based on node type and availability
 	style_map_node_button(button, map_node)
-	
-	# Connect the button press
 	button.pressed.connect(_on_map_node_pressed.bind(map_node))
-	
-	# Add to the scene and track it
 	map_container.add_child(button)
 	map_node_buttons.append(button)
 	

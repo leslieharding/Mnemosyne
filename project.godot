@@ -35,6 +35,10 @@ BossLossTrackerAutoload="*res://Scripts/boss_loss_tracker.gd"
 SoundManagerAutoload="*res://Scripts/sound_manager.gd"
 MainLevelAutoload="*uid://6p4xlo11nsn8"
 
+[display]
+
+window/stretch/mode="canvas_items"
+
 [gui]
 
 theme/custom_font="uid://dhav1fcbvg4d5"
