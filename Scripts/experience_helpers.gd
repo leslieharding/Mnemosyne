@@ -7,7 +7,7 @@ const XP_PER_LEVEL: int = 50
 
 # Calculate level from experience points
 static func calculate_level(xp: int) -> int:
-	return xp / XP_PER_LEVEL
+	return max(1, xp / XP_PER_LEVEL)
 
 # Calculate progress within current level (0-49)
 static func calculate_progress(xp: int) -> int:

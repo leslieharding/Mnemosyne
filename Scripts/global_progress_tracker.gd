@@ -95,7 +95,7 @@ func add_run_experience(god_name: String, run_experience: Dictionary):
 		
 		# Combine both experience types into unified pool
 		var total_gained = card_exp.get("capture_exp", 0) + card_exp.get("defense_exp", 0)
-		progress_data[god_name][card_index]["total_exp"] += total_gained
+		progress_data[god_name][card_index]["total_exp"] = max(0, progress_data[god_name][card_index]["total_exp"] + total_gained)
 		
 		print("Card ", card_index, " gained ", total_gained, " total exp (", card_exp.get("capture_exp", 0), " capture + ", card_exp.get("defense_exp", 0), " defense)")
 	

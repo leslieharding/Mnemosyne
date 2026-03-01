@@ -33,6 +33,9 @@ func start_new_run(deck_indices: Array[int]):
 
 # Add capture experience
 func add_capture_exp(card_index: int, amount: int):
+	if amount <= 0:
+		return
+	
 	if not card_index in run_experience:
 		print("Warning: Card index ", card_index, " not in current run!")
 		# Initialize if missing (defensive programming)
@@ -49,6 +52,8 @@ func add_capture_exp(card_index: int, amount: int):
 
 # Add defense experience
 func add_defense_exp(card_index: int, amount: int):
+	if amount <= 0:
+		return
 	if not card_index in run_experience:
 		print("Warning: Card index ", card_index, " not in current run!")
 		# Initialize if missing (defensive programming)
