@@ -1,12 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://cynrsrhislb68"]
+[gd_scene format=3 uid="uid://cynrsrhislb68"]
 
 [ext_resource type="Script" uid="uid://bu3s8gjaukbo6" path="res://Scripts/card_battle_manager.gd" id="1_xcrvx"]
 [ext_resource type="Texture2D" uid="uid://b71s1dsanmfh4" path="res://Assets/Images/UI_02.png" id="2_8owk5"]
+[ext_resource type="Script" uid="uid://ckdicolpfc4rd" path="res://Scripts/thread_display.gd" id="3_6rnm5"]
 
-[node name="ApolloGame" type="Node2D"]
+[node name="ApolloGame" type="Node2D" unique_id=321576781]
 script = ExtResource("1_xcrvx")
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="TextureRect" type="TextureRect" parent="." unique_id=441888294]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -20,7 +21,7 @@ size_flags_vertical = 3
 texture = ExtResource("2_8owk5")
 expand_mode = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=784241801]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -32,27 +33,27 @@ grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Title" type="Label" parent="VBoxContainer"]
+[node name="Title" type="Label" parent="VBoxContainer" unique_id=10495558]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Apollo Game"
 
-[node name="DeckName" type="Label" parent="VBoxContainer"]
+[node name="DeckName" type="Label" parent="VBoxContainer" unique_id=765494710]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="GameGrid" type="GridContainer" parent="VBoxContainer"]
+[node name="GameGrid" type="GridContainer" parent="VBoxContainer" unique_id=1394070775]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 columns = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=1346148534]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="CardInfoPanel" type="PanelContainer" parent="."]
+[node name="CardInfoPanel" type="PanelContainer" parent="." unique_id=814632690]
 visible = false
 custom_minimum_size = Vector2(300, 200)
 offset_left = 12.0
@@ -60,7 +61,7 @@ offset_top = 108.0
 offset_right = 312.0
 offset_bottom = 368.0
 
-[node name="MarginContainer" type="MarginContainer" parent="CardInfoPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="CardInfoPanel" unique_id=356556742]
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_constants/margin_left = 10
@@ -68,89 +69,102 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CardInfoPanel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CardInfoPanel/MarginContainer" unique_id=1689918311]
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer" unique_id=1381942158]
 layout_mode = 2
 
-[node name="LeftSection" type="VBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="LeftSection" type="VBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1449673460]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CardNameLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection"]
+[node name="CardNameLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection" unique_id=220135196]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 16
 
-[node name="CardDescriptionLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection"]
+[node name="CardDescriptionLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection" unique_id=1959643474]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
 
-[node name="HSeparator" type="HSeparator" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection"]
+[node name="HSeparator" type="HSeparator" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection" unique_id=817931098]
 custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
-[node name="AbilityNameLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection"]
+[node name="AbilityNameLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection" unique_id=840719725]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.843137, 0, 1)
 theme_override_font_sizes/font_size = 14
 text = "Ability Name"
 autowrap_mode = 3
 
-[node name="AbilityDescriptionLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection"]
+[node name="AbilityDescriptionLabel" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection" unique_id=863639713]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 theme_override_font_sizes/font_size = 11
 text = "Ability Description goes here"
 autowrap_mode = 3
 
-[node name="RightSection" type="VBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="RightSection" type="VBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=194523822]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 size_flags_horizontal = 8
 alignment = 1
 
-[node name="PowerGrid" type="VBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection"]
+[node name="PowerGrid" type="VBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection" unique_id=1676978625]
 custom_minimum_size = Vector2(60, 60)
 layout_mode = 2
 alignment = 1
 
-[node name="TopRow" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid"]
+[node name="TopRow" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid" unique_id=781123952]
 layout_mode = 2
 
-[node name="NorthPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/TopRow"]
+[node name="NorthPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/TopRow" unique_id=424133812]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "5"
 horizontal_alignment = 1
 
-[node name="MiddleRow" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid"]
+[node name="MiddleRow" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid" unique_id=286604433]
 layout_mode = 2
 
-[node name="WestPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow"]
+[node name="WestPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow" unique_id=2059996401]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "5"
 horizontal_alignment = 1
 
-[node name="EastPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow"]
+[node name="EastPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow" unique_id=1710240]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "5"
 horizontal_alignment = 1
 
-[node name="BottomRow" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid"]
+[node name="BottomRow" type="HBoxContainer" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid" unique_id=598413560]
 layout_mode = 2
 
-[node name="SouthPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/BottomRow"]
+[node name="SouthPower" type="Label" parent="CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/BottomRow" unique_id=1573887041]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "5"
 horizontal_alignment = 1
+
+[node name="ThreadLayer" type="CanvasLayer" parent="." unique_id=1563972293]
+layer = 10
+
+[node name="ThreadDisplay" type="Control" parent="ThreadLayer" unique_id=1277913469]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_6rnm5")

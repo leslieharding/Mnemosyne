@@ -283,6 +283,9 @@ var hunt_id_counter: int = 0
 @onready var east_power_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow/EastPower
 @onready var south_power_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/BottomRow/SouthPower
 @onready var west_power_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow/WestPower
+@onready var thread_display = $ThreadLayer/ThreadDisplay
+
+
 
 var active_passive_abilities: Dictionary = {}  # position -> array of passive abilities
 
@@ -1251,8 +1254,7 @@ func update_game_status():
 		var opponent_info = opponent_manager.get_opponent_info()
 		game_status_label.text = special_status + "Opponent's Turn - " + opponent_info.name + " is thinking..."
 	
-	# Update to show scores instead of card counts
-	deck_name_label.text = "Score - Player: " + str(scores.player) + " | Opponent: " + str(scores.opponent)
+	thread_display.update_score(scores.player, scores.opponent)
 
 
 
