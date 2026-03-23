@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://cjckm0orglar0"]
+[gd_scene format=3 uid="uid://cjckm0orglar0"]
 
 [ext_resource type="Script" uid="uid://h556kvhhwuup" path="res://Scripts/cutscene.gd" id="1_1srds"]
 [ext_resource type="Texture2D" uid="uid://bfq86nrvxej17" path="res://Assets/Images/UI_01.png" id="2_c1xi3"]
@@ -6,7 +6,7 @@
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_idm0t"]
 texture = ExtResource("2_c1xi3")
 
-[node name="Cutscene" type="Control"]
+[node name="Cutscene" type="Control" unique_id=1697215347]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,7 +15,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_1srds")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=1443425792]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,7 +24,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.101961, 0.101961, 0.101961, 1)
 
-[node name="MainContainer" type="VBoxContainer" parent="."]
+[node name="MainContainer" type="VBoxContainer" parent="." unique_id=1799784703]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,103 +32,118 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SpeakerArea" type="HBoxContainer" parent="MainContainer"]
+[node name="SpeakerArea" type="HBoxContainer" parent="MainContainer" unique_id=2099772908]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="LeftSpeaker" type="PanelContainer" parent="MainContainer/SpeakerArea"]
+[node name="LeftSpeaker" type="PanelContainer" parent="MainContainer/SpeakerArea" unique_id=1972434705]
 custom_minimum_size = Vector2(300, 400)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="MainContainer/SpeakerArea/LeftSpeaker"]
+[node name="MarginContainer" type="MarginContainer" parent="MainContainer/SpeakerArea/LeftSpeaker" unique_id=123953968]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/SpeakerArea/LeftSpeaker/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/SpeakerArea/LeftSpeaker/MarginContainer" unique_id=257090388]
 layout_mode = 2
 
-[node name="PortraitArea" type="Control" parent="MainContainer/SpeakerArea/LeftSpeaker/MarginContainer/VBoxContainer"]
+[node name="PortraitArea" type="Control" parent="MainContainer/SpeakerArea/LeftSpeaker/MarginContainer/VBoxContainer" unique_id=1339158792]
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="MainContainer/SpeakerArea/LeftSpeaker/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="MainContainer/SpeakerArea/LeftSpeaker/MarginContainer/VBoxContainer" unique_id=1786586965]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Character Name"
 horizontal_alignment = 1
 
-[node name="CenterSpace" type="Control" parent="MainContainer/SpeakerArea"]
+[node name="CenterSpace" type="Control" parent="MainContainer/SpeakerArea" unique_id=134824059]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 
-[node name="RightSpeaker" type="PanelContainer" parent="MainContainer/SpeakerArea"]
+[node name="RightSpeaker" type="PanelContainer" parent="MainContainer/SpeakerArea" unique_id=1802752448]
 custom_minimum_size = Vector2(300, 400)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="MainContainer/SpeakerArea/RightSpeaker"]
+[node name="MarginContainer" type="MarginContainer" parent="MainContainer/SpeakerArea/RightSpeaker" unique_id=1415008284]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/SpeakerArea/RightSpeaker/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/SpeakerArea/RightSpeaker/MarginContainer" unique_id=27593733]
 layout_mode = 2
 
-[node name="PortraitArea" type="Control" parent="MainContainer/SpeakerArea/RightSpeaker/MarginContainer/VBoxContainer"]
+[node name="PortraitArea" type="Control" parent="MainContainer/SpeakerArea/RightSpeaker/MarginContainer/VBoxContainer" unique_id=1394017712]
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="MainContainer/SpeakerArea/RightSpeaker/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="MainContainer/SpeakerArea/RightSpeaker/MarginContainer/VBoxContainer" unique_id=1151535757]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Character Name"
 horizontal_alignment = 1
 
-[node name="DialogueArea" type="PanelContainer" parent="MainContainer"]
+[node name="DialogueArea" type="PanelContainer" parent="MainContainer" unique_id=1679241540]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_idm0t")
 
-[node name="MarginContainer" type="MarginContainer" parent="MainContainer/DialogueArea"]
+[node name="MarginContainer" type="MarginContainer" parent="MainContainer/DialogueArea" unique_id=1296360677]
 layout_mode = 2
 theme_override_constants/margin_left = 40
 theme_override_constants/margin_top = 30
 theme_override_constants/margin_right = 40
 theme_override_constants/margin_bottom = 30
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/DialogueArea/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/DialogueArea/MarginContainer" unique_id=266345565]
 layout_mode = 2
 
-[node name="SpeakerNameLabel" type="Label" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer"]
+[node name="SpeakerNameLabel" type="Label" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer" unique_id=1366892603]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Speaker Name"
 
-[node name="DialogueText" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer"]
+[node name="DialogueTextWrapper" type="Control" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer" unique_id=102559926]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="DialogueText" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/DialogueTextWrapper" unique_id=1999437623]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
 bbcode_enabled = true
-text = "This is where the dialogue would appear, click to continue....."
 fit_content = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer" unique_id=2111474196]
 layout_mode = 2
 
-[node name="SkipIndicator" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="BackButton" type="Button" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1745697271]
+visible = false
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "↑"
+flat = true
+
+[node name="SkipIndicator" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1368698242]
 custom_minimum_size = Vector2(300, 20)
 layout_mode = 2
 bbcode_enabled = true
 text = "[center][wave amp=5 freq=2]Skip[/wave][/center]"
 
-[node name="AdvanceIndicatoror" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="AdvanceIndicatoror" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer" unique_id=560772143]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 10
