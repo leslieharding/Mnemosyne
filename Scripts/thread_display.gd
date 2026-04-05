@@ -1,6 +1,6 @@
 extends Control
 
-const LINE_X: float = 0.95        # 85% across screen = right side
+const LINE_X: float = 0.98        # 85% across screen = right side
 const LINE_TOP: float = 0.1       # line starts at 10% down
 const LINE_BOTTOM: float = 0.9    # line ends at 90% down
 const DOT_RADIUS: float = 8.0
