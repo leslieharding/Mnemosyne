@@ -54,6 +54,7 @@ func _ready():
 	right_panel.visible = false
 	
 	setup_journal_button()
+	select_deck(0)
 
 
 func setup_journal_button():
