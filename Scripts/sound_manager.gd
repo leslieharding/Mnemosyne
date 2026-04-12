@@ -52,7 +52,7 @@ const SOUNDS = {
 
 # Music paths
 const MUSIC = {
-	"menu_theme": "res://Assets/Music/menu_theme.ogg",
+	"menu_theme": "res://Assets/Music/main_menu.wav",
 	"battle_theme": "res://Assets/Music/battle_theme.ogg",
 }
 
@@ -64,6 +64,9 @@ var current_player_index = 0
 
 # Dedicated music player
 var music_player: AudioStreamPlayer
+
+
+var music_fade_tween: Tween = null
 
 # Hover sound tracking
 var card_hover_player: AudioStreamPlayer = null
@@ -142,17 +145,44 @@ func play_click():
 
 
 # Music functions
-func play_music(music_name: String, fade_duration: float = 0.0):
+func play_music(music_name: String, fade_in_duration: float = 1.0):
 	if not MUSIC.has(music_name):
 		push_error("Music not found: " + music_name)
 		return
-	
+	if music_fade_tween:
+		music_fade_tween.kill()
+		music_fade_tween = null
 	music_player.stream = load(MUSIC[music_name])
-	music_player.play()
+	if fade_in_duration > 0.0:
+		music_player.volume_db = -80.0
+		music_player.play()
+		var tween = create_tween()
+		tween.tween_property(music_player, "volume_db", 0.0, fade_in_duration)
+	else:
+		music_player.volume_db = 0.0
+		music_player.play()
 
 func stop_music(fade_duration: float = 0.0):
 	music_player.stop()
 
+func fade_out_music(duration: float = 1.5):
+	if not music_player or not music_player.playing:
+		return
+	if music_fade_tween:
+		music_fade_tween.kill()
+	music_fade_tween = create_tween()
+	music_fade_tween.tween_property(music_player, "volume_db", -80.0, duration)
+	music_fade_tween.tween_callback(func():
+		music_player.stop()
+		music_player.volume_db = 0.0
+		music_fade_tween = null
+	)
+
+
+func is_playing_music(music_name: String) -> bool:
+	if not MUSIC.has(music_name):
+		return false
+	return music_player.playing and music_player.stream == load(MUSIC[music_name])
 
 func play_dialogue_tone(tone: String):
 	var sound_key = "dialogue_" + tone

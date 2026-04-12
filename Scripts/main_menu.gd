@@ -105,6 +105,9 @@ func _ready():
 		print("✗ CardDisplay scene failed to load")
 	
 	print("=== EXPORT DEBUG END ===")
+	
+	if not SoundManagerAutoload.is_playing_music("menu_theme"):
+		SoundManagerAutoload.play_music("menu_theme")
 
 func setup_menu_based_on_save_data():
 	# Check if there's any existing progress

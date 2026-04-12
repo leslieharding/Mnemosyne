@@ -28,8 +28,9 @@ var resolutions = [
 @onready var brightness_slider = $SettingsContainer/TabContainer/Video/BrightnessContainer/HSlider
 
 func _ready():
-	# Setup resolution dropdown
 	_setup_resolution_dropdown()
+	
+	load_settings()
 	
 	# Connect audio signals
 	master_slider.value_changed.connect(_on_master_volume_changed)
@@ -41,9 +42,6 @@ func _ready():
 	resolution_dropdown.item_selected.connect(_on_resolution_selected)
 	fullscreen_checkbox.toggled.connect(_on_fullscreen_toggled)
 	brightness_slider.value_changed.connect(_on_brightness_changed)
-	
-	# Load saved settings
-	load_settings()
 
 func _setup_resolution_dropdown():
 	resolution_dropdown.clear()
