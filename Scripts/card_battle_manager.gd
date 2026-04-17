@@ -73,6 +73,7 @@ var active_enemy_deck_power: EnemyDeckDefinition.EnemyDeckPowerType = EnemyDeckD
 var darkness_shroud_active: bool = false
 
 var misdirection_used: bool = false
+var board_intro_played: bool = false
 
 var disarray_active: bool = false
 
@@ -965,6 +966,9 @@ func start_game():
 	else:
 		game_status_label.text = "Flipping coin to determine who goes first..."
 		disable_player_input()
+		if not board_intro_played:
+			board_intro_played = true
+			await animate_board_intro()
 		turn_manager.start_game()
 
 # Remove all the tutorial step functions and replace with simple status messages
@@ -2633,6 +2637,44 @@ func get_scene_params() -> Dictionary:
 		return get_tree().get_meta("scene_params")
 	return {}
 
+
+func animate_board_intro() -> void:
+	# Build a randomly shuffled play order for the 9 slots
+	var indices: Array = []
+	for i in range(grid_size * grid_size):
+		indices.append(i)
+	indices.shuffle()
+
+	var stagger_delay := 0.07   # seconds between each slot starting
+	var anim_duration := 0.22   # how long each individual slot animates
+
+	var last_tween: Tween = null
+
+	for i in range(indices.size()):
+		var slot = grid_slots[indices[i]]
+		var delay: float = i * stagger_delay
+
+		var tween = create_tween()
+		tween.set_parallel(true)
+
+		# Fade in
+		tween.tween_property(slot, "modulate:a", 1.0, anim_duration)\
+			.set_delay(delay)\
+			.set_trans(Tween.TRANS_SINE)\
+			.set_ease(Tween.EASE_OUT)
+
+		# Scale snap-in with slight overshoot
+		tween.tween_property(slot, "scale", Vector2(1.0, 1.0), anim_duration)\
+			.set_delay(delay)\
+			.set_trans(Tween.TRANS_BACK)\
+			.set_ease(Tween.EASE_OUT)
+
+		last_tween = tween
+
+	# Wait for the last slot's animation to finish before returning
+	if last_tween:
+		await last_tween.finished
+
 # Setup the empty 3x3 board
 func setup_empty_board():
 	# Find the GridContainer for the board
@@ -2656,6 +2698,9 @@ func setup_empty_board():
 		slot.name = "Slot" + str(i)
 		
 		slot.mouse_filter = Control.MOUSE_FILTER_PASS
+		slot.modulate.a = 0.0
+		slot.scale = Vector2(0.85, 0.85)
+		slot.pivot_offset = Vector2(50.0, 70.0)  # center of 100x140 slot
 		
 		# Add some margin to the grid container
 		board_container.add_theme_constant_override("h_separation", 0)  # Horizontal space between slots
