@@ -969,6 +969,8 @@ func start_game():
 		if not board_intro_played:
 			board_intro_played = true
 			await animate_board_intro()
+			if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER:
+				await animate_sun_spots_in()
 		turn_manager.start_game()
 
 # Remove all the tutorial step functions and replace with simple status messages
@@ -2942,12 +2944,9 @@ func apply_sunlit_styling(grid_index: int):
 	god_rays.clip_contents = true
 	slot.clip_contents = true
 	
-	# Add to slot
 	slot.add_child(god_rays)
-	
-	# Move god rays behind any card displays
 	slot.move_child(god_rays, 0)
-	
+	god_rays.modulate.a = 0.0  # Hidden until animate_sun_spots_in() is called after board intro
 	print("Applied god rays effect to sun slot ", grid_index)
 
 
@@ -8780,6 +8779,14 @@ func assign_new_rhythm_slot():
 	
 	# Apply visual effect to the rhythm slot
 	apply_rhythm_slot_visual(rhythm_slot)
+	
+	# Fade in the rhythm slot (slot is always empty when assigned so this is safe)
+	var rhythm_slot_node = grid_slots[rhythm_slot]
+	rhythm_slot_node.modulate.a = 0.0
+	var rhythm_tween = create_tween()
+	rhythm_tween.tween_property(rhythm_slot_node, "modulate:a", 1.0, 0.35)\
+		.set_trans(Tween.TRANS_SINE)\
+		.set_ease(Tween.EASE_OUT)
 
 func apply_rhythm_slot_visual(grid_index: int):
 	if grid_index < 0 or grid_index >= grid_slots.size():
@@ -10294,3 +10301,15 @@ func create_misdirection_button():
 	misdirection_button.modulate = Color(1, 1, 1)
 	
 	print("Misdirection button created and added to battle scene")
+
+func animate_sun_spots_in() -> void:
+	var tween = create_tween()
+	tween.set_parallel(true)
+	for pos in sunlit_positions:
+		var slot = grid_slots[pos]
+		var god_rays = slot.get_node_or_null("GodRays")
+		if god_rays:
+			tween.tween_property(god_rays, "modulate:a", 1.0, 1.2)\
+				.set_trans(Tween.TRANS_SINE)\
+				.set_ease(Tween.EASE_OUT)
+	await tween.finished
