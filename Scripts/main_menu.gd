@@ -229,6 +229,11 @@ func _on_new_game_confirmed():
 		conv_manager.clear_all_conversations()
 		print("Conversation data cleared")
 	
+	# Clear Mnemosyne progression
+	if has_node("/root/MnemosyneProgressTrackerAutoload"):
+		get_node("/root/MnemosyneProgressTrackerAutoload").reset_progression()
+		print("Mnemosyne progression cleared")
+	
 	# Clear boss prediction patterns
 	if has_node("/root/BossPredictionTrackerAutoload"):
 		var boss_tracker = get_node("/root/BossPredictionTrackerAutoload")
