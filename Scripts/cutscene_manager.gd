@@ -30,12 +30,12 @@ func create_sample_cutscenes():
 	var mnemosyne_portrait = load("res://Assets/Images/Mnemosyne.png")
 
 	# Create Mnemosyne character
-	var mnemosyne = Character.new("Mnemosyne", Color("#DDA0DD"), mnemosyne_portrait, "left")
+	var mnemosyne = Character.new("Mnemosyne", Color("#1F4A3D"), mnemosyne_portrait, "left")
 	# Create Chrion character  
-	var chiron = Character.new("Chiron", Color("#FFD700"), chiron_portrait, "right")
+	var chiron = Character.new("Chiron", Color("#1F4A3D"), chiron_portrait, "right")
 	
 	# Create Chronos character  
-	var chronos = Character.new("Chronos", Color("#8B4513"), null, "right")
+	var chronos = Character.new("Chronos", Color("#1F4A3D"), null, "right")
 	
 	
 	# Tutorial introduction cutscene

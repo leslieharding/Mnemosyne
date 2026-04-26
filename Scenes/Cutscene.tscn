@@ -6,6 +6,12 @@
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_idm0t"]
 texture = ExtResource("2_c1xi3")
 
+[sub_resource type="LabelSettings" id="LabelSettings_c1xi3"]
+font_size = 19
+font_color = Color(0.36078432, 0.05882353, 0, 1)
+outline_size = 1
+outline_color = Color(0.18039216, 0.08235294, 0, 1)
+
 [node name="Cutscene" type="Control" unique_id=1697215347]
 layout_mode = 3
 anchors_preset = 15
@@ -57,6 +63,7 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="Label" type="Label" parent="MainContainer/SpeakerArea/LeftSpeaker/MarginContainer/VBoxContainer" unique_id=1786586965]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Character Name"
@@ -87,13 +94,14 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="Label" type="Label" parent="MainContainer/SpeakerArea/RightSpeaker/MarginContainer/VBoxContainer" unique_id=1151535757]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Character Name"
 horizontal_alignment = 1
 
 [node name="DialogueArea" type="PanelContainer" parent="MainContainer" unique_id=1679241540]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_idm0t")
 
@@ -109,8 +117,17 @@ layout_mode = 2
 
 [node name="SpeakerNameLabel" type="Label" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer" unique_id=1366892603]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.101960786, 0.22745098, 0.36078432, 1)
 theme_override_font_sizes/font_size = 16
 text = "Speaker Name"
+label_settings = SubResource("LabelSettings_c1xi3")
+horizontal_alignment = 1
+
+[node name="HSeparator" type="ColorRect" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer" unique_id=1474868605]
+custom_minimum_size = Vector2(120, 2)
+layout_mode = 2
+size_flags_horizontal = 4
+color = Color(0.36078432, 0.05882353, 0, 1)
 
 [node name="DialogueTextWrapper" type="Control" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer" unique_id=102559926]
 layout_mode = 2
@@ -121,11 +138,16 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 15.0
+offset_bottom = -13.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.47843137, 0.12156863, 0, 1)
+theme_override_constants/line_separation = 2
 bbcode_enabled = true
 fit_content = true
+horizontal_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer" unique_id=2111474196]
 layout_mode = 2
@@ -140,6 +162,7 @@ flat = true
 [node name="SkipIndicator" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1368698242]
 custom_minimum_size = Vector2(300, 20)
 layout_mode = 2
+theme_override_colors/default_color = Color(0.54509807, 0.38431373, 0, 1)
 bbcode_enabled = true
 text = "[center][wave amp=5 freq=2]Skip[/wave][/center]"
 
@@ -148,6 +171,7 @@ custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_horizontal = 10
 mouse_filter = 2
+theme_override_colors/default_color = Color(0.54509807, 0.38431373, 0, 1)
 bbcode_enabled = true
 text = "[wave amp=20 freq=2]Continue[/wave]"
 fit_content = true
