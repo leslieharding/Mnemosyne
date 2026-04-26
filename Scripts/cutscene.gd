@@ -49,7 +49,21 @@ func _ready():
 		return
 
 	await get_tree().process_frame
-
+	
+	var character_names = cutscene_data.participants.map(func(c): return c.character_name)
+	print("DEBUG cutscene participants: ", character_names)  # ADD THIS
+	
+	if "Chronos" in character_names:
+		print("DEBUG playing chronos_theme")  # ADD THIS
+		SoundManagerAutoload.fade_out_music(0.5)
+		await get_tree().create_timer(0.5).timeout
+		SoundManagerAutoload.play_music("chronos_talking", 1.5)
+	elif "Chiron" in character_names:
+		print("DEBUG playing chiron_theme")  # ADD THIS
+		SoundManagerAutoload.fade_out_music(0.5)
+		await get_tree().create_timer(0.5).timeout
+		SoundManagerAutoload.play_music("chiron_talking", 1.5)
+	
 	if advance_indicator:
 		advance_indicator.add_theme_color_override("default_color", Color.WHITE)
 		advance_indicator.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
@@ -387,6 +401,7 @@ func finish_cutscene():
 
 
 func return_to_previous_scene():
+	SoundManagerAutoload.fade_out_music(1.2)
 	if has_node("/root/CutsceneManagerAutoload"):
 		get_node("/root/CutsceneManagerAutoload").return_to_previous_scene()
 	else:

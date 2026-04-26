@@ -44,6 +44,9 @@ func _ready():
 	# Reset animation index
 	card_animation_index = 0
 	
+	if not victory:
+		SoundManagerAutoload.play_music("defeat_theme", 2.0)
+	
 	# Set up UI immediately without waiting
 	setup_ui_safely()
 
@@ -648,12 +651,14 @@ func get_scene_params() -> Dictionary:
 	return {}
 
 func _on_new_run_button_pressed() -> void:
+	SoundManagerAutoload.fade_out_music(1.0)
 	save_run_to_global_progress()
 	if has_node("/root/RunExperienceTrackerAutoload"):
 		get_node("/root/RunExperienceTrackerAutoload").clear_run()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 func _on_main_menu_button_pressed() -> void:
+	SoundManagerAutoload.fade_out_music(1.0)
 	save_run_to_global_progress()
 	if has_node("/root/RunExperienceTrackerAutoload"):
 		get_node("/root/RunExperienceTrackerAutoload").clear_run()

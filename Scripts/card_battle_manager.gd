@@ -390,7 +390,7 @@ func _ready():
 	else:
 		push_error("No deck was selected!")
 	
-	
+	SoundManagerAutoload.play_music("battle_theme", 2.0)
 	
 	# Set up input handling (only when it's player's turn)
 	set_process_input(false)  # Start disabled
@@ -2245,6 +2245,7 @@ func end_game():
 			get_node("/root/MainLevelAutoload").add_main_exp(MainLevelManager.EXP_LOSS)
 		
 		# Add a delay then go to run summary
+		SoundManagerAutoload.fade_out_music(2.0)
 		await get_tree().create_timer(3.0).timeout
 		
 		# Pass data to summary screen
@@ -2299,6 +2300,7 @@ func end_game():
 				"victory": true,
 				"leather_scraps_earned": scraps_earned
 			})
+			SoundManagerAutoload.fade_out_music(1.0) 
 			TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
 			
 			# Clear the battle snapshot since the battle is over

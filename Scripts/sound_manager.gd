@@ -53,7 +53,11 @@ const SOUNDS = {
 # Music paths
 const MUSIC = {
 	"menu_theme": "res://Assets/Music/main_menu.wav",
-	"battle_theme": "res://Assets/Music/battle_theme.ogg",
+	"battle_theme": "res://Assets/Music/greek_battle_vol3.wav",
+	"chronos_talking": "res://Assets/Music/Chronos_Talking.wav",
+	"chronos_battle": "res://Assets/Music/chronos_battle.wav",
+	"chiron_talking": "res://Assets/Music/Chiron_talking.wav",
+	"defeat_theme": "res://Assets/Music/chiron_talking_vol2.wav",
 }
 
 
