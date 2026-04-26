@@ -42,6 +42,11 @@ var tantalize_turn_counter: int = 0  # Separate counter for Tantalize ability ti
 # Track Second Chance cards and their info for returning to hand
 var second_chance_cards: Dictionary = {}  # Format: {grid_position: {card: CardResource, owner: Owner, collection_index: int}}
 
+# Germinate mode tracking
+var germinate_mode_active: bool = false
+var current_germinate_position: int = -1
+var current_germinate_card: CardResource = null
+
 var silence_active: bool = false
 
 var aristeia_mode_active: bool = false
@@ -3329,6 +3334,12 @@ func _on_grid_mouse_entered(grid_index):
 	if not turn_manager.is_player_turn():
 		return
 	
+	# Handle germinate mode - highlight valid targets on hover
+	if germinate_mode_active:
+		if grid_occupied[grid_index] and is_grow_card(grid_card_data[grid_index]):
+			add_germinate_card_overlay(grid_slots[grid_index])
+		return
+	
 	# Handle enrich mode
 	if enrich_mode_active and current_enricher_owner == Owner.PLAYER:
 		apply_enrich_selection_highlight(grid_index)
@@ -3353,6 +3364,13 @@ func _on_grid_mouse_entered(grid_index):
 
 func _on_grid_mouse_exited(grid_index):
 	if not turn_manager.is_player_turn():
+		return
+	
+	# Handle germinate mode - remove hover highlight (persistent highlights restored by start_germinate_mode)
+	if germinate_mode_active:
+		# Re-apply the persistent green tint to valid targets so it doesn't vanish on exit
+		if grid_occupied[grid_index] and is_grow_card(grid_card_data[grid_index]):
+			add_germinate_card_overlay(grid_slots[grid_index])
 		return
 	
 	# Handle enrich mode - restore styling for ANY slot
@@ -3543,6 +3561,16 @@ func _on_grid_gui_input(event, grid_index):
 				else:
 					print("Cannot sanctuary occupied slot - can only sanctuary empty slots")
 				return  # Don't process normal card placement during sanctuary mode
+	
+	# Handle germinate target selection
+	if germinate_mode_active:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				if grid_occupied[grid_index] and is_grow_card(grid_card_data[grid_index]):
+					select_germinate_target(grid_index)
+				else:
+					print("Germinate: That slot is not a valid grow card target")
+			return  # Block all other input during germinate mode
 	
 	# Handle enrich target selection (only during enrich mode setup)
 	if enrich_mode_active and current_enricher_owner == Owner.PLAYER:
@@ -3967,6 +3995,28 @@ func place_card_on_grid():
 					else:
 						print("Aristeia did not activate (no captures or ownership changed)")
 					break  # Exit the ability loop
+				if ability.ability_name == "Germinate":
+					print("Checking Germinate ability")
+					var germinate_context = {
+						"placed_card": card_data,
+						"grid_position": current_grid_index,
+						"game_manager": self,
+						"placing_owner": Owner.PLAYER,
+						"card_level": card_level
+					}
+					var germinate_activated = ability.execute(germinate_context)
+					if germinate_activated:
+						print("Germinate mode activated - waiting for player target selection")
+						var temp_index = selected_card_index
+						selected_card_index = -1
+						remove_card_from_hand(temp_index)
+						if current_grid_index != -1:
+							restore_slot_original_styling(current_grid_index)
+						current_grid_index = -1
+						return
+					else:
+						print("Germinate fizzled - no valid targets")
+					break
 	# Update the score display immediately after combat
 	update_game_status()
 
@@ -3985,6 +4035,10 @@ func place_card_on_grid():
 	# DON'T switch turns if any special modes are active
 	if hunt_mode_active:
 		print("Hunt mode active - staying on player turn for target selection")
+		return
+	
+	if germinate_mode_active:
+		print("Germinate mode active - staying on player turn for target selection")
 		return
 	
 	if compel_mode_active:
@@ -10315,3 +10369,120 @@ func animate_sun_spots_in() -> void:
 				.set_trans(Tween.TRANS_SINE)\
 				.set_ease(Tween.EASE_OUT)
 	await tween.finished
+
+func is_grow_card(card: CardResource) -> bool:
+	if not card:
+		return false
+	# Check all levels for a grow-type ability
+	var grow_ability_names = ["Grow", "Cultivate", "Enrich"]
+	var all_abilities = card.abilities.duplicate()
+	if card.uses_level_progression:
+		for level_data in card.level_data:
+			for ability in level_data.abilities:
+				all_abilities.append(ability)
+	for ability in all_abilities:
+		if ability.ability_name in grow_ability_names:
+			return true
+	return false
+
+func get_germinate_valid_targets() -> Array:
+	var valid = []
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:
+			continue
+		var card = grid_card_data[i]
+		if is_grow_card(card):
+			valid.append(i)
+	return valid
+
+func add_germinate_card_overlay(slot: Control):
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.modulate = Color(0.6, 1.0, 0.6, 1.0)  # Green tint
+			break
+
+func remove_germinate_card_overlay(slot: Control):
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.modulate = Color(1.0, 1.0, 1.0, 1.0)  # Reset
+			break
+
+func start_germinate_mode(germinate_position: int, germinate_card: CardResource):
+	germinate_mode_active = true
+	current_germinate_position = germinate_position
+	current_germinate_card = germinate_card
+
+	if germinate_card:
+		germinate_card.set_meta("germinate_used", true)
+
+	game_status_label.text = "🌱 GERMINATE: Select a Grow card to return to your hand"
+	print("Germinate mode activated - player must select a grow card")
+
+	for pos in get_germinate_valid_targets():
+		add_germinate_card_overlay(grid_slots[pos])
+		# Directly connect to the card display panel so occupied slot clicks register
+		for child in grid_slots[pos].get_children():
+			if child is CardDisplay:
+				child.panel.gui_input.connect(_on_germinate_card_clicked.bind(pos))
+				break
+
+func select_germinate_target(target_position: int):
+	if not germinate_mode_active:
+		return
+
+	var valid_targets = get_germinate_valid_targets()
+	if not target_position in valid_targets:
+		print("GerminateAbility: Invalid target selected at position ", target_position)
+		return
+
+	# Disconnect click handlers and remove overlays from all valid targets
+	for pos in valid_targets:
+		remove_germinate_card_overlay(grid_slots[pos])
+		for child in grid_slots[pos].get_children():
+			if child is CardDisplay:
+				if child.panel.gui_input.is_connected(_on_germinate_card_clicked):
+					child.panel.gui_input.disconnect(_on_germinate_card_clicked)
+				break
+
+	var target_card = grid_card_data[target_position]
+	var target_collection_index = get_card_collection_index(target_position)
+
+	print("Germinate: Returning ", target_card.card_name, " from position ", target_position, " to player hand")
+
+	grid_occupied[target_position] = false
+	grid_ownership[target_position] = Owner.NONE
+	grid_card_data[target_position] = null
+
+	var slot = grid_slots[target_position]
+	for child in slot.get_children():
+		if child is CardDisplay:
+			child.queue_free()
+			break
+
+	grid_to_collection_index.erase(target_position)
+	if target_position in active_passive_abilities:
+		active_passive_abilities.erase(target_position)
+
+	var base_card = target_card.duplicate(true)
+	player_deck.append(base_card)
+	deck_card_indices.append(target_collection_index)
+	display_player_hand()
+
+	print("Germinate: ", target_card.card_name, " returned to player hand")
+
+	germinate_mode_active = false
+	current_germinate_position = -1
+	current_germinate_card = null
+
+	update_board_visuals()
+	update_game_status()
+
+	if should_game_end():
+		end_game()
+		return
+
+	turn_manager.next_turn()
+
+func _on_germinate_card_clicked(event: InputEvent, grid_pos: int):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		select_germinate_target(grid_pos)

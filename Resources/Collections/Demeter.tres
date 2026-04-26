@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=35 format=3 uid="uid://dgxi7oww6yrg0"]
+[gd_resource type="Resource" script_class="GodCardCollection" format=3 uid="uid://dgxi7oww6yrg0"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_stdfb"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_0nxk6"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://43v8bwokc47i" path="res://Resources/Abilities/extended_range_ability.gd" id="4_34bjj"]
 [ext_resource type="Script" uid="uid://u1ucm0sox8pa" path="res://Resources/Abilities/grow_ability.gd" id="5_rjcyb"]
 [ext_resource type="Script" uid="uid://bsyjru6fxhmp5" path="res://Resources/Abilities/cultivate_ability.gd" id="6_0ni4c"]
+[ext_resource type="Script" uid="uid://bwlelpkcvc0i" path="res://Resources/Abilities/germinate_ability.gd" id="6_k8dqu"]
 [ext_resource type="Script" uid="uid://46m7rkeu3yy6" path="res://Resources/Abilities/enrich_ability.gd" id="7_wun1n"]
 [ext_resource type="Script" uid="uid://bheirx7xq22eb" path="res://Resources/Abilities/torches_ability.gd" id="10_dqtp2"]
 [ext_resource type="Script" uid="uid://b3kubk5opefp6" path="res://Resources/Abilities/wealth_ability.gd" id="10_k8dqu"]
@@ -72,11 +73,10 @@ abilities = Array[ExtResource("2_0nxk6")]([SubResource("Resource_clfq6")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_20mgd"]
-script = ExtResource("6_0ni4c")
-ability_name = "Cultivate"
-description = "If still owned, this card gains 10 experience at the start of each of your turns"
-trigger_condition = 3
-metadata/_custom_type_script = "uid://bsyjru6fxhmp5"
+script = ExtResource("6_k8dqu")
+ability_name = "Germinate"
+description = "On play, return one of your non-Persephone cards to your hand"
+metadata/_custom_type_script = "uid://bwlelpkcvc0i"
 
 [sub_resource type="Resource" id="Resource_0ni4c"]
 script = ExtResource("1_stdfb")
