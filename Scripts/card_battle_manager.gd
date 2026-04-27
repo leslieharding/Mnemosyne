@@ -4438,6 +4438,7 @@ func show_reward_screen():
 		"current_node": params.get("current_node"),
 		"perfect_victory": is_perfect_victory
 	})
+	SoundManagerAutoload.fade_out_music(1.0)
 	TransitionManagerAutoload.change_scene_to("res://Scenes/RewardScreen.tscn")
 
 
