@@ -272,10 +272,6 @@ func setup_card_displays_panel(container: VBoxContainer):
 		
 		print("Processing card index: ", card_index, " with exp data: ", run_exp_data)
 		
-		# Skip cards with no experience gain
-		if run_exp_data.get("total_exp", 0) <= 0:
-			print("  Skipping card with no experience")
-			continue
 		
 		# Get card data
 		if card_index >= collection.cards.size():
@@ -312,14 +308,7 @@ func setup_card_displays_panel(container: VBoxContainer):
 		
 		print("    Added card container for: ", card.card_name)
 	
-	# If no cards had experience, show a message
-	if cards_with_exp == 0:
-		print("No cards gained experience this run")
-		var no_exp_label = Label.new()
-		no_exp_label.text = "No experience gained this run"
-		no_exp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		no_exp_label.add_theme_color_override("font_color", Color("#888888"))
-		container.add_child(no_exp_label)
+	
 	
 	print("Card displays panel setup complete!")
 	print("Created ", cards_with_exp, " displays")
