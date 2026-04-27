@@ -21,7 +21,390 @@ var current_deck_definition: EnemyDeckDefinition = null
 
 # Reference to game manager for board state analysis
 var game_manager = null
+var turn_number: int = 0
+var current_ai_profile: Dictionary = {}
 
+var default_ai_profile: Dictionary = {
+	"error_rate": 0.25,
+	"error_multiplier": 1.5,
+	"capture_weight": 50,
+	"capture_value_bonus_weight": 1,
+	"exposure_penalty_weight": 5,
+	"shelter_bonus": 5,
+	"efficient_capture_bonus": 20,
+	"card_priorities": {},
+	"card_order": [],
+	"card_order_bonus": 200,
+}
+
+var ai_profiles: Dictionary = {
+	"Pythons Gang": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+			"The Omphalos":    {"score_bonus": 60, "max_turn": 2},
+			"Ismenian Dragon": {"score_bonus": 30, "max_turn": 3},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Niobes Brood": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Cultists of Nyx": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"The Wrong Note": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"The Plague": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Chronos": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"?????": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Hermes Boss": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Fimbulwinter": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Artemis Boss": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Craftsmen": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Giants": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Bestial Labours": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Creature Foes of Heracles": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"The Grudges": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Sleep": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Amazons": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"The Graeae": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Rogue Love": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Pandora's box": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"So beautiful it hurts": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Crete": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"The Hunting Party": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"The Way Home": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Isthmus Road": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	"Wicked Kings": {
+		"error_rate": 0.2,
+		"error_multiplier": 1.5,
+		"capture_weight": 55,
+		"capture_value_bonus_weight": 1,
+		"exposure_penalty_weight": 7,
+		"shelter_bonus": 6,
+		"efficient_capture_bonus": 25,
+		"card_priorities": {
+			"Python":  {"score_bonus": 70, "max_turn": 2},
+		},
+		"card_order": [],
+		"card_order_bonus": 200,
+	},
+	}
 
 func _ready():
 	load_enemies_collection()
@@ -94,6 +477,12 @@ func setup_opponent(enemy_name: String, difficulty: int = 0):
 		print("OpponentManager: Deck has power: ", current_deck_definition.get_power_description())
 	else:
 		print("OpponentManager: Deck has no special power")
+		
+	current_ai_profile = ai_profiles.get(enemy_name, default_ai_profile)
+	turn_number = 0
+	print("OpponentManager: AI profile loaded for '", enemy_name,
+		"' | error_rate: ", current_ai_profile.get("error_rate", 0.25),
+		" | card_order: ", current_ai_profile.get("card_order", []))	
 
 # Get the current deck definition
 func get_current_deck_definition() -> EnemyDeckDefinition:
@@ -102,6 +491,8 @@ func get_current_deck_definition() -> EnemyDeckDefinition:
 # Setup fallback opponent if loading fails
 func setup_fallback_opponent():
 	print("Using fallback opponent (Apollo deck)")
+	current_ai_profile = default_ai_profile
+	turn_number = 0
 	current_deck_definition = null  # No special powers for fallback
 	
 	var apollo_collection: GodCardCollection = load("res://Resources/Collections/Apollo.tres")
@@ -112,168 +503,222 @@ func setup_fallback_opponent():
 	else:
 		push_error("Failed to load fallback opponent deck!")
 
-# Take opponent's turn with improved AI
 func take_turn(available_slots: Array[int]):
 	if opponent_deck.is_empty():
 		print("Opponent has no cards left!")
 		return
-	
-	print("Opponent is thinking...")
-	
-	# Add thinking delay for more natural feel
+
+	turn_number += 1
+	print("Opponent is thinking... (turn ", turn_number, ")")
+
 	var think_time = randf_range(think_time_min, think_time_max)
 	await get_tree().create_timer(think_time).timeout
-	
-	# AI Decision: Evaluate all card-slot combinations
-	var best_move = evaluate_best_move(available_slots)
-	
-	if best_move:
-		var chosen_card_index = best_move["card_index"]
-		var chosen_slot = best_move["slot"]
-		
-		# Store the card before removing it
-		last_played_card = opponent_deck[chosen_card_index]
-		
-		# Remove the card from the deck
-		opponent_deck.remove_at(chosen_card_index)
-		
-		print("AI Decision: Playing ", last_played_card.card_name, " at slot ", chosen_slot, 
-			  " (Score: ", best_move["score"], ", Captures: ", best_move["captures"], ")")
-		
-		# Emit signal with the chosen slot
-		emit_signal("opponent_card_placed", chosen_slot)
-	else:
-		print("No valid move found - falling back to random")
-		# Fallback: random card and slot
+
+	# Card order enforcement — runs before everything, immune to error rate
+	var ordered_move = check_card_order(available_slots)
+	if not ordered_move.is_empty():
+		execute_move(ordered_move)
+		return
+
+	# Score all combinations then select via error rate cascade
+	var ranked_moves = evaluate_best_move(available_slots)
+
+	if ranked_moves.is_empty():
+		print("No valid move found — falling back to random")
 		var chosen_slot = available_slots[randi() % available_slots.size()]
 		last_played_card = opponent_deck[0]
 		opponent_deck.remove_at(0)
 		emit_signal("opponent_card_placed", chosen_slot)
+		return
 
-# Evaluate all possible moves and return the best one
-func evaluate_best_move(available_slots: Array[int]) -> Dictionary:
+	var chosen_move = select_move_with_error(ranked_moves)
+	execute_move(chosen_move)
+
+func execute_move(move: Dictionary):
+	var chosen_card_index = move["card_index"]
+	var chosen_slot = move["slot"]
+	last_played_card = opponent_deck[chosen_card_index]
+	opponent_deck.remove_at(chosen_card_index)
+	print("AI Decision: Playing '", last_played_card.card_name, "' at slot ", chosen_slot,
+		" | Score: ", move["score"],
+		" | Captures: ", move.get("captures", 0))
+	emit_signal("opponent_card_placed", chosen_slot)
+
+func check_card_order(available_slots: Array[int]) -> Dictionary:
+	var card_order: Array = current_ai_profile.get("card_order", [])
+	if card_order.is_empty():
+		return {}
+
+	for ordered_card_name in card_order:
+		for card_idx in range(opponent_deck.size()):
+			if opponent_deck[card_idx].card_name == ordered_card_name:
+				# Found — pick best slot for it using full scoring
+				var card = opponent_deck[card_idx]
+				var best_slot = -1
+				var best_score = -999999
+				for slot in available_slots:
+					var eval = evaluate_move(card, slot)
+					if eval["score"] > best_score:
+						best_score = eval["score"]
+						best_slot = slot
+				if best_slot != -1:
+					print("AI: Card order enforcing '", ordered_card_name, "' at slot ", best_slot)
+					return {
+						"card_index": card_idx,
+						"slot": best_slot,
+						"score": best_score,
+						"captures": 0,
+					}
+
+	return {}
+
+func evaluate_best_move(available_slots: Array[int]) -> Array:
 	if not game_manager:
 		print("AI Error: No game manager reference")
-		return {}
-	
-	var best_move = null
-	var best_score = -999999
-	
-	# Evaluate each card in hand
+		return []
+
+	var all_moves: Array = []
+
 	for card_idx in range(opponent_deck.size()):
 		var card = opponent_deck[card_idx]
-		
-		# Evaluate each available slot for this card
 		for slot in available_slots:
-			var move_evaluation = evaluate_move(card, slot)
-			
-			# Track the best move
-			if move_evaluation["score"] > best_score:
-				best_score = move_evaluation["score"]
-				best_move = {
-					"card_index": card_idx,
-					"slot": slot,
-					"score": move_evaluation["score"],
-					"captures": move_evaluation["captures"]
-				}
-	
-	return best_move
+			var eval = evaluate_move(card, slot)
+			all_moves.append({
+				"card_index": card_idx,
+				"slot": slot,
+				"score": eval["score"],
+				"captures": eval["captures"],
+				"defensive_alignment": eval["defensive_alignment"],
+			})
 
-# Evaluate a specific card-slot combination
+	# Post-pass: bonus for the most efficiently positioned capturer at each slot
+	apply_efficient_capture_bonus(all_moves, available_slots)
+
+	# Sort highest score first
+	all_moves.sort_custom(func(a, b): return a["score"] > b["score"])
+
+	return all_moves
+
 func evaluate_move(card: CardResource, slot: int) -> Dictionary:
-	var score = 0
-	var capture_count = 0
-	
-	# Get card stats (assuming level 1 for enemies, adjust if needed)
+	var profile = current_ai_profile
 	var card_values = card.values
-	
-	# Calculate potential captures
-	var adjacent_positions = get_adjacent_positions(slot)
-	
-	for adj_info in adjacent_positions:
-		var adj_slot = adj_info["position"]
-		var direction = adj_info["direction"]  # 0=North, 1=East, 2=South, 3=West
-		
-		# Check if adjacent slot has a player card
-		if game_manager.grid_occupied[adj_slot]:
-			var adj_owner = game_manager.get_owner_at_position(adj_slot)
-			
-			# Only consider player-owned cards as capture targets
-			if adj_owner == game_manager.Owner.PLAYER:
-				var adj_card = game_manager.get_card_at_position(adj_slot)
-				if adj_card:
-					# Get the opposing direction value for the adjacent card
-					var opposing_direction = get_opposing_direction(direction)
-					var adj_value = adj_card.values[opposing_direction]
-					var our_value = card_values[direction]
-					
-					# Check if we can capture
-					if our_value > adj_value:
-						capture_count += 1
-						# Score heavily for captures (50 points per capture)
-						score += 50
-						
-						# Bonus for capturing high-value cards
-						var card_total_stats = adj_card.values[0] + adj_card.values[1] + adj_card.values[2] + adj_card.values[3]
-						score += card_total_stats * 2
-	
-	# If no captures, evaluate defensive positioning
-	if capture_count == 0:
-		score += evaluate_defensive_position(card, slot, adjacent_positions)
-	
-	return {
-		"score": score,
-		"captures": capture_count
-	}
+	var capture_weight: int = profile.get("capture_weight", 50)
+	var capture_value_bonus_weight: int = profile.get("capture_value_bonus_weight", 1)
 
-# Evaluate how defensively sound a position is
-func evaluate_defensive_position(card: CardResource, slot: int, adjacent_positions: Array) -> int:
-	var defensive_score = 0
-	var card_values = card.values
-	
-	# Prefer corners and edges (fewer attack angles)
-	var empty_adjacent_count = 0
-	var player_threat_count = 0
-	
+	# Capture scoring
+	var capture_score = 0
+	var capture_count = 0
+	var adjacent_positions = get_adjacent_positions(slot)
+
 	for adj_info in adjacent_positions:
 		var adj_slot = adj_info["position"]
 		var direction = adj_info["direction"]
-		
-		if not game_manager.grid_occupied[adj_slot]:
-			# Empty adjacent slot = safer
-			empty_adjacent_count += 1
-			defensive_score += 5
-		else:
+
+		if game_manager.grid_occupied[adj_slot]:
 			var adj_owner = game_manager.get_owner_at_position(adj_slot)
-			
 			if adj_owner == game_manager.Owner.PLAYER:
-				# Player card adjacent = potential threat
 				var adj_card = game_manager.get_card_at_position(adj_slot)
 				if adj_card:
-					var opposing_direction = get_opposing_direction(direction)
-					var adj_value = adj_card.values[opposing_direction]
+					var opposing_dir = get_opposing_direction(direction)
+					var adj_value = adj_card.values[opposing_dir]
 					var our_value = card_values[direction]
-					
-					# If player can capture us, penalty
-					if adj_value >= our_value:
-						player_threat_count += 1
-						defensive_score -= 20
-					else:
-						# We're safe from this adjacent card
-						defensive_score += 10
-	
-	# Bonus for corner positions (only 2 adjacent)
-	if adjacent_positions.size() == 2:
-		defensive_score += 15
-	# Bonus for edge positions (3 adjacent)
-	elif adjacent_positions.size() == 3:
-		defensive_score += 10
-	
-	# Consider card strength when playing defensively
-	var total_card_strength = card_values[0] + card_values[1] + card_values[2] + card_values[3]
-	defensive_score += total_card_strength / 4  # Small bonus for stronger cards
-	
-	return defensive_score
+					if our_value > adj_value:
+						capture_count += 1
+						capture_score += capture_weight
+						var target_total = adj_card.values[0] + adj_card.values[1] \
+							+ adj_card.values[2] + adj_card.values[3]
+						capture_score += target_total * capture_value_bonus_weight
+
+	# Defensive alignment — always contributes, not just when no captures exist
+	var defensive_alignment = get_defensive_alignment_score(card, slot)
+
+	# Card priority bonus
+	var priority_bonus = 0
+	var card_priorities: Dictionary = profile.get("card_priorities", {})
+	if card.card_name in card_priorities:
+		var priority = card_priorities[card.card_name]
+		var max_turn: int = priority.get("max_turn", 0)
+		if max_turn == 0 or turn_number <= max_turn:
+			priority_bonus = priority.get("score_bonus", 0)
+
+	return {
+		"score": capture_score + defensive_alignment + priority_bonus,
+		"captures": capture_count,
+		"defensive_alignment": defensive_alignment,
+	}
+
+func get_defensive_alignment_score(card: CardResource, slot: int) -> int:
+	var profile = current_ai_profile
+	var exposure_weight: int = profile.get("exposure_penalty_weight", 5)
+	var shelter: int = profile.get("shelter_bonus", 5)
+	var card_values = card.values
+	var grid_size = 3
+	var score = 0
+
+	var row = slot / grid_size
+	var col = slot % grid_size
+
+	var direction_checks = [
+		{"stat_idx": 0, "in_bounds": row > 0,             "adj": slot - grid_size},  # North
+		{"stat_idx": 1, "in_bounds": col < grid_size - 1, "adj": slot + 1},           # East
+		{"stat_idx": 2, "in_bounds": row < grid_size - 1, "adj": slot + grid_size},   # South
+		{"stat_idx": 3, "in_bounds": col > 0,             "adj": slot - 1},            # West
+	]
+
+	for d in direction_checks:
+		var stat: int = card_values[d["stat_idx"]]
+		if not d["in_bounds"]:
+			score += shelter                          # Board edge — fully sheltered
+		elif game_manager.grid_occupied[d["adj"]]:
+			score += shelter                          # Occupied neighbour — sheltered
+		else:
+			score -= exposure_weight * (10 - stat)   # Empty — penalise weak stat here
+
+	return score
+
+func apply_efficient_capture_bonus(all_moves: Array, available_slots: Array[int]):
+	var bonus: int = current_ai_profile.get("efficient_capture_bonus", 20)
+	if bonus == 0:
+		return
+
+	for slot in available_slots:
+		var capturing_at_slot: Array = []
+		for move in all_moves:
+			if move["slot"] == slot and move["captures"] > 0:
+				capturing_at_slot.append(move)
+
+		if capturing_at_slot.is_empty():
+			continue
+
+		var best = capturing_at_slot[0]
+		for move in capturing_at_slot:
+			if move["defensive_alignment"] > best["defensive_alignment"]:
+				best = move
+
+		best["score"] += bonus
+
+func select_move_with_error(ranked_moves: Array) -> Dictionary:
+	if ranked_moves.size() == 1:
+		return ranked_moves[0]
+
+	var error_rate: float = current_ai_profile.get("error_rate", 0.0)
+	var multiplier: float = current_ai_profile.get("error_multiplier", 1.5)
+
+	var try_count = min(3, ranked_moves.size() - 1)
+	var current_error = error_rate
+
+	for attempt in range(try_count):
+		if randf() >= current_error:
+			print("AI: Error cascade — playing rank ", attempt + 1,
+				" (skip chance was %.2f)" % current_error)
+			return ranked_moves[attempt]
+		print("AI: Error cascade — skipped rank ", attempt + 1,
+			" (skip chance was %.2f)" % current_error)
+		current_error *= multiplier
+
+	var fallback_idx = min(3, ranked_moves.size() - 1)
+	print("AI: Error cascade — guaranteed fallback at rank ", fallback_idx + 1)
+	return ranked_moves[fallback_idx]
 
 # Get adjacent grid positions for a given slot
 func get_adjacent_positions(slot: int) -> Array:
