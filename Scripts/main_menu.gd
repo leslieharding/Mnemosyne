@@ -110,17 +110,18 @@ func _ready():
 		SoundManagerAutoload.play_music("menu_theme")
 
 func setup_menu_based_on_save_data():
-	# Check if there's any existing progress
 	var has_progress = false
 	if has_node("/root/GlobalProgressTrackerAutoload"):
 		var global_tracker = get_node("/root/GlobalProgressTrackerAutoload")
 		has_progress = global_tracker.has_any_progress()
 	
+	# Also treat as returning player if tutorial has already been seen
+	if not has_progress and has_node("/root/CutsceneManagerAutoload"):
+		has_progress = get_node("/root/CutsceneManagerAutoload").has_viewed_cutscene("tutorial_intro")
+	
 	if has_progress:
-		# Returning player - Continue on top, New Game below with warning
 		setup_returning_player_menu()
 	else:
-		# First-time player - New Game on top, Continue disabled
 		setup_first_time_player_menu()
 
 func setup_first_time_player_menu():
@@ -200,7 +201,6 @@ func _on_continue_button_pressed():
 	SoundManagerAutoload.play_randomized("click")
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
-# Replace this entire function in Scripts/main_menu.gd (around lines 95-125)
 
 func _on_new_game_confirmed():
 	print("Player confirmed new game - erasing all progress")
@@ -240,22 +240,20 @@ func _on_new_game_confirmed():
 		boss_tracker.clear_patterns()
 		print("Boss prediction patterns cleared")
 	
-	# FIXED: Always trigger the tutorial cutscene for new games, regardless of previous data
-	if has_node("/root/CutsceneManagerAutoload"):
-		TransitionManagerAutoload.change_scene_to("res://Scenes/Cutscene.tscn")
-		# The cutscene manager will handle setting up the cutscene data
-		get_node("/root/CutsceneManagerAutoload").play_cutscene("tutorial_intro")
-	else:
-		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
-		
 	if has_node("/root/MainLevelAutoload"):
 		get_node("/root/MainLevelAutoload").reset()
 		print("Main level reset")
-		
-	# Clear viewed cutscenes
+
+	# Clear viewed cutscenes BEFORE playing tutorial so last_played resolves correctly on finish
 	if has_node("/root/CutsceneManagerAutoload"):
 		get_node("/root/CutsceneManagerAutoload").clear_viewed_cutscenes()
-		print("Viewed cutscenes cleared")		
+		print("Viewed cutscenes cleared")
+
+	# Trigger the tutorial cutscene — play_cutscene handles the scene transition
+	if has_node("/root/CutsceneManagerAutoload"):
+		get_node("/root/CutsceneManagerAutoload").play_cutscene("tutorial_intro")
+	else:
+		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 
 
