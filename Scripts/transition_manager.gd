@@ -23,7 +23,7 @@ var silhouette_delay: float = 0.1
 
 # Simple fade configuration
 var simple_fade_out_duration: float = 0.3
-var simple_fade_in_duration: float = 0.3
+var simple_fade_in_duration: float = 0.65
 var default_transition_mode: TransitionMode = TransitionMode.SIMPLE_FADE
 
 # Scene/silhouette mapping (only used for silhouette mode)
@@ -168,10 +168,7 @@ func start_transition_in() -> void:
 	if current_mode == TransitionMode.SIMPLE_FADE:
 		silhouette_texture.modulate.a = 0.0
 	
-	# Configure the tween for transitioning in
-	current_tween = create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
-	
-	# Use appropriate fade in duration
+	current_tween = create_tween().set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_EXPO)
 	var fade_duration = simple_fade_in_duration if current_mode == TransitionMode.SIMPLE_FADE else fade_in_duration
 	
 	# Fade out the black overlay

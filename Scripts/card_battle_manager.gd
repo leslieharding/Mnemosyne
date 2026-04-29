@@ -962,7 +962,10 @@ func start_game():
 	
 	if is_tutorial_mode:
 		game_status_label.text = "Tutorial: Learning the Basics"
-		# Simple tutorial setup - just start the game normally
+		disable_player_input()
+		if not board_intro_played:
+			board_intro_played = true
+			await animate_board_intro()
 		turn_manager.is_game_active = true
 		turn_manager.current_player = TurnManager.Player.HUMAN
 		enable_player_input()
