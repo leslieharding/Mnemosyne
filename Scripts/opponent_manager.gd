@@ -192,7 +192,7 @@ var ai_profiles: Dictionary = {
 		"shelter_bonus": 6,
 		"efficient_capture_bonus": 25,
 		"card_priorities": {
-			"Icarus":  {"score_bonus": 70, "max_turn": 2},
+			"Icarus":  {"min_turn": 2, "too_early_penalty": -500},
 			"Daedalus":  {"score_bonus": 30, "max_turn": 2},
 		},
 		"card_order": [],
@@ -650,8 +650,11 @@ func evaluate_move(card: CardResource, slot: int) -> Dictionary:
 	var card_priorities: Dictionary = profile.get("card_priorities", {})
 	if card.card_name in card_priorities:
 		var priority = card_priorities[card.card_name]
+		var min_turn: int = priority.get("min_turn", 0)
 		var max_turn: int = priority.get("max_turn", 0)
-		if max_turn == 0 or turn_number <= max_turn:
+		if min_turn > 0 and turn_number < min_turn:
+			priority_bonus = priority.get("too_early_penalty", -500)
+		elif max_turn == 0 or turn_number <= max_turn:
 			priority_bonus = priority.get("score_bonus", 0)
 
 	return {
