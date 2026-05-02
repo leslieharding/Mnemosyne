@@ -221,9 +221,9 @@ var ai_profiles: Dictionary = {
 		"shelter_bonus": 6,
 		"efficient_capture_bonus": 25,
 		"card_priorities": {
-			"Nemian Lion":  {"score_bonus": 70, "max_turn": 2},
-			"Ceryneian Hind":  {"score_bonus": 50, "max_turn": 4},
 			"Stymphalian Birds":  {"score_bonus": 80, "max_turn": 2},
+			"Ceryneian Hind":  {"score_bonus": 50, "max_turn": 4},
+			"Nemian Lion":  {"score_bonus": 70, "max_turn": 2},
 		},
 		"card_order": [],
 		"card_order_bonus": 200,

@@ -4751,6 +4751,8 @@ func handle_standard_combat_effects(attacker_pos: int, defender_pos: int, attack
 	if attacking_card_display:
 		var is_player_attack = (attacking_owner == Owner.PLAYER)
 		visual_effects_manager.show_capture_flash(attacking_card_display, direction.my_value_index, is_player_attack)
+		visual_effects_manager.show_attacking_stat_pulse(attacking_card_display, direction.my_value_index)  # NEW
+
 	
 	# Award capture experience if it's a player card attacking - UNIFIED VERSION
 	if attacking_owner == Owner.PLAYER:
@@ -4787,6 +4789,12 @@ func handle_standard_defense_effects(attacker_pos: int, defender_pos: int, attac
 			var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
 			if progress_tracker:
 				progress_tracker.increment_defends()
+	
+	# VISUAL EFFECT: Nudge the defending stat away from the attack direction
+	var defending_card_display = get_card_display_at_position(defender_pos)
+	var attacking_card_display = get_card_display_at_position(attacker_pos)
+	if defending_card_display and visual_effects_manager:
+		visual_effects_manager.show_defending_stat_nudge(defending_card_display, attacking_card_display, direction.my_value_index)  
 	
 	# Execute ON_DEFEND abilities
 	execute_defend_abilities(defender_pos, defending_card, attacker_pos, attacking_card, direction.name)

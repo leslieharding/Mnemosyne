@@ -846,3 +846,67 @@ func screen_shake(intensity: float = 4.0, duration: float = 0.3, frequency: floa
 				screen_shake_target.position = original_position
 		shake_tween = null
 	)
+
+# Helper: resolve the Label node for a given direction index
+func get_stat_label_for_direction(card_display: CardDisplay, direction: int) -> Label:
+	match direction:
+		0: return card_display.north_power
+		1: return card_display.east_power
+		2: return card_display.south_power
+		3: return card_display.west_power
+		_: return null
+
+# Show gold pulse on the attacking stat that won the comparison
+func show_attacking_stat_pulse(card_display: CardDisplay, attack_direction: int):
+	if not card_display:
+		return
+	var label = get_stat_label_for_direction(card_display, attack_direction)
+	if not label:
+		return
+
+	var tween = create_tween()
+	tween.set_parallel(true)
+	# Colour: ramp to bright gold, fade back to white
+	tween.tween_property(label, "modulate", Color(2.0, 1.8, 0.4), 0.1)
+	tween.tween_property(label, "modulate", Color.WHITE, 0.35).set_delay(0.1)
+	# Scale: pop up, spring back
+	tween.tween_property(label, "scale", Vector2(1.35, 1.35), 0.1)
+	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.3).set_delay(0.1).set_trans(Tween.TRANS_SPRING).set_ease(Tween.EASE_OUT)
+
+func show_defending_stat_nudge(defending_card_display: CardDisplay, attacking_card_display: CardDisplay, attack_direction: int):
+	# --- Defending stat: slow lean back, fast snap forward ---
+	if defending_card_display:
+		var defending_stat_direction = (attack_direction + 2) % 4
+		var def_label = get_stat_label_for_direction(defending_card_display, defending_stat_direction)
+		if def_label:
+			var nudge: Vector2
+			match attack_direction:
+				0: nudge = Vector2(0, -3)
+				1: nudge = Vector2(3, 0)
+				2: nudge = Vector2(0, 3)
+				3: nudge = Vector2(-3, 0)
+				_: nudge = Vector2.ZERO
+
+			var def_original = def_label.position
+			var def_tween = create_tween()
+			def_tween.tween_property(def_label, "position", def_original + nudge, 0.3).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+			def_tween.tween_property(def_label, "position", def_original, 0.15).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	# --- Attacking stat: lean toward defender, then retreat ---
+	if attacking_card_display:
+		var atk_label = get_stat_label_for_direction(attacking_card_display, attack_direction)
+		if atk_label:
+			var lean: Vector2
+			match attack_direction:
+				0: lean = Vector2(0, -3)
+				1: lean = Vector2(3, 0)
+				2: lean = Vector2(0, 3)
+				3: lean = Vector2(-3, 0)
+				_: lean = Vector2.ZERO
+
+			var atk_original = atk_label.position
+			var atk_tween = create_tween()
+			# Lean in slowly as the attack is pressed
+			atk_tween.tween_property(atk_label, "position", atk_original + lean, 0.25).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+			# Pull back — the attack failed
+			atk_tween.tween_property(atk_label, "position", atk_original, 0.3).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
