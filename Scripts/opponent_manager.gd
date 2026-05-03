@@ -47,8 +47,9 @@ var ai_profiles: Dictionary = {
 		"shelter_bonus": 6,
 		"efficient_capture_bonus": 25,
 		"card_priorities": {
+			"The Omphalos": {"score_bonus": 60, "max_turn": 4, "preferred_slots": [4], "slot_bonus": 80},
 			"Python":  {"score_bonus": 70, "max_turn": 2},
-			"The Omphalos":    {"score_bonus": 60, "max_turn": 2},
+			"Ladon": {"min_turn": 2, "too_early_penalty": -300},
 		},
 		"card_order": [],
 		"card_order_bonus": 200,
@@ -239,6 +240,7 @@ var ai_profiles: Dictionary = {
 		"card_priorities": {
 			"Nessus":  {"score_bonus": 70, "max_turn": 1},
 			"Orthrus":  {"score_bonus": 50, "max_turn": 3},
+			"Antaeus":  {"score_bonus": 50, "max_turn": 3, "preferred_slots": [6,7,8], "slot_bonus": 80},
 		},
 		"card_order": [],
 		"card_order_bonus": 200,
@@ -656,6 +658,10 @@ func evaluate_move(card: CardResource, slot: int) -> Dictionary:
 			priority_bonus = priority.get("too_early_penalty", -500)
 		elif max_turn == 0 or turn_number <= max_turn:
 			priority_bonus = priority.get("score_bonus", 0)
+		
+		var preferred_slots: Array = priority.get("preferred_slots", [])
+		if preferred_slots.size() > 0 and slot in preferred_slots:
+			priority_bonus += priority.get("slot_bonus", 0)
 
 	return {
 		"score": capture_score + defensive_alignment + priority_bonus,
@@ -682,7 +688,7 @@ func get_defensive_alignment_score(card: CardResource, slot: int) -> int:
 	]
 
 	for d in direction_checks:
-		var stat: int = card_values[d["stat_idx"]]
+		var stat: int = min(card_values[d["stat_idx"]], 10)
 		if not d["in_bounds"]:
 			score += shelter                          # Board edge — fully sheltered
 		elif game_manager.grid_occupied[d["adj"]]:
