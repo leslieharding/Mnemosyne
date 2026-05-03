@@ -15,6 +15,8 @@ var new_game_ripple: ButtonRipple
 var settings_ripple: ButtonRipple
 var quit_ripple: ButtonRipple
 
+var saved_run_popup: Panel
+
 func _process(_delta):
 	if continue_button_ripple:
 		continue_button_ripple.update_mouse_position()
@@ -195,10 +197,18 @@ func _on_new_game_button_pressed_direct():
 func _on_new_game_button_pressed_with_confirmation():
 	confirmation_dialog.popup_centered()
 
-# Continue game for returning players
 func _on_continue_button_pressed():
 	continue_button_ripple.on_pressed()
 	SoundManagerAutoload.play_randomized("click")
+	
+	# Check for a saved run before proceeding
+	if has_node("/root/RunSaveManagerAutoload"):
+		var save_manager = get_node("/root/RunSaveManagerAutoload")
+		if save_manager.has_saved_run():
+			_show_saved_run_popup()
+			return
+	
+	# No saved run - proceed normally
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 
@@ -303,3 +313,103 @@ func _on_settings_button_mouse_exited() -> void:
 
 func _on_quit_button_mouse_exited() -> void:
 	quit_ripple.on_mouse_exited()
+
+func _show_saved_run_popup():
+	if saved_run_popup and is_instance_valid(saved_run_popup):
+		saved_run_popup.queue_free()
+	
+	var save_manager = get_node("/root/RunSaveManagerAutoload")
+	var save_data = save_manager.load_run()
+	var god_name = save_data.get("god", "Unknown")
+	var deck_index = save_data.get("deck_index", 0)
+	
+	saved_run_popup = Panel.new()
+	saved_run_popup.custom_minimum_size = Vector2(420, 240)
+	add_child(saved_run_popup)
+	
+	var screen_size = get_viewport().get_visible_rect().size
+	saved_run_popup.position = (screen_size - saved_run_popup.custom_minimum_size) / 2
+	
+	var vbox = VBoxContainer.new()
+	vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 12)
+	saved_run_popup.add_child(vbox)
+	
+	var label = Label.new()
+	label.text = "Run In Progress"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 20)
+	vbox.add_child(label)
+	
+	var sublabel = Label.new()
+	sublabel.text = "You have a saved run with " + god_name + " (Deck " + str(deck_index + 1) + ").\nWhat would you like to do?"
+	sublabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sublabel.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(sublabel)
+	
+	var resume_button = Button.new()
+	resume_button.text = "Resume Run"
+	resume_button.pressed.connect(_on_saved_run_resume_pressed)
+	vbox.add_child(resume_button)
+	
+	var abandon_button = Button.new()
+	abandon_button.text = "Abandon Run"
+	abandon_button.pressed.connect(_on_saved_run_abandon_pressed)
+	vbox.add_child(abandon_button)
+	
+	var cancel_button = Button.new()
+	cancel_button.text = "Cancel"
+	cancel_button.pressed.connect(func(): saved_run_popup.queue_free())
+	vbox.add_child(cancel_button)
+
+func _on_saved_run_resume_pressed():
+	saved_run_popup.hide()
+	var save_manager = get_node("/root/RunSaveManagerAutoload")
+	var save_data = save_manager.load_run()
+	
+	if save_data.is_empty():
+		print("ERROR: Could not load saved run data")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+		return
+	
+	# Restore all tracker state
+	save_manager.restore_trackers_from_save(save_data)
+	
+	# Reconstruct map data
+	var map_data = save_manager.reconstruct_map_data(save_data)
+	
+	# Clear the save file now that we've loaded it (it'll be re-saved if they exit again)
+	save_manager.clear_saved_run()
+	
+	# Pass to run map
+	get_tree().set_meta("scene_params", {
+		"god": save_data["god"],
+		"deck_index": save_data["deck_index"],
+		"map_data": map_data,
+		"resuming_run": true
+	})
+	TransitionManagerAutoload.change_scene_to("res://Scenes/RunMap.tscn")
+
+func _on_saved_run_abandon_pressed():
+	saved_run_popup.hide()
+	var save_manager = get_node("/root/RunSaveManagerAutoload")
+	var save_data = save_manager.load_run()
+	
+	if save_data.is_empty():
+		print("ERROR: Could not load saved run data for abandon")
+		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+		return
+	
+	# Restore trackers so RunSummary has exp data to display and commit
+	save_manager.restore_trackers_from_save(save_data)
+	
+	# Clear the saved run
+	save_manager.clear_saved_run()
+	
+	# Go to run summary as a loss
+	get_tree().set_meta("scene_params", {
+		"god": save_data["god"],
+		"deck_index": save_data["deck_index"],
+		"victory": false
+	})
+	TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")

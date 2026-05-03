@@ -2265,8 +2265,10 @@ func end_game():
 		})
 		TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
 		
-		# Clear the battle snapshot since the battle is over
+		# Clear the battle snapshot and any saved run since the run is now over
 		clear_battle_snapshot()
+		if has_node("/root/RunSaveManagerAutoload"):
+			get_node("/root/RunSaveManagerAutoload").clear_saved_run()
 		return
 	
 	# Player won - check if this completes the run
@@ -2311,8 +2313,10 @@ func end_game():
 			SoundManagerAutoload.fade_out_music(1.0) 
 			TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
 			
-			# Clear the battle snapshot since the battle is over
+			# Clear the battle snapshot and any saved run since the run is now over
 			clear_battle_snapshot()
+			if has_node("/root/RunSaveManagerAutoload"):
+				get_node("/root/RunSaveManagerAutoload").clear_saved_run()
 			return
 	
 	# Not the final boss - continue with reward screen

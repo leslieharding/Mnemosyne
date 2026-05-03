@@ -15,6 +15,10 @@ var map_node_buttons: Array[Button] = []
 var selected_god: String = "Apollo"
 var selected_deck_index: int = 0
 
+var exit_popup: Panel
+var exit_popup_save_button: Button
+var exit_popup_abandon_button: Button
+
 # Experience panel reference
 var exp_panel: ExpPanel
 
@@ -31,11 +35,11 @@ func _ready():
 	# Add experience panel
 	setup_experience_panel()
 	
-	# Check if we're returning from a battle or starting fresh
+	# Check if we're returning from a battle, resuming a saved run, or starting fresh
 	var params = get_scene_params()
-	if params.has("returning_from_battle") and params.has("map_data"):
-		# Returning from battle - use existing map data
-		current_map = params.map_data
+	if params.has("map_data") and params["map_data"] != null:
+		# Returning from battle or resuming a saved run - use the provided map data
+		current_map = params["map_data"]
 		display_map()
 	else:
 		# Starting fresh - generate new map
@@ -70,6 +74,14 @@ func get_run_parameters():
 		selected_god = params.god
 	if params.has("deck_index"):
 		selected_deck_index = params.deck_index
+	
+	# If resuming, use the restored map data instead of generating a new one
+	if params.has("map_data") and params["map_data"] != null:
+		current_map = params["map_data"]
+		print("RunMap: Resuming saved run with restored map data")
+	else:
+		generate_new_map()
+		print("RunMap: Generated new map for ", selected_god)
 	
 	print("Starting run with: ", selected_god, " deck ", selected_deck_index)
 
@@ -272,11 +284,9 @@ func _on_new_run_pressed():
 
 
 
-# Handle back button press
 func _on_back_button_pressed():
 	SoundManagerAutoload.play("click")
-	# Return to god selection
-	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
+	_show_exit_popup()
 
 # Helper to get passed parameters from previous scene
 func get_scene_params() -> Dictionary:
@@ -299,3 +309,73 @@ func refresh_map():
 	if current_map.is_map_complete():
 		title_label.text = "Run Complete! " + selected_god + " Victorious!"
 		progress_label.text = "Congratulations! You've completed this run."
+
+func _show_exit_popup():
+	if exit_popup and is_instance_valid(exit_popup):
+		exit_popup.queue_free()
+	
+	# Build a manual popup panel rather than relying on AcceptDialog internals
+	exit_popup = Panel.new()
+	exit_popup.custom_minimum_size = Vector2(400, 220)
+	add_child(exit_popup)
+	
+	# Centre it on screen
+	var screen_size = get_viewport().get_visible_rect().size
+	exit_popup.position = (screen_size - exit_popup.custom_minimum_size) / 2
+	
+	var vbox = VBoxContainer.new()
+	vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 12)
+	exit_popup.add_child(vbox)
+	
+	var label = Label.new()
+	label.text = "Leave Run?"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 20)
+	vbox.add_child(label)
+	
+	var sublabel = Label.new()
+	sublabel.text = "What would you like to do with your current run?"
+	sublabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sublabel.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(sublabel)
+	
+	exit_popup_save_button = Button.new()
+	exit_popup_save_button.text = "Save & Exit"
+	exit_popup_save_button.pressed.connect(_on_exit_save_pressed)
+	vbox.add_child(exit_popup_save_button)
+	
+	exit_popup_abandon_button = Button.new()
+	exit_popup_abandon_button.text = "Abandon Run"
+	exit_popup_abandon_button.pressed.connect(_on_exit_abandon_pressed)
+	vbox.add_child(exit_popup_abandon_button)
+	
+	var cancel_button = Button.new()
+	cancel_button.text = "Cancel"
+	cancel_button.pressed.connect(func(): exit_popup.queue_free())
+	vbox.add_child(cancel_button)
+
+func _on_exit_save_pressed():
+	exit_popup.hide()
+	if has_node("/root/RunSaveManagerAutoload"):
+		var save_manager = get_node("/root/RunSaveManagerAutoload")
+		var success = save_manager.save_run(selected_god, selected_deck_index, current_map)
+		if success:
+			print("Run saved - returning to main menu")
+		else:
+			print("WARNING: Run save failed - returning to main menu anyway")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
+
+func _on_exit_abandon_pressed():
+	exit_popup.hide()
+	# Clear any saved run file for this run since we're abandoning definitively
+	if has_node("/root/RunSaveManagerAutoload"):
+		get_node("/root/RunSaveManagerAutoload").clear_saved_run()
+	
+	# Go to run summary as a loss - existing flow handles exp commit
+	get_tree().set_meta("scene_params", {
+		"god": selected_god,
+		"deck_index": selected_deck_index,
+		"victory": false
+	})
+	TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
