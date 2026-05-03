@@ -20,6 +20,7 @@ config/features=PackedStringArray("4.6", "Mobile")
 
 [autoload]
 
+SettingsManagerAutoload="*uid://c57kal2i0bcad"
 TransitionManagerAutoload="*res://Scripts/transition_manager.gd"
 RunExperienceTrackerAutoload="*res://Scripts/run_experience_tracker.gd"
 GlobalProgressTrackerAutoload="*res://Scripts/global_progress_tracker.gd"
