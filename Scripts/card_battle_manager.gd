@@ -20,6 +20,9 @@ var grid_card_data: Array = []  # Track the actual card data for each slot
 
 var misdirection_button: Button
 
+var is_natural_harmonics_deck: bool = false
+
+
 # Typewriter effect variables
 var typewriter_timer: Timer
 var typewriter_full_text: String = ""
@@ -1213,6 +1216,11 @@ func make_boss_prediction():
 		available_cards, 
 		available_positions
 	)
+	
+	# Natural Harmonics override: ignore slot ranking, target the rhythm slot directly
+	if is_natural_harmonics_deck and rhythm_slot >= 0:
+		current_boss_prediction["position"] = rhythm_slot
+		print("Natural Harmonics: Boss overriding predicted position to rhythm slot ", rhythm_slot)
 	
 	print("Boss prediction for turn ", current_turn, ": Card ", current_boss_prediction.get("card", -1), " at position ", current_boss_prediction.get("position", -1))
 
@@ -2866,6 +2874,9 @@ func initialize_deck_power(deck_def: DeckDefinition):
 		DeckDefinition.DeckPowerType.COORDINATE_POWER:
 			setup_coordinate_power()	
 		DeckDefinition.DeckPowerType.RHYTHM_POWER:
+			if deck_def.deck_name == "Natural Harmonics":
+				is_natural_harmonics_deck = true
+				print("Natural Harmonics deck detected - Apollo boss will target rhythm slot")
 			setup_rhythm_power()	
 		DeckDefinition.DeckPowerType.NONE:
 			print("No deck power for this deck")
