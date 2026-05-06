@@ -29,6 +29,9 @@ var label_fade_tween: Tween
 const LABEL_FADE_DURATION: float = 0.5  # Duration of fade-in effect
 const POWER_FADE_DURATION: float = 0.8  # Slightly slower fade for power values
 
+var tune_mode_active: bool = false
+var tune_modal = null
+var tune_pending: bool = false
 
 var discordant_active: bool = false
 
@@ -3252,6 +3255,13 @@ func handle_card_selection(card_display, card_index):
 		print("Game paused for modal - blocking card selection")
 		return
 	
+	# Tune mode: intercept hand card click to select the tune target
+	if tune_mode_active:
+		tune_mode_active = false
+		game_status_label.text = ""
+		show_tune_modal(card_index)
+		return
+	
 	# In tutorial mode, FORCE allow card selection regardless of turn state
 	if is_tutorial_mode:
 		print("Tutorial mode: Allowing card selection")
@@ -4079,7 +4089,13 @@ func place_card_on_grid():
 	if race_mode_active:
 		print("Race mode active - staying on turn until race completes")
 		return
-		
+	
+	if tune_pending:
+		print("Tune pending - staying on player turn for tune selection")
+		tune_pending = false
+		trigger_tune_ability()
+		return
+	
 	# Check if game should end
 	if should_game_end():
 		end_game()
@@ -10502,3 +10518,75 @@ func select_germinate_target(target_position: int):
 func _on_germinate_card_clicked(event: InputEvent, grid_pos: int):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		select_germinate_target(grid_pos)
+
+func trigger_tune_ability():
+	"""Called deferred after Tune card's combat resolves"""
+	print("TuneAbility: Triggering - player hand size: ", player_deck.size())
+
+	if player_deck.size() == 0:
+		print("TuneAbility: No cards in hand - fizzling")
+		return
+
+	if player_deck.size() == 1:
+		print("TuneAbility: One card in hand - auto-selecting index 0")
+		show_tune_modal(0)
+		return
+
+	# Multiple cards: wait for player to click one
+	tune_mode_active = true
+	game_status_label.text = "Tune: Click a card in hand to tune its stats"
+
+
+func show_tune_modal(card_index: int):
+	"""Show the stat tuning modal for the selected hand card"""
+	if tune_modal:
+		print("TuneAbility: Modal already open - skipping")
+		return
+
+	if card_index < 0 or card_index >= player_deck.size():
+		print("TuneAbility: Invalid card index ", card_index, " - fizzling")
+		return
+
+	var card = player_deck[card_index]
+
+	game_paused_for_modal = true
+	disable_player_input()
+
+	var modal_scene = preload("res://Scenes/TuneModal.tscn")
+	tune_modal = modal_scene.instantiate()
+
+	var canvas_layer = CanvasLayer.new()
+	canvas_layer.layer = 100
+	canvas_layer.name = "TuneModalLayer"
+	add_child(canvas_layer)
+	canvas_layer.add_child(tune_modal)
+
+	tune_modal.setup(card, card_index)
+	tune_modal.tune_confirmed.connect(_on_tune_confirmed.bind(card_index))
+
+	print("TuneAbility: Modal displayed for card: ", card.card_name)
+
+
+func _on_tune_confirmed(deltas: Array, card_index: int):
+	"""Apply the tuned stat deltas to the target hand card"""
+	print("TuneAbility: Confirmed - deltas: ", deltas, " card_index: ", card_index)
+
+	tune_modal = null
+
+	var modal_layer = get_node_or_null("TuneModalLayer")
+	if modal_layer:
+		modal_layer.queue_free()
+
+	game_paused_for_modal = false
+
+	if card_index >= 0 and card_index < player_deck.size():
+		var card = player_deck[card_index]
+		for i in range(min(deltas.size(), card.values.size())):
+			card.values[i] = max(0, card.values[i] + deltas[i])
+		print("TuneAbility: '", card.card_name, "' stats after tuning: ", card.values)
+		display_player_hand()
+	else:
+		print("TuneAbility: Card index no longer valid - skipping stat application")
+
+	if turn_manager.is_game_active:
+		turn_manager.next_turn()

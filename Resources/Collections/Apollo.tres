@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=51 format=3 uid="uid://b1qqsnldvvxvp"]
+[gd_resource type="Resource" script_class="GodCardCollection" format=3 uid="uid://b1qqsnldvvxvp"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_vqrrp"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_gowu1"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://nnfoltbs28a7" path="res://Resources/Abilities/sun_dancer_ability.gd" id="7_xjxyc"]
 [ext_resource type="Script" uid="uid://c6eymtk5786om" path="res://Resources/Abilities/sun_hunt_ability.gd" id="8_xjxyc"]
 [ext_resource type="Script" uid="uid://cs8jo68kos2c6" path="res://Resources/Abilities/harmony_ability.gd" id="9_p7jhq"]
+[ext_resource type="Script" uid="uid://c46di80s1ir7j" path="res://Resources/Abilities/tune_ability.gd" id="10_tn03x"]
 [ext_resource type="Script" uid="uid://btx30eg0dkxdt" path="res://Resources/Abilities/symmetry_ability.gd" id="10_xjxyc"]
 [ext_resource type="Script" uid="uid://bfbpkrqf1u508" path="res://Resources/Abilities/finale_ability.gd" id="12_cknfu"]
 [ext_resource type="Script" uid="uid://c25iupuskk6vd" path="res://Resources/Abilities/compel_ability.gd" id="14_xjxyc"]
@@ -118,11 +119,18 @@ description = "Rosey Fingered Eos throws open the doors to a new day"
 abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_sfw3d")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_4h8a3"]
+script = ExtResource("10_tn03x")
+ability_name = "Tune"
+description = "Increase or decrease up to 4 stats of a card in hand"
+metadata/_custom_type_script = "uid://c46di80s1ir7j"
+
 [sub_resource type="Resource" id="Resource_p3s3h"]
 script = ExtResource("1_vqrrp")
 card_name = "Calliope"
 values = Array[int]([2, 2, 3, 3])
 description = "lovely voice personified"
+abilities = Array[ExtResource("2_gowu1")]([SubResource("Resource_4h8a3")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_ca26u"]

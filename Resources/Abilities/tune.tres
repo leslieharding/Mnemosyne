@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CardAbility" format=3 uid="uid://4kerr2yonmym"]
+
+[ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="1_slewf"]
+
+[resource]
+script = ExtResource("1_slewf")
+ability_name = "Tune"
+description = "Increase or decrease up to 4 stats of a card in hand."
+metadata/_custom_type_script = "uid://bx8x0dmil6800"

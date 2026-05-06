@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://bxpa0kdhkrwhr"]
+
+[ext_resource type="Script" uid="uid://by82o7if40gek" path="res://Scripts/tune_modal.gd" id="1_awinp"]
+
+[node name="TuneModal" type="Control" unique_id=1724234840]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_awinp")
