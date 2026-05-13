@@ -61,7 +61,7 @@ func execute(context: Dictionary) -> bool:
 	print("SunDanceAbility: Total sunlit positions now: ", game_manager.sunlit_positions)
 	
 	# Apply the visual styling to the new sun spot
-	game_manager.apply_sunlit_styling(new_sunlit_position)
+	game_manager.apply_sunlit_styling(new_sunlit_position, true)
 	
 	# Play sun dance sound effect
 	SoundManagerAutoload.play("sun_dance")

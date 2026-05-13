@@ -148,10 +148,12 @@ func play_click():
 	play("click")
 
 
-# Music functions
 func play_music(music_name: String, fade_in_duration: float = 1.0):
 	if not MUSIC.has(music_name):
 		push_error("Music not found: " + music_name)
+		return
+	# If this track is already playing, do nothing
+	if is_playing_music(music_name):
 		return
 	if music_fade_tween:
 		music_fade_tween.kill()

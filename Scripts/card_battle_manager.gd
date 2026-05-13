@@ -2912,7 +2912,7 @@ func setup_sun_power():
 	for position in sunlit_positions:
 		apply_sunlit_styling(position)
 
-func apply_sunlit_styling(grid_index: int):
+func apply_sunlit_styling(grid_index: int, start_visible: bool = false):
 	if grid_index < 0 or grid_index >= grid_slots.size():
 		return
 	
@@ -2974,7 +2974,12 @@ func apply_sunlit_styling(grid_index: int):
 	
 	slot.add_child(god_rays)
 	slot.move_child(god_rays, 0)
-	god_rays.modulate.a = 0.0  # Hidden until animate_sun_spots_in() is called after board intro
+	if start_visible:
+		god_rays.modulate.a = 0.0
+		var fade_tween = create_tween()
+		fade_tween.tween_property(god_rays, "modulate:a", 1.0, 0.5)
+	else:
+		god_rays.modulate.a = 0.0  # Hidden until animate_sun_spots_in() is called after board intro
 	print("Applied god rays effect to sun slot ", grid_index)
 
 
@@ -8481,7 +8486,7 @@ func reapply_battle_visual_effects():
 	# Re-apply sunlit styling if sun power is active AND not blocked by darkness
 	if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER and not darkness_shroud_active:
 		for position in sunlit_positions:
-			apply_sunlit_styling(position)
+			apply_sunlit_styling(position, true)
 		print("Re-applied sunlit styling to positions: ", sunlit_positions)
 	elif active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER and darkness_shroud_active:
 		print("Sun power blocked by Darkness Shroud - no sunlit positions displayed")
