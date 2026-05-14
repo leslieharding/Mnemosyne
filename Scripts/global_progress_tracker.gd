@@ -9,6 +9,8 @@ var save_path: String = "user://card_progress.save"
 var traps_fallen_for: int = 0  # Track trap encounters for Artemis unlock
 var total_defends: int = 0  # Track total defends for Athena unlock
 var leather_scraps: int = 0  # Track leather scraps earned from boss kills
+var leather_scraps_thrown: int = 0  # Track leather scraps thrown away for Víðarr
+
 
 var chronos_rechallenge_visible: bool = false
 var chronos_rechallenge_unlocked: bool = false
@@ -141,7 +143,8 @@ func save_progress():
 			"traps_fallen_for": traps_fallen_for,
 			"chronos_rechallenge_visible": chronos_rechallenge_visible,
 			"chronos_rechallenge_unlocked": chronos_rechallenge_unlocked,
-			"leather_scraps": leather_scraps
+			"leather_scraps": leather_scraps,
+			"leather_scraps_thrown": leather_scraps_thrown
 		}
 		save_file.store_var(save_data)
 		save_file.close()
@@ -165,6 +168,7 @@ func load_progress():
 				couples_united = loaded_data.get("couples_united", [])
 				traps_fallen_for = loaded_data.get("traps_fallen_for", 0)
 				leather_scraps = loaded_data.get("leather_scraps", 0)
+				leather_scraps_thrown = loaded_data.get("leather_scraps_thrown", 0)
 				chronos_rechallenge_visible = loaded_data.get("chronos_rechallenge_visible", false)
 				chronos_rechallenge_unlocked = loaded_data.get("chronos_rechallenge_unlocked", false)
 				# Migrate old capture_exp/defense_exp format to unified total_exp
@@ -227,6 +231,7 @@ func clear_all_progress():
 	traps_fallen_for = 0
 	total_defends = 0  # Reset defend counter for Athena unlock
 	leather_scraps = 0
+	leather_scraps_thrown = 0
 	save_progress()
 	
 	# Clear boss victory tracker
@@ -524,5 +529,15 @@ func award_leather_scraps(amount: int = 1):
 	save_progress()
 	print("Leather scraps awarded: +", amount, " (total: ", leather_scraps, ")")
 
+func throw_leather_scraps(amount: int = 1):
+	var actual = min(amount, leather_scraps)
+	leather_scraps -= actual
+	leather_scraps_thrown += actual
+	save_progress()
+	print("Leather scraps thrown: -", actual, " (held: ", leather_scraps, ", thrown total: ", leather_scraps_thrown, ")")
+
 func get_leather_scraps() -> int:
 	return leather_scraps
+
+func get_leather_scraps_thrown() -> int:
+	return leather_scraps_thrown

@@ -923,12 +923,24 @@ func refresh_mnemosyne_tab():
 	# Show leather scraps total above the deck - only if player has earned some
 	var progress_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
 	if progress_tracker and progress_tracker.get_leather_scraps() > 0:
+		var scraps_row = HBoxContainer.new()
+		scraps_row.alignment = BoxContainer.ALIGNMENT_CENTER
+		card_container.add_child(scraps_row)
+
 		var scraps_label = Label.new()
 		scraps_label.text = "🪡 Leather Scraps: " + str(progress_tracker.get_leather_scraps())
 		scraps_label.add_theme_font_size_override("font_size", 16)
 		scraps_label.add_theme_color_override("font_color", Color("#C8A45A"))
-		scraps_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		card_container.add_child(scraps_label)
+		scraps_row.add_child(scraps_label)
+
+		var throw_button = Button.new()
+		throw_button.text = "  🗑️ Throw Away  "
+		throw_button.tooltip_text = "Cast aside for Víðarr's great work"
+		throw_button.pressed.connect(func():
+			progress_tracker.throw_leather_scraps(1)
+			refresh_mnemosyne_tab()
+		)
+		scraps_row.add_child(throw_button)
 	
 	# Load and display Mnemosyne deck with progression
 	populate_mnemosyne_cards_with_progression(card_container)
