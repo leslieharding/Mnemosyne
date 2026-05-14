@@ -88,6 +88,10 @@ var board_intro_played: bool = false
 
 var disarray_active: bool = false
 
+# Apollo alternate win condition tracking
+var apollo_laughter_count: int = 0
+var apollo_alternate_win_pending: bool = false
+
 # Hermes boss visual inversion system
 var is_hermes_boss_battle: bool = false
 var visual_stat_inversion_active: bool = false
@@ -522,6 +526,8 @@ func setup_boss_prediction_tracker():
 		if is_boss_battle:
 			if current_node.enemy_name == BossConfig.APOLLO_BOSS_NAME:
 				is_apollo_boss_battle = true
+				apollo_laughter_count = 0
+				apollo_alternate_win_pending = false
 				print("Apollo boss battle detected - prediction system activated!")
 				game_status_label.text = "The oracle's gaze pierces through time..."
 			elif current_node.enemy_name == BossConfig.HERMES_BOSS_NAME:
@@ -547,6 +553,8 @@ func setup_boss_prediction_tracker():
 			setup_fimbulwinter_snow_overlay()
 		elif params["enemy_name"] == BossConfig.APOLLO_BOSS_NAME:
 			is_apollo_boss_battle = true
+			apollo_laughter_count = 0
+			apollo_alternate_win_pending = false
 			print("Apollo boss battle detected (test battle)!")
 			game_status_label.text = "The oracle's gaze pierces through time..."
 		elif params["enemy_name"] == BossConfig.HERMES_BOSS_NAME:
@@ -2145,6 +2153,12 @@ func end_game():
 		tracker.stop_recording()
 	
 	await get_tree().process_frame
+	
+	# Check for Apollo alternate win condition BEFORE any score evaluation
+	if apollo_alternate_win_pending:
+		apollo_alternate_win_pending = false
+		apollo_boss_alternate_win_condition()
+		return
 	
 	# TUTORIAL MODE CHECK - Handle tutorial completion first
 	if is_tutorial_mode:
@@ -3827,6 +3841,17 @@ func place_card_on_grid():
 			# Trigger the notification
 			if notification_manager:
 				notification_manager.show_notification("I knew you would go there")
+			
+			# Track laughter count for alternate win condition
+			apollo_laughter_count += 1
+			print("Apollo laughter count: ", apollo_laughter_count, "/5")
+			
+			# TODO: Play escalating laugh sound here
+			# SoundManagerAutoload.play_laughter(apollo_laughter_count)
+			
+			if apollo_laughter_count >= 5:
+				apollo_alternate_win_pending = true
+				print("All 5 traps triggered - alternate win condition pending!")
 			
 			# Record trap encounter for Artemis unlock
 			var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
@@ -10606,3 +10631,45 @@ func _on_tune_confirmed(deltas: Array, card_index: int):
 
 	if turn_manager.is_game_active:
 		turn_manager.next_turn()
+
+
+func apollo_boss_alternate_win_condition():
+	print("=== APOLLO BOSS ALTERNATE WIN CONDITION ===")
+	print("Player fell for all 5 traps - Loki laughed himself to defeat!")
+	
+	game_status_label.text = "Loki collapses in laughter... You win?"
+	disable_player_input()
+	opponent_is_thinking = false
+	turn_manager.end_game()
+	
+	# TODO: Play final boisterous laugh sound here
+	# SoundManagerAutoload.play_laughter(5)
+	
+	await get_tree().create_timer(3.0).timeout
+	
+	var params = get_scene_params()
+	
+	record_enemy_encounter(true)
+	record_god_experience()
+	check_god_unlocks()
+	
+	if has_node("/root/MainLevelAutoload"):
+		get_node("/root/MainLevelAutoload").add_main_exp(MainLevelManager.EXP_WIN)
+	
+	var scraps_earned = 1
+	if has_node("/root/GlobalProgressTrackerAutoload"):
+		get_node("/root/GlobalProgressTrackerAutoload").award_leather_scraps(scraps_earned)
+	
+	get_tree().set_meta("scene_params", {
+		"god": params.get("god", current_god),
+		"deck_index": params.get("deck_index", 0),
+		"victory": true,
+		"leather_scraps_earned": scraps_earned
+	})
+	
+	SoundManagerAutoload.fade_out_music(1.0)
+	TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
+	
+	clear_battle_snapshot()
+	if has_node("/root/RunSaveManagerAutoload"):
+		get_node("/root/RunSaveManagerAutoload").clear_saved_run()
