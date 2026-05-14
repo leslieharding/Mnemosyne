@@ -20,6 +20,8 @@ var grid_card_data: Array = []  # Track the actual card data for each slot
 
 var misdirection_button: Button
 
+var ability_mode_input_blocked: bool = false
+
 var is_natural_harmonics_deck: bool = false
 
 
@@ -3537,6 +3539,9 @@ func _on_grid_gui_input(event, grid_index):
 		print("Game paused for modal - blocking grid input")
 		return
 	
+	# Block ability slot selection briefly after mode activation to prevent accidental clicks
+	if ability_mode_input_blocked:
+		return
 	
 	# Handle dance target selection FIRST (but only during dance mode setup)
 	if dance_mode_active and current_dancer_owner == Owner.PLAYER:
@@ -5157,6 +5162,7 @@ func start_hunt_mode(hunter_position: int, hunter_owner: Owner, hunter_card: Car
 	# Update game status
 	if hunter_owner == Owner.PLAYER:
 		game_status_label.text = "🎯 HUNT MODE: Select a slot to hunt"
+		block_ability_input_briefly()
 	else:
 		game_status_label.text = "🎯 " + opponent_manager.get_opponent_info().name + " is hunting..."
 		# Auto-select target for opponent
@@ -5676,6 +5682,7 @@ func start_compel_mode(compeller_position: int, compeller_owner: Owner, compelle
 	# Update game status
 	if compeller_owner == Owner.PLAYER:
 		game_status_label.text = "🎯 COMPEL MODE: Select a slot to compel the opponent"
+		block_ability_input_briefly()
 	else:
 		game_status_label.text = "🎯 " + opponent_manager.get_opponent_info().name + " is compelling..."
 		# Auto-select target for opponent
@@ -5806,6 +5813,7 @@ func start_ordain_mode(ordainer_position: int, ordainer_owner: Owner, ordainer_c
 	# Update game status
 	if ordainer_owner == Owner.PLAYER:
 		game_status_label.text = "✨ ORDAIN MODE: Select an empty slot to ordain"
+		block_ability_input_briefly()
 	else:
 		game_status_label.text = "✨ " + opponent_manager.get_opponent_info().name + " is ordaining..."
 		# Auto-select target for opponent
@@ -6556,6 +6564,7 @@ func start_sanctuary_mode(sanctuary_position: int, sanctuary_owner: Owner, sanct
 	# Update game status
 	if sanctuary_owner == Owner.PLAYER:
 		game_status_label.text = "🛡️ SANCTUARY MODE: Select an empty slot to sanctuary"
+		block_ability_input_briefly()
 	else:
 		game_status_label.text = "🛡️ " + opponent_manager.get_opponent_info().name + " is sanctuaring..."
 		# Auto-select target for opponent
@@ -7402,6 +7411,7 @@ func start_enrich_mode(enricher_position: int, enricher_owner: Owner, enricher_c
 	if enricher_owner == Owner.PLAYER:
 		if enrichment_amount > 0:
 			game_status_label.text = "Choose a slot to enrich (+%d boost to friendly cards)" % enrichment_amount
+			block_ability_input_briefly()
 		else:
 			game_status_label.text = "Choose a slot to weaken (%d penalty to friendly cards)" % enrichment_amount
 	else:
@@ -10728,3 +10738,8 @@ func clear_prophecy_trap_indicator():
 		var existing = slot.get_node_or_null("ProphecyTrapIndicator")
 		if existing:
 			existing.queue_free()
+
+func block_ability_input_briefly():
+	ability_mode_input_blocked = true
+	await get_tree().create_timer(0.3).timeout
+	ability_mode_input_blocked = false
