@@ -5704,6 +5704,12 @@ func select_compel_target(target_position: int):
 	# Update game status
 	if current_compeller_owner == Owner.PLAYER:
 		game_status_label.text = "Compel set! Opponent must play in the marked slot."
+	else:
+		game_status_label.text = "Opponent must play in the marked slot."
+	
+	# Reset selection state - place_card_on_grid was bypassed so these weren't cleared
+	current_grid_index = -1
+	hide_dotted_highlight()
 	
 	# Switch turns - compel action completes the turn
 	print("Compel target selected - switching turns")
@@ -7744,7 +7750,12 @@ func show_opponent_hand_modal():
 	
 	# Pause game interactions
 	game_paused_for_modal = true
+	# Save current_grid_index before disable_player_input() clears it.
+	# place_card_on_grid() is mid-execution as a coroutine and needs this
+	# intact after the modal closes to correctly call resolve_combat().
+	var saved_grid_index = current_grid_index
 	disable_player_input()
+	current_grid_index = saved_grid_index
 	
 	print("Creating opponent hand modal...")
 	
