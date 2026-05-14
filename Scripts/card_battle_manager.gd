@@ -2964,20 +2964,11 @@ func apply_sunlit_styling(grid_index: int, start_visible: bool = false):
 	var shader_material = ShaderMaterial.new()
 	shader_material.shader = load("res://Shaders/god_rays.gdshader")
 	
-	# Set shader parameters for natural god rays
-	shader_material.set_shader_parameter("angle", 0.0)  # Straight down
-	shader_material.set_shader_parameter("position", 0.5)  # Centered horizontally
-	shader_material.set_shader_parameter("spread", 0.3)  # More parallel (less fan out)
-	shader_material.set_shader_parameter("cutoff", -0.8)  # WIDE beam (negative = wider)
-	shader_material.set_shader_parameter("falloff", 0.5)  # Gentle fade at top
-	shader_material.set_shader_parameter("edge_fade", 0.4)  # Soft, blurry edges
-	shader_material.set_shader_parameter("speed", 0.6)  # Gentle shimmer
-	shader_material.set_shader_parameter("ray1_density", 4.0)  # Wide spacing (fewer rays)
-	shader_material.set_shader_parameter("ray2_density", 15.0)  # More compact detail layer
-	shader_material.set_shader_parameter("ray2_intensity", 0.6)  # Strong second layer for blending
-	shader_material.set_shader_parameter("color", Color(1.0, 0.95, 0.7, 0.85))
-	shader_material.set_shader_parameter("hdr", false)
-	shader_material.set_shader_parameter("seed", randf() * 10.0)
+	# Set shader parameters for pulse glow
+	shader_material.set_shader_parameter("glow_color", Color(1.0, 0.9, 0.5, 1.0))
+	shader_material.set_shader_parameter("intensity", 0.8)
+	shader_material.set_shader_parameter("spread", 1.27)
+	shader_material.set_shader_parameter("pulse_speed", 0.31)
 	
 	god_rays.material = shader_material
 	
