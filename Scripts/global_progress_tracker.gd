@@ -497,6 +497,7 @@ func check_chronos_rechallenge_conditions():
 		if boss_wins >= 1:
 			chronos_rechallenge_visible = true
 			print("Chronos rechallenge button now visible")
+			save_progress()  # ADD THIS LINE
 	
 	# State 3 condition: Unlocked - player has defeated 3 bosses
 	if not chronos_rechallenge_unlocked and chronos_rechallenge_visible:
@@ -520,7 +521,7 @@ func get_total_boss_wins() -> int:
 	for boss_name in boss_names:
 		if boss_name in enemy_memories:
 			var boss_data = enemy_memories[boss_name]
-			total_wins += boss_data.get("wins", 0)
+			total_wins += boss_data.get("victories", 0)
 	
 	return total_wins
 

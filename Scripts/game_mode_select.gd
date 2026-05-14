@@ -32,6 +32,9 @@ func _ready():
 	load_test_battle_data()
 	setup_main_level_banner()
 	
+	if has_node("/root/GlobalProgressTrackerAutoload"):
+		get_node("/root/GlobalProgressTrackerAutoload").check_chronos_rechallenge_conditions()
+	
 	if chiron_button:
 		# Use call_deferred to ensure the button's _ready() has finished
 		call_deferred("refresh_chiron_button")
