@@ -1173,7 +1173,7 @@ func _on_turn_changed(is_player_turn: bool):
 	
 	# Normal turn flow continues...
 # If it's opponent turn and they haven't started thinking yet, let them take their turn
-	if turn_manager.is_opponent_turn() and not opponent_is_thinking:
+	if turn_manager.is_opponent_turn() and not opponent_is_thinking and not game_paused_for_modal:
 		print("Starting opponent turn")
 		call_deferred("opponent_take_turn")
 
@@ -4012,10 +4012,15 @@ func place_card_on_grid():
 	# CRITICAL FIX: Don't resolve combat here if card was replaced
 	# The replace_card_with_summon function already handles combat for the summoned ally
 	if not card_was_replaced:
+		# If a modal is open (e.g. Prophetic), wait until it closes before resolving combat
+		while game_paused_for_modal:
+			await get_tree().process_frame
+		
 		# Resolve combat
 		var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 		if captures > 0:
 			print("Player captured ", captures, " cards!")
+		
 		# Check for awakening triggers after player places card
 		check_for_awakening_triggers(current_grid_index, Owner.PLAYER)	
 		# NEW: Check if card has Aristeia ability and trigger it with captures_made
@@ -4125,6 +4130,7 @@ func place_card_on_grid():
 	if trojan_horse_mode_active:
 		print("Trojan Horse mode active - staying on player turn for target selection")
 		return
+	
 	
 	if race_mode_active:
 		print("Race mode active - staying on turn until race completes")
@@ -5775,6 +5781,17 @@ func get_available_slots_for_opponent() -> Array[int]:
 
 
 func start_ordain_mode(ordainer_position: int, ordainer_owner: Owner, ordainer_card: CardResource):
+	# Check if any empty slots exist to ordain - if not, fizzle silently
+	var empty_slots_exist = false
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:
+			empty_slots_exist = true
+			break
+	
+	if not empty_slots_exist:
+		print("OrdainAbility: No empty slots available to ordain - fizzling")
+		return
+	
 	ordain_mode_active = true
 	current_ordainer_position = ordainer_position
 	current_ordainer_owner = ordainer_owner
@@ -5822,6 +5839,10 @@ func select_ordain_target(target_position: int):
 		game_status_label.text = "Ordain set! Next card in that slot gets +2 to all stats."
 	else:
 		game_status_label.text = "Opponent ordained a slot."
+	
+	# Reset selection state - place_card_on_grid was bypassed so these weren't cleared
+	current_grid_index = -1
+	hide_dotted_highlight()
 	
 	# Switch turns - ordain action completes the turn
 	print("Ordain target selected - switching turns")
@@ -7750,28 +7771,25 @@ func show_opponent_hand_modal():
 	opponent_hand_modal.display_opponent_hand(opponent_cards)
 
 func _on_opponent_hand_modal_closed():
-	"""Handle when the prophetic modal is closed"""
-	print("Opponent hand modal closed - resuming game")
+	print("Opponent hand modal closed - unblocking combat")
 	
-	# Clean up modal reference
 	opponent_hand_modal = null
 	
-	# Remove the canvas layer
 	var modal_layer = get_node_or_null("PropheticModalLayer")
 	if modal_layer:
 		modal_layer.queue_free()
 	
-	# Resume game
+	# Setting this to false unblocks the await loop in place_card_on_grid
+	# which will then resolve combat and switch turns normally
 	game_paused_for_modal = false
 	
-	# Re-enable player input if it's still the player's turn
-	if turn_manager.current_player == TurnManager.Player.HUMAN and turn_manager.is_game_active:
-		enable_player_input()
+	print("Game resumed after prophetic vision")
 	
-	# If it's the opponent's turn and they haven't started thinking yet, let them take their turn
+	# Fallback for non-prophetic modal use (shouldn't normally reach here)
 	if turn_manager.is_opponent_turn() and not opponent_is_thinking and not is_tutorial_mode:
-		print("Modal closed - starting deferred opponent turn")
 		call_deferred("opponent_take_turn")
+	elif turn_manager.is_player_turn() and turn_manager.is_game_active:
+		enable_player_input()
 	
 	print("Game resumed after prophetic vision")
 

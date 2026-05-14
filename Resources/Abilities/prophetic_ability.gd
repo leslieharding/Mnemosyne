@@ -17,10 +17,7 @@ func execute(context: Dictionary) -> bool:
 		return false
 	
 	print("PropheticAbility activated! Opening opponent hand viewer...")
-	
-	# Call the game manager to show the opponent's hand modal
 	game_manager.show_opponent_hand_modal()
-	
 	return true
 
 func can_execute(context: Dictionary) -> bool:
