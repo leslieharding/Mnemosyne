@@ -1231,7 +1231,11 @@ func make_boss_prediction():
 		print("Natural Harmonics: Boss overriding predicted position to rhythm slot ", rhythm_slot)
 	
 	print("Boss prediction for turn ", current_turn, ": Card ", current_boss_prediction.get("card", -1), " at position ", current_boss_prediction.get("position", -1))
-
+	
+	# Show trap indicator if player is using the Prophecy deck (Prophecy power extension)
+	if active_deck_power == DeckDefinition.DeckPowerType.PROPHECY_POWER:
+		show_prophecy_trap_indicator(current_boss_prediction.get("position", -1))
+	
 # Calculate and return current scores (Triple Triad style)
 func get_current_scores() -> Dictionary:
 	# Count cards owned on the board
@@ -3823,6 +3827,10 @@ func place_card_on_grid():
 		var tracker = get_node("/root/BossPredictionTrackerAutoload")
 		if tracker:
 			tracker.record_card_play(card_collection_index, current_grid_index)
+	
+	# Clear prophecy trap indicator when player commits to a slot
+	if active_deck_power == DeckDefinition.DeckPowerType.PROPHECY_POWER:
+		clear_prophecy_trap_indicator()
 	
 	# Check boss prediction if this is a boss battle
 	var boss_prediction_hit = false
@@ -10673,3 +10681,30 @@ func apollo_boss_alternate_win_condition():
 	clear_battle_snapshot()
 	if has_node("/root/RunSaveManagerAutoload"):
 		get_node("/root/RunSaveManagerAutoload").clear_saved_run()
+
+func show_prophecy_trap_indicator(grid_index: int):
+	clear_prophecy_trap_indicator()
+
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+
+	var slot = grid_slots[grid_index]
+
+	var indicator = Label.new()
+	indicator.name = "ProphecyTrapIndicator"
+	indicator.text = "✗"
+	indicator.add_theme_color_override("font_color", Color(1, 0, 0, 0.85))
+	indicator.add_theme_font_size_override("font_size", 48)
+	indicator.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	indicator.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	indicator.set_anchors_preset(Control.PRESET_FULL_RECT)
+	indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.add_child(indicator)
+
+	print("Prophecy trap indicator shown at slot ", grid_index)
+
+func clear_prophecy_trap_indicator():
+	for slot in grid_slots:
+		var existing = slot.get_node_or_null("ProphecyTrapIndicator")
+		if existing:
+			existing.queue_free()
