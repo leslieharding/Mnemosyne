@@ -36,6 +36,7 @@ BossLossTrackerAutoload="*res://Scripts/boss_loss_tracker.gd"
 SoundManagerAutoload="*res://Scripts/sound_manager.gd"
 MainLevelAutoload="*uid://6p4xlo11nsn8"
 RunSaveManagerAutoload="*uid://cufc1cgvdy13b"
+FeedbackManagerAutoload="*uid://b1jef5v3wv1nd"
 
 [display]
 
