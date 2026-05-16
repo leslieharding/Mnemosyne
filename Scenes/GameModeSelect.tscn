@@ -1,14 +1,10 @@
-[gd_scene load_steps=17 format=3 uid="uid://vha8ujknia5b"]
+[gd_scene format=3 uid="uid://vha8ujknia5b"]
 
 [ext_resource type="Script" uid="uid://bhy4ca4xh6wgg" path="res://Scripts/game_mode_select.gd" id="1_3aue6"]
 [ext_resource type="Script" uid="uid://cww2cxqfgy5s5" path="res://Scripts/chiron_button.gd" id="2_1fq1s"]
-[ext_resource type="Texture2D" uid="uid://hp1jmoxcxohl" path="res://Assets/Images/Hero_Selection-export.png" id="2_x5d8l"]
+[ext_resource type="Texture2D" uid="uid://0pb0be2ju7ye" path="res://Assets/Images/Hero_Selection-export.png" id="2_x5d8l"]
 [ext_resource type="Script" uid="uid://uriqrs6jmhvb" path="res://Scripts/chronos_button.gd" id="3_cn38a"]
-[ext_resource type="Texture2D" uid="uid://c745weacrxsys" path="res://Assets/Images/Apollo.png" id="5_7djtl"]
 [ext_resource type="Shader" uid="uid://cj06coiouh3vc" path="res://Shaders/hover_highlight.gdshader" id="5_u4vls"]
-[ext_resource type="Texture2D" uid="uid://bssiar0i1k30c" path="res://Assets/Images/Hermes.png" id="6_u4vls"]
-[ext_resource type="Texture2D" uid="uid://d0cto01b1xsql" path="res://Assets/Images/Artemis.png" id="7_qbekx"]
-[ext_resource type="Texture2D" uid="uid://btvbpdy7pwk5x" path="res://Assets/Images/Demeter.png" id="8_ok7rk"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qbekx"]
 shader = ExtResource("5_u4vls")
@@ -21,6 +17,9 @@ shader_parameter/pulse_speed = 0.4
 shader_parameter/pulse_intensity = 0.8
 shader_parameter/pulse_thickness_range = 0.5
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dqabf"]
+load_path = "res://.godot/imported/Apollo.png-9cc913b35962e1ff9e991f9a83d42eea.ctex"
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_u4vls"]
 shader = ExtResource("5_u4vls")
 shader_parameter/clr = Color(0.7529412, 0.7529412, 0.7529412, 1)
@@ -31,6 +30,9 @@ shader_parameter/glow_falloff = 0.4
 shader_parameter/pulse_speed = 0.8
 shader_parameter/pulse_intensity = 1.0
 shader_parameter/pulse_thickness_range = 0.5
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_pygnc"]
+load_path = "res://.godot/imported/Hermes.png-ccd1c4941f1e6c143a8a3ff4efcb6958.ctex"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ok7rk"]
 shader = ExtResource("5_u4vls")
@@ -43,6 +45,9 @@ shader_parameter/pulse_speed = 0.4
 shader_parameter/pulse_intensity = 1.0
 shader_parameter/pulse_thickness_range = 0.5
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_jajgl"]
+load_path = "res://.godot/imported/Artemis.png-ee18708542f0d67f9a4749164d70214d.ctex"
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ohc70"]
 shader = ExtResource("5_u4vls")
 shader_parameter/clr = Color(0.72156864, 0.5254902, 0.043137256, 1)
@@ -53,6 +58,9 @@ shader_parameter/glow_falloff = 0.4
 shader_parameter/pulse_speed = 0.4
 shader_parameter/pulse_intensity = 1.0
 shader_parameter/pulse_thickness_range = 0.5
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_7djtl"]
+load_path = "res://.godot/imported/Demeter.png-2cb9416a273d7eab101ed937a5b5d97c.ctex"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jvq57"]
 shader = ExtResource("5_u4vls")
@@ -87,7 +95,7 @@ shader_parameter/pulse_speed = 2.0
 shader_parameter/pulse_intensity = 0.5
 shader_parameter/pulse_thickness_range = 0.3
 
-[node name="GameModeSelect" type="Control"]
+[node name="GameModeSelect" type="Control" unique_id=1431164860]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -96,7 +104,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_3aue6")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=1477812380]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -107,7 +115,7 @@ texture = ExtResource("2_x5d8l")
 expand_mode = 3
 stretch_mode = 4
 
-[node name="Button" type="Button" parent="Background"]
+[node name="Button" type="Button" parent="Background" unique_id=1352172330]
 layout_mode = 0
 offset_left = 836.0
 offset_top = 595.0
@@ -115,7 +123,7 @@ offset_right = 946.0
 offset_bottom = 626.0
 text = "Back"
 
-[node name="ChironButton" type="Button" parent="."]
+[node name="ChironButton" type="Button" parent="." unique_id=1658128030]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -131,14 +139,14 @@ grow_vertical = 0
 text = "Visit Chiron"
 script = ExtResource("2_1fq1s")
 
-[node name="UnlockInfoPanel" type="PanelContainer" parent="."]
+[node name="UnlockInfoPanel" type="PanelContainer" parent="." unique_id=1471865176]
 layout_mode = 0
 offset_left = -200.0
 offset_right = -160.0
 offset_bottom = 40.0
 metadata/_edit_use_anchors_ = true
 
-[node name="ChronosButton" type="Button" parent="."]
+[node name="ChronosButton" type="Button" parent="." unique_id=2013834833]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -154,61 +162,61 @@ grow_vertical = 0
 text = "Challenge Chronos"
 script = ExtResource("3_cn38a")
 
-[node name="Apollo" type="TextureRect" parent="."]
+[node name="Apollo" type="TextureRect" parent="." unique_id=1533215507]
 material = SubResource("ShaderMaterial_qbekx")
 layout_mode = 0
-offset_left = 54.0
-offset_top = 256.0
-offset_right = 221.0
-offset_bottom = 573.0
-texture = ExtResource("5_7djtl")
+offset_left = 50.0
+offset_top = 201.0
+offset_right = 217.0
+offset_bottom = 463.0
+texture = SubResource("CompressedTexture2D_dqabf")
 
-[node name="Hermes" type="TextureRect" parent="."]
+[node name="Hermes" type="TextureRect" parent="." unique_id=2043042467]
 material = SubResource("ShaderMaterial_u4vls")
 layout_mode = 0
-offset_left = 220.0
-offset_top = 256.0
-offset_right = 354.0
-offset_bottom = 574.0
-texture = ExtResource("6_u4vls")
+offset_left = 222.0
+offset_top = 247.0
+offset_right = 365.0
+offset_bottom = 461.0
+texture = SubResource("CompressedTexture2D_pygnc")
 
-[node name="Artemis" type="TextureRect" parent="."]
+[node name="Artemis" type="TextureRect" parent="." unique_id=399756270]
 material = SubResource("ShaderMaterial_ok7rk")
 layout_mode = 0
-offset_left = 375.0
-offset_top = 266.0
-offset_right = 490.0
-offset_bottom = 576.0
-texture = ExtResource("7_qbekx")
+offset_left = 372.0
+offset_top = 257.0
+offset_right = 491.0
+offset_bottom = 460.0
+texture = SubResource("CompressedTexture2D_jajgl")
 
-[node name="Demeter" type="TextureRect" parent="."]
+[node name="Demeter" type="TextureRect" parent="." unique_id=329889306]
 material = SubResource("ShaderMaterial_ohc70")
 layout_mode = 0
-offset_left = 496.0
-offset_top = 262.0
-offset_right = 642.0
-offset_bottom = 574.0
-texture = ExtResource("8_ok7rk")
+offset_left = 491.0
+offset_top = 241.0
+offset_right = 651.0
+offset_bottom = 462.0
+texture = SubResource("CompressedTexture2D_7djtl")
 
-[node name="Aphrodite" type="TextureRect" parent="."]
+[node name="Aphrodite" type="TextureRect" parent="." unique_id=406263017]
 material = SubResource("ShaderMaterial_jvq57")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Dionysus" type="TextureRect" parent="."]
+[node name="Dionysus" type="TextureRect" parent="." unique_id=1157268764]
 material = SubResource("ShaderMaterial_64ylo")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Athena" type="TextureRect" parent="."]
+[node name="Athena" type="TextureRect" parent="." unique_id=876686929]
 material = SubResource("ShaderMaterial_ec8fm")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="ApolloButton" type="Button" parent="."]
+[node name="ApolloButton" type="Button" parent="." unique_id=1630226650]
 modulate = Color(1, 1, 1, 0)
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 0
@@ -217,7 +225,7 @@ offset_top = 251.0
 offset_right = 217.0
 offset_bottom = 491.0
 
-[node name="HermesButton" type="Button" parent="."]
+[node name="HermesButton" type="Button" parent="." unique_id=242894599]
 modulate = Color(1, 1, 1, 0)
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 0
@@ -226,16 +234,16 @@ offset_top = 252.0
 offset_right = 357.0
 offset_bottom = 489.0
 
-[node name="ArtemisButton" type="Button" parent="."]
+[node name="ArtemisButton" type="Button" parent="." unique_id=540880359]
 modulate = Color(1, 1, 1, 0)
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 0
 offset_left = 372.0
 offset_top = 252.0
-offset_right = 495.0
+offset_right = 496.0
 offset_bottom = 491.0
 
-[node name="DemeterButton" type="Button" parent="."]
+[node name="DemeterButton" type="Button" parent="." unique_id=1359278808]
 modulate = Color(1, 1, 1, 0)
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 0
@@ -244,7 +252,7 @@ offset_top = 254.0
 offset_right = 644.0
 offset_bottom = 489.0
 
-[node name="AphroditeButton" type="Button" parent="."]
+[node name="AphroditeButton" type="Button" parent="." unique_id=4160970]
 modulate = Color(1, 1, 1, 0)
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 0
@@ -253,7 +261,7 @@ offset_top = 251.0
 offset_right = 783.0
 offset_bottom = 489.0
 
-[node name="DionysusButton" type="Button" parent="."]
+[node name="DionysusButton" type="Button" parent="." unique_id=1322958087]
 modulate = Color(1, 1, 1, 0)
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 0
@@ -262,7 +270,7 @@ offset_top = 251.0
 offset_right = 914.0
 offset_bottom = 489.0
 
-[node name="AthenaButton" type="Button" parent="."]
+[node name="AthenaButton" type="Button" parent="." unique_id=1576574275]
 modulate = Color(1, 1, 1, 0)
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 0

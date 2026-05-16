@@ -3181,7 +3181,7 @@ func display_player_hand():
 	# Simple line layout parameters
 	var hand_size = player_deck.size()
 	var card_width = 120
-	var card_spacing = 10  # Gap between cards (adjust this for wider/narrower gaps)
+	var card_spacing = -10  # Gap between cards (adjust this for wider/narrower gaps)
 	
 	var total_spacing = card_width + card_spacing
 	var total_width = hand_size * total_spacing - card_spacing
