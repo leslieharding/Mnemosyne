@@ -11,6 +11,7 @@ var total_defends: int = 0  # Track total defends for Athena unlock
 var leather_scraps: int = 0  # Track leather scraps earned from boss kills
 var leather_scraps_thrown: int = 0  # Track leather scraps thrown away for Víðarr
 
+var enemy_weakening: Dictionary = {}  # { "enemy_name": weakening_amount }
 
 var chronos_rechallenge_visible: bool = false
 var chronos_rechallenge_unlocked: bool = false
@@ -144,7 +145,8 @@ func save_progress():
 			"chronos_rechallenge_visible": chronos_rechallenge_visible,
 			"chronos_rechallenge_unlocked": chronos_rechallenge_unlocked,
 			"leather_scraps": leather_scraps,
-			"leather_scraps_thrown": leather_scraps_thrown
+			"leather_scraps_thrown": leather_scraps_thrown,
+			"enemy_weakening": enemy_weakening,
 		}
 		save_file.store_var(save_data)
 		save_file.close()
@@ -173,6 +175,7 @@ func load_progress():
 				chronos_rechallenge_unlocked = loaded_data.get("chronos_rechallenge_unlocked", false)
 				# Migrate old capture_exp/defense_exp format to unified total_exp
 				progress_data = migrate_experience_data(old_progress_data)
+				enemy_weakening = loaded_data.get("enemy_weakening", {})
 			else:
 				# Very old format - just progress data
 				var old_progress_data = loaded_data if loaded_data is Dictionary else {}
@@ -232,6 +235,7 @@ func clear_all_progress():
 	total_defends = 0  # Reset defend counter for Athena unlock
 	leather_scraps = 0
 	leather_scraps_thrown = 0
+	enemy_weakening = {}
 	save_progress()
 	
 	# Clear boss victory tracker
@@ -542,3 +546,13 @@ func get_leather_scraps() -> int:
 
 func get_leather_scraps_thrown() -> int:
 	return leather_scraps_thrown
+
+func add_enemy_weakening(enemy_name: String):
+	if not enemy_name in enemy_weakening:
+		enemy_weakening[enemy_name] = 0
+	enemy_weakening[enemy_name] += 1
+	save_progress()
+	print("GlobalProgressTracker: ", enemy_name, " weakened by 1. Total weakening: ", enemy_weakening[enemy_name])
+
+func get_enemy_weakening(enemy_name: String) -> int:
+	return enemy_weakening.get(enemy_name, 0)

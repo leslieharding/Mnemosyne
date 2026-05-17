@@ -98,7 +98,7 @@ func build_overlay():
 
 	# Title
 	var title = Label.new()
-	title.text = "Playtest Feedback  (F1 to close)"
+	title.text = "Bug Report and Feedback"
 	title.add_theme_font_size_override("font_size", 20)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(title)
@@ -108,25 +108,27 @@ func build_overlay():
 	# Category label + dropdown
 	var cat_label = Label.new()
 	cat_label.text = "Category:"
+	
 	vbox.add_child(cat_label)
 
 	category_option = OptionButton.new()
+	
 	category_option.process_mode = Node.PROCESS_MODE_ALWAYS
 	category_option.add_item("Bug")
 	category_option.add_item("Balance")
-	category_option.add_item("Feel / UX")
+	category_option.add_item("Visual")
 	category_option.add_item("Other")
 	vbox.add_child(category_option)
 
 	# Feedback label + text box
 	var fb_label = Label.new()
-	fb_label.text = "Feedback:"
+	fb_label.text = "Details:"
 	vbox.add_child(fb_label)
 
 	text_input = TextEdit.new()
 	text_input.process_mode = Node.PROCESS_MODE_ALWAYS
 	text_input.custom_minimum_size = Vector2(0, 100)
-	text_input.placeholder_text = "Describe what happened or what you noticed..."
+	text_input.placeholder_text = "What has Loki done to the code now?"
 	text_input.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 	vbox.add_child(text_input)
 

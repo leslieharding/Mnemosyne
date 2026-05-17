@@ -24,6 +24,11 @@ var ability_mode_input_blocked: bool = false
 
 var is_natural_harmonics_deck: bool = false
 
+# Hermes impatient mood system
+var hermes_mood_active: bool = false
+var impatient_timer: Timer = null
+var impatient_thresholds: Array[int] = [12, 10, 8, 6, 4]
+var impatient_threshold_index: int = 0
 
 # Typewriter effect variables
 var typewriter_timer: Timer
@@ -675,7 +680,7 @@ func setup_opponent_from_params():
 		else:
 			print("No enemy data found, using default Shadow Acolyte")
 			opponent_manager.setup_opponent("Shadow Acolyte", 0)
-
+	setup_hermes_mood()
 
 func initialize_enemy_deck_power(deck_def: EnemyDeckDefinition):
 	active_enemy_deck_power = deck_def.deck_power_type
@@ -1136,10 +1141,14 @@ func _on_turn_changed(is_player_turn: bool):
 		enable_player_input()
 		if is_boss_battle:
 			make_boss_prediction()
+		if hermes_mood_active:
+			_start_impatient_timer()
 	else:
 		process_tremors_for_player(Owner.OPPONENT)
 		process_volleys_for_player(Owner.OPPONENT)
 		disable_player_input()
+		if hermes_mood_active:
+			_stop_impatient_timer()
 	
 	# CRITICAL FIX: Check if current player has no cards when their turn starts
 	# Only end the game if BOTH players are out of cards
@@ -2277,7 +2286,8 @@ func end_game():
 		opponent_is_thinking = false
 		turn_manager.end_game()
 		
-		record_enemy_encounter(false)  
+		record_enemy_encounter(false)
+		record_vengeful_weakening()
 		record_god_experience()
 		check_god_unlocks()
 		if has_node("/root/MainLevelAutoload"):
@@ -4219,6 +4229,10 @@ func place_card_on_grid():
 		if child is CardDisplay:
 			child.is_in_hand = false
 			break
+	
+	if hermes_mood_active:
+		_stop_impatient_timer()
+		impatient_threshold_index = 0
 	
 	# Switch turns only if no special modes are active
 	turn_manager.next_turn()
@@ -10743,3 +10757,92 @@ func block_ability_input_briefly():
 	ability_mode_input_blocked = true
 	await get_tree().create_timer(0.3).timeout
 	ability_mode_input_blocked = false
+
+func setup_hermes_mood():
+	hermes_mood_active = false
+	if GodMoodManagerAutoload.is_mood_active() \
+			and GodMoodManagerAutoload.get_active_god() == "Hermes" \
+			and GodMoodManagerAutoload.get_active_mood() == "impatient":
+		hermes_mood_active = true
+		impatient_threshold_index = 0
+		print("Hermes impatient mood ACTIVE for this battle")
+		
+		impatient_timer = Timer.new()
+		impatient_timer.one_shot = true
+		add_child(impatient_timer)
+		impatient_timer.timeout.connect(_on_impatient_timer_fired)
+
+func _start_impatient_timer():
+	if not impatient_timer or not is_instance_valid(impatient_timer):
+		return
+	var threshold = impatient_thresholds[min(impatient_threshold_index, impatient_thresholds.size() - 1)]
+	impatient_timer.wait_time = threshold
+	impatient_timer.start()
+	print("Impatient timer started: ", threshold, "s")
+
+func _stop_impatient_timer():
+	if impatient_timer and is_instance_valid(impatient_timer) and not impatient_timer.is_stopped():
+		impatient_timer.stop()
+
+func _on_impatient_timer_fired():
+	if not turn_manager.is_player_turn():
+		return
+	if player_deck.is_empty():
+		return
+	
+	print("Hermes impatient! Playing a card for the player.")
+	
+	# Escalate threshold for next time
+	impatient_threshold_index = min(impatient_threshold_index + 1, impatient_thresholds.size() - 1)
+	
+	# Get available slots from the player's perspective
+	var available_slots: Array[int] = []
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:
+			available_slots.append(i)
+	
+	if available_slots.is_empty():
+		return
+	
+	# Ask opponent manager to pick the best move using player cards
+	var chosen = opponent_manager.get_best_move_for_player(available_slots, player_deck)
+	
+	if chosen.is_empty():
+		# Fallback: pick first card, random slot
+		chosen = {
+			"card_index": 0,
+			"slot": available_slots[randi() % available_slots.size()]
+		}
+	
+	# Execute as if the player placed the card
+	var card_index_in_hand = chosen["card_index"]
+	var target_slot = chosen["slot"]
+	
+	# Select and place the card
+	selected_card_index = card_index_in_hand
+	current_grid_index = target_slot
+	place_card_on_grid()
+
+func record_vengeful_weakening():
+	if not GodMoodManagerAutoload.is_mood_active():
+		return
+	if GodMoodManagerAutoload.get_active_god() != "Artemis":
+		return
+	if GodMoodManagerAutoload.get_active_mood() != "vengeful":
+		return
+	
+	var params = get_scene_params()
+	var enemy_name = ""
+	
+	if params.has("current_node"):
+		enemy_name = params["current_node"].enemy_name
+	elif params.has("enemy_name"):
+		enemy_name = params["enemy_name"]
+	
+	if enemy_name == "":
+		print("record_vengeful_weakening: Could not determine enemy name")
+		return
+	
+	if has_node("/root/GlobalProgressTrackerAutoload"):
+		get_node("/root/GlobalProgressTrackerAutoload").add_enemy_weakening(enemy_name)
+		print("Vengeful mood: ", enemy_name, " permanently weakened")

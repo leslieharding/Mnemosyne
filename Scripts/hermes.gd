@@ -4,6 +4,7 @@ extends Node2D
 var hermes_collection: GodCardCollection
 var selected_deck_index: int = -1  # -1 means no deck selected
 var journal_button: JournalButton
+var mood_toggle_button: Button
 
 # UI References
 @onready var deck1_button = $MainContainer/LeftPanel/Deck1Button
@@ -55,6 +56,7 @@ func _ready():
 	
 	setup_journal_button()
 	select_deck(0)
+	setup_mood_toggle()
 
 
 func _on_start_game_button_pressed() -> void:
@@ -554,3 +556,28 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 	
 	return card_panel
 	
+
+func setup_mood_toggle():
+	var left_panel = $MainContainer/LeftPanel
+	
+	mood_toggle_button = Button.new()
+	mood_toggle_button.name = "MoodToggleButton"
+	left_panel.add_child(mood_toggle_button)
+	
+	_refresh_mood_button()
+	mood_toggle_button.pressed.connect(_on_mood_toggle_pressed)
+
+func _refresh_mood_button():
+	if GodMoodManagerAutoload.is_mood_active() and GodMoodManagerAutoload.get_active_god() == "Hermes":
+		mood_toggle_button.text = "Mood: Impatient ✓"
+		mood_toggle_button.modulate = Color(1.0, 0.8, 0.2)
+	else:
+		mood_toggle_button.text = "Mood: Normal"
+		mood_toggle_button.modulate = Color.WHITE
+
+func _on_mood_toggle_pressed():
+	if GodMoodManagerAutoload.is_mood_active() and GodMoodManagerAutoload.get_active_god() == "Hermes":
+		GodMoodManagerAutoload.clear_mood()
+	else:
+		GodMoodManagerAutoload.set_mood("Hermes", "impatient")
+	_refresh_mood_button()

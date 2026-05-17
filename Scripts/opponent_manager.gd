@@ -497,7 +497,8 @@ func setup_opponent(enemy_name: String, difficulty: int = 0):
 	turn_number = 0
 	print("OpponentManager: AI profile loaded for '", enemy_name,
 		"' | error_rate: ", current_ai_profile.get("error_rate", 0.25),
-		" | card_order: ", current_ai_profile.get("card_order", []))	
+		" | card_order: ", current_ai_profile.get("card_order", []))
+	apply_enemy_weakening(enemy_name)
 
 # Get the current deck definition
 func get_current_deck_definition() -> EnemyDeckDefinition:
@@ -796,3 +797,50 @@ func get_opponent_info() -> Dictionary:
 		"description": opponent_description,
 		"cards_remaining": opponent_deck.size()
 	}
+
+
+func get_best_move_for_player(available_slots: Array[int], player_cards: Array) -> Dictionary:
+	if player_cards.is_empty() or available_slots.is_empty():
+		return {}
+	
+	var all_moves: Array = []
+	
+	for card_idx in range(player_cards.size()):
+		var card = player_cards[card_idx]
+		for slot in available_slots:
+			var eval = evaluate_move(card, slot)
+			all_moves.append({
+				"card_index": card_idx,
+				"slot": slot,
+				"score": eval["score"],
+				"captures": eval["captures"],
+				"defensive_alignment": eval["defensive_alignment"],
+			})
+	
+	if all_moves.is_empty():
+		return {}
+	
+	apply_efficient_capture_bonus(all_moves, available_slots)
+	all_moves.sort_custom(func(a, b): return a["score"] > b["score"])
+	
+	# Use the existing error-based selection so it isn't always perfect
+	var chosen = select_move_with_error(all_moves)
+	return chosen
+
+func apply_enemy_weakening(enemy_name: String):
+	if not has_node("/root/GlobalProgressTrackerAutoload"):
+		return
+	
+	var weakening = get_node("/root/GlobalProgressTrackerAutoload").get_enemy_weakening(enemy_name)
+	if weakening <= 0:
+		return
+	
+	print("OpponentManager: Applying ", weakening, " weakening to ", enemy_name)
+	
+	for card in opponent_deck:
+		if not card:
+			continue
+		for i in range(card.values.size()):
+			card.values[i] = max(1, card.values[i] - weakening)
+	
+	print("OpponentManager: Weakening applied to all cards in deck")

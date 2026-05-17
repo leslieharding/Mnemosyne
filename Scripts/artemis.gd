@@ -5,6 +5,8 @@ var artemis_collection: GodCardCollection
 var selected_deck_index: int = -1  # -1 means no deck selected
 var journal_button: JournalButton
 
+var mood_toggle_button: Button
+
 # UI References
 @onready var deck1_button = $MainContainer/LeftPanel/Deck1Button
 @onready var deck2_button = $MainContainer/LeftPanel/Deck2Button
@@ -55,6 +57,8 @@ func _ready():
 	
 	setup_journal_button()
 	select_deck(0)
+	setup_mood_toggle()
+
 
 
 
@@ -556,3 +560,28 @@ func create_deck_card_display(card: CardResource, card_index: int) -> Control:
 		exp_container.add_child(next_level_label)
 	
 	return card_panel
+
+func setup_mood_toggle():
+	var left_panel = $MainContainer/LeftPanel
+	
+	mood_toggle_button = Button.new()
+	mood_toggle_button.name = "MoodToggleButton"
+	left_panel.add_child(mood_toggle_button)
+	
+	_refresh_mood_button()
+	mood_toggle_button.pressed.connect(_on_mood_toggle_pressed)
+
+func _refresh_mood_button():
+	if GodMoodManagerAutoload.is_mood_active() and GodMoodManagerAutoload.get_active_god() == "Artemis":
+		mood_toggle_button.text = "Mood: Vengeful ✓"
+		mood_toggle_button.modulate = Color(0.8, 0.2, 0.2)
+	else:
+		mood_toggle_button.text = "Mood: Normal"
+		mood_toggle_button.modulate = Color.WHITE
+
+func _on_mood_toggle_pressed():
+	if GodMoodManagerAutoload.is_mood_active() and GodMoodManagerAutoload.get_active_god() == "Artemis":
+		GodMoodManagerAutoload.clear_mood()
+	else:
+		GodMoodManagerAutoload.set_mood("Artemis", "vengeful")
+	_refresh_mood_button()

@@ -1598,15 +1598,14 @@ metadata/_custom_type_script = "uid://u34cve51dbeq"
 
 [sub_resource type="Resource" id="Resource_wkbxl"]
 script = ExtResource("2_xcqsp")
-card_name = "Typhon"
+card_name = "Eurytos"
 values = Array[int]([2, 2, 2, 2])
-description = "The father of all monsters, hes probably not trying his hardest. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_ix0su")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_slolt"]
 script = ExtResource("2_xcqsp")
-card_name = "Echidna"
+card_name = "Polybotes"
 values = Array[int]([3, 3, 3, 4])
 description = "The mother of monsters, no not your mother, the greek monsters"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
@@ -1641,17 +1640,15 @@ metadata/_custom_type_script = "uid://u34cve51dbeq"
 
 [sub_resource type="Resource" id="Resource_thrr0"]
 script = ExtResource("2_xcqsp")
-card_name = "Typhon"
+card_name = "Eurytos"
 values = Array[int]([2, 2, 2, 2])
-description = "The father of all monsters, hes probably not trying his hardest. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_gucqx")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_b5g45"]
 script = ExtResource("2_xcqsp")
-card_name = "Echidna"
+card_name = "Polybotes"
 values = Array[int]([4, 4, 4, 5])
-description = "Loves a hundred headed giants, but a hundred eyed giants will be the death of her"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_qeou4"]
@@ -1684,17 +1681,15 @@ metadata/_custom_type_script = "uid://u34cve51dbeq"
 
 [sub_resource type="Resource" id="Resource_mt8hw"]
 script = ExtResource("2_xcqsp")
-card_name = "Typhon"
+card_name = "Eurytos"
 values = Array[int]([2, 2, 2, 2])
-description = "The father of all monsters, hes probably not trying his hardest. "
 abilities = Array[ExtResource("3_lm3ty")]([SubResource("Resource_x7t01")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_mjsp8"]
 script = ExtResource("2_xcqsp")
-card_name = "Echidna"
+card_name = "Polybotes"
 values = Array[int]([5, 5, 5, 6])
-description = "Loves a hundred headed giants, but a hundred eyed giants will be the death of her"
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_aiele"]

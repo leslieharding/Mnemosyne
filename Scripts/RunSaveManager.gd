@@ -20,6 +20,7 @@ func save_run(god: String, deck_index: int, map_data: MapData) -> bool:
 		"run_experience": _get_experience_data(),
 		"enrichment_data": _get_enrichment_data(),
 		"stat_growth_data": _get_stat_growth_data(),
+		"active_mood": GodMoodManagerAutoload.get_active_mood(),
 	}
 	
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -55,6 +56,7 @@ func restore_trackers_from_save(save_data: Dictionary):
 	_restore_experience_data(save_data.get("run_experience", {}))
 	_restore_enrichment_data(save_data.get("enrichment_data", {}))
 	_restore_stat_growth_data(save_data.get("stat_growth_data", {}))
+	_restore_mood_data(save_data)
 
 func reconstruct_map_data(save_data: Dictionary) -> MapData:
 	return _deserialize_map_data(save_data.get("map_data", {}))
@@ -167,3 +169,13 @@ func _restore_stat_growth_data(growth_data: Dictionary):
 	for key in growth_data.keys():
 		tracker.current_deck_indices.append(int(key))
 	print("RunSaveManager: Stat growth tracker restored")
+
+
+func _restore_mood_data(save_data: Dictionary):
+	var mood = save_data.get("active_mood", "")
+	var god = save_data.get("god", "")
+	if mood != "":
+		GodMoodManagerAutoload.set_mood(god, mood)
+	else:
+		GodMoodManagerAutoload.clear_mood()
+	print("RunSaveManager: Mood restored - ", god, " / ", mood)
