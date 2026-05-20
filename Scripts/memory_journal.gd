@@ -7,8 +7,8 @@ signal journal_closed()
 # UI References - these will be connected automatically by the scene structure
 @onready var main_panel = $MainContainer
 @onready var tab_container = $MainContainer/VBox/TabContainer
-@onready var close_button = $MainContainer/VBox/Header/CloseButton
-@onready var title_label = $MainContainer/VBox/Header/TitleLabel
+@onready var close_button = $MainContainer/CloseButton
+@onready var title_label = null
 @onready var summary_label = $MainContainer/VBox/Header/SummaryLabel
 
 # Tab references
@@ -33,9 +33,7 @@ func _ready():
 	if not main_panel:
 		push_error("MemoryJournal: main_panel not found!")
 		return
-	if not title_label:
-		push_error("MemoryJournal: title_label not found!")
-		return
+	
 	
 	# Connect signals
 	close_button.pressed.connect(_on_close_pressed)
@@ -862,7 +860,7 @@ func refresh_mnemosyne_tab():
 		var scraps_label = Label.new()
 		scraps_label.text = "🪡 Leather Scraps: " + str(progress_tracker.get_leather_scraps())
 		scraps_label.add_theme_font_size_override("font_size", 16)
-		scraps_label.add_theme_color_override("font_color", Color("#C8A45A"))
+		scraps_label.add_theme_color_override("font_color", Color("#1A0F00"))
 		scraps_row.add_child(scraps_label)
 
 		var throw_button = Button.new()
@@ -941,7 +939,7 @@ func populate_mnemosyne_cards_with_progression(container: VBoxContainer):
 
 func create_mnemosyne_card_panel(card_name: String, values: Array[int], upgrade_count: int) -> Control:
 	var panel = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(0, 100)  # Increased height for abilities
+	panel.custom_minimum_size = Vector2(0, 50)  # Increased height for abilities
 	
 	# Style the panel
 	var style = StyleBoxFlat.new()
@@ -961,8 +959,8 @@ func create_mnemosyne_card_panel(card_name: String, values: Array[int], upgrade_
 	var margin = MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 10)
 	margin.add_theme_constant_override("margin_right", 10)
-	margin.add_theme_constant_override("margin_top", 8)
-	margin.add_theme_constant_override("margin_bottom", 8)
+	margin.add_theme_constant_override("margin_top", 0)
+	margin.add_theme_constant_override("margin_bottom", 0)
 	panel.add_child(margin)
 	
 	# Main layout - horizontal container to put abilities to the right
@@ -1278,6 +1276,7 @@ func refresh_remember_tab():
 		label.text = display_name
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(label)
+		label.add_theme_color_override("font_color", Color("#1A0F00"))
 
 		var btn = Button.new()
 		btn.text = "Replay"

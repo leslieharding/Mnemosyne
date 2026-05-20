@@ -49,23 +49,10 @@ theme_override_styles/panel = SubResource("StyleBoxTexture_255ux")
 [node name="VBox" type="VBoxContainer" parent="MainContainer" unique_id=146130026]
 layout_mode = 2
 
-[node name="Header" type="HBoxContainer" parent="MainContainer/VBox" unique_id=1951982255]
-layout_mode = 2
-
-[node name="TitleLabel" type="Label" parent="MainContainer/VBox/Header" unique_id=511504755]
-layout_mode = 2
-size_flags_horizontal = 3
-horizontal_alignment = 1
-
-[node name="CloseButton" type="Button" parent="MainContainer/VBox/Header" unique_id=1110010651]
-custom_minimum_size = Vector2(30, 30)
-layout_mode = 2
-text = "X"
-
 [node name="TabContainer" type="TabContainer" parent="MainContainer/VBox" unique_id=1605147862]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_wbglo")
-current_tab = 2
+current_tab = 3
 
 [node name="Bestiary" type="HSplitContainer" parent="MainContainer/VBox/TabContainer" unique_id=410306672]
 visible = false
@@ -138,6 +125,7 @@ text = "Select a god to view mastery details"
 horizontal_alignment = 1
 
 [node name="Mnemosyne" type="VBoxContainer" parent="MainContainer/VBox/TabContainer" unique_id=561996861]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
@@ -145,20 +133,14 @@ metadata/_tab_index = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TitleLabel" type="Label" parent="MainContainer/VBox/TabContainer/Mnemosyne" unique_id=130261883]
-layout_mode = 2
-text = "Your Deck"
-horizontal_alignment = 1
-
 [node name="Remember" type="VBoxContainer" parent="MainContainer/VBox/TabContainer" unique_id=1625297954]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 3
 
 [node name="TitleLabel" type="Label" parent="MainContainer/VBox/TabContainer/Remember" unique_id=2070933407]
 layout_mode = 2
 size_flags_horizontal = 4
-text = "Remember
+text = "
 "
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Remember" unique_id=1396820478]
@@ -168,5 +150,12 @@ size_flags_vertical = 3
 
 [node name="CutsceneList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Remember/ScrollContainer" unique_id=319886566]
 layout_mode = 2
+
+[node name="CloseButton" type="Button" parent="MainContainer" unique_id=1007089980]
+z_index = 10
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+text = "X"
 
 [connection signal="tab_changed" from="MainContainer/VBox/TabContainer" to="." method="_on_tab_container_tab_changed"]
