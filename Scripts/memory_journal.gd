@@ -624,17 +624,7 @@ func create_enhanced_god_display(container: Control, info: Dictionary):
 	name_label.add_theme_color_override("font_color", Color("#1A0F00"))  
 	header_container.add_child(name_label)
 	
-	var mastery_label = Label.new()
-	mastery_label.text = "Mastery Level: " + str(info["mastery_level"]) + " (" + info["mastery_description"] + ")"
-	mastery_label.add_theme_font_size_override("font_size", 16)
-	mastery_label.add_theme_color_override("font_color", Color("#3D2B1A"))  
-	header_container.add_child(mastery_label)
 	
-	var battles_label = Label.new()
-	battles_label.text = "Battles Fought Together: " + str(info["battles_fought"])
-	battles_label.add_theme_font_size_override("font_size", 12)
-	battles_label.add_theme_color_override("font_color", Color("#6B4C2A"))
-	header_container.add_child(battles_label)
 	
 	main_vbox.add_child(header_container)
 	
