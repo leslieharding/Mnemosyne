@@ -3,7 +3,6 @@ extends Node2D
 # Reference to the Demeter card collection
 var demeter_collection: GodCardCollection
 var selected_deck_index: int = -1  # -1 means no deck selected
-var journal_button: JournalButton
 
 # UI References
 @onready var deck1_button = $MainContainer/LeftPanel/Deck1Button
@@ -53,7 +52,6 @@ func _ready():
 	# Right panel starts hidden
 	right_panel.visible = false
 	
-	setup_journal_button()
 	select_deck(0)
 
 func _on_start_game_button_pressed() -> void:
@@ -108,22 +106,7 @@ func _on_deck_1_button_pressed() -> void:
 
 
 
-func setup_journal_button():
-	if not journal_button:
-		# Create a CanvasLayer to ensure it's always on top, especially for Node2D scenes
-		var canvas_layer = CanvasLayer.new()
-		canvas_layer.layer = 10  # High layer value to be on top
-		canvas_layer.name = "JournalLayer"
-		add_child(canvas_layer)
-		
-		# Create the journal button
-		journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
-		canvas_layer.add_child(journal_button)
-		
-		journal_button.position = Vector2(20, get_viewport().get_visible_rect().size.y - 80)
-		journal_button.size = Vector2(60, 60)
-		
-		print("Demeter: Journal button added with CanvasLayer")
+
 
 # Set up deck buttons with unlock conditions
 func setup_deck_buttons():

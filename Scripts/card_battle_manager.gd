@@ -251,8 +251,7 @@ var couple_definitions = {
 	"Odysseus": "Circe",
 	"Circe": "Odysseus"
 }
-# Journal button reference  
-var journal_button: JournalButton
+
 
 # Current god and game state
 var current_god: String = "Apollo"  # Default fallback
@@ -590,26 +589,9 @@ func setup_card_info_panel():
 		print("Card info panel fade system initialized")
 
 func setup_journal_button():
-	if is_tutorial_mode:
-		# Don't show journal button in tutorial
-		print("Tutorial mode: Skipping journal button setup")
-		return
-	
-	if not journal_button:
-		# Create a CanvasLayer to ensure it's always on top, especially for Node2D scenes
-		var canvas_layer = CanvasLayer.new()
-		canvas_layer.layer = 10  # High layer value to be on top
-		canvas_layer.name = "JournalLayer"
-		add_child(canvas_layer)
-		
-		# Create the journal button
-		journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
-		canvas_layer.add_child(journal_button)
-		
-		journal_button.position = Vector2(20, get_viewport().get_visible_rect().size.y - 80)
-		journal_button.size = Vector2(60, 60)
-		
-		print("Battle Scene: Journal button added with CanvasLayer")
+	var jbl = get_node_or_null("JournalLayer")
+	if jbl and is_tutorial_mode:
+		jbl.visible = false
 
 # Set up the game managers
 func setup_managers():

@@ -1,73 +1,82 @@
-[gd_scene load_steps=2 format=3 uid="uid://7j18kdk8kkcw"]
+[gd_scene format=3 uid="uid://7j18kdk8kkcw"]
 
 [ext_resource type="Script" uid="uid://bewnkj8rlflex" path="res://Scripts/artemis.gd" id="1_e5tj5"]
+[ext_resource type="PackedScene" uid="uid://5tws4ffpt061" path="res://Scenes/JournalButton.tscn" id="2_polid"]
 
-[node name="Artemis" type="Node2D"]
+[node name="Artemis" type="Node2D" unique_id=1591385953]
 script = ExtResource("1_e5tj5")
 
-[node name="MainContainer" type="HBoxContainer" parent="."]
+[node name="MainContainer" type="HBoxContainer" parent="." unique_id=1673024968]
 offset_left = 61.0
 offset_top = 16.0
 offset_right = 1013.0
 offset_bottom = 616.0
 
-[node name="LeftPanel" type="VBoxContainer" parent="MainContainer"]
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer" unique_id=1897391314]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainContainer/LeftPanel"]
+[node name="Label" type="Label" parent="MainContainer/LeftPanel" unique_id=1229332586]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Artemis"
 
-[node name="Deck1Button" type="Button" parent="MainContainer/LeftPanel"]
+[node name="Deck1Button" type="Button" parent="MainContainer/LeftPanel" unique_id=294338226]
 layout_mode = 2
 text = "The Hunt"
 
-[node name="Button" type="Button" parent="MainContainer/LeftPanel"]
+[node name="Button" type="Button" parent="MainContainer/LeftPanel" unique_id=1139406851]
 layout_mode = 2
 text = "Back"
 
-[node name="StartGameButton" type="Button" parent="MainContainer/LeftPanel"]
+[node name="StartGameButton" type="Button" parent="MainContainer/LeftPanel" unique_id=364546516]
 layout_mode = 2
 text = "Start Game"
 
-[node name="VSeparator" type="VSeparator" parent="MainContainer"]
+[node name="VSeparator" type="VSeparator" parent="MainContainer" unique_id=1547412623]
 layout_mode = 2
 
-[node name="RightPanel" type="HBoxContainer" parent="MainContainer"]
+[node name="RightPanel" type="HBoxContainer" parent="MainContainer" unique_id=1891236182]
 layout_mode = 2
 
-[node name="DeckInfoContainer" type="VBoxContainer" parent="MainContainer/RightPanel"]
+[node name="DeckInfoContainer" type="VBoxContainer" parent="MainContainer/RightPanel" unique_id=1184247366]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 
-[node name="DeckTitleContainer" type="VBoxContainer" parent="MainContainer/RightPanel/DeckInfoContainer"]
+[node name="DeckTitleContainer" type="VBoxContainer" parent="MainContainer/RightPanel/DeckInfoContainer" unique_id=438014864]
 layout_mode = 2
 
-[node name="SelectedDeckTitle" type="Label" parent="MainContainer/RightPanel/DeckInfoContainer/DeckTitleContainer"]
+[node name="SelectedDeckTitle" type="Label" parent="MainContainer/RightPanel/DeckInfoContainer/DeckTitleContainer" unique_id=476208392]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Selected Deck Name"
 
-[node name="SelectedDeckDescription" type="Label" parent="MainContainer/RightPanel/DeckInfoContainer/DeckTitleContainer"]
+[node name="SelectedDeckDescription" type="Label" parent="MainContainer/RightPanel/DeckInfoContainer/DeckTitleContainer" unique_id=132990885]
 layout_mode = 2
 text = "Deck description appears here"
 
-[node name="HSeparator" type="HSeparator" parent="MainContainer/RightPanel/DeckInfoContainer"]
+[node name="HSeparator" type="HSeparator" parent="MainContainer/RightPanel/DeckInfoContainer" unique_id=251755386]
 layout_mode = 2
 
-[node name="VSeparator" type="VSeparator" parent="MainContainer/RightPanel"]
+[node name="VSeparator" type="VSeparator" parent="MainContainer/RightPanel" unique_id=875411702]
 layout_mode = 2
 
-[node name="CardsContainer" type="VBoxContainer" parent="MainContainer/RightPanel"]
+[node name="CardsContainer" type="VBoxContainer" parent="MainContainer/RightPanel" unique_id=139616787]
 layout_mode = 2
 
-[node name="CardDisplayLabel" type="Label" parent="MainContainer/RightPanel/CardsContainer"]
+[node name="CardDisplayLabel" type="Label" parent="MainContainer/RightPanel/CardsContainer" unique_id=605621095]
 layout_mode = 2
 text = "Cards in Deck"
 
-[node name="CardContainer" type="VBoxContainer" parent="MainContainer/RightPanel/CardsContainer"]
+[node name="CardContainer" type="VBoxContainer" parent="MainContainer/RightPanel/CardsContainer" unique_id=2114127641]
 layout_mode = 2
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1388817375]
+
+[node name="JournalButton" parent="CanvasLayer" unique_id=809230567 instance=ExtResource("2_polid")]
+offset_left = 27.0
+offset_top = -84.0
+offset_right = 87.0
+offset_bottom = -24.0
 
 [connection signal="pressed" from="MainContainer/LeftPanel/Deck1Button" to="." method="_on_deck_1_button_pressed"]
 [connection signal="pressed" from="MainContainer/LeftPanel/Button" to="." method="_on_button_pressed"]

@@ -1,7 +1,6 @@
 # Updated res://Scripts/game_mode_select.gd
 extends Control
 
-var journal_button: JournalButton
 
 # God button references
 @onready var apollo_button: Button = $ApolloButton
@@ -26,7 +25,6 @@ var available_enemies: Array[Dictionary] = []  # {enemy_name: String, difficulty
 var enemies_collection: EnemiesCollection
 
 func _ready():
-	setup_journal_button()
 	setup_god_buttons()
 	setup_test_battle_panel()
 	load_test_battle_data()
@@ -52,22 +50,7 @@ func refresh_chronos_button():
 		print("GameModeSelect: Refreshing Chronos button state")
 		chronos_button.update_button_state()
 
-func setup_journal_button():
-	if not journal_button:
-		# Create a CanvasLayer to ensure consistent positioning like Apollo
-		var canvas_layer = CanvasLayer.new()
-		canvas_layer.layer = 10  # High layer value to be on top
-		canvas_layer.name = "JournalLayer"
-		add_child(canvas_layer)
-		
-		# Create the journal button
-		journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
-		canvas_layer.add_child(journal_button)
-		
-		journal_button.position = Vector2(20, get_viewport().get_visible_rect().size.y - 80)
-		journal_button.size = Vector2(60, 60)
-		
-		print("GameModeSelect: Journal button added with CanvasLayer")
+
 
 func setup_god_buttons():
 	# Check god unlock status

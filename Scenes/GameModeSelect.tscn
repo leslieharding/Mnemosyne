@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://0pb0be2ju7ye" path="res://Assets/Images/Hero_Selection-export.png" id="2_x5d8l"]
 [ext_resource type="Script" uid="uid://uriqrs6jmhvb" path="res://Scripts/chronos_button.gd" id="3_cn38a"]
 [ext_resource type="Shader" uid="uid://cj06coiouh3vc" path="res://Shaders/hover_highlight.gdshader" id="5_u4vls"]
+[ext_resource type="PackedScene" uid="uid://5tws4ffpt061" path="res://Scenes/JournalButton.tscn" id="6_pygnc"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qbekx"]
 shader = ExtResource("5_u4vls")
@@ -278,6 +279,14 @@ offset_left = 946.0
 offset_top = 245.0
 offset_right = 1070.0
 offset_bottom = 488.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=664424911]
+
+[node name="JournalButton" parent="CanvasLayer" unique_id=1985372108 instance=ExtResource("6_pygnc")]
+offset_left = 10.0
+offset_top = -69.0
+offset_right = 70.0
+offset_bottom = -9.0
 
 [connection signal="mouse_entered" from="Background/Button" to="." method="_on_button_mouse_entered"]
 [connection signal="pressed" from="Background/Button" to="." method="_on_button_pressed"]

@@ -1,11 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://pp46piyj2qbs"]
+[gd_scene format=3 uid="uid://pp46piyj2qbs"]
 
 [ext_resource type="Script" uid="uid://cduy0ci6au10" path="res://Scripts/run_map.gd" id="1_3231i"]
+[ext_resource type="Texture2D" uid="uid://csch40qqijl6o" path="res://Assets/Images/Worn-Parchment-BG-1.png" id="2_wvi63"]
+[ext_resource type="PackedScene" uid="uid://5tws4ffpt061" path="res://Scenes/JournalButton.tscn" id="3_jbe1u"]
 
-[node name="RunMap" type="Node2D"]
+[node name="RunMap" type="Node2D" unique_id=1194750382]
 script = ExtResource("1_3231i")
 
-[node name="UI" type="Control" parent="."]
+[node name="UI" type="Control" parent="." unique_id=869524961]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,44 +15,51 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UI" unique_id=706721745]
+z_index = 1
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 962.0
-offset_top = 538.0
-offset_right = 1113.0
-offset_bottom = 623.0
+offset_left = 926.0
+offset_top = 568.0
+offset_right = 1108.0
+offset_bottom = 653.0
 grow_horizontal = 0
 grow_vertical = 0
 
-[node name="Title" type="Label" parent="UI/VBoxContainer"]
+[node name="BackButton" type="Button" parent="UI/VBoxContainer" unique_id=1161029536]
 layout_mode = 2
-text = "Choose Your Path"
-horizontal_alignment = 1
+text = "EXIT"
 
-[node name="ProgressLabel" type="Label" parent="UI/VBoxContainer"]
-layout_mode = 2
-
-[node name="BackButton" type="Button" parent="UI/VBoxContainer"]
-layout_mode = 2
-text = "Back to God Select"
-
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=695740028]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -1.0
+offset_top = 10.0
+offset_right = 1146.0
+offset_bottom = 643.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_wvi63")
 stretch_mode = 6
 
-[node name="MapContainer" type="Control" parent="."]
+[node name="MapContainer" type="Control" parent="." unique_id=1074357827]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=354484099]
+
+[node name="JournalButton" parent="CanvasLayer" unique_id=1853818458 instance=ExtResource("3_jbe1u")]
+offset_left = 90.0
+offset_top = -106.0
+offset_right = 150.0
+offset_bottom = -46.0

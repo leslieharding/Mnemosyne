@@ -19,8 +19,7 @@ var exit_popup: Panel
 var exit_popup_save_button: Button
 var exit_popup_abandon_button: Button
 
-# Experience panel reference
-var exp_panel: ExpPanel
+
 
 # Journal button reference
 var journal_button: JournalButton
@@ -32,8 +31,7 @@ func _ready():
 	# Get run parameters from previous scene
 	get_run_parameters()
 	
-	# Add experience panel
-	setup_experience_panel()
+	
 	
 	# Check if we're returning from a battle, resuming a saved run, or starting fresh
 	var params = get_scene_params()
@@ -47,24 +45,8 @@ func _ready():
 	
 	# Update UI
 	update_ui()
-	setup_journal_button()
+	
 
-func setup_journal_button():
-	if not journal_button:
-		# Create a CanvasLayer to ensure it's always on top, especially for Node2D scenes
-		var canvas_layer = CanvasLayer.new()
-		canvas_layer.layer = 10  # High layer value to be on top
-		canvas_layer.name = "JournalLayer"
-		add_child(canvas_layer)
-		
-		# Create the journal button
-		journal_button = preload("res://Scenes/JournalButton.tscn").instantiate()
-		canvas_layer.add_child(journal_button)
-		
-		journal_button.position = Vector2(20, get_viewport().get_visible_rect().size.y - 80)
-		journal_button.size = Vector2(60, 60)
-		
-		print("Run Map: Journal button added with CanvasLayer")
 
 
 # Get parameters passed from the deck selection scene
@@ -85,24 +67,7 @@ func get_run_parameters():
 	
 	print("Starting run with: ", selected_god, " deck ", selected_deck_index)
 
-# Add new function to set up experience panel
-func setup_experience_panel():
-	# Only show if we have deck data
-	var params = get_scene_params()
-	if not params.has("deck_index"):
-		return
-		
-	# Create experience panel
-	exp_panel = preload("res://Scenes/ExpPanel.tscn").instantiate()
-	exp_panel.position = Vector2(900, 10)
-	$UI.add_child(exp_panel)
-	
-	# Load the deck to display
-	var apollo_collection = load("res://Resources/Collections/Apollo.tres")
-	if apollo_collection and params.has("deck_index"):
-		var deck = apollo_collection.get_deck(params.deck_index)
-		var deck_def = apollo_collection.decks[params.deck_index]
-		exp_panel.setup_deck(deck, deck_def.card_indices)
+
 
 func generate_new_map():
 	# Sync generator dimensions to viewport coordinate space

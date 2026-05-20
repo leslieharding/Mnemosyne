@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://cynrsrhislb68"]
 
 [ext_resource type="Script" uid="uid://bu3s8gjaukbo6" path="res://Scripts/card_battle_manager.gd" id="1_xcrvx"]
-[ext_resource type="Texture2D" uid="uid://b71s1dsanmfh4" path="res://Assets/Images/UI_02.png" id="2_8owk5"]
+[ext_resource type="Texture2D" uid="uid://cl1soogbb7u6y" path="res://Assets/Images/UI_02.png" id="2_8owk5"]
 [ext_resource type="Script" uid="uid://ckdicolpfc4rd" path="res://Scripts/thread_display.gd" id="3_6rnm5"]
+[ext_resource type="PackedScene" uid="uid://5tws4ffpt061" path="res://Scenes/JournalButton.tscn" id="4_2ap6k"]
 
 [node name="ApolloGame" type="Node2D" unique_id=321576781]
 script = ExtResource("1_xcrvx")
@@ -168,3 +169,11 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("3_6rnm5")
+
+[node name="JournalLayer" type="CanvasLayer" parent="." unique_id=890301214]
+
+[node name="JournalButton" parent="JournalLayer" unique_id=433130862 instance=ExtResource("4_2ap6k")]
+offset_left = 11.0
+offset_top = -101.0
+offset_right = 71.0
+offset_bottom = -41.0
