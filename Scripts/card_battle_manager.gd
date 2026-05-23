@@ -424,23 +424,9 @@ func setup_tutorial_ui():
 	print("Tutorial mode: Simplified setup complete")
 
 func setup_notification_manager():
+	notification_manager = get_node_or_null("NotificationCanvas/NotificationManager")
 	if not notification_manager:
-		# Create a CanvasLayer to ensure proper positioning
-		var notification_canvas = CanvasLayer.new()
-		notification_canvas.layer = 99  # High layer to be on top
-		notification_canvas.name = "NotificationCanvas"
-		add_child(notification_canvas)
-		
-		notification_manager = preload("res://Scenes/NotificationManager.tscn").instantiate()
-		notification_canvas.add_child(notification_manager)
-		
-		# Position it properly on screen
-		notification_manager.position = Vector2(
-			get_viewport().get_visible_rect().size.x - 320,  # 20px from right edge (300 width + 20)
-			get_viewport().get_visible_rect().size.y / 2 - 40  # Centered vertically
-		)
-		
-		print("NotificationManager created and positioned at: ", notification_manager.position)
+		push_error("NotificationManager not found in scene tree")
 
 func setup_tutorial_panel():
 	if not is_tutorial_mode:
@@ -3177,7 +3163,7 @@ func display_player_hand():
 	
 	var total_spacing = card_width + card_spacing
 	var total_width = hand_size * total_spacing - card_spacing
-	var horizontal_offset = 0  # Shift entire hand left/right if needed
+	var horizontal_offset = 15  # Shift entire hand left/right if needed
 	var start_x = -total_width / 2 + horizontal_offset
 	
 	# Create a Node2D as a container for all cards
@@ -8919,8 +8905,8 @@ func setup_rhythm_power():
 	print("=== SETTING UP RHYTHM POWER ===")
 	
 	
-	if notification_manager:
-		notification_manager.show_notification("🎵 The rhythm guides your moves")
+	#if notification_manager:
+	#	notification_manager.show_notification("🎵 The rhythm guides your moves")
 
 func assign_new_rhythm_slot():
 	# Get all empty slots - use explicit typing

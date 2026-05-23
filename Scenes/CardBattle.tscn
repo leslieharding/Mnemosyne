@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://ckdicolpfc4rd" path="res://Scripts/thread_display.gd" id="3_6rnm5"]
 [ext_resource type="Texture2D" uid="uid://dhgyxou3h6dr6" path="res://Assets/Images/Open_Scroll.png" id="3_wxip6"]
 [ext_resource type="PackedScene" uid="uid://5tws4ffpt061" path="res://Scenes/JournalButton.tscn" id="4_2ap6k"]
+[ext_resource type="PackedScene" uid="uid://cu34wrsam7v5o" path="res://Scenes/NotificationManager.tscn" id="6_qoqa2"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qoqa2"]
 texture = ExtResource("3_wxip6")
@@ -60,10 +61,10 @@ size_flags_vertical = 4
 
 [node name="CardInfoPanel" type="Panel" parent="." unique_id=1602268062]
 custom_minimum_size = Vector2(300, 200)
-offset_left = 12.0
-offset_top = 54.0
-offset_right = 312.0
-offset_bottom = 447.0
+offset_left = 11.0
+offset_top = 32.0
+offset_right = 311.0
+offset_bottom = 425.0
 theme_override_styles/panel = SubResource("StyleBoxTexture_qoqa2")
 
 [node name="MarginContainer" type="MarginContainer" parent="CardInfoPanel" unique_id=356556742]
@@ -182,9 +183,9 @@ horizontal_alignment = 1
 [node name="CardDescriptionLabel" type="RichTextLabel" parent="CardInfoPanel" unique_id=1129694548]
 layout_mode = 0
 offset_left = 50.0
-offset_top = 312.0
+offset_top = 297.0
 offset_right = 247.0
-offset_bottom = 327.0
+offset_bottom = 312.0
 theme_override_colors/default_color = Color(0.2901961, 0.18039216, 0.101960786, 1)
 theme_override_font_sizes/normal_font_size = 12
 theme_override_font_sizes/bold_font_size = 12
@@ -216,3 +217,11 @@ offset_left = 11.0
 offset_top = -101.0
 offset_right = 71.0
 offset_bottom = -41.0
+
+[node name="NotificationCanvas" type="CanvasLayer" parent="." unique_id=15925343]
+
+[node name="NotificationManager" parent="NotificationCanvas" unique_id=1693108271 instance=ExtResource("6_qoqa2")]
+offset_left = -1149.0
+offset_top = 84.0
+offset_right = -849.0
+offset_bottom = 164.0
