@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=22 format=3 uid="uid://dwrds6g3whmsq"]
+[gd_resource type="Resource" script_class="GodCardCollection" format=3 uid="uid://dwrds6g3whmsq"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_ttyo6"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_nyy1t"]
@@ -9,7 +9,7 @@
 [ext_resource type="Script" uid="uid://b3qdfwuofelgc" path="res://Resources/Abilities/critical_strike_ability.gd" id="5_cynoy"]
 [ext_resource type="Script" uid="uid://cf0rb8uoxl6jj" path="res://Resources/Abilities/hunt_ability.gd" id="6_vobqy"]
 [ext_resource type="Script" uid="uid://bp6f5cssscdo5" path="res://Resources/Abilities/exploit_ability.gd" id="6_wiuqi"]
-[ext_resource type="Script" uid="uid://cm2mhp17xds1o" path="res://Resources/Abilities/survival_ability.gd" id="8_cynoy"]
+[ext_resource type="Script" uid="uid://x2s4mh2v67f6" path="res://Resources/Abilities/trap_ability.gd" id="8_cynoy"]
 
 [sub_resource type="Resource" id="Resource_8h57p"]
 script = ExtResource("3_cynoy")
@@ -69,10 +69,9 @@ metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_30n57"]
 script = ExtResource("8_cynoy")
-ability_name = "Survival"
-description = "This card prevents the first time it would be captured, but reduces its stats to 1 to do so"
-trigger_condition = 1
-metadata/_custom_type_script = "uid://cm2mhp17xds1o"
+ability_name = "Trap"
+description = "Select an empty slot to set a trap. If an enemy plays there, your card attacks using its highest stat vs their lowest."
+metadata/_custom_type_script = "uid://x2s4mh2v67f6"
 
 [sub_resource type="Resource" id="Resource_vobqy"]
 script = ExtResource("1_ttyo6")

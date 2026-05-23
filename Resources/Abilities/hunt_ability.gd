@@ -4,7 +4,7 @@ extends CardAbility
 
 func _init():
 	ability_name = "Hunt"
-	description = "After placement, select a slot to hunt. Forces combat using your highest stat vs their lowest stat."
+	description = "After placement, select an enemy. Forces combat using your highest stat vs their lowest stat."
 	trigger_condition = TriggerType.ON_PLAY
 
 func execute(context: Dictionary) -> bool:

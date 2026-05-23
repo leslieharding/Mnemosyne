@@ -24,6 +24,14 @@ var ability_mode_input_blocked: bool = false
 
 var is_natural_harmonics_deck: bool = false
 
+var trap_mode_active: bool = false
+var current_trapper_position: int = -1
+var current_trapper_owner: Owner = Owner.NONE
+var current_trapper_card: CardResource = null
+var active_traps: Dictionary = {}
+var trap_id_counter: int = 0
+var trap_target_style: StyleBoxFlat
+
 # Hermes impatient mood system
 var hermes_mood_active: bool = false
 var impatient_timer: Timer = null
@@ -2026,8 +2034,8 @@ func _on_opponent_card_placed(grid_index: int):
 		var ability = opponent_card_data.abilities[i]
 		print("  Ability ", i, ": ", ability.ability_name, " - ", ability.description)
 	
-	# Check for hunt traps when opponent places cards
-	check_hunt_trap_trigger(grid_index, opponent_card_data, Owner.OPPONENT)
+	# Check for traps when opponent places cards
+	check_trap_trigger(grid_index, opponent_card_data, Owner.OPPONENT)
 	
 	# Handle passive abilities when opponent places card
 	handle_passive_abilities_on_place(grid_index, opponent_card_data, opponent_card_level)
@@ -2122,6 +2130,7 @@ func end_game():
 		visual_effects_manager.clear_all_hunt_effects(grid_slots)
 	
 	clear_all_hunt_traps()
+	clear_all_traps()
 	clear_all_compel_constraints()
 	clear_all_coerce_constraints()
 	clear_all_ordain_effects()
@@ -2358,6 +2367,8 @@ func restart_round():
 	# Reset game state flags
 	opponent_is_thinking = false
 	hunt_mode_active = false
+	trap_mode_active = false
+
 	
 	# Redisplay player hand with restored card data
 	display_player_hand()
@@ -2609,6 +2620,15 @@ func create_grid_styles():
 	hunt_target_style.border_width_right = 3
 	hunt_target_style.border_width_bottom = 3
 	hunt_target_style.border_color = Color("#FF8800")  # Orange for hunt targets
+	
+	# Trap target style (orange border for trapped slots)
+	trap_target_style = StyleBoxFlat.new()
+	trap_target_style.bg_color = Color("#444444")
+	trap_target_style.border_width_left = 3
+	trap_target_style.border_width_top = 3
+	trap_target_style.border_width_right = 3
+	trap_target_style.border_width_bottom = 3
+	trap_target_style.border_color = Color("#FF8800")  # Orange for trap targets
 	
 	# Compel target style (purple border for compelled slots)
 	compel_target_style = StyleBoxFlat.new()
@@ -3376,9 +3396,8 @@ func _on_grid_mouse_entered(grid_index):
 		
 		current_grid_index = grid_index
 		
-		if grid_index in active_hunts:
-			print("Mouse entered hunt trap slot - preserving hunt styling but allowing selection")
-			# Don't change the visual styling, but the slot is now selected for placement
+		if grid_index in active_traps:
+			print("Mouse entered trap slot - preserving trap styling but allowing selection")
 			return
 		
 		# Apply selection highlight with awareness of sun spots (for non-hunt slots)
@@ -3409,9 +3428,9 @@ func _on_grid_mouse_exited(grid_index):
 	# If this slot is not the currently selected one, restore its original styling
 	if current_grid_index != grid_index and not grid_occupied[grid_index]:
 		restore_slot_original_styling(grid_index)
-	# FIXED: If this IS the currently selected slot but has a hunt trap, restore hunt styling
-	elif current_grid_index == grid_index and grid_index in active_hunts:
-		apply_hunt_target_styling(grid_index)
+	# If this IS the currently selected slot but has a trap, restore trap styling
+	elif current_grid_index == grid_index and grid_index in active_traps:
+		apply_trap_target_styling(grid_index)
 
 func apply_enrich_selection_highlight(grid_index: int):
 	if grid_index < 0 or grid_index >= grid_slots.size():
@@ -3452,10 +3471,9 @@ func restore_slot_original_styling(grid_index: int):
 	elif grid_index == active_compel_slot:
 		# Restore compel styling
 		apply_compel_target_styling(grid_index)
-	# Then check for hunt trap
-	elif grid_index in active_hunts:
-		# Restore hunt trap styling
-		apply_hunt_target_styling(grid_index)
+	# Then check for trap
+	elif grid_index in active_traps:
+		apply_trap_target_styling(grid_index)
 	elif grid_index in sunlit_positions:
 		# Restore sunlit styling
 		apply_sunlit_styling(grid_index)
@@ -3481,8 +3499,8 @@ func apply_selection_highlight(grid_index: int):
 	elif grid_index == active_compel_slot:
 		hide_dotted_highlight()
 		return
-	# Don't override hunt trap styling with selection highlight
-	elif grid_index in active_hunts:
+	# Don't override trap styling with selection highlight
+	elif grid_index in active_traps:
 		hide_dotted_highlight()
 		return
 	
@@ -3543,16 +3561,24 @@ func _on_grid_gui_input(event, grid_index):
 					print("Cannot move to occupied slot - can only move to empty slots")
 				return  # Don't process normal card placement during aristeia mode
 	
-	# Handle hunt target selection FIRST (but only during hunt mode setup)
 	if hunt_mode_active and current_hunter_owner == Owner.PLAYER:
 		if event is InputEventMouseButton:
 			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-				# Only allow trap setup on empty slots for now (disable direct combat)
-				if not grid_occupied[grid_index]:
+				if grid_occupied[grid_index] and get_owner_at_position(grid_index) != Owner.PLAYER:
 					select_hunt_target(grid_index)
 				else:
-					print("Direct hunt combat disabled - can only set traps on empty slots")
-				return  # Don't process normal card placement during hunt mode
+					print("Hunt requires an occupied enemy slot")
+			return
+
+	# Handle trap target selection (only empty slots)
+	if trap_mode_active and current_trapper_owner == Owner.PLAYER:
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+				if not grid_occupied[grid_index]:
+					select_trap_target(grid_index)
+				else:
+					print("Cannot set trap on occupied slot")
+			return
 	
 	# Handle compel target selection (only during compel mode setup)
 	if compel_mode_active and current_compeller_owner == Owner.PLAYER:
@@ -3669,15 +3695,14 @@ func place_card_on_grid():
 		select_aristeia_target(current_grid_index)
 		return
 	
-	# Handle hunt trap removal BEFORE checking if slot is occupied
-	if current_grid_index in active_hunts:
-		var hunt_data = active_hunts[current_grid_index]
-		# Only remove if it's our own hunt trap
-		if hunt_data.hunter_owner == Owner.PLAYER:
-			print("Removing player's own hunt trap from slot ", current_grid_index)
-			remove_hunt_trap(current_grid_index)
+	# Handle trap removal BEFORE checking if slot is occupied
+	if current_grid_index in active_traps:
+		var trap_data = active_traps[current_grid_index]
+		if trap_data.trapper_owner == Owner.PLAYER:
+			print("Removing player's own trap from slot ", current_grid_index)
+			remove_trap(current_grid_index)
 		else:
-			print("Cannot place on enemy hunt trap!")
+			print("Cannot place on enemy trap!")
 			return
 			
 	# Handle compel constraint removal when player places card in compelled slot
@@ -3852,12 +3877,12 @@ func place_card_on_grid():
 		sun_boosted = true
 		print("Card boosted to: ", card_data.values)
 	
-	# Check if this is a Hunt trap trigger (enemy trap)
-	if current_grid_index in active_hunts:
-		var hunt_data = active_hunts[current_grid_index]
-		if hunt_data.hunter_owner != Owner.PLAYER:
-			print("Player triggered enemy hunt trap!")
-			check_hunt_trap_trigger(current_grid_index, card_data, Owner.PLAYER)
+	# Check if this is a Trap trigger (enemy trap)
+	if current_grid_index in active_traps:
+		var trap_data = active_traps[current_grid_index]
+		if trap_data.trapper_owner != Owner.PLAYER:
+			print("Player triggered enemy trap!")
+			check_trap_trigger(current_grid_index, card_data, Owner.PLAYER)
 			return
 
 	# Mark the slot as occupied and set ownership
@@ -4080,6 +4105,10 @@ func place_card_on_grid():
 	# DON'T switch turns if any special modes are active
 	if hunt_mode_active:
 		print("Hunt mode active - staying on player turn for target selection")
+		return
+	
+	if trap_mode_active:
+		print("Trap mode active - staying on player turn for target selection")
 		return
 	
 	if germinate_mode_active:
@@ -5135,55 +5164,74 @@ func get_current_turn_number() -> int:
 
 
 # Start hunt target selection mode
+# Replaces the full start_hunt_mode function:
 func start_hunt_mode(hunter_position: int, hunter_owner: Owner, hunter_card: CardResource):
+	# Check if any enemy cards exist to target - if not, fizzle
+	var enemy_targets_exist = false
+	for i in range(grid_slots.size()):
+		if grid_occupied[i] and get_owner_at_position(i) != hunter_owner:
+			enemy_targets_exist = true
+			break
+
+	if not enemy_targets_exist:
+		print("HuntAbility: No enemy cards to target - fizzling")
+		return
+
 	hunt_mode_active = true
 	current_hunter_position = hunter_position
 	current_hunter_owner = hunter_owner
 	current_hunter_card = hunter_card
-	
-	# Update game status
+
 	if hunter_owner == Owner.PLAYER:
-		game_status_label.text = "🎯 HUNT MODE: Select a slot to hunt"
+		game_status_label.text = "🎯 HUNT MODE: Select an enemy card to attack"
 		block_ability_input_briefly()
+		# Allow clicks to pass through opponent card displays to reach the slot handler
+		for i in range(grid_slots.size()):
+			if grid_occupied[i] and get_owner_at_position(i) == Owner.OPPONENT:
+				for child in grid_slots[i].get_children():
+					if child is CardDisplay and child.panel:
+						child.panel.mouse_filter = Control.MOUSE_FILTER_PASS
 	else:
 		game_status_label.text = "🎯 " + opponent_manager.get_opponent_info().name + " is hunting..."
-		# Auto-select target for opponent
 		call_deferred("opponent_select_hunt_target")
-	
+
 	print("Hunt mode activated for ", hunter_card.card_name, " at position ", hunter_position)
 
+# Replaces the full select_hunt_target function:
 func select_hunt_target(target_position: int):
 	if not hunt_mode_active:
 		return
-	
+
 	print("Hunt target selected: position ", target_position)
-	
-	# Check if target slot is occupied
-	if grid_occupied[target_position]:
-		# Immediate hunt combat
+
+	if grid_occupied[target_position] and get_owner_at_position(target_position) != current_hunter_owner:
 		execute_immediate_hunt(target_position)
 	else:
-		# Set up hunt trap
-		setup_hunt_trap(target_position)
+		print("Hunt: invalid target - must be an occupied enemy slot")
 	
-	# Reset selection state so dotted highlight doesn't cover hunt trap styling
+	# Restore opponent card panel mouse filters
+	for i in range(grid_slots.size()):
+		if grid_occupied[i]:
+			for child in grid_slots[i].get_children():
+				if child is CardDisplay and child.panel:
+					child.panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	# Reset selection state
 	current_grid_index = -1
 	hide_dotted_highlight()
-	
+
 	# Exit hunt mode
 	hunt_mode_active = false
 	current_hunter_position = -1
 	current_hunter_owner = Owner.NONE
 	current_hunter_card = null
-	
-	# Update game status
+
 	update_game_status()
-	
-	# NOW switch turns after hunt target is selected
+
 	if should_game_end():
 		end_game()
 		return
-	
+
 	turn_manager.next_turn()
 
 # Execute immediate hunt combat
@@ -5393,28 +5441,27 @@ func execute_hunt_capture_abilities(defender_pos: int, defending_card: CardResou
 func opponent_select_hunt_target():
 	if not hunt_mode_active:
 		return
-	
-	# Simple AI: prefer occupied enemy slots, otherwise pick random empty slot
-	var possible_targets = []
+
 	var enemy_targets = []
-	
 	for i in range(grid_slots.size()):
-		if grid_occupied[i]:
-			var owner = get_owner_at_position(i)
-			if owner != current_hunter_owner:
-				enemy_targets.append(i)
-		else:
-			possible_targets.append(i)
-	
-	# Prefer enemy targets if available
-	var target_position = -1
+		if grid_occupied[i] and get_owner_at_position(i) != current_hunter_owner:
+			enemy_targets.append(i)
+
 	if enemy_targets.size() > 0:
-		target_position = enemy_targets[randi() % enemy_targets.size()]
-	elif possible_targets.size() > 0:
-		target_position = possible_targets[randi() % possible_targets.size()]
-	
-	if target_position != -1:
-		select_hunt_target(target_position)
+		select_hunt_target(enemy_targets[randi() % enemy_targets.size()])
+	else:
+		print("Opponent hunt fizzled - no enemy targets")
+		for i in range(grid_slots.size()):
+			if grid_occupied[i]:
+				for child in grid_slots[i].get_children():
+					if child is CardDisplay and child.panel:
+						child.panel.mouse_filter = Control.MOUSE_FILTER_STOP
+		hunt_mode_active = false
+		current_hunter_position = -1
+		current_hunter_owner = Owner.NONE
+		current_hunter_card = null
+		update_game_status()
+		turn_manager.next_turn()
 
 # Clear all hunt traps (for game end or reset)
 func clear_all_hunt_traps():
@@ -10822,3 +10869,189 @@ func record_vengeful_weakening():
 	if has_node("/root/GlobalProgressTrackerAutoload"):
 		get_node("/root/GlobalProgressTrackerAutoload").add_enemy_weakening(enemy_name)
 		print("Vengeful mood: ", enemy_name, " permanently weakened")
+
+func start_trap_mode(trapper_position: int, trapper_owner: Owner, trapper_card: CardResource):
+	var empty_slots_exist = false
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:
+			empty_slots_exist = true
+			break
+
+	if not empty_slots_exist:
+		print("TrapAbility: No empty slots available - fizzling")
+		return
+
+	trap_mode_active = true
+	current_trapper_position = trapper_position
+	current_trapper_owner = trapper_owner
+	current_trapper_card = trapper_card
+
+	if trapper_owner == Owner.PLAYER:
+		game_status_label.text = "🪤 TRAP MODE: Select an empty slot to set a trap"
+		block_ability_input_briefly()
+	else:
+		game_status_label.text = "🪤 " + opponent_manager.get_opponent_info().name + " is setting a trap..."
+		call_deferred("opponent_select_trap_target")
+
+	print("Trap mode activated for ", trapper_card.card_name, " at position ", trapper_position)
+
+
+func select_trap_target(target_position: int):
+	if not trap_mode_active:
+		return
+
+	print("Trap target selected: position ", target_position)
+
+	setup_trap(target_position)
+
+	# Reset selection state so dotted highlight doesn't cover trap styling
+	current_grid_index = -1
+	hide_dotted_highlight()
+
+	var trap_owner = current_trapper_owner
+
+	# End trap mode
+	trap_mode_active = false
+	current_trapper_position = -1
+	current_trapper_owner = Owner.NONE
+	current_trapper_card = null
+
+	if trap_owner == Owner.PLAYER:
+		game_status_label.text = "Trap set! Enemy card placed there will trigger combat."
+	else:
+		game_status_label.text = "Opponent set a trap."
+
+	if should_game_end():
+		end_game()
+		return
+
+	turn_manager.next_turn()
+
+
+func opponent_select_trap_target():
+	if not trap_mode_active:
+		return
+
+	var possible_targets = []
+	for i in range(grid_slots.size()):
+		if not grid_occupied[i]:
+			possible_targets.append(i)
+
+	if possible_targets.size() > 0:
+		select_trap_target(possible_targets[randi() % possible_targets.size()])
+	else:
+		print("Opponent trap fizzled - no empty slots")
+		trap_mode_active = false
+		current_trapper_position = -1
+		current_trapper_owner = Owner.NONE
+		current_trapper_card = null
+		turn_manager.next_turn()
+
+
+func setup_trap(target_position: int):
+	print("Setting up trap at position ", target_position)
+
+	if target_position in active_traps:
+		remove_trap(target_position)
+
+	var trap_id = trap_id_counter
+	trap_id_counter += 1
+
+	active_traps[target_position] = {
+		"trap_id": trap_id,
+		"trapper_position": current_trapper_position,
+		"trapper_owner": current_trapper_owner,
+		"trapper_card": current_trapper_card,
+		"target_position": target_position
+	}
+
+	apply_trap_target_styling(target_position)
+	print("Trap set with ID ", trap_id, " at position ", target_position)
+
+
+func apply_trap_target_styling(grid_index: int):
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	grid_slots[grid_index].add_theme_stylebox_override("panel", trap_target_style)
+	print("Applied trap styling (orange border) to slot ", grid_index)
+
+
+func remove_trap(target_position: int):
+	if not target_position in active_traps:
+		return
+	print("Removing trap from position ", target_position)
+	restore_slot_original_styling(target_position)
+	active_traps.erase(target_position)
+
+
+func check_trap_trigger(grid_position: int, placed_card: CardResource, placing_owner: Owner):
+	if not grid_position in active_traps:
+		return
+
+	var trap_data = active_traps[grid_position]
+
+	if not grid_occupied[trap_data.trapper_position] or grid_ownership[trap_data.trapper_position] != trap_data.trapper_owner:
+		print("Trap expired - trapper card captured/removed")
+		remove_trap(grid_position)
+		return
+
+	if placing_owner == trap_data.trapper_owner:
+		print("WARNING: check_trap_trigger called for friendly placement")
+		remove_trap(grid_position)
+		return
+
+	print("Trap triggered! ", trap_data.trapper_card.card_name, " attacks the newly placed ", placed_card.card_name)
+	execute_trap_combat(grid_position, placed_card, trap_data)
+	remove_trap(grid_position)
+
+
+func execute_trap_combat(target_position: int, hunted_card: CardResource, trap_data: Dictionary):
+	var trapper_card = trap_data.trapper_card
+
+	var trapper_stats = HuntAbility.get_highest_stat(trapper_card.values)
+	var hunted_stats = HuntAbility.get_lowest_stat(hunted_card.values)
+
+	print("Trap combat: Trapper ", trapper_stats.value, " vs Hunted ", hunted_stats.value)
+
+	if visual_effects_manager:
+		var trapper_display = get_card_display_at_position(trap_data.trapper_position)
+		var hunted_display = get_card_display_at_position(target_position)
+		if trapper_display and hunted_display:
+			visual_effects_manager.show_hunt_trap_flash(trapper_display, hunted_display)
+
+	if trapper_stats.value > hunted_stats.value:
+		print("Trap successful! Capturing hunted card")
+
+		var hunted_owner = get_owner_at_position(target_position)
+
+		if hunted_owner == Owner.PLAYER and trap_data.trapper_owner == Owner.OPPONENT:
+			var progress_tracker = get_node("/root/GlobalProgressTrackerAutoload")
+			progress_tracker.record_trap_fallen_for("trap", "Player's card caught in enemy trap")
+			if progress_tracker.should_show_artemis_notification() and notification_manager:
+				notification_manager.show_notification("Artemis was watching")
+
+		set_card_ownership(target_position, trap_data.trapper_owner)
+
+		if trap_data.trapper_owner == Owner.PLAYER:
+			var trapper_card_index = get_card_collection_index(trap_data.trapper_position)
+			if trapper_card_index != -1:
+				var exp_tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+				if exp_tracker:
+					exp_tracker.add_capture_exp(trapper_card_index, 10)
+					print("Trap capture awarded 10 exp to trapper")
+
+		execute_hunt_capture_abilities(target_position, hunted_card, trap_data.trapper_position, trapper_card)
+		update_board_visuals()
+	else:
+		print("Trap failed - hunted card resisted")
+
+
+func clear_all_traps():
+	for target_position in active_traps.keys():
+		remove_trap(target_position)
+	active_traps.clear()
+	trap_mode_active = false
+	current_trapper_position = -1
+	current_trapper_owner = Owner.NONE
+	current_trapper_card = null
+	print("All traps cleared")

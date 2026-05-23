@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="CardAbility" format=3 uid="uid://dtgf5sjwkecs2"]
+
+[ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="1_i4bym"]
+
+[resource]
+script = ExtResource("1_i4bym")
+description = "After placement, select an empty slot to set a trap. If an enemy plays there, your card attacks using its highest stat vs their lowest."
+metadata/_custom_type_script = "uid://bx8x0dmil6800"
