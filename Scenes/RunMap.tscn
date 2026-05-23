@@ -23,10 +23,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 926.0
-offset_top = 568.0
-offset_right = 1108.0
-offset_bottom = 653.0
+offset_left = 916.0
+offset_top = 558.0
+offset_right = 1098.0
+offset_bottom = 643.0
 grow_horizontal = 0
 grow_vertical = 0
 
@@ -38,12 +38,12 @@ text = "EXIT"
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -1.0
-offset_top = 10.0
-offset_right = 1146.0
-offset_bottom = 643.0
+offset_left = 4.0
+offset_right = 7144.9287
+offset_bottom = 5097.645
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(0.16020325, 0.1310409)
 mouse_filter = 2
 texture = ExtResource("2_wvi63")
 stretch_mode = 6
@@ -59,7 +59,7 @@ grow_vertical = 2
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=354484099]
 
 [node name="JournalButton" parent="CanvasLayer" unique_id=1853818458 instance=ExtResource("3_jbe1u")]
-offset_left = 90.0
-offset_top = -106.0
-offset_right = 150.0
-offset_bottom = -46.0
+offset_left = 33.0
+offset_top = -115.0
+offset_right = 93.0
+offset_bottom = -55.0

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://tx1ipeivmntw"]
 
 [ext_resource type="Script" uid="uid://der57mv5vo48a" path="res://Scripts/memory_journal.gd" id="1_fi0jc"]
-[ext_resource type="Texture2D" uid="uid://cm4lslo0irkxx" path="res://Assets/Images/UIBook.png" id="2_wbglo"]
+[ext_resource type="Texture2D" uid="uid://00d1hk8cyid0" path="res://Assets/Images/Open_Book.png" id="2_wbglo"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_255ux"]
 content_margin_left = 50.0

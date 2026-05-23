@@ -297,14 +297,14 @@ var hunt_id_counter: int = 0
 @onready var game_status_label = $VBoxContainer/Title
 @onready var deck_name_label = $VBoxContainer/DeckName
 @onready var card_info_panel = $CardInfoPanel
-@onready var card_name_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection/CardNameLabel
-@onready var card_description_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection/CardDescriptionLabel
-@onready var ability_name_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection/AbilityNameLabel
-@onready var ability_description_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/LeftSection/AbilityDescriptionLabel
-@onready var north_power_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/TopRow/NorthPower
-@onready var east_power_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow/EastPower
-@onready var south_power_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/BottomRow/SouthPower
-@onready var west_power_display = $CardInfoPanel/MarginContainer/VBoxContainer/HBoxContainer/RightSection/PowerGrid/MiddleRow/WestPower
+@onready var card_name_display = $CardInfoPanel/MarginContainer/VBoxContainer/LeftSection/CardNameLabel
+@onready var card_description_display = $CardInfoPanel/CardDescriptionLabel
+@onready var ability_name_display = $CardInfoPanel/MarginContainer/VBoxContainer/LeftSection/AbilityNameLabel
+@onready var ability_description_display = $CardInfoPanel/MarginContainer/VBoxContainer/LeftSection/AbilityDescriptionLabel
+@onready var north_power_display = $CardInfoPanel/RightSection/PowerGrid/TopRow/NorthPower
+@onready var east_power_display = $CardInfoPanel/RightSection/PowerGrid/MiddleRow/EastPower
+@onready var south_power_display = $CardInfoPanel/RightSection/PowerGrid/BottomRow/SouthPower
+@onready var west_power_display = $CardInfoPanel/RightSection/PowerGrid/MiddleRow/WestPower
 @onready var thread_display = $ThreadLayer/ThreadDisplay
 
 
@@ -826,7 +826,7 @@ func update_panel_content(card_data: CardResource):
 	label_fade_tween.set_parallel(true)
 	
 	# Fade in description
-	card_description_display.text = card_data.description
+	card_description_display.text = "[i]" + card_data.description + "[/i]"
 	card_description_display.visible = true
 	card_description_display.modulate.a = 0.0
 	label_fade_tween.tween_property(card_description_display, "modulate:a", 1.0, LABEL_FADE_DURATION)
