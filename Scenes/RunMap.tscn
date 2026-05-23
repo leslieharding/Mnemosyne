@@ -1,11 +1,15 @@
 [gd_scene format=3 uid="uid://pp46piyj2qbs"]
 
 [ext_resource type="Script" uid="uid://cduy0ci6au10" path="res://Scripts/run_map.gd" id="1_3231i"]
+[ext_resource type="Texture2D" uid="uid://c134s8xat68xp" path="res://Assets/Images/Crossed_swords.png" id="2_not6i"]
 [ext_resource type="Texture2D" uid="uid://csch40qqijl6o" path="res://Assets/Images/Worn-Parchment-BG-1.png" id="2_wvi63"]
 [ext_resource type="PackedScene" uid="uid://5tws4ffpt061" path="res://Scenes/JournalButton.tscn" id="3_jbe1u"]
+[ext_resource type="Texture2D" uid="uid://dn04gsqijnmas" path="res://Assets/Images/Crown.png" id="3_tbbom"]
 
 [node name="RunMap" type="Node2D" unique_id=1194750382]
 script = ExtResource("1_3231i")
+texture_battle = ExtResource("2_not6i")
+texture_boss = ExtResource("3_tbbom")
 
 [node name="UI" type="Control" parent="." unique_id=869524961]
 layout_mode = 3

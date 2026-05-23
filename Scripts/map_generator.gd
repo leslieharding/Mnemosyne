@@ -145,30 +145,41 @@ static func assign_enemies_to_tiers(god_name: String = "Apollo", deck_name: Stri
 
 static func generate_layer_nodes(layer: int, starting_id: int, tier_enemy_assignments: Dictionary, god_name: String = "Apollo") -> Array[MapNode]:
 	var layer_nodes: Array[MapNode] = []
-	var node_count = NODES_PER_LAYER[layer]
-	
-	# Use MAP_WIDTH instead of DisplayServer so positions are in viewport coordinate space
-	var screen_width = MAP_WIDTH
-	var screen_center_x = MAP_WIDTH / 2.0
-	
-	var horizontal_spacing = (screen_width * 0.8) / (node_count + 1)
-	var start_x = screen_width * 0.1
-	
-	var button_height = 60
-	var top_padding = button_height / 2
-	var bottom_padding = button_height
-	var usable_height = MAP_HEIGHT - top_padding - bottom_padding
-	var layer_spacing = usable_height / (LAYER_COUNT - 1) if LAYER_COUNT > 1 else 0
-	var y_position = top_padding + (LAYER_COUNT - 1 - layer) * layer_spacing
+	var node_count: int = NODES_PER_LAYER[layer]
 
-	for i in range(node_count):
-		var x_position = start_x + (i + 1) * horizontal_spacing
-		var position = Vector2(x_position, y_position)
-		var node_type = determine_node_type(layer, i)
-		var node = MapNode.new(starting_id + i, node_type, position)
+	# Horizontal layout: layer index → X, nodes within layer spread on Y
+	var icon_display_size: float = 64.0
+	var left_padding: float = icon_display_size
+	var usable_width: float = MAP_WIDTH - left_padding * 2.0
+
+	var layer_x: float
+	if LAYER_COUNT > 1:
+		layer_x = left_padding + layer * (usable_width / float(LAYER_COUNT - 1))
+	else:
+		layer_x = MAP_WIDTH / 2.0
+
+	var center_y: float = MAP_HEIGHT / 2.0
+	var vertical_spread: float = MAP_HEIGHT * 0.55
+
+	var node_y: float
+	if node_count > 1:
+		var vertical_spacing: float = vertical_spread / float(node_count + 1)
+		var start_y: float = center_y - vertical_spread / 2.0
+		for i in range(node_count):
+			node_y = start_y + float(i + 1) * vertical_spacing
+			var position := Vector2(layer_x, node_y)
+			var node_type := determine_node_type(layer, i)
+			var node := MapNode.new(starting_id + i, node_type, position)
+			assign_enemy_to_node_with_tier_assignments(node, layer, tier_enemy_assignments, god_name)
+			layer_nodes.append(node)
+	else:
+		node_y = center_y
+		var position := Vector2(layer_x, node_y)
+		var node_type := determine_node_type(layer, 0)
+		var node := MapNode.new(starting_id, node_type, position)
 		assign_enemy_to_node_with_tier_assignments(node, layer, tier_enemy_assignments, god_name)
 		layer_nodes.append(node)
-	
+
 	return layer_nodes
 
 # Determine what type of node this should be

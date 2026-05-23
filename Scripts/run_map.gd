@@ -9,7 +9,10 @@ extends Node2D
 
 # Map data
 var current_map: MapData
-var map_node_buttons: Array[Button] = []
+var map_node_icons: Array[TextureButton] = []
+var path_lines_node: Node2D = null
+@export var texture_battle: Texture2D
+@export var texture_boss: Texture2D
 
 # Run state - we'll get this from the previous scene
 var selected_god: String = "Apollo"
@@ -87,109 +90,30 @@ func generate_new_map():
 	display_map()
 
 # Display the map visually
-func display_map():
-	# Clear any existing map nodes
+func display_map() -> void:
 	clear_map_display()
-	
-	# Create visual nodes for each map node
+
+	# Lines added first so they render behind the icons
+	path_lines_node = MapPathLines.new()
+	map_container.add_child(path_lines_node)
+	path_lines_node.set_map_nodes(current_map.nodes)
+
 	for map_node in current_map.nodes:
-		create_map_node_button(map_node)
+		create_map_node_icon(map_node)
 
 # Clear existing map display
-func clear_map_display():
-	for button in map_node_buttons:
-		if is_instance_valid(button):
-			button.queue_free()
-	map_node_buttons.clear()
+func clear_map_display() -> void:
+	for icon in map_node_icons:
+		if is_instance_valid(icon):
+			icon.queue_free()
+	map_node_icons.clear()
+	if is_instance_valid(path_lines_node):
+		path_lines_node.queue_free()
+	path_lines_node = null
 
-func create_map_node_button(map_node: MapNode):
-	var button = Button.new()
-	button.text = map_node.display_name
+
 	
-	var button_size = Vector2(180, 60)
-	button.custom_minimum_size = button_size
-	button.size = button_size
-	
-	button.clip_contents = true
-	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	
-	button.position = Vector2(
-		map_node.position.x - button_size.x / 2,
-		map_node.position.y - button_size.y / 2
-	)
-	
-	style_map_node_button(button, map_node)
-	button.pressed.connect(_on_map_node_pressed.bind(map_node))
-	map_container.add_child(button)
-	map_node_buttons.append(button)
-	
-# Style a map node button based on its state
-func style_map_node_button(button: Button, map_node: MapNode):
-	# Create custom style based on node state
-	var style = StyleBoxFlat.new()
-	
-	# Base styling
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.corner_radius_bottom_left = 4
-	style.corner_radius_bottom_right = 4
-	
-	# Color and state based styling
-	if map_node.is_completed:
-		# Completed nodes - green
-		style.bg_color = Color("#2D5A2D")
-		style.border_color = Color("#4A8A4A")
-		button.disabled = true
-		button.text += " ✓"
-		button.modulate.a = 1.0
-	elif map_node.is_available:
-		# Available nodes - blue/white
-		style.bg_color = Color("#2D4A5A")
-		style.border_color = Color("#4A7A8A")
-		button.disabled = false
-		button.modulate.a = 1.0
-	else:
-		# Unavailable nodes - gray
-		style.bg_color = Color("#3A3A3A")
-		style.border_color = Color("#5A5A5A")
-		button.disabled = true
-		button.modulate.a = 0.6
-	
-	# Node type specific styling
-	match map_node.node_type:
-		MapNode.NodeType.BATTLE:
-			style.border_width_left = 2
-			style.border_width_top = 2
-			style.border_width_right = 2
-			style.border_width_bottom = 2
-		MapNode.NodeType.BOSS:
-			style.bg_color = Color("#5A2D2D")  # Reddish for boss
-			style.border_color = Color("#8A4A4A")
-			style.border_width_left = 3
-			style.border_width_top = 3
-			style.border_width_right = 3
-			style.border_width_bottom = 3
-			button.text += " 👑"
-	
-	# Add enemy info to button text and tooltip
-	if map_node.enemy_name != "" and map_node.enemy_difficulty >= 0:
-		var difficulty_text = ""
-		match map_node.enemy_difficulty:
-			0: difficulty_text = "Novice"
-			1: difficulty_text = "Adept"
-			2: difficulty_text = "Master"
-		
-		# Update button text to include enemy info
-		if not button.text.contains("✓"):
-			button.text = map_node.display_name + "\n" + map_node.enemy_name
-		
-		# Set tooltip with more detailed info
-		button.tooltip_text = map_node.enemy_name + " (" + difficulty_text + ")"
-	
-	# Apply the style
-	button.add_theme_stylebox_override("normal", style)
-	button.add_theme_stylebox_override("hover", style)
-	button.add_theme_stylebox_override("pressed", style)
+
 
 # Handle map node button press
 func _on_map_node_pressed(map_node: MapNode):
@@ -219,6 +143,50 @@ func _on_map_node_pressed(map_node: MapNode):
 		_:
 			# Future: handle other node types
 			TransitionManagerAutoload.change_scene_to("res://Scenes/CardBattle.tscn")
+
+func create_map_node_icon(map_node: MapNode) -> void:
+	var icon_size := Vector2(64, 64)
+	var btn := TextureButton.new()
+
+	match map_node.node_type:
+		MapNode.NodeType.BOSS:
+			btn.texture_normal = texture_boss
+		_:
+			btn.texture_normal = texture_battle
+
+	btn.ignore_texture_size = true
+	btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	btn.custom_minimum_size = icon_size
+	btn.size = icon_size
+	btn.position = Vector2(
+		map_node.position.x - icon_size.x / 2.0,
+		map_node.position.y - icon_size.y / 2.0
+	)
+
+	if map_node.is_completed:
+		btn.modulate = Color(0.5, 1.0, 0.5, 0.85)
+		btn.disabled = true
+	elif map_node.is_available:
+		btn.modulate = Color(1.0, 1.0, 1.0, 1.0)
+		btn.disabled = false
+	else:
+		btn.modulate = Color(0.35, 0.35, 0.35, 0.5)
+		btn.disabled = true
+
+	btn.pressed.connect(_on_map_node_pressed.bind(map_node))
+	# Hover feedback only on nodes the player can actually click
+	if map_node.is_available:
+		btn.pivot_offset = icon_size / 2.0
+		btn.mouse_entered.connect(func():
+			var t := btn.create_tween()
+			t.tween_property(btn, "scale", Vector2(1.3, 1.3), 0.1)
+		)
+		btn.mouse_exited.connect(func():
+			var t := btn.create_tween()
+			t.tween_property(btn, "scale", Vector2(1.0, 1.0), 0.1)
+		)
+	map_container.add_child(btn)
+	map_node_icons.append(btn)
 
 # Update the UI labels
 func update_ui():
