@@ -5166,6 +5166,10 @@ func select_hunt_target(target_position: int):
 		# Set up hunt trap
 		setup_hunt_trap(target_position)
 	
+	# Reset selection state so dotted highlight doesn't cover hunt trap styling
+	current_grid_index = -1
+	hide_dotted_highlight()
+	
 	# Exit hunt mode
 	hunt_mode_active = false
 	current_hunter_position = -1
@@ -6566,6 +6570,10 @@ func select_sanctuary_target(target_position: int):
 	
 	# Apply visual styling to show this slot is sanctuaried
 	apply_sanctuary_target_styling(target_position)
+	
+	# Reset selection state so dotted highlight doesn't cover sanctuary styling
+	current_grid_index = -1
+	hide_dotted_highlight()
 	
 	# End sanctuary mode
 	sanctuary_mode_active = false
