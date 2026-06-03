@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dhgyxou3h6dr6" path="res://Assets/Images/Open_Scroll.png" id="3_wxip6"]
 [ext_resource type="PackedScene" uid="uid://5tws4ffpt061" path="res://Scenes/JournalButton.tscn" id="4_2ap6k"]
 [ext_resource type="PackedScene" uid="uid://cu34wrsam7v5o" path="res://Scenes/NotificationManager.tscn" id="6_qoqa2"]
+[ext_resource type="PackedScene" uid="uid://deyqnlai25tcq" path="res://Scenes/MenuButton.tscn" id="7_7h662"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qoqa2"]
 texture = ExtResource("3_wxip6")
@@ -225,3 +226,12 @@ offset_left = -1149.0
 offset_top = 84.0
 offset_right = -849.0
 offset_bottom = 164.0
+
+[node name="MenuLayer" type="CanvasLayer" parent="." unique_id=374465533]
+layer = 20
+
+[node name="MenuButton" parent="MenuLayer" unique_id=680593917 instance=ExtResource("7_7h662")]
+offset_left = -496.0
+offset_top = 225.0
+offset_right = -436.0
+offset_bottom = 285.0

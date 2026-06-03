@@ -14,6 +14,8 @@ var path_lines_node: Node2D = null
 @export var texture_battle: Texture2D
 @export var texture_boss: Texture2D
 
+var menu_button_instance
+
 # Run state - we'll get this from the previous scene
 var selected_god: String = "Apollo"
 var selected_deck_index: int = 0
@@ -48,9 +50,25 @@ func _ready():
 	
 	# Update UI
 	update_ui()
+	var menu_btn = get_node_or_null("CanvasLayer/MenuButton")
+	if menu_btn:
+		menu_btn.show_save_exit = true          # <-- add this line
+		menu_btn.menu_opened.connect(_on_menu_button_opened)
 	
 
+func _on_menu_button_opened(menu_instance: Control):
+	menu_instance.save_exited.connect(_on_pause_menu_save_exited)
+	menu_instance.abandoned.connect(_on_pause_menu_abandoned)
 
+func _on_pause_menu_save_exited():
+	if has_node("/root/RunSaveManagerAutoload"):
+		var save_manager = get_node("/root/RunSaveManagerAutoload")
+		var success = save_manager.save_run(selected_god, selected_deck_index, current_map)
+		if success:
+			print("RunMap: Run saved from pause menu")
+		else:
+			print("RunMap: WARNING - save failed, exiting anyway")
+	TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
 
 # Get parameters passed from the deck selection scene
 func get_run_parameters():
@@ -219,7 +237,7 @@ func _on_new_run_pressed():
 
 func _on_back_button_pressed():
 	SoundManagerAutoload.play("click")
-	_show_exit_popup()
+	_open_pause_menu()
 
 # Helper to get passed parameters from previous scene
 func get_scene_params() -> Dictionary:
@@ -306,6 +324,38 @@ func _on_exit_abandon_pressed():
 		get_node("/root/RunSaveManagerAutoload").clear_saved_run()
 	
 	# Go to run summary as a loss - existing flow handles exp commit
+	get_tree().set_meta("scene_params", {
+		"god": selected_god,
+		"deck_index": selected_deck_index,
+		"victory": false
+	})
+	TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
+
+func _open_pause_menu():
+	var menu_btn = get_node_or_null("CanvasLayer/MenuButton")
+	if menu_btn:
+		menu_btn._on_pressed()
+		if menu_btn.pause_menu_instance:
+			menu_btn.pause_menu_instance.save_exited.connect(_on_pause_menu_save_exited)
+			menu_btn.pause_menu_instance.abandoned.connect(_on_pause_menu_abandoned)
+	else:
+		var menu_canvas = CanvasLayer.new()
+		menu_canvas.layer = 90
+		menu_canvas.name = "PauseMenuCanvas"
+		add_child(menu_canvas)
+		var menu = preload("res://Scenes/PauseMenu.tscn").instantiate()
+		menu.show_save_exit = true
+		menu_canvas.add_child(menu)
+		menu.resumed.connect(func(): menu_canvas.queue_free())
+		menu.save_exited.connect(_on_pause_menu_save_exited)
+		menu.abandoned.connect(_on_pause_menu_abandoned)
+
+func _on_pause_menu_abandoned():
+	_do_abandon_run()
+
+func _do_abandon_run():
+	if has_node("/root/RunSaveManagerAutoload"):
+		get_node("/root/RunSaveManagerAutoload").clear_saved_run()
 	get_tree().set_meta("scene_params", {
 		"god": selected_god,
 		"deck_index": selected_deck_index,

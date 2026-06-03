@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://b6ch1fh8dtox4"]
+
+[ext_resource type="Script" uid="uid://cnsvoju5dtks4" path="res://Scripts/pause_menu.gd" id="1_lj4oq"]
+[ext_resource type="Texture2D" uid="uid://dhgyxou3h6dr6" path="res://Assets/Images/Open_Scroll.png" id="2_qwhev"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qwhev"]
+
+[node name="PauseMenu" type="Control" unique_id=420082699]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lj4oq")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=898574555]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -2.0
+offset_right = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0)
+
+[node name="PanelContainer" type="PanelContainer" parent="ColorRect" unique_id=360879661]
+custom_minimum_size = Vector2(300, 220)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_qwhev")
+
+[node name="TextureRect" type="TextureRect" parent="ColorRect/PanelContainer" unique_id=1276664506]
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_qwhev")
+
+[node name="MarginContainer" type="MarginContainer" parent="ColorRect/PanelContainer" unique_id=638718023]
+layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/PanelContainer/MarginContainer" unique_id=1325196801]
+layout_mode = 2
+
+[node name="ResumeButton" type="Button" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer" unique_id=1324538609]
+layout_mode = 2
+text = "Resume"
+
+[node name="OptionsButton" type="Button" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer" unique_id=820835788]
+layout_mode = 2
+text = "Options"
+
+[node name="Control" type="Control" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer" unique_id=1264400453]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="SaveExitButton" type="Button" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer" unique_id=1605464179]
+layout_mode = 2
+text = "Save And Exit"
+
+[node name="AbandonButton" type="Button" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer" unique_id=818495447]
+layout_mode = 2
+text = "Abandon Run"
+
+[connection signal="pressed" from="ColorRect/PanelContainer/MarginContainer/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
+[connection signal="pressed" from="ColorRect/PanelContainer/MarginContainer/VBoxContainer/OptionsButton" to="." method="_on_options_button_pressed"]
+[connection signal="pressed" from="ColorRect/PanelContainer/MarginContainer/VBoxContainer/SaveExitButton" to="." method="_on_save_exit_button_pressed"]
+[connection signal="pressed" from="ColorRect/PanelContainer/MarginContainer/VBoxContainer/AbandonButton" to="." method="_on_abandon_button_pressed"]

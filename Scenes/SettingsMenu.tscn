@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://ch3w657mo8m13"]
 
 [ext_resource type="Script" uid="uid://vyruggp7tt0s" path="res://Scripts/settings_menu.gd" id="1_8uw7q"]
+[ext_resource type="Texture2D" uid="uid://dhgyxou3h6dr6" path="res://Assets/Images/Open_Scroll.png" id="2_bxjf0"]
 
 [node name="SettingsMenu" type="Control" unique_id=692251111]
 layout_mode = 3
@@ -19,6 +20,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="TextureRect" type="TextureRect" parent="." unique_id=385857663]
+layout_mode = 0
+offset_left = 293.00003
+offset_top = 141.0
+offset_right = 689.00006
+offset_bottom = 282.0
+scale = Vector2(1.36801, 2.9606647)
+texture = ExtResource("2_bxjf0")
+
 [node name="SettingsContainer" type="VBoxContainer" parent="." unique_id=718749309]
 layout_mode = 1
 anchors_preset = 8
@@ -35,12 +45,14 @@ grow_vertical = 2
 
 [node name="Label" type="Label" parent="SettingsContainer" unique_id=1420300357]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.26657522, 0.2665752, 0.2665752, 1)
 theme_override_font_sizes/font_size = 48
 text = "SETTINGS"
 horizontal_alignment = 1
 
 [node name="Label2" type="Label" parent="SettingsContainer" unique_id=1164635315]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.16862746, 0.16862746, 0.16862746, 1)
 text = "— Audio —"
 
 [node name="MasterVolumeContainer" type="HBoxContainer" parent="SettingsContainer" unique_id=1779216042]
@@ -49,6 +61,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="SettingsContainer/MasterVolumeContainer" unique_id=1684173933]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.16924527, 0.1692453, 0.16924527, 1)
 text = "Master"
 
 [node name="HSlider" type="HSlider" parent="SettingsContainer/MasterVolumeContainer" unique_id=880081719]
@@ -62,6 +75,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="SettingsContainer/MusicVolumeContainer" unique_id=370596024]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.16862746, 0.16862746, 0.16862746, 1)
 text = "Music"
 
 [node name="HSlider" type="HSlider" parent="SettingsContainer/MusicVolumeContainer" unique_id=2026872156]
@@ -75,6 +89,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="SettingsContainer/SFXVolumeContainer" unique_id=655340704]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.16862746, 0.16862746, 0.16862746, 1)
 text = "SFX"
 
 [node name="HSlider" type="HSlider" parent="SettingsContainer/SFXVolumeContainer" unique_id=71141701]
@@ -84,6 +99,7 @@ value = 80.0
 
 [node name="Label3" type="Label" parent="SettingsContainer" unique_id=426487850]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.16862746, 0.16862746, 0.16862746, 1)
 text = "— Video —"
 
 [node name="FullscreenContainer" type="HBoxContainer" parent="SettingsContainer" unique_id=144326722]
@@ -92,6 +108,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="SettingsContainer/FullscreenContainer" unique_id=1094656319]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.16862746, 0.16862746, 0.16862746, 1)
 text = "FullScreen"
 
 [node name="CheckBox" type="CheckBox" parent="SettingsContainer/FullscreenContainer" unique_id=1756098909]

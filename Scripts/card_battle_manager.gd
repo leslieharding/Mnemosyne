@@ -21,6 +21,7 @@ var grid_card_data: Array = []  # Track the actual card data for each slot
 var misdirection_button: Button
 
 var ability_mode_input_blocked: bool = false
+var menu_button_instance  # MenuButton ref
 
 var is_natural_harmonics_deck: bool = false
 
@@ -409,6 +410,7 @@ func _ready():
 	
 	# Add journal button (unless tutorial mode)
 	setup_journal_button()
+	setup_menu_button()
 	
 	# Add to battle manager group for cross-script communication
 	add_to_group("battle_manager")
@@ -11055,3 +11057,29 @@ func clear_all_traps():
 	current_trapper_owner = Owner.NONE
 	current_trapper_card = null
 	print("All traps cleared")
+
+func setup_menu_button():
+	var menu_btn = get_node_or_null("MenuLayer/MenuButton")
+	if menu_btn:
+		menu_btn.show_save_exit = false
+		menu_btn.menu_opened.connect(_on_menu_button_opened)
+	if is_tutorial_mode:
+		if menu_btn:
+			menu_btn.visible = false
+
+func _on_menu_button_opened(menu_instance: Control):
+	menu_instance.abandoned.connect(_on_pause_menu_abandoned)
+
+func _on_pause_menu_abandoned():
+	_do_abandon_run_from_combat()
+
+func _do_abandon_run_from_combat():
+	var params = get_scene_params()
+	if has_node("/root/RunSaveManagerAutoload"):
+		get_node("/root/RunSaveManagerAutoload").clear_saved_run()
+	get_tree().set_meta("scene_params", {
+		"god": params.get("god", current_god),
+		"deck_index": params.get("deck_index", 0),
+		"victory": false
+	})
+	TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")

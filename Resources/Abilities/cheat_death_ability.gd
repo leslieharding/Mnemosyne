@@ -4,7 +4,7 @@ extends CardAbility
 
 func _init():
 	ability_name = "Cheat Death"
-	description = "This card prevents the first time it would be captured"
+	description = "This card prevents the first time it would be captured by normal combat"
 	trigger_condition = TriggerType.ON_DEFEND
 
 func execute(context: Dictionary) -> bool:

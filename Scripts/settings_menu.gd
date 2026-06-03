@@ -5,6 +5,9 @@ extends Control
 @onready var sfx_slider = $SettingsContainer/SFXVolumeContainer/HSlider
 @onready var fullscreen_checkbox = $SettingsContainer/FullscreenContainer/CheckBox
 
+var is_overlay: bool = false
+
+
 func _ready():
 	master_slider.value = SettingsManagerAutoload.master_volume
 	music_slider.value = SettingsManagerAutoload.music_volume
@@ -30,4 +33,7 @@ func _on_fullscreen_toggled(pressed: bool):
 
 func _on_back_button_pressed() -> void:
 	SoundManagerAutoload.play_randomized('click')
-	TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
+	if is_overlay:
+		queue_free()
+	else:
+		TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")

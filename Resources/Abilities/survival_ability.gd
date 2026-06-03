@@ -4,7 +4,7 @@ extends CardAbility
 
 func _init():
 	ability_name = "Survival"
-	description = "This card prevents the first time it would be captured, but reduces its stats to 1 to do so"
+	description = "This card prevents the first time it would be captured by normal combat, but reduces its stats to 1 to do so"
 	trigger_condition = TriggerType.ON_DEFEND
 
 func execute(context: Dictionary) -> bool:
