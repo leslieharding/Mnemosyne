@@ -7,7 +7,8 @@ enum NodeType {
 	EVENT,
 	SHOP,
 	BOSS,
-	REST
+	REST,
+	OPTIONAL_BATTLE
 }
 
 @export var node_type: NodeType = NodeType.BATTLE
@@ -55,6 +56,9 @@ func _init(id: int = -1, type: NodeType = NodeType.BATTLE, pos: Vector2 = Vector
 		NodeType.REST:
 			display_name = "Rest"
 			description = "Recover and prepare"
+		NodeType.OPTIONAL_BATTLE:
+			display_name = "Optional Challenge"
+			description = "A dangerous optional encounter. Defeat them for a permanent bonus."	
 
 # Helper to check if this node can be accessed
 func can_be_accessed(completed_nodes: Array[int]) -> bool:

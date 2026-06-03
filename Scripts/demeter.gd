@@ -82,6 +82,13 @@ func _on_start_game_button_pressed() -> void:
 		else:
 			print("Warning: RunEnrichmentTrackerAutoload not found!")
 		
+		# Initialize optional battle tracker for new run
+		if has_node("/root/OptionalBattleTrackerAutoload"):
+			get_node("/root/OptionalBattleTrackerAutoload").start_new_run("Demeter", deck_def.deck_name)
+			print("Initialized optional battle tracker for new run")
+		else:
+			print("Warning: OptionalBattleTrackerAutoload not found!")
+		
 		# Initialize boss prediction tracker
 		get_node("/root/BossPredictionTrackerAutoload").clear_patterns()
 		print("Initialized boss prediction tracker for new run")

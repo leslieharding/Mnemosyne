@@ -13,6 +13,8 @@ var leather_scraps_thrown: int = 0  # Track leather scraps thrown away for Víð
 
 var enemy_weakening: Dictionary = {}  # { "enemy_name": weakening_amount }
 
+var optional_battle_wins: Array = []
+
 var chronos_rechallenge_visible: bool = false
 var chronos_rechallenge_unlocked: bool = false
 
@@ -147,6 +149,7 @@ func save_progress():
 			"leather_scraps": leather_scraps,
 			"leather_scraps_thrown": leather_scraps_thrown,
 			"enemy_weakening": enemy_weakening,
+			"optional_battle_wins": optional_battle_wins,
 		}
 		save_file.store_var(save_data)
 		save_file.close()
@@ -176,6 +179,7 @@ func load_progress():
 				# Migrate old capture_exp/defense_exp format to unified total_exp
 				progress_data = migrate_experience_data(old_progress_data)
 				enemy_weakening = loaded_data.get("enemy_weakening", {})
+				optional_battle_wins = loaded_data.get("optional_battle_wins", [])
 			else:
 				# Very old format - just progress data
 				var old_progress_data = loaded_data if loaded_data is Dictionary else {}
@@ -556,3 +560,18 @@ func add_enemy_weakening(enemy_name: String):
 
 func get_enemy_weakening(enemy_name: String) -> int:
 	return enemy_weakening.get(enemy_name, 0)
+
+
+func add_optional_battle_win(battle_id: String):
+	if battle_id in optional_battle_wins:
+		print("GlobalProgressTracker: Optional battle ", battle_id, " already recorded")
+		return
+	optional_battle_wins.append(battle_id)
+	save_progress()
+	print("GlobalProgressTracker: Optional battle win recorded: ", battle_id)
+
+func is_optional_battle_won(battle_id: String) -> bool:
+	return battle_id in optional_battle_wins
+
+func get_all_optional_battle_wins() -> Array:
+	return optional_battle_wins.duplicate()

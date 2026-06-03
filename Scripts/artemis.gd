@@ -94,6 +94,13 @@ func _on_start_game_button_pressed() -> void:
 		else:
 			print("Warning: RunEnrichmentTrackerAutoload not found!")
 		
+		# Initialize optional battle tracker for new run
+		if has_node("/root/OptionalBattleTrackerAutoload"):
+			get_node("/root/OptionalBattleTrackerAutoload").start_new_run("Artemis", deck_def.deck_name)
+			print("Initialized optional battle tracker for new run")
+		else:
+			print("Warning: OptionalBattleTrackerAutoload not found!")
+		
 		# Pass the selected god and deck index to the map scene
 		get_tree().set_meta("scene_params", {
 			"god": "Artemis",

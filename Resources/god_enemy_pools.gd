@@ -46,23 +46,35 @@ func get_enemy_pool_for_god(god_name: String) -> Array[String]:
 
 func get_weighted_enemy_pool(god_name: String, deck_name: String = "") -> Array[String]:
 	var weighted_pool: Array[String] = []
-	
+
+	# Get optional battle tracker to check which enemies to exclude from regular pool
+	var optional_tracker = null
+	var scene_tree = Engine.get_main_loop()
+	if scene_tree and scene_tree.root:
+		optional_tracker = scene_tree.root.get_node_or_null("/root/OptionalBattleTrackerAutoload")
+
 	# Add deck-specific enemies with highest weight
 	if deck_name != "" and god_name in deck_specific_enemies:
 		if deck_name in deck_specific_enemies[god_name]:
 			for enemy in deck_specific_enemies[god_name][deck_name]:
+				if optional_tracker and optional_tracker.should_exclude_from_regular_pool(enemy, god_name, deck_name):
+					print("GodEnemyPools: Excluding optional battle enemy from regular pool: ", enemy)
+					continue
 				for i in range(deck_specific_weight):
 					weighted_pool.append(enemy)
-	
+
 	# Add god-specific enemies with medium weight
 	if god_name in god_specific_enemies:
 		for enemy in god_specific_enemies[god_name]:
+			if optional_tracker and optional_tracker.should_exclude_from_regular_pool(enemy, god_name, deck_name):
+				print("GodEnemyPools: Excluding optional battle enemy from regular pool: ", enemy)
+				continue
 			for i in range(god_specific_weight):
 				weighted_pool.append(enemy)
-	
-	# Add general enemies with base weight
+
+	# Add general enemies with base weight (never optional battle enemies)
 	for enemy in general_enemies:
 		for i in range(general_weight):
 			weighted_pool.append(enemy)
-	
+
 	return weighted_pool

@@ -38,6 +38,7 @@ MainLevelAutoload="*uid://6p4xlo11nsn8"
 RunSaveManagerAutoload="*uid://cufc1cgvdy13b"
 FeedbackManagerAutoload="*uid://b1jef5v3wv1nd"
 GodMoodManagerAutoload="*uid://b86ehncm1nld5"
+OptionalBattleTrackerAutoload="*uid://d0nklar2cltep"
 
 [display]
 

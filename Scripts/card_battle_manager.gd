@@ -2264,7 +2264,23 @@ func end_game():
 		disable_player_input()
 		opponent_is_thinking = false
 		turn_manager.end_game()
-		
+
+		# If this was an optional battle, losing does not end the run - return to map
+		var loss_params = get_scene_params()
+		if loss_params.get("is_optional_battle", false):
+			_handle_optional_battle_result(false)
+			SoundManagerAutoload.fade_out_music(1.0)
+			await get_tree().create_timer(2.0).timeout
+			get_tree().set_meta("scene_params", {
+				"god": loss_params.get("god", current_god),
+				"deck_index": loss_params.get("deck_index", 0),
+				"map_data": loss_params.get("map_data"),
+				"resuming_run": true,
+			})
+			clear_battle_snapshot()
+			TransitionManagerAutoload.change_scene_to("res://Scenes/RunMap.tscn")
+			return
+
 		record_enemy_encounter(false)
 		record_vengeful_weakening()
 		record_god_experience()
@@ -2338,6 +2354,11 @@ func end_game():
 			if has_node("/root/RunSaveManagerAutoload"):
 				get_node("/root/RunSaveManagerAutoload").clear_saved_run()
 			return
+	
+	# Check if this was an optional battle and handle win/loss reward
+	var battle_params = get_scene_params()
+	if battle_params.get("is_optional_battle", false):
+		_handle_optional_battle_result(true)
 	
 	# Not the final boss - continue with reward screen
 	show_reward_screen()
@@ -3076,11 +3097,12 @@ func apply_sun_power_boost(card_data: CardResource, grid_position: int) -> bool:
 	if grid_position in sunlit_positions:
 		print("☀️ SUN POWER ACTIVATED! Boosting card stats by +1")
 		
-		# Apply +1 to all stats
-		card_data.values[0] += 1  # North
-		card_data.values[1] += 1  # East
-		card_data.values[2] += 1  # South
-		card_data.values[3] += 1  # West
+		var sun_bonus = _get_sun_spot_bonus()
+		card_data.values[0] += sun_bonus  # North
+		card_data.values[1] += sun_bonus  # East
+		card_data.values[2] += sun_bonus  # South
+		card_data.values[3] += sun_bonus  # West
+		print("☀️ Sun spot bonus applied: +", sun_bonus, " to all stats")
 		
 		print("Card stats boosted to: ", card_data.values)
 		return true
@@ -3874,10 +3896,11 @@ func place_card_on_grid():
 	var sun_boosted = false
 	if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER and current_grid_index in sunlit_positions and not darkness_shroud_active:
 		print("Sun Power boost activated for card in sunlit position!")
+		var sun_bonus = _get_sun_spot_bonus()
 		for i in range(card_data.values.size()):
-			card_data.values[i] += 1
+			card_data.values[i] += sun_bonus
 		sun_boosted = true
-		print("Card boosted to: ", card_data.values)
+		print("Card boosted to: ", card_data.values, " (bonus was +", sun_bonus, ")")
 	
 	# Check if this is a Trap trigger (enemy trap)
 	if current_grid_index in active_traps:
@@ -11083,3 +11106,20 @@ func _do_abandon_run_from_combat():
 		"victory": false
 	})
 	TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
+
+func _get_sun_spot_bonus() -> int:
+	var optional_tracker = get_node_or_null("/root/OptionalBattleTrackerAutoload")
+	if optional_tracker and optional_tracker.is_permanently_won("Apollo_The Sun_Cultists of Nyx"):
+		return 2
+	return 1
+
+func _handle_optional_battle_result(player_won: bool):
+	var optional_tracker = get_node_or_null("/root/OptionalBattleTrackerAutoload")
+	if not optional_tracker:
+		print("card_battle_manager: OptionalBattleTrackerAutoload not found!")
+		return
+	if player_won:
+		print("card_battle_manager: Optional battle WON - recording permanent win and applying reward")
+		optional_tracker.record_current_run_win()
+	else:
+		print("card_battle_manager: Optional battle LOST - no permanent effect, returning to map")

@@ -5,12 +5,14 @@
 [ext_resource type="Texture2D" uid="uid://csch40qqijl6o" path="res://Assets/Images/Worn-Parchment-BG-1.png" id="2_wvi63"]
 [ext_resource type="PackedScene" uid="uid://5tws4ffpt061" path="res://Scenes/JournalButton.tscn" id="3_jbe1u"]
 [ext_resource type="Texture2D" uid="uid://dn04gsqijnmas" path="res://Assets/Images/Crown.png" id="3_tbbom"]
+[ext_resource type="Texture2D" uid="uid://dcpqkg338v20j" path="res://Assets/Images/Question_Mark.png" id="4_sdi7r"]
 [ext_resource type="PackedScene" uid="uid://deyqnlai25tcq" path="res://Scenes/MenuButton.tscn" id="6_tbbom"]
 
 [node name="RunMap" type="Node2D" unique_id=1194750382]
 script = ExtResource("1_3231i")
 texture_battle = ExtResource("2_not6i")
 texture_boss = ExtResource("3_tbbom")
+texture_optional = ExtResource("4_sdi7r")
 
 [node name="UI" type="Control" parent="." unique_id=869524961]
 layout_mode = 3

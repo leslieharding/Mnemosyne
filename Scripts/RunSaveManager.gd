@@ -21,6 +21,7 @@ func save_run(god: String, deck_index: int, map_data: MapData) -> bool:
 		"enrichment_data": _get_enrichment_data(),
 		"stat_growth_data": _get_stat_growth_data(),
 		"active_mood": GodMoodManagerAutoload.get_active_mood(),
+		"optional_battle_data": _get_optional_battle_data(),
 	}
 	
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -57,6 +58,7 @@ func restore_trackers_from_save(save_data: Dictionary):
 	_restore_enrichment_data(save_data.get("enrichment_data", {}))
 	_restore_stat_growth_data(save_data.get("stat_growth_data", {}))
 	_restore_mood_data(save_data)
+	_restore_optional_battle_data(save_data.get("optional_battle_data", {}))
 
 func reconstruct_map_data(save_data: Dictionary) -> MapData:
 	return _deserialize_map_data(save_data.get("map_data", {}))
@@ -179,3 +181,19 @@ func _restore_mood_data(save_data: Dictionary):
 	else:
 		GodMoodManagerAutoload.clear_mood()
 	print("RunSaveManager: Mood restored - ", god, " / ", mood)
+
+
+func _get_optional_battle_data() -> Dictionary:
+	if has_node("/root/OptionalBattleTrackerAutoload"):
+		return get_node("/root/OptionalBattleTrackerAutoload").get_run_save_data()
+	return {}
+
+func _restore_optional_battle_data(data: Dictionary):
+	if data.is_empty():
+		print("RunSaveManager: No optional battle data to restore")
+		return
+	if not has_node("/root/OptionalBattleTrackerAutoload"):
+		print("RunSaveManager: OptionalBattleTrackerAutoload not found")
+		return
+	get_node("/root/OptionalBattleTrackerAutoload").restore_from_save_data(data)
+	print("RunSaveManager: Optional battle state restored")

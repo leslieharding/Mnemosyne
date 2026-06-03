@@ -39,6 +39,9 @@ static func generate_map(god_name: String = "Apollo", deck_name: String = "") ->
 	# Update initial availability (starting nodes should be available)
 	map_data.update_node_availability()
 	
+	# Add optional battle node if one exists for this god/deck
+	_add_optional_battle_node(map_data, god_name, deck_name, nodes_by_layer, node_id_counter)
+	
 	return map_data
 
 # Pre-assign enemies to tiers to ensure each enemy is used exactly once
@@ -281,3 +284,41 @@ static func print_map_debug(map_data: MapData):
 		for node in layer_nodes:
 			print("  Node ", node.node_id, " (", node.display_name, ") -> ", node.connections)
 			print("    Enemy: ", node.enemy_name, " (difficulty ", node.enemy_difficulty, ")")
+
+static func _add_optional_battle_node(map_data: MapData, god_name: String, deck_name: String, nodes_by_layer: Array, next_id: int):
+	var scene_tree = Engine.get_main_loop()
+	var optional_tracker = null
+	if scene_tree and scene_tree.root:
+		optional_tracker = scene_tree.root.get_node_or_null("/root/OptionalBattleTrackerAutoload")
+
+	if not optional_tracker:
+		print("MapGenerator: OptionalBattleTrackerAutoload not found - skipping optional node")
+		return
+
+	if not optional_tracker.has_optional_battle_this_run():
+		print("MapGenerator: No optional battle for this run")
+		return
+
+	var enemy_name = optional_tracker.get_optional_enemy_name(god_name, deck_name)
+	if enemy_name == "":
+		print("MapGenerator: No optional enemy name found")
+		return
+
+	# Position above the 3rd battle node (layer index 2)
+	if nodes_by_layer.size() <= 2 or nodes_by_layer[2].size() == 0:
+		print("MapGenerator: Could not find layer 2 node for optional battle positioning")
+		return
+
+	var layer_2_node: MapNode = nodes_by_layer[2][0]
+	var optional_position = Vector2(layer_2_node.position.x, layer_2_node.position.y - 120.0)
+
+	var optional_node = MapNode.new(next_id, MapNode.NodeType.OPTIONAL_BATTLE, optional_position)
+	optional_node.enemy_name = enemy_name
+	optional_node.enemy_difficulty = 2
+	optional_node.display_name = "Optional Challenge"
+	optional_node.description = "A dangerous optional encounter. Defeat them for a permanent bonus."
+	optional_node.connections.clear()
+	optional_node.is_available = false
+
+	map_data.nodes.append(optional_node)
+	print("MapGenerator: Added optional battle node - Enemy: ", enemy_name, " at ", optional_position)

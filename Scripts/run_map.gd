@@ -13,7 +13,7 @@ var map_node_icons: Array[TextureButton] = []
 var path_lines_node: Node2D = null
 @export var texture_battle: Texture2D
 @export var texture_boss: Texture2D
-
+@export var texture_optional: Texture2D
 var menu_button_instance
 
 # Run state - we'll get this from the previous scene
@@ -137,29 +137,33 @@ func clear_map_display() -> void:
 func _on_map_node_pressed(map_node: MapNode):
 	SoundManagerAutoload.play_randomized('click')
 	print("Selected map node: ", map_node.display_name, " (ID: ", map_node.node_id, ")")
-	
-	# Check if the node is actually available
+
+	# Handle optional battle node separately — it uses its own availability logic
+	if map_node.node_type == MapNode.NodeType.OPTIONAL_BATTLE:
+		if not _is_optional_node_accessible():
+			print("Optional battle node is not accessible right now")
+			return
+		_start_optional_battle(map_node)
+		return
+
+	# Standard node: check availability
 	if not (map_node.is_available or map_node.can_be_accessed(current_map.completed_nodes)):
 		print("Node is not available!")
 		return
-	
-	# Mark this node as completed (for now, since all encounters are battles)
+
 	current_map.complete_node(map_node.node_id)
-	
-	# Pass all necessary data to the battle scene
+
 	get_tree().set_meta("scene_params", {
 		"god": selected_god,
 		"deck_index": selected_deck_index,
 		"map_data": current_map,
 		"current_node": map_node
 	})
-	
-	# For now, all nodes lead to battle - later we'll check node type
+
 	match map_node.node_type:
 		MapNode.NodeType.BATTLE, MapNode.NodeType.BOSS:
 			TransitionManagerAutoload.change_scene_to("res://Scenes/CardBattle.tscn")
 		_:
-			# Future: handle other node types
 			TransitionManagerAutoload.change_scene_to("res://Scenes/CardBattle.tscn")
 
 func create_map_node_icon(map_node: MapNode) -> void:
@@ -169,6 +173,8 @@ func create_map_node_icon(map_node: MapNode) -> void:
 	match map_node.node_type:
 		MapNode.NodeType.BOSS:
 			btn.texture_normal = texture_boss
+		MapNode.NodeType.OPTIONAL_BATTLE:
+			btn.texture_normal = texture_optional if texture_optional else texture_battle
 		_:
 			btn.texture_normal = texture_battle
 
@@ -181,7 +187,9 @@ func create_map_node_icon(map_node: MapNode) -> void:
 		map_node.position.y - icon_size.y / 2.0
 	)
 
-	if map_node.is_completed:
+	if map_node.node_type == MapNode.NodeType.OPTIONAL_BATTLE:
+		_apply_optional_node_styling(btn, map_node)
+	elif map_node.is_completed:
 		btn.modulate = Color(0.5, 1.0, 0.5, 0.85)
 		btn.disabled = true
 	elif map_node.is_available:
@@ -192,8 +200,9 @@ func create_map_node_icon(map_node: MapNode) -> void:
 		btn.disabled = true
 
 	btn.pressed.connect(_on_map_node_pressed.bind(map_node))
-	# Hover feedback only on nodes the player can actually click
-	if map_node.is_available:
+
+	var is_clickable = map_node.is_available or (map_node.node_type == MapNode.NodeType.OPTIONAL_BATTLE and _is_optional_node_accessible())
+	if is_clickable:
 		btn.pivot_offset = icon_size / 2.0
 		btn.mouse_entered.connect(func():
 			var t := btn.create_tween()
@@ -208,12 +217,10 @@ func create_map_node_icon(map_node: MapNode) -> void:
 
 # Update the UI labels
 func update_ui():
-	
 	var completed_count = current_map.completed_nodes.size()
 	var total_count = current_map.nodes.size()
-	
-	# Check if run is complete
 	check_run_completion()
+	_check_optional_battle_activation()
 
 # Check if the run is complete after returning from battle
 func check_run_completion():
@@ -362,3 +369,59 @@ func _do_abandon_run():
 		"victory": false
 	})
 	TransitionManagerAutoload.change_scene_to("res://Scenes/RunSummary.tscn")
+
+func _is_optional_node_accessible() -> bool:
+	var optional_tracker = get_node_or_null("/root/OptionalBattleTrackerAutoload")
+	if not optional_tracker:
+		return false
+	return optional_tracker.is_optional_node_accessible()
+
+func _check_optional_battle_activation():
+	var optional_tracker = get_node_or_null("/root/OptionalBattleTrackerAutoload")
+	if not optional_tracker:
+		return
+
+	var regular_battle_count = 0
+	for node in current_map.nodes:
+		if node.is_completed and node.node_type == MapNode.NodeType.BATTLE:
+			regular_battle_count += 1
+
+	if regular_battle_count >= 2:
+		var was_active_before = optional_tracker.optional_battle_active
+		optional_tracker.notify_two_battles_completed()
+		if not was_active_before and optional_tracker.optional_battle_active:
+			print("run_map: Optional battle unlocked - refreshing display")
+			display_map()
+
+func _apply_optional_node_styling(btn: TextureButton, map_node: MapNode):
+	var optional_tracker = get_node_or_null("/root/OptionalBattleTrackerAutoload")
+	var attempted = optional_tracker.optional_battle_attempted_this_run if optional_tracker else false
+	var active = optional_tracker.optional_battle_active if optional_tracker else false
+
+	if attempted:
+		btn.modulate = Color(0.35, 0.35, 0.35, 0.5)
+		btn.disabled = true
+	elif active:
+		btn.modulate = Color(1.0, 0.85, 0.3, 1.0)  # Golden tint when available
+		btn.disabled = false
+	else:
+		btn.modulate = Color(0.35, 0.35, 0.35, 0.5)
+		btn.disabled = true
+
+func _start_optional_battle(map_node: MapNode):
+	var optional_tracker = get_node_or_null("/root/OptionalBattleTrackerAutoload")
+	if not optional_tracker:
+		print("run_map: ERROR - OptionalBattleTrackerAutoload not found!")
+		return
+
+	optional_tracker.mark_attempted()
+	print("run_map: Starting optional battle - ", map_node.enemy_name)
+
+	get_tree().set_meta("scene_params", {
+		"god": selected_god,
+		"deck_index": selected_deck_index,
+		"map_data": current_map,
+		"current_node": map_node,
+		"is_optional_battle": true,
+	})
+	TransitionManagerAutoload.change_scene_to("res://Scenes/CardBattle.tscn")
