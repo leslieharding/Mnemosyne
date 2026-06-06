@@ -16,19 +16,13 @@ var screen_shake_target: Node = null
 var shake_tween: Tween = null
 var original_position: Vector2 = Vector2.ZERO
 
-# Passive pulse configuration
-const PASSIVE_PULSE_DURATION: float = 2.0  # Full pulse cycle duration
-const PASSIVE_PULSE_COLOR: Color = Color("#9966FF")  # Purple for passive abilities
-const PASSIVE_PULSE_MIN_ALPHA: float = 0.2  # Minimum opacity
-const PASSIVE_PULSE_MAX_ALPHA: float = 0.6  # Maximum opacity
+
 
 # Stat nullify arrow configuration
 const STAT_NULLIFY_DURATION: float = 1.5  # Total effect duration
 const STAT_NULLIFY_COLOR: Color = Color("#CC0000")  # Red color for the arrow
 const ARROW_SIZE: float = 20.0  # Size of the arrow
 
-# Track active passive pulses to avoid duplicates
-var active_passive_pulses: Dictionary = {}  # card_display -> pulse_effect
 
 var tremor_shake_effects: Dictionary = {}  # position -> shake_tween
 
@@ -250,76 +244,9 @@ func show_stat_nullify_arrow(affected_card_display: CardDisplay):
 			arrow_label.queue_free()
 	)
 
-# Start passive ability pulse effect on a card
-func start_passive_pulse(card_display: CardDisplay):
-	if not card_display or not card_display.panel:
-		print("VisualEffectsManager: Invalid card display for passive pulse")
-		return
-	
-	# Check if this card already has a passive pulse active
-	if card_display in active_passive_pulses:
-		return
-	
-	# Wait one frame to ensure the card is fully rendered
-	await get_tree().process_frame
-	
-	# Create the pulse overlay that covers all edges
-	var pulse_container = Control.new()
-	pulse_container.name = "PassivePulseEffect"
-	pulse_container.set_anchors_preset(Control.PRESET_FULL_RECT)
-	pulse_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	
-	# Create individual edge overlays
-	var edges = create_all_edge_overlays(card_display.panel.size)
-	for edge in edges:
-		pulse_container.add_child(edge)
-	
-	# Add to the card panel
-	card_display.panel.add_child(pulse_container)
-	pulse_container.z_index = 50
-	
-	# Store reference to track active pulse
-	active_passive_pulses[card_display] = pulse_container
-	
-	# Start the pulsing animation
-	start_pulse_animation(pulse_container)
 
-func stop_passive_pulse(card_display: CardDisplay):
-	if not card_display in active_passive_pulses:
-		return	
-	
-	var pulse_container = active_passive_pulses[card_display]
-	
-	# Immediately remove the pulse container to stop any visual interference
-	if is_instance_valid(pulse_container):
-		pulse_container.queue_free()
-	
-	# Remove from tracking immediately
-	active_passive_pulses.erase(card_display)
-	
-	print("VisualEffectsManager: Stopped passive pulse and cleared tracking for card")
 
-# Create overlay rectangles for all four edges
-func create_all_edge_overlays(card_size: Vector2) -> Array[ColorRect]:
-	var edges: Array[ColorRect] = []
-	var thickness = 3
-	
-	# Create all four edges
-	var positions_and_sizes = [
-		[Vector2(0, 0), Vector2(card_size.x, thickness)],  # North
-		[Vector2(0, card_size.y - thickness), Vector2(card_size.x, thickness)],  # South
-		[Vector2(0, 0), Vector2(thickness, card_size.y)],  # West
-		[Vector2(card_size.x - thickness, 0), Vector2(thickness, card_size.y)]  # East
-	]
-	
-	for pos_size in positions_and_sizes:
-		var edge = ColorRect.new()
-		edge.color = PASSIVE_PULSE_COLOR
-		edge.position = pos_size[0]
-		edge.size = pos_size[1]
-		edges.append(edge)
-	
-	return edges
+
 
 
 func show_toxic_counter_flash(card_display: CardDisplay):
@@ -376,18 +303,7 @@ func show_thunder_bolt_flash(card_display: CardDisplay):
 	tween.tween_callback(func(): flash_overlay.queue_free()).set_delay(0.3)
 
 
-# Start the continuous pulsing animation
-func start_pulse_animation(pulse_container: Control):
-	if not is_instance_valid(pulse_container):
-		return
-	
-	pulse_container.modulate.a = PASSIVE_PULSE_MIN_ALPHA
-	
-	var pulse_tween = create_tween()
-	pulse_tween.set_loops()
-	
-	pulse_tween.tween_property(pulse_container, "modulate:a", PASSIVE_PULSE_MAX_ALPHA, PASSIVE_PULSE_DURATION * 0.5).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-	pulse_tween.tween_property(pulse_container, "modulate:a", PASSIVE_PULSE_MIN_ALPHA, PASSIVE_PULSE_DURATION * 0.5).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+
 
 
 func show_tremor_capture_flash(card_display: CardDisplay):

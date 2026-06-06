@@ -4300,21 +4300,7 @@ func handle_passive_abilities_on_place(grid_position: int, card_data: CardResour
 				else:
 					print("Passive ability ", ability.ability_name, " not active for current owner")
 		
-		# Check if any of the active abilities should show visual pulse
-		var should_show_pulse = false
-		for ability in active_abilities_for_card:
-			if should_passive_ability_show_pulse(ability, card_owner, grid_position):
-				should_show_pulse = true
-				break
 		
-		# Only start visual pulse if needed
-		if should_show_pulse:
-			var card_display = get_card_display_at_position(grid_position)
-			if card_display and visual_effects_manager:
-				visual_effects_manager.start_passive_pulse(card_display)
-				print("Started visual pulse for ", card_data.card_name)
-		else:
-			print("No visual pulse needed for ", card_data.card_name, " (Cultivate has its own arrow effect)")
 	
 	# Also trigger passive abilities of existing cards (in case they need to affect the new card)
 	refresh_all_passive_abilities()
@@ -4330,10 +4316,7 @@ func handle_passive_abilities_on_capture(grid_position: int, card_data: CardReso
 	if grid_position in active_passive_abilities:
 		print("Removing passive abilities for captured card at position ", grid_position)
 		
-		# Stop visual pulse effect first
-		var card_display = get_card_display_at_position(grid_position)
-		if card_display and visual_effects_manager:
-			visual_effects_manager.stop_passive_pulse(card_display)
+		
 		
 		# Execute each passive ability with "remove" action
 		for ability in active_passive_abilities[grid_position]:
@@ -4382,13 +4365,7 @@ func refresh_all_passive_abilities():
 	# Clear all tracking
 	active_passive_abilities.clear()
 	
-	# Stop all visual pulse effects before re-applying
-	if visual_effects_manager:
-		for position in range(grid_slots.size()):
-			if grid_occupied[position]:
-				var card_display = get_card_display_at_position(position)
-				if card_display:
-					visual_effects_manager.stop_passive_pulse(card_display)
+	
 	
 	# Then re-apply all boosts based on current ownership AND ability functionality
 	for position in range(grid_slots.size()):
@@ -4435,18 +4412,7 @@ func refresh_all_passive_abilities():
 			if active_abilities_for_card.size() > 0:
 				active_passive_abilities[position] = active_abilities_for_card
 			
-			# Check if any of the active abilities should show visual pulse
-			var should_show_pulse = false
-			for ability in active_abilities_for_card:
-				if should_passive_ability_show_pulse(ability, card_owner, position):
-					should_show_pulse = true
-					break
 			
-			# Only start visual pulse if needed
-			if should_show_pulse:
-				var card_display = get_card_display_at_position(position)
-				if card_display and visual_effects_manager:
-					visual_effects_manager.start_passive_pulse(card_display)
 func should_passive_ability_be_active(ability: CardAbility, card_owner: Owner, position: int) -> bool:
 	match ability.ability_name:
 		"Cultivate":
@@ -4471,21 +4437,7 @@ func should_passive_ability_be_active(ability: CardAbility, card_owner: Owner, p
 			# Default: passive abilities work for both owners
 			return true
 
-# NEW: Helper function to determine if a passive ability should show visual pulse
-func should_passive_ability_show_pulse(ability: CardAbility, card_owner: Owner, position: int) -> bool:
-	match ability.ability_name:
-		"Cultivate":
-			# Cultivation has its own green arrow visual - no need for pulse
-			return false
-		"Adaptive Defense":
-			# Show pulse for adaptive defense
-			return true
-		"Divine Inspiration", "Passive Boost":
-			# Show pulse for boost abilities
-			return true
-		_:
-			# Default: show pulse for most passive abilities
-			return true
+
 
 # Helper function to check if a position is a corner slot
 func is_corner_position(position: int) -> bool:

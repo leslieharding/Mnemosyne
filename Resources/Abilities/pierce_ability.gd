@@ -143,8 +143,32 @@ func execute_pierce_combat(attacker_pos: int, defender_pos: int, direction: int,
 			print("    Capture prevented by Survival/Cheat Death!")
 			return 0
 		
-		# Execute the capture using game manager's ownership change method
+		# Store attacker ownership BEFORE changing anything
 		var attacking_owner = game_manager.get_owner_at_position(attacker_pos)
+		var is_player_attack = (attacking_owner == game_manager.Owner.PLAYER)
+		var old_owner_was_player = (game_manager.get_owner_at_position(defender_pos) == game_manager.Owner.PLAYER)
+		
+		# Trigger capture visuals on the attacking card
+		var attacking_card_display = game_manager.get_card_display_at_position(attacker_pos)
+		var captured_card_display = game_manager.get_card_display_at_position(defender_pos)
+		
+		if attacking_card_display and game_manager.visual_effects_manager:
+			game_manager.visual_effects_manager.show_capture_flash(attacking_card_display, direction, is_player_attack)
+		
+		if captured_card_display and game_manager.visual_effects_manager:
+			game_manager.visual_effects_manager.show_capture_highlight(
+				captured_card_display,
+				direction,
+				old_owner_was_player,
+				is_player_attack
+			)
+		
+		if game_manager.visual_effects_manager:
+			game_manager.visual_effects_manager.screen_shake(4.0, 0.3, 25.0)
+		
+		SoundManagerAutoload.play_randomized_subtle("card_captured")
+		
+		# Execute the capture using game manager's ownership change method
 		game_manager.set_card_ownership(defender_pos, attacking_owner)
 		
 		# Update board visuals to show the capture

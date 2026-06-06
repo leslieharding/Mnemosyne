@@ -101,10 +101,7 @@ func remove_adaptive_defense(position: int, card: CardResource, game_manager) ->
 			print("AdaptiveDefenseAbility: Updated CardDisplay visual for card at position ", position)
 			break
 	
-	# Stop passive pulse effect
-	var card_display = game_manager.get_card_display_at_position(position)
-	if card_display and game_manager.visual_effects_manager:
-		game_manager.visual_effects_manager.stop_passive_pulse(card_display)
+	
 	
 	return true
 
