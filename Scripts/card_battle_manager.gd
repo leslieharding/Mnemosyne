@@ -1504,6 +1504,7 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 		
 		# Change ownership
 		grid_ownership[captured_index] = attacking_owner
+		SoundManagerAutoload.play_randomized_subtle("card_captured")
 		print("Card at slot ", captured_index, " is now owned by ", "Player" if attacking_owner == Owner.PLAYER else "Opponent")
 		
 		# Award capture experience
@@ -1553,6 +1554,7 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 			print("Restarted ", active_abilities_for_new_owner.size(), " passive abilities for captured card")
 	
 	# Update visuals for all ownership changes
+	
 	update_board_visuals()
 	
 	return successful_captures.size()
@@ -3938,6 +3940,8 @@ func place_card_on_grid():
 	
 	# Wait another frame to ensure setup is complete
 	await get_tree().process_frame
+	
+	SoundManagerAutoload.play_randomized_subtle("card_placed")
 	
 	# Apply special styling for sun-boosted cards
 	if sun_boosted:

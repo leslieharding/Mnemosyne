@@ -1,5 +1,7 @@
 extends Node
 
+
+
 # Sound effect paths - change sounds here in one place
 const SOUNDS = {
 	#basic default navigation
@@ -10,10 +12,10 @@ const SOUNDS = {
 	
 	# God-specific card click variations
 	"apollo_card_click_1": "res://Assets/SoundEffects/apollo_card_click_1.wav",
-	"on_card_clicked": "res://Assets/SoundEffects/on_card_clicked.wav",
-	
-	# Dialogue sounds
-	
+	"on_card_clicked": "res://Assets/SoundEffects/card_flick.wav",
+	"card_placed": "res://Assets/SoundEffects/card_placed.wav",
+	"card_captured": "res://Assets/SoundEffects/capture.wav",
+
 	
 	
 	# Run Map Actions
@@ -133,9 +135,10 @@ func play(sound_name: String):
 	var player = sfx_players[current_player_index]
 	current_player_index = (current_player_index + 1) % max_players
 	
-	# CRITICAL: Reset to default values for non-randomized sounds
 	player.pitch_scale = 1.0
 	player.volume_db = 0.0
+	player.stream = load(SOUNDS[sound_name])
+	player.play()
 	
 	# Load and play the sound
 	player.stream = load(SOUNDS[sound_name])
@@ -319,6 +322,7 @@ func play_god_card_click(god_name: String):
 	play_randomized_subtle(sound_key)
 
 func play_randomized_subtle(sound_name: String):
+	
 	if not SOUNDS.has(sound_name):
 		push_error("Sound not found: " + sound_name)
 		return
@@ -327,9 +331,11 @@ func play_randomized_subtle(sound_name: String):
 	var player = sfx_players[current_player_index]
 	current_player_index = (current_player_index + 1) % max_players
 	
+	print("play_randomized_subtle: ", sound_name, " player_index: ", current_player_index, " pitch: ", player.pitch_scale)
+	
 	# Subtle randomization - much smaller variation
-	player.pitch_scale = randf_range(0.96, 1.04)  # ±5% instead of ±20%
-	player.volume_db = randf_range(-0.9, 0.9)  # ±1 dB instead of ±4 dB
+	player.pitch_scale = randf_range(0.95, 1.05)  # ±5% instead of ±20%
+	player.volume_db = randf_range(-0.90, 0.90)  # ±1 dB instead of ±4 dB
 	
 	# Load and play the sound
 	player.stream = load(SOUNDS[sound_name])

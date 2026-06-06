@@ -5,7 +5,6 @@ extends Node2D
 @onready var map_container = $MapContainer
 @onready var title_label = $UI/VBoxContainer/Title
 @onready var progress_label = $UI/VBoxContainer/ProgressLabel
-@onready var back_button = $UI/VBoxContainer/BackButton
 
 # Map data
 var current_map: MapData
@@ -30,8 +29,7 @@ var exit_popup_abandon_button: Button
 var journal_button: JournalButton
 
 func _ready():
-	# Connect back button
-	back_button.pressed.connect(_on_back_button_pressed)
+	
 	
 	# Get run parameters from previous scene
 	get_run_parameters()
