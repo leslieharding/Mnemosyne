@@ -1,6 +1,6 @@
 extends Node
 
-
+const CARD_FLICK_VARIATIONS = 5
 
 # Sound effect paths - change sounds here in one place
 const SOUNDS = {
@@ -12,7 +12,11 @@ const SOUNDS = {
 	
 	# God-specific card click variations
 	"apollo_card_click_1": "res://Assets/SoundEffects/apollo_card_click_1.wav",
-	"on_card_clicked": "res://Assets/SoundEffects/card_flick.wav",
+	"on_card_clicked_1": "res://Assets/SoundEffects/card_flick(1).wav",
+	"on_card_clicked_2": "res://Assets/SoundEffects/card_flick(2).wav",
+	"on_card_clicked_3": "res://Assets/SoundEffects/card_flick(3).wav",
+	"on_card_clicked_4": "res://Assets/SoundEffects/card_flick(4).wav",
+	"on_card_clicked_5": "res://Assets/SoundEffects/card_flick(5).wav",
 	"card_placed": "res://Assets/SoundEffects/card_placed.wav",
 	"card_captured": "res://Assets/SoundEffects/capture.wav",
 
@@ -205,7 +209,7 @@ func play_dialogue_skip():
 
 
 func play_on_card_click():
-	play("on_card_click")	
+	play_card_flick()
 
 func _on_card_hover_finished():
 	card_hover_sound_playing = false
@@ -311,7 +315,7 @@ func play_god_card_click(god_name: String):
 	# Check if this god has custom click sounds
 	if not click_counts.has(god_key):
 		# Fallback to generic click with subtle randomization
-		play_randomized_subtle("on_card_clicked")
+		play_card_flick()
 		return
 	
 	# Pick random variation from the pool
@@ -340,3 +344,8 @@ func play_randomized_subtle(sound_name: String):
 	# Load and play the sound
 	player.stream = load(SOUNDS[sound_name])
 	player.play()
+
+func play_card_flick():
+	var variation = randi_range(1, CARD_FLICK_VARIATIONS)
+	var sound_key = "on_card_clicked_" + str(variation)
+	play_randomized_subtle(sound_key)
