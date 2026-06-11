@@ -21,8 +21,6 @@ signal journal_closed()
 var journal_tween: Tween
 
 var is_first_tab_change: bool = true
-var selected_god_name: String = ""
-var selected_god_data: Dictionary = {}
 
 func _ready():
 	# Wait one frame to ensure all @onready variables are initialized
@@ -507,8 +505,7 @@ func refresh_gods_tab():
 	# Force layout updates
 	await get_tree().process_frame
 	if sorted_gods.size() > 0:
-		selected_god_name = sorted_gods[0]["name"]
-		selected_god_data = sorted_gods[0]["data"]
+		_on_god_selected(sorted_gods[0]["name"], sorted_gods[0]["data"])
 	god_list.queue_redraw()
 	scroll_container.queue_redraw()
 	left_panel.queue_redraw()
@@ -595,9 +592,9 @@ func create_god_list_button(god_name: String, god_data: Dictionary, memory_manag
 
 # Handle god selection
 func _on_god_selected(god_name: String, god_data: Dictionary):
-	selected_god_name = god_name
-	selected_god_data = god_data
 	var details_panel = gods_tab.get_node("ScrollContainer/RightPanel")
+	details_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	gods_tab.get_node("ScrollContainer").horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	
 	# Clear existing content
 	for child in details_panel.get_children():
@@ -619,6 +616,7 @@ func _on_god_selected(god_name: String, god_data: Dictionary):
 func create_enhanced_god_display(container: Control, info: Dictionary):
 	var main_vbox = VBoxContainer.new()
 	main_vbox.add_theme_constant_override("separation", 12)
+	main_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
 	# === HEADER SECTION ===
 	var header_container = VBoxContainer.new()
@@ -653,35 +651,6 @@ func create_enhanced_god_display(container: Control, info: Dictionary):
 	lore_container.add_child(lore_label)
 	
 	main_vbox.add_child(lore_container)
-	
-	
-	
-	
-	
-	
-	
-	# === PROGRESSION HINTS === (For lower mastery levels)
-	if info["mastery_level"] < 5:  # Not at Divine Mastery yet
-		var separator6 = HSeparator.new()
-		main_vbox.add_child(separator6)
-		
-		var progression_container = VBoxContainer.new()
-		
-		var progression_title = Label.new()
-		progression_title.text = "Path to Greater Understanding"
-		progression_title.add_theme_font_size_override("font_size", 14)
-		progression_title.add_theme_color_override("font_color", Color("#FFE4B5"))  # Moccasin
-		progression_container.add_child(progression_title)
-		
-		var hint_text = get_progression_hint(info["mastery_level"])
-		var hint_label = Label.new()
-		hint_label.text = hint_text
-		hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		hint_label.add_theme_color_override("font_color", Color("#BBBBBB"))
-		hint_label.add_theme_font_size_override("font_size", 11)
-		progression_container.add_child(hint_label)
-		
-		main_vbox.add_child(progression_container)
 	
 	# Add main container to the details panel
 	container.add_child(main_vbox)
@@ -1202,13 +1171,7 @@ func create_compact_card_display(card: CardResource) -> Control:
 
 
 func _on_tab_container_tab_changed(tab: int) -> void:
-	if not tab_container or not gods_tab:
-		return
-	
-	if tab == tab_container.get_tab_idx_from_control(gods_tab) and not selected_god_name.is_empty():
-		await get_tree().process_frame
-		_on_god_selected(selected_god_name, selected_god_data)
-	
+	# Skip sound on first tab change (when journal opens)
 	if is_first_tab_change:
 		is_first_tab_change = false
 		return
