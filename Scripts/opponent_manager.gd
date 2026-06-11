@@ -208,7 +208,7 @@ var ai_profiles: Dictionary = {
 		"shelter_bonus": 6,
 		"efficient_capture_bonus": 25,
 		"card_priorities": {
-			"Typhon":  {"score_bonus": 70, "max_turn": 1},
+			"Eurytos":  {"score_bonus": 70, "max_turn": 3},
 		},
 		"card_order": [],
 		"card_order_bonus": 200,

@@ -15,61 +15,29 @@ func execute(context: Dictionary) -> bool:
 	var grid_position = context.get("grid_position", -1)
 	var game_manager = context.get("game_manager")
 	
-	print("StretcherAbility: Starting execution for card at position ", grid_position)
-	
 	if not placed_card or grid_position == -1 or not game_manager:
 		print("StretcherAbility: Missing required context data")
 		return false
 	
+	# Record adjacent enemies NOW, before combat. These are the only cards the
+	# stretcher reshapes - and it does so AFTER combat (see apply_after_combat).
 	var stretcher_owner = game_manager.get_owner_at_position(grid_position)
-	var total_cards_modified = 0
+	var targets: Array = []
 	
-	# Check all 4 orthogonal directions
-	var directions = [
-		{"index": 0, "name": "North"},
-		{"index": 1, "name": "East"},
-		{"index": 2, "name": "South"},
-		{"index": 3, "name": "West"}
-	]
-	
-	for direction in directions:
-		var adjacent_pos = get_adjacent_position(grid_position, direction.index, game_manager.grid_size)
-		
+	for direction in range(4):
+		var adjacent_pos = get_adjacent_position(grid_position, direction, game_manager.grid_size)
 		if adjacent_pos == -1:
 			continue
-		
 		if not game_manager.grid_occupied[adjacent_pos]:
 			continue
-		
 		var adjacent_owner = game_manager.get_owner_at_position(adjacent_pos)
-		# Skip empty slots, but process ALL enemy cards (including just-captured ones)
-		if adjacent_owner == game_manager.Owner.NONE:
+		if adjacent_owner == game_manager.Owner.NONE or adjacent_owner == stretcher_owner:
 			continue
-		
-		# Only affect enemy cards (not friendly cards)
-		if adjacent_owner == stretcher_owner:
-			continue
-		
-		var adjacent_card = game_manager.get_card_at_position(adjacent_pos)
-		if not adjacent_card:
-			continue
-		
-		print("  Processing adjacent enemy at position ", adjacent_pos, " in direction ", direction.name)
-		
-		# Pass the direction index so only that facing stat is modified
-		var modifications_made = stretch_or_cut_card(placed_card, adjacent_card, direction.index, adjacent_pos, game_manager)
-		
-		if modifications_made:
-			total_cards_modified += 1
+		targets.append({"position": adjacent_pos, "direction": direction})
 	
-	if total_cards_modified > 0:
-		# Update all affected card displays
-		game_manager.update_board_visuals()
-		print("StretcherAbility activated! Modified ", total_cards_modified, " adjacent enemy cards")
-		return true
-	else:
-		print("StretcherAbility had no effect - no adjacent enemies to modify")
-		return false
+	placed_card.set_meta("stretcher_targets", targets)
+	print("StretcherAbility: Recorded ", targets.size(), " target(s) to reshape after combat")
+	return true
 
 func stretch_or_cut_card(stretcher_card: CardResource, target_card: CardResource, direction_from_stretcher: int, target_position: int, game_manager) -> bool:
 	"""
@@ -147,3 +115,30 @@ func get_direction_name(direction: int) -> String:
 
 func can_execute(context: Dictionary) -> bool:
 	return true
+
+func apply_after_combat(placed_card: CardResource, game_manager) -> bool:
+	if not placed_card or not placed_card.has_meta("stretcher_targets"):
+		return false
+	
+	var targets: Array = placed_card.get_meta("stretcher_targets")
+	placed_card.remove_meta("stretcher_targets")
+	
+	var total_cards_modified = 0
+	for target in targets:
+		var adjacent_pos: int = target["position"]
+		var direction: int = target["direction"]
+		
+		# Card may have left the slot during combat (e.g. returned to hand) - skip if gone
+		if not game_manager.grid_occupied[adjacent_pos]:
+			continue
+		var adjacent_card = game_manager.get_card_at_position(adjacent_pos)
+		if not adjacent_card:
+			continue
+		
+		if stretch_or_cut_card(placed_card, adjacent_card, direction, adjacent_pos, game_manager):
+			total_cards_modified += 1
+	
+	if total_cards_modified > 0:
+		game_manager.update_board_visuals()
+		print("StretcherAbility: Reshaped ", total_cards_modified, " card(s) after combat")
+	return total_cards_modified > 0

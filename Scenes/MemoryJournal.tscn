@@ -52,7 +52,7 @@ layout_mode = 2
 [node name="TabContainer" type="TabContainer" parent="MainContainer/VBox" unique_id=1605147862]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_wbglo")
-current_tab = 3
+current_tab = 1
 
 [node name="Bestiary" type="HSplitContainer" parent="MainContainer/VBox/TabContainer" unique_id=410306672]
 visible = false
@@ -91,7 +91,6 @@ text = "Select an enemy to view details"
 horizontal_alignment = 1
 
 [node name="Gods" type="HSplitContainer" parent="MainContainer/VBox/TabContainer" unique_id=1534416453]
-visible = false
 layout_mode = 2
 theme_override_constants/separation = 80
 metadata/_tab_index = 1
@@ -134,6 +133,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="Remember" type="VBoxContainer" parent="MainContainer/VBox/TabContainer" unique_id=1625297954]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 3
 

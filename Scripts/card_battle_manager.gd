@@ -2051,7 +2051,13 @@ func _on_opponent_card_placed(grid_index: int):
 	var captures = resolve_combat(grid_index, Owner.OPPONENT, opponent_card_data)
 	if captures > 0:
 		print("Opponent captured ", captures, " cards!")
-		
+	
+	# The Stretcher: reshape the cards it fought, AFTER combat
+	for ability in opponent_card_data.get_available_abilities(opponent_card_level):
+		if ability is StretcherAbility:
+			ability.apply_after_combat(opponent_card_data, self)
+			break
+	
 	# Update the score display immediately after combat
 	update_game_status()
 	
@@ -2059,7 +2065,7 @@ func _on_opponent_card_placed(grid_index: int):
 	print("Checking for Pursuit ability triggers...")
 	check_pursuit_triggers(grid_index, opponent_card_data)
 	# Check for awakening triggers after opponent places card
-	check_for_awakening_triggers(grid_index, Owner.OPPONENT)
+	await check_for_awakening_triggers(grid_index, Owner.OPPONENT)
 	
 	# If cloak of night is active, hide the newly placed card (but only if still opponent-owned)
 	if cloak_of_night_active and grid_ownership[grid_index] == Owner.OPPONENT:
@@ -4059,8 +4065,8 @@ func place_card_on_grid():
 			print("Player captured ", captures, " cards!")
 		
 		# Check for awakening triggers after player places card
-		check_for_awakening_triggers(current_grid_index, Owner.PLAYER)	
-		# NEW: Check if card has Aristeia ability and trigger it with captures_made
+		await check_for_awakening_triggers(current_grid_index, Owner.PLAYER)	
+		#Check if card has Aristeia ability and trigger it with captures_made
 		if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
 			var available_abilities = card_data.get_available_abilities(card_level)
 			for ability in available_abilities:
@@ -10018,7 +10024,7 @@ func check_for_awakening_triggers(placed_position: int, placed_owner: Owner):
 						
 						for ability in available_abilities:
 							if ability is AwakeningAbility:
-								ability.check_and_trigger_awakening(adj_index, adjacent_card, self)
+								await ability.check_and_trigger_awakening(adj_index, adjacent_card, self)
 								break
 
 func process_awakening_turn_start(is_player_turn: bool):

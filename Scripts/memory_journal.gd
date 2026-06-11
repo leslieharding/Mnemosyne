@@ -21,6 +21,8 @@ signal journal_closed()
 var journal_tween: Tween
 
 var is_first_tab_change: bool = true
+var selected_god_name: String = ""
+var selected_god_data: Dictionary = {}
 
 func _ready():
 	# Wait one frame to ensure all @onready variables are initialized
@@ -505,7 +507,8 @@ func refresh_gods_tab():
 	# Force layout updates
 	await get_tree().process_frame
 	if sorted_gods.size() > 0:
-		_on_god_selected(sorted_gods[0]["name"], sorted_gods[0]["data"])
+		selected_god_name = sorted_gods[0]["name"]
+		selected_god_data = sorted_gods[0]["data"]
 	god_list.queue_redraw()
 	scroll_container.queue_redraw()
 	left_panel.queue_redraw()
@@ -592,6 +595,8 @@ func create_god_list_button(god_name: String, god_data: Dictionary, memory_manag
 
 # Handle god selection
 func _on_god_selected(god_name: String, god_data: Dictionary):
+	selected_god_name = god_name
+	selected_god_data = god_data
 	var details_panel = gods_tab.get_node("ScrollContainer/RightPanel")
 	
 	# Clear existing content
@@ -1197,7 +1202,13 @@ func create_compact_card_display(card: CardResource) -> Control:
 
 
 func _on_tab_container_tab_changed(tab: int) -> void:
-	# Skip sound on first tab change (when journal opens)
+	if not tab_container or not gods_tab:
+		return
+	
+	if tab == tab_container.get_tab_idx_from_control(gods_tab) and not selected_god_name.is_empty():
+		await get_tree().process_frame
+		_on_god_selected(selected_god_name, selected_god_data)
+	
 	if is_first_tab_change:
 		is_first_tab_change = false
 		return
