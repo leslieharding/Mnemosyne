@@ -709,6 +709,7 @@ func setup_darkness_shroud():
 		
 		# Now remove sun styling from all formerly sunlit positions
 		for position in positions_to_restore:
+			remove_sun_spot_visual(position)
 			restore_slot_original_styling(position)
 		
 		# Show notification
@@ -976,7 +977,7 @@ func start_game():
 		if not board_intro_played:
 			board_intro_played = true
 			await animate_board_intro()
-			if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER:
+			if active_deck_power == DeckDefinition.DeckPowerType.SUN_POWER and not darkness_shroud_active:
 				await animate_sun_spots_in()
 		turn_manager.start_game()
 
@@ -10494,6 +10495,8 @@ func create_misdirection_button():
 	print("Misdirection button created and added to battle scene")
 
 func animate_sun_spots_in() -> void:
+	if darkness_shroud_active:
+		return
 	var tween = create_tween()
 	tween.set_parallel(true)
 	for pos in sunlit_positions:
@@ -11085,3 +11088,11 @@ func _handle_optional_battle_result(player_won: bool):
 		optional_tracker.record_current_run_win()
 	else:
 		print("card_battle_manager: Optional battle LOST - no permanent effect, returning to map")
+
+func remove_sun_spot_visual(grid_index: int) -> void:
+	if grid_index < 0 or grid_index >= grid_slots.size():
+		return
+	var slot = grid_slots[grid_index]
+	var god_rays = slot.get_node_or_null("GodRays")
+	if god_rays:
+		god_rays.free()
