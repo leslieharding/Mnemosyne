@@ -659,12 +659,19 @@ func setup_opponent_from_params():
 			print("No enemy data found, using default Shadow Acolyte")
 			opponent_manager.setup_opponent("Shadow Acolyte", 0)
 	setup_hermes_mood()
+	
+	# Initialize enemy deck power NOW - opponent is set up so get_current_deck_definition() works
+	if not is_tutorial_mode:
+		var deck_def = opponent_manager.get_current_deck_definition()
+		if deck_def and deck_def.deck_power_type != EnemyDeckDefinition.EnemyDeckPowerType.NONE:
+			print("Enemy deck power initialization: ", deck_def.get_power_description())
+			initialize_enemy_deck_power(deck_def)
 
 func initialize_enemy_deck_power(deck_def: EnemyDeckDefinition):
+	print("=== INITIALIZE_ENEMY_DECK_POWER CALLED, type: ", deck_def.deck_power_type)
+
 	active_enemy_deck_power = deck_def.deck_power_type
-	
-	print("Initializing enemy deck power: ", active_enemy_deck_power)
-	
+		
 	match active_enemy_deck_power:
 		EnemyDeckDefinition.EnemyDeckPowerType.DARKNESS_SHROUD:
 			setup_darkness_shroud()
@@ -696,7 +703,7 @@ func setup_discordant():
 		print("Discordant ready, but no rhythm power detected")
 
 func setup_darkness_shroud():
-	print("=== SETTING UP DARKNESS SHROUD ===")
+	print("=== SETUP_DARKNESS_SHROUD CALLED === active_deck_power: ", active_deck_power, " darkness_shroud_active: ", darkness_shroud_active)
 	darkness_shroud_active = true
 	
 	# Check if player has sun power active
@@ -947,18 +954,7 @@ func start_game():
 		growth_tracker.update_deck_indices(deck_card_indices)
 		print("Updated run stat growth tracker with current deck indices (preserving growth)")
 	
-	# MOVE enemy deck power initialization HERE - before player deck power effects
-	var params = get_scene_params()
-	if not is_tutorial_mode and params.has("current_node"):
-		var current_node = params["current_node"]
-		var enemy_name = current_node.enemy_name if current_node.enemy_name != "" else "Shadow Acolyte"
-		var enemy_difficulty = current_node.enemy_difficulty
-		
-		# Initialize enemy deck power EARLY
-		var deck_def = opponent_manager.get_current_deck_definition()
-		if deck_def and deck_def.deck_power_type != EnemyDeckDefinition.EnemyDeckPowerType.NONE:
-			print("Early enemy deck power initialization: ", deck_def.get_power_description())
-			initialize_enemy_deck_power(deck_def)
+	
 	
 	if is_tutorial_mode:
 		game_status_label.text = "Tutorial: Learning the Basics"
@@ -2946,6 +2942,11 @@ func setup_prophecy_power():
 
 func setup_sun_power():
 	print("=== SETTING UP SUN POWER ===")
+	
+	# If darkness shroud is already active (e.g. Cultists of Nyx), skip sun spot creation
+	if darkness_shroud_active:
+		print("☀️ Sun power blocked by Darkness Shroud - skipping sun spot creation")
+		return
 	
 	# Randomly select 3 grid positions for sunlight
 	var available_positions: Array[int] = []
