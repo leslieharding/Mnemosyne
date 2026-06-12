@@ -1,6 +1,7 @@
 extends Node
 
 const CARD_FLICK_VARIATIONS = 5
+const LEVEL_UP_VARIATIONS = 4
 
 # Sound effect paths - change sounds here in one place
 const SOUNDS = {
@@ -20,7 +21,12 @@ const SOUNDS = {
 	"card_placed": "res://Assets/SoundEffects/card_placed.wav",
 	"card_captured": "res://Assets/SoundEffects/capture.wav",
 
-	
+	# Run Summary Level Up Sounds
+	"level_up_1": "res://Assets/SoundEffects/level_up(1).wav",
+	"level_up_2": "res://Assets/SoundEffects/level_up(2).wav",
+	"level_up_3": "res://Assets/SoundEffects/level_up(3).wav",
+	"level_up_4": "res://Assets/SoundEffects/level_up(4).wav",
+	"level_up_final": "res://Assets/SoundEffects/level_up(5).wav",
 	
 	# Run Map Actions
 	"battle_entered": "res://Assets/SoundEffects/battle_entered.wav",
@@ -349,3 +355,23 @@ func play_card_flick():
 	var variation = randi_range(1, CARD_FLICK_VARIATIONS)
 	var sound_key = "on_card_clicked_" + str(variation)
 	play_randomized_subtle(sound_key)
+
+func play_level_up_sound(pitch: float = 1.0, volume_db: float = 0.0, is_final: bool = false):
+	var sound_key: String
+	if is_final:
+		sound_key = "level_up_final"
+	else:
+		var variation = randi_range(1, LEVEL_UP_VARIATIONS)
+		sound_key = "level_up_" + str(variation)
+
+	if not SOUNDS.has(sound_key):
+		push_error("Level up sound not found: " + sound_key)
+		return
+
+	var player = sfx_players[current_player_index]
+	current_player_index = (current_player_index + 1) % max_players
+
+	player.pitch_scale = pitch
+	player.volume_db = volume_db
+	player.stream = load(SOUNDS[sound_key])
+	player.play()

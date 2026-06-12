@@ -402,6 +402,7 @@ func animate_progress_bar(
 	# mapping the shader value as (current_xp mod XP_PER_LEVEL) / XP_PER_LEVEL
 	# and updating the level label whenever we cross a level boundary
 	var tracked_level = before_level
+	var levels_crossed = 0
 	tween.tween_method(func(xp_gained: float):
 		var current_xp = before_total + xp_gained
 		var current_level = ExperienceHelpers.calculate_level(int(current_xp))
@@ -410,6 +411,11 @@ func animate_progress_bar(
 		progress_bar.material.set_shader_parameter("value", shader_value)
 		if current_level != tracked_level:
 			tracked_level = current_level
+			levels_crossed += 1
+			var is_final_level_up = (tracked_level == after_level and level_ups >= 3)
+			var pitch = clampf(1.0 + (levels_crossed - 1) * 0.06, 1.0, 1.3)
+			var vol = clampf((levels_crossed - 1) * 0.8, 0.0, 3.0)
+			SoundManagerAutoload.play_level_up_sound(pitch, vol, is_final_level_up)
 			level_label.text = card_name + " (Lv." + str(tracked_level) + ")"
 		, 0.0, float(total_gain), duration)
 
