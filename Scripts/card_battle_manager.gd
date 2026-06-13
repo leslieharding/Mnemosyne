@@ -2151,7 +2151,18 @@ func end_game():
 	if tracker:
 		tracker.stop_recording()
 	
-	await get_tree().process_frame
+	var previous_ownership = grid_ownership.duplicate()
+	var stable_frames = 0
+	while stable_frames < 2:
+		await get_tree().process_frame
+		if grid_ownership == previous_ownership:
+			stable_frames += 1
+		else:
+			stable_frames = 0
+			previous_ownership = grid_ownership.duplicate()
+	
+	# Force a final score display update so visuals match what we're about to evaluate
+	update_game_status()
 	
 	# Check for Apollo alternate win condition BEFORE any score evaluation
 	if apollo_alternate_win_pending:
@@ -4056,74 +4067,83 @@ func place_card_on_grid():
 	
 	# CRITICAL FIX: Don't resolve combat here if card was replaced
 	# The replace_card_with_summon function already handles combat for the summoned ally
+	var captures = 0 
 	if not card_was_replaced:
 		# If a modal is open (e.g. Prophetic), wait until it closes before resolving combat
 		while game_paused_for_modal:
 			await get_tree().process_frame
 		
 		# Resolve combat
-		var captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
+		captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 		if captures > 0:
 			print("Player captured ", captures, " cards!")
-		
-		# Check for awakening triggers after player places card
-		await check_for_awakening_triggers(current_grid_index, Owner.PLAYER)	
-		#Check if card has Aristeia ability and trigger it with captures_made
-		if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
-			var available_abilities = card_data.get_available_abilities(card_level)
-			for ability in available_abilities:
-				if ability.ability_name == "Aristeia":
-					print("Checking Aristeia ability with ", captures, " captures")
+	
+	else:
+		# Card was replaced (e.g. Persephone summoned an ally) - the replace function is async
+		# Wait for it to fully complete (including Torches/other ON_PLAY abilities) before continuing
+		await get_tree().process_frame
+		await get_tree().process_frame
+		# Force score update so captures from the summoned card count before game-end check
+		update_game_status()
+	
+	# Check for awakening triggers after player places card
+	await check_for_awakening_triggers(current_grid_index, Owner.PLAYER)	
+	#Check if card has Aristeia ability and trigger it with captures_made
+	if card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
+		var available_abilities = card_data.get_available_abilities(card_level)
+		for ability in available_abilities:
+			if ability.ability_name == "Aristeia":
+				print("Checking Aristeia ability with ", captures, " captures")
+				
+				var aristeia_context = {
+					"placed_card": card_data,
+					"grid_position": current_grid_index,
+					"game_manager": self,
+					"placing_owner": Owner.PLAYER,
+					"card_level": card_level,
+					"captures_made": captures
+				}
+				
+				var aristeia_activated = ability.execute(aristeia_context)
+				if aristeia_activated:
+					print("Aristeia successfully activated - mode is now active")
 					
-					var aristeia_context = {
-						"placed_card": card_data,
-						"grid_position": current_grid_index,
-						"game_manager": self,
-						"placing_owner": Owner.PLAYER,
-						"card_level": card_level,
-						"captures_made": captures
-					}
+					# Remove the card from hand now that it's been placed and aristeia activated
+					var temp_index = selected_card_index
+					selected_card_index = -1
+					remove_card_from_hand(temp_index)
 					
-					var aristeia_activated = ability.execute(aristeia_context)
-					if aristeia_activated:
-						print("Aristeia successfully activated - mode is now active")
-						
-						# Remove the card from hand now that it's been placed and aristeia activated
-						var temp_index = selected_card_index
-						selected_card_index = -1
-						remove_card_from_hand(temp_index)
-						
-						# Reset grid selection
-						if current_grid_index != -1:
-							restore_slot_original_styling(current_grid_index)
-						current_grid_index = -1
-						
-						return
-					else:
-						print("Aristeia did not activate (no captures or ownership changed)")
-					break  # Exit the ability loop
-				if ability.ability_name == "Germinate":
-					print("Checking Germinate ability")
-					var germinate_context = {
-						"placed_card": card_data,
-						"grid_position": current_grid_index,
-						"game_manager": self,
-						"placing_owner": Owner.PLAYER,
-						"card_level": card_level
-					}
-					var germinate_activated = ability.execute(germinate_context)
-					if germinate_activated:
-						print("Germinate mode activated - waiting for player target selection")
-						var temp_index = selected_card_index
-						selected_card_index = -1
-						remove_card_from_hand(temp_index)
-						if current_grid_index != -1:
-							restore_slot_original_styling(current_grid_index)
-						current_grid_index = -1
-						return
-					else:
-						print("Germinate fizzled - no valid targets")
-					break
+					# Reset grid selection
+					if current_grid_index != -1:
+						restore_slot_original_styling(current_grid_index)
+					current_grid_index = -1
+					
+					return
+				else:
+					print("Aristeia did not activate (no captures or ownership changed)")
+				break  # Exit the ability loop
+			if ability.ability_name == "Germinate":
+				print("Checking Germinate ability")
+				var germinate_context = {
+					"placed_card": card_data,
+					"grid_position": current_grid_index,
+					"game_manager": self,
+					"placing_owner": Owner.PLAYER,
+					"card_level": card_level
+				}
+				var germinate_activated = ability.execute(germinate_context)
+				if germinate_activated:
+					print("Germinate mode activated - waiting for player target selection")
+					var temp_index = selected_card_index
+					selected_card_index = -1
+					remove_card_from_hand(temp_index)
+					if current_grid_index != -1:
+						restore_slot_original_styling(current_grid_index)
+					current_grid_index = -1
+					return
+				else:
+					print("Germinate fizzled - no valid targets")
+				break
 	# Update the score display immediately after combat
 	update_game_status()
 
@@ -7153,6 +7173,9 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource) -
 		print("Summoned ally captured ", captures, " cards!")
 	else:
 		print("No captures for summoned ally")
+	
+	# Update score display after all captures from summoned ally are processed
+	update_game_status()
 	
 	return true
 
