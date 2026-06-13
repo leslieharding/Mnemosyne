@@ -22,11 +22,11 @@ const SOUNDS = {
 	"card_captured": "res://Assets/SoundEffects/capture.wav",
 
 	# Run Summary Level Up Sounds
-	"level_up_1": "res://Assets/SoundEffects/level_up(1).wav",
-	"level_up_2": "res://Assets/SoundEffects/level_up(2).wav",
-	"level_up_3": "res://Assets/SoundEffects/level_up(3).wav",
-	"level_up_4": "res://Assets/SoundEffects/level_up(4).wav",
-	"level_up_final": "res://Assets/SoundEffects/level_up(5).wav",
+	"level_up_1": "res://Assets/SoundEffects/level_up_1.wav",
+	"level_up_2": "res://Assets/SoundEffects/level_up_2.wav",
+	"level_up_3": "res://Assets/SoundEffects/level_up_3.wav",
+	"level_up_4": "res://Assets/SoundEffects/level_up_4.wav",
+	"level_up_final": "res://Assets/SoundEffects/level_up_final.wav",
 	
 	# Run Map Actions
 	"battle_entered": "res://Assets/SoundEffects/battle_entered.wav",

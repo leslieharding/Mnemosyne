@@ -7111,7 +7111,7 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource) -
 						child.panel.gui_input.disconnect(_on_grid_card_right_click)
 			
 			# Now it's safe to free
-			child.queue_free()
+			child.free()
 	
 	# Wait for the old card to be fully removed
 	await get_tree().process_frame
@@ -8270,20 +8270,16 @@ func reveal_camouflaged_card(card_display: CardDisplay):
 		print("reveal_camouflaged_card: Card display is no longer valid")
 		return
 	
-	if not card_display.panel:
-		print("reveal_camouflaged_card: Card display panel is null")
-		return
-	
-	# Check if panel is still valid (not freed)
-	if not is_instance_valid(card_display.panel):
-		print("reveal_camouflaged_card: Card display panel has been freed")
+	var p = get_valid_panel(card_display)
+	if not p:
+		print("reveal_camouflaged_card: Card display panel is null or freed")
 		return
 	
 	# Restore full opacity
 	card_display.modulate = Color(1, 1, 1, 1)
 	
-	# CRITICAL FIX: Restore normal mouse input handling
-	card_display.panel.mouse_filter = Control.MOUSE_FILTER_PASS
+	# Restore normal mouse input handling
+	p.mouse_filter = Control.MOUSE_FILTER_PASS
 	print("Restored camouflaged card mouse_filter to PASS")
 	
 	# Restore normal ownership styling
@@ -8296,9 +8292,9 @@ func reveal_camouflaged_card(card_display: CardDisplay):
 	if grid_position != -1:
 		var owner = grid_ownership[grid_position]
 		if owner == Owner.PLAYER:
-			card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+			p.add_theme_stylebox_override("panel", player_card_style)
 		else:
-			card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+			p.add_theme_stylebox_override("panel", opponent_card_style)
 	
 	print("Revealed camouflaged card: ", card_display.get_card_data().card_name if card_display.get_card_data() else "Unknown")
 
@@ -8354,23 +8350,18 @@ func hide_camouflaged_card(card_display: CardDisplay):
 	print("Card display exists: ", card_display != null)
 	print("Card display panel exists: ", card_display.panel != null if card_display else "N/A")
 	
-	if card_display and card_display.panel:
+	var p = get_valid_panel(card_display)
+	if p:
 		print("BEFORE hiding - card modulate: ", card_display.modulate)
-		print("BEFORE hiding - panel style override exists: ", card_display.panel.has_theme_stylebox_override("panel"))
+		print("BEFORE hiding - panel style override exists: ", p.has_theme_stylebox_override("panel"))
 		
-		# Make the card completely transparent
 		card_display.modulate = Color(1, 1, 1, 0)
-		
-		# CRITICAL FIX: Allow mouse input to pass through the camouflaged card
-		# so clicks can reach the underlying grid slot
-		card_display.panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		print("Set camouflaged card mouse_filter to IGNORE")
-		
-		# Remove any ownership styling to make the slot appear empty
-		card_display.panel.remove_theme_stylebox_override("panel")
+		p.remove_theme_stylebox_override("panel")
 		
 		print("AFTER hiding - card modulate: ", card_display.modulate)
-		print("AFTER hiding - mouse_filter: ", card_display.panel.mouse_filter)
+		print("AFTER hiding - mouse_filter: ", p.mouse_filter)
 	
 	print("Card successfully camouflaged and mouse input set to pass through")
 
