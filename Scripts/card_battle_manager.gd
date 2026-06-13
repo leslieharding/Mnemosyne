@@ -2015,7 +2015,7 @@ func _on_opponent_card_placed(grid_index: int):
 			"game_manager": self,
 			"card_level": opponent_card_level
 		}
-		opponent_card_data.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, opponent_card_level)
+		await opponent_card_data.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, opponent_card_level)
 	
 	# Connect hover signals for opponent cards too
 	card_display.card_hovered.connect(_on_card_hovered)
@@ -7128,6 +7128,12 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource) -
 	# Wait one frame to ensure the card display is ready
 	await get_tree().process_frame
 	
+	# Guard: the card_display could have been freed during the await frames
+	# (e.g. by Fimbulwinter boss logic running between frames)
+	if not is_instance_valid(card_display):
+		print("ERROR: card_display was freed during await in replace_card_with_summon - aborting")
+		return false
+	
 	# Setup the new card display
 	card_display.setup(ally_copy)
 	
@@ -7137,16 +7143,19 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource) -
 	print("Connected hover signals for summoned card: ", ally_copy.card_name)
 	
 	# Connect right-click handling for the summoned card
-	if card_display and card_display.panel:
+	if is_instance_valid(card_display) and is_instance_valid(card_display.panel):
 		card_display.panel.gui_input.connect(_on_grid_card_right_click.bind(grid_position))
 		print("Connected right-click handler for summoned card at grid position ", grid_position)
 	
 	# Apply ownership styling
 	if current_owner == Owner.PLAYER:
-		if card_display and card_display.panel:
+		if is_instance_valid(card_display) and is_instance_valid(card_display.panel):
 			card_display.panel.add_theme_stylebox_override("panel", player_card_style)
 	
-	print("Card replacement complete - ", ally_copy.card_name, " now visible")
+	if not is_instance_valid(card_display):
+		print("WARNING: card_display lost validity after setup in replace_card_with_summon")
+	else:
+		print("Card replacement complete - ", ally_copy.card_name, " now visible")
 	
 	# Execute the summoned ally's ON_PLAY abilities
 	var ally_level = 1  # Summoned allies are always base level
@@ -9909,8 +9918,11 @@ func process_fimbulwinter_enrich(card: CardResource, position: int, card_level: 
 	# Select a RANDOM slot on the board (0-8)
 	var random_slot = randi() % 9
 	
-	# Apply enrichment to that random slot
-	enrichment_tracker.add_enrichment(random_slot, enrichment_amount)
+	# Apply enrichment to that random slot - correct method name is add_slot_enrichment
+	enrichment_tracker.add_slot_enrichment(random_slot, enrichment_amount)
+	
+	# Update the visual display for the affected slot
+	update_slot_enrichment_display(random_slot)
 	
 	print("Fimbulwinter: ", card.card_name, " caused slot ", random_slot, " to lose ", abs(enrichment_amount), " enrichment")
 	

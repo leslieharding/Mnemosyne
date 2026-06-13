@@ -87,7 +87,7 @@ func execute_abilities(trigger_type: CardAbility.TriggerType, context: Dictionar
 	for ability in abilities_to_execute:
 		if ability.trigger_condition == trigger_type:
 			print("Executing ability: ", ability.ability_name)
-			ability.execute(context)
+			await ability.execute(context)
 
 # Get available abilities for a card at a given level (filters by unlock_level)
 func get_available_abilities(level: int) -> Array[CardAbility]:

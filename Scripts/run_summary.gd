@@ -392,31 +392,29 @@ func animate_progress_bar(
 	var level_ups = after_level - before_level
 	var duration = BASE_ANIMATION_DURATION + (level_ups * 0.5)
 
-	# Tween a single float that represents progress-within-current-level
-	# When it crosses 1.0 we wrap it and update the level label
 	var tween = create_tween()
 	tween.set_trans(Tween.TRANS_QUAD)
 	tween.set_ease(Tween.EASE_IN)
 
-	# We animate from before_progress to (before_progress + total_gain),
-	# mapping the shader value as (current_xp mod XP_PER_LEVEL) / XP_PER_LEVEL
-	# and updating the level label whenever we cross a level boundary
-	var tracked_level = before_level
-	var levels_crossed = 0
+	# Use an array so the lambda captures by reference, preserving mutations across tween frames
+	# state[0] = tracked_level, state[1] = levels_crossed
+	var state = [before_level, 0]
 	tween.tween_method(func(xp_gained: float):
 		var current_xp = before_total + xp_gained
 		var current_level = ExperienceHelpers.calculate_level(int(current_xp))
 		var current_progress = ExperienceHelpers.calculate_progress(int(current_xp))
 		var shader_value = current_progress / float(XP_PER_LEVEL)
 		progress_bar.material.set_shader_parameter("value", shader_value)
-		if current_level != tracked_level:
-			tracked_level = current_level
-			levels_crossed += 1
-			var is_final_level_up = (tracked_level == after_level and level_ups >= 3)
-			var pitch = clampf(1.0 + (levels_crossed - 1) * 0.06, 1.0, 1.3)
-			var vol = clampf((levels_crossed - 1) * 0.8, 0.0, 3.0)
+		if current_level != state[0]:
+			print("LEVELUP DETECTED: ", state[0], " -> ", current_level, " | levels_crossed so far: ", state[1])
+			state[0] = current_level
+			state[1] += 1
+			var is_final_level_up = (state[0] == after_level and level_ups >= 3)
+			var pitch = clampf(1.0 + (state[1] - 1) * 0.06, 1.0, 1.3)
+			var vol = clampf((state[1] - 1) * 0.8, 0.0, 3.0)
+			print("PLAYING SOUND: is_final=", is_final_level_up, " pitch=", pitch, " vol=", vol)
 			SoundManagerAutoload.play_level_up_sound(pitch, vol, is_final_level_up)
-			level_label.text = card_name + " (Lv." + str(tracked_level) + ")"
+			level_label.text = card_name + " (Lv." + str(state[0]) + ")"
 		, 0.0, float(total_gain), duration)
 
 	await tween.finished
