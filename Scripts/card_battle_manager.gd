@@ -2022,8 +2022,9 @@ func _on_opponent_card_placed(grid_index: int):
 	card_display.card_unhovered.connect(_on_card_unhovered)
 	print("Connected hover signals for opponent card: ", opponent_card_data.card_name)
 	
-	if card_display and card_display.panel:
-		card_display.panel.gui_input.connect(_on_grid_card_right_click.bind(grid_index))
+	var p = get_valid_panel(card_display)
+	if p:
+		p.gui_input.connect(_on_grid_card_right_click.bind(grid_index))
 		print("Connected right-click handler for opponent card at grid position ", grid_index)
 	
 	# Apply opponent card styling to the slot (not the card display) - BUT NOT if camouflaged  
@@ -3985,8 +3986,9 @@ func place_card_on_grid():
 
 	print("Player placed ", card_data.card_name, " at slot ", current_grid_index)
 	# Connect right-click handling for cards placed on the grid
-	if card_display and card_display.panel:
-		card_display.panel.gui_input.connect(_on_grid_card_right_click.bind(current_grid_index))
+	var p = get_valid_panel(card_display)
+	if p:
+		p.gui_input.connect(_on_grid_card_right_click.bind(current_grid_index))
 		print("Connected right-click handler for player card at grid position ", current_grid_index)
 	
 	# Check if the card should get ordain bonus BEFORE executing abilities
@@ -7143,14 +7145,12 @@ func replace_card_with_summon(grid_position: int, summoned_ally: CardResource) -
 	print("Connected hover signals for summoned card: ", ally_copy.card_name)
 	
 	# Connect right-click handling for the summoned card
-	if is_instance_valid(card_display) and is_instance_valid(card_display.panel):
-		card_display.panel.gui_input.connect(_on_grid_card_right_click.bind(grid_position))
+	var p = get_valid_panel(card_display)
+	if p:
+		p.gui_input.connect(_on_grid_card_right_click.bind(grid_position))
 		print("Connected right-click handler for summoned card at grid position ", grid_position)
-	
-	# Apply ownership styling
-	if current_owner == Owner.PLAYER:
-		if is_instance_valid(card_display) and is_instance_valid(card_display.panel):
-			card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+		if current_owner == Owner.PLAYER:
+			p.add_theme_stylebox_override("panel", player_card_style)
 	
 	if not is_instance_valid(card_display):
 		print("WARNING: card_display lost validity after setup in replace_card_with_summon")
@@ -7535,26 +7535,20 @@ func select_enrich_target(target_slot: int):
 	turn_manager.next_turn()
 
 func set_cards_mouse_passthrough_for_enrich_mode(enable_passthrough: bool):
-	"""
-	During enrich mode, we need to allow mouse input to pass through cards on occupied slots
-	so that the underlying grid slots can receive mouse events for selection.
-	"""
 	print("Setting cards mouse passthrough for enrich mode: ", enable_passthrough)
-	
 	for i in range(grid_slots.size()):
 		if grid_occupied[i]:
 			var slot = grid_slots[i]
-			# Find the card display in the slot
 			for child in slot.get_children():
-				if child is CardDisplay and child.panel:
-					if enable_passthrough:
-						# Allow mouse input to pass through the card to the slot underneath
-						child.panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-						print("Set card at slot ", i, " to MOUSE_FILTER_IGNORE for enrich mode")
-					else:
-						# Restore normal mouse input handling
-						child.panel.mouse_filter = Control.MOUSE_FILTER_PASS
-						print("Restored card at slot ", i, " to MOUSE_FILTER_PASS after enrich mode")
+				if child is CardDisplay:
+					var p = get_valid_panel(child)
+					if p:
+						if enable_passthrough:
+							p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+							print("Set card at slot ", i, " to MOUSE_FILTER_IGNORE for enrich mode")
+						else:
+							p.mouse_filter = Control.MOUSE_FILTER_PASS
+							print("Restored card at slot ", i, " to MOUSE_FILTER_PASS after enrich mode")
 
 func opponent_select_enrich_target():
 	if not enrich_mode_active:
@@ -8182,24 +8176,25 @@ func execute_camouflage_capture(camouflage_slot: int, captured_owner: Owner):
 
 func _setup_captured_card_display(card_display: CardDisplay, card_data: CardResource, card_level: int, is_opponent_card: bool, slot_index: int):
 	"""Helper function to set up a captured card display after it's been added to the scene"""
-	if not card_display or not card_display.panel:
-		print("ERROR: Card display or panel is null in _setup_captured_card_display")
+	if not is_instance_valid(card_display):
+		print("ERROR: Card display is invalid in _setup_captured_card_display")
 		return
 	
-	# Setup the captured card display
 	card_display.setup(card_data, card_level, current_god, 0, is_opponent_card)
 	
-	# Apply correct ownership styling to the captured card
-	if not is_opponent_card:
-		card_display.panel.add_theme_stylebox_override("panel", player_card_style)
-	else:
-		card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+	var p = get_valid_panel(card_display)
+	if not p:
+		print("ERROR: Panel is invalid in _setup_captured_card_display")
+		return
 	
-	# Connect hover and input signals for the captured card
+	if not is_opponent_card:
+		p.add_theme_stylebox_override("panel", player_card_style)
+	else:
+		p.add_theme_stylebox_override("panel", opponent_card_style)
+	
 	card_display.card_hovered.connect(_on_card_hovered)
 	card_display.card_unhovered.connect(_on_card_unhovered)
-	if card_display.panel:
-		card_display.panel.gui_input.connect(_on_grid_card_right_click.bind(slot_index))
+	p.gui_input.connect(_on_grid_card_right_click.bind(slot_index))
 	
 	print("Captured card display setup complete for slot ", slot_index)
 
@@ -11132,3 +11127,12 @@ func remove_sun_spot_visual(grid_index: int) -> void:
 	var god_rays = slot.get_node_or_null("GodRays")
 	if god_rays:
 		god_rays.free()
+
+func get_valid_panel(card_display) -> Panel:
+	if not is_instance_valid(card_display):
+		return null
+	if not card_display.get("panel"):
+		return null
+	if not is_instance_valid(card_display.panel):
+		return null
+	return card_display.panel

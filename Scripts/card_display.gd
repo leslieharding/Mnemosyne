@@ -297,6 +297,10 @@ func setup_hover_shader():
 	# Apply to panel
 	panel.material = shader_material
 
+func get_panel() -> Panel:
+	if not is_instance_valid(panel):
+		return null
+	return panel
 
 func adjust_card_name_size() -> void:
 	if not card_name_label:
