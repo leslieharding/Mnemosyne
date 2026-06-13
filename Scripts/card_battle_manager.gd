@@ -11094,33 +11094,33 @@ func get_valid_panel(card_display) -> Panel:
 	return card_display.panel
 
 func play_card_drop_tween(card_display: CardDisplay, target_global_position: Vector2) -> Tween:
-	"""Shared placement animation: quick approach above the slot, a fast drop
-	covering nearly the full distance, a held catch, then a slow decelerating
-	creep into final position (no impact/bounce)."""
+	"""Shared placement animation: card starts elevated above the slot (no hop),
+	a fast drop covering nearly the full distance, a held catch, then a slow
+	decelerating creep into final position (no impact/bounce)."""
+	
+	# Start elevated above the slot - no upward animation, this is the spawn point
+	var start_position = target_global_position - Vector2(0, 40)
+	card_display.global_position = start_position
+	
 	var tween = create_tween()
 	tween.set_parallel(false)
 
-	# Quick approach above the slot
-	var lift_position = target_global_position - Vector2(0, 60)
-	tween.tween_property(card_display, "global_position", lift_position, 0.18) \
-		.set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
-
-	# Brief pause at the top
-	tween.tween_interval(0.03)
-
 	# Drop - falls nearly all the way down, accelerating
-	var catch_position = target_global_position - Vector2(0, 8)
-	tween.tween_property(card_display, "global_position", catch_position, 0.13) \
+	var catch_position = target_global_position - Vector2(0, 20)
+	tween.tween_property(card_display, "global_position", catch_position, 0.16) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-
+	
+	# Play the thud sound at the moment of the catch/damper
+	tween.tween_callback(func(): SoundManagerAutoload.play_card_thud())
+	
 	# Held catch - the damper grabs it just before it reaches the slot
 	tween.tween_interval(0.2)
-	
+
 	# Play the slide sound as the final creep begins
 	tween.tween_callback(func(): SoundManagerAutoload.play_card_placed())
-	
+
 	# Final creep - short distance, slow and decelerating to a stop
-	tween.tween_property(card_display, "global_position", target_global_position, 0.25) \
+	tween.tween_property(card_display, "global_position", target_global_position, 0.60) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 	return tween

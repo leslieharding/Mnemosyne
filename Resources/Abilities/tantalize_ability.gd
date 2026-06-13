@@ -55,7 +55,7 @@ static func check_tantalize_trigger(defending_card: CardResource, defending_posi
 	
 	print("TantalizeAbility: Checking trigger - placed turn: ", placed_turn, ", current turn: ", current_turn, ", elapsed: ", turns_elapsed)
 	
-	if turns_elapsed > 2:
+	if turns_elapsed >= 2:
 		print("TantalizeAbility: Window expired (", turns_elapsed, " > 2 turns)")
 		defending_card.set_meta("tantalize_active", false)
 		return false
@@ -129,7 +129,7 @@ static func check_and_deactivate_expired_tantalize(game_manager):
 		
 		var turns_elapsed = current_turn - placed_turn
 		
-		if turns_elapsed > 2:
+		if turns_elapsed >= 2:
 			print("TantalizeAbility: Deactivating expired tantalize on ", card.card_name, 
 				  " (placed turn ", placed_turn, ", current turn ", current_turn, ")")
 			card.set_meta("tantalize_active", false)

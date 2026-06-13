@@ -2,7 +2,8 @@ extends Node
 
 const CARD_FLICK_VARIATIONS = 5
 const LEVEL_UP_VARIATIONS = 4
-const CARD_PLACED_VARIATIONS = 6
+const CARD_PLACED_VARIATIONS = 2
+const CARD_THUD_VARIATIONS = 4
 
 # Sound effect paths - change sounds here in one place
 const SOUNDS = {
@@ -24,10 +25,10 @@ const SOUNDS = {
 	#card placement sound pool
 	"card_placed_1": "res://Assets/SoundEffects/card_placed_1.wav",
 	"card_placed_2": "res://Assets/SoundEffects/card_placed_2.wav",
-	"card_placed_3": "res://Assets/SoundEffects/card_placed_3.wav",
-	"card_placed_4": "res://Assets/SoundEffects/card_placed_4.wav",
-	"card_placed_5": "res://Assets/SoundEffects/card_placed_5.wav",
-	"card_placed_6": "res://Assets/SoundEffects/card_placed_6.wav",
+	"card_thud_1": "res://Assets/SoundEffects/card_thud_1.wav",
+	"card_thud_2": "res://Assets/SoundEffects/card_thud_2.wav",
+	"card_thud_3": "res://Assets/SoundEffects/card_thud_3.wav",
+	"card_thud_4": "res://Assets/SoundEffects/card_thud_4.wav",
 
 	# Run Summary Level Up Sounds
 	"level_up_1": "res://Assets/SoundEffects/level_up_1.wav",
@@ -389,4 +390,9 @@ func play_level_up_sound(pitch: float = 1.0, volume_db: float = 0.0, is_final: b
 func play_card_placed():
 	var variation = randi_range(1, CARD_PLACED_VARIATIONS)
 	var sound_key = "card_placed_" + str(variation)
+	play_randomized_subtle(sound_key)
+
+func play_card_thud():
+	var variation = randi_range(1, CARD_THUD_VARIATIONS)
+	var sound_key = "card_thud_" + str(variation)
 	play_randomized_subtle(sound_key)
