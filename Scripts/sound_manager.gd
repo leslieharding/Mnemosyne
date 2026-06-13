@@ -2,7 +2,7 @@ extends Node
 
 const CARD_FLICK_VARIATIONS = 5
 const LEVEL_UP_VARIATIONS = 4
-const CARD_PLACED_VARIATIONS = 3
+const CARD_PLACED_VARIATIONS = 6
 
 # Sound effect paths - change sounds here in one place
 const SOUNDS = {
