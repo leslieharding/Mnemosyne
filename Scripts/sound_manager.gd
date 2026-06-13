@@ -22,12 +22,12 @@ const SOUNDS = {
 	"card_captured": "res://Assets/SoundEffects/capture.wav",
 
 	#card placement sound pool
-	"card_placed_1": "res://Assets/SoundEffects/card_placed(1).wav",
-	"card_placed_2": "res://Assets/SoundEffects/card_placed(2).wav",
-	"card_placed_3": "res://Assets/SoundEffects/card_placed(3).wav",
-	"card_placed_4": "res://Assets/SoundEffects/card_placed(4).wav",
-	"card_placed_5": "res://Assets/SoundEffects/card_placed(5).wav",
-	"card_placed_6": "res://Assets/SoundEffects/card_placed(6).wav",
+	"card_placed_1": "res://Assets/SoundEffects/card_placed_1.wav",
+	"card_placed_2": "res://Assets/SoundEffects/card_placed_2.wav",
+	"card_placed_3": "res://Assets/SoundEffects/card_placed_3.wav",
+	"card_placed_4": "res://Assets/SoundEffects/card_placed_4.wav",
+	"card_placed_5": "res://Assets/SoundEffects/card_placed_5.wav",
+	"card_placed_6": "res://Assets/SoundEffects/card_placed_6.wav",
 
 	# Run Summary Level Up Sounds
 	"level_up_1": "res://Assets/SoundEffects/level_up_1.wav",
