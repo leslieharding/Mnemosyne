@@ -2,6 +2,7 @@ extends Node
 
 const CARD_FLICK_VARIATIONS = 5
 const LEVEL_UP_VARIATIONS = 4
+const CARD_PLACED_VARIATIONS = 3
 
 # Sound effect paths - change sounds here in one place
 const SOUNDS = {
@@ -18,8 +19,15 @@ const SOUNDS = {
 	"on_card_clicked_3": "res://Assets/SoundEffects/card_flick(3).wav",
 	"on_card_clicked_4": "res://Assets/SoundEffects/card_flick(4).wav",
 	"on_card_clicked_5": "res://Assets/SoundEffects/card_flick(5).wav",
-	"card_placed": "res://Assets/SoundEffects/card_placed.wav",
 	"card_captured": "res://Assets/SoundEffects/capture.wav",
+
+	#card placement sound pool
+	"card_placed_1": "res://Assets/SoundEffects/card_placed(1).wav",
+	"card_placed_2": "res://Assets/SoundEffects/card_placed(2).wav",
+	"card_placed_3": "res://Assets/SoundEffects/card_placed(3).wav",
+	"card_placed_4": "res://Assets/SoundEffects/card_placed(4).wav",
+	"card_placed_5": "res://Assets/SoundEffects/card_placed(5).wav",
+	"card_placed_6": "res://Assets/SoundEffects/card_placed(6).wav",
 
 	# Run Summary Level Up Sounds
 	"level_up_1": "res://Assets/SoundEffects/level_up_1.wav",
@@ -27,6 +35,8 @@ const SOUNDS = {
 	"level_up_3": "res://Assets/SoundEffects/level_up_3.wav",
 	"level_up_4": "res://Assets/SoundEffects/level_up_4.wav",
 	"level_up_final": "res://Assets/SoundEffects/level_up_final.wav",
+	
+	
 	
 	# Run Map Actions
 	"battle_entered": "res://Assets/SoundEffects/battle_entered.wav",
@@ -375,3 +385,8 @@ func play_level_up_sound(pitch: float = 1.0, volume_db: float = 0.0, is_final: b
 	player.volume_db = volume_db
 	player.stream = load(SOUNDS[sound_key])
 	player.play()
+
+func play_card_placed():
+	var variation = randi_range(1, CARD_PLACED_VARIATIONS)
+	var sound_key = "card_placed_" + str(variation)
+	play_randomized_subtle(sound_key)

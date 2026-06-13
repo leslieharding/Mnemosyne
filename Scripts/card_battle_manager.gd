@@ -1981,21 +1981,8 @@ func _on_opponent_card_placed(grid_index: int):
 	card_display.rotation = 0
 	card_display.scale = Vector2.ONE
 
-	# Create animation sequence
-	var tween = create_tween()
-	tween.set_parallel(false)
-
-	# Lift up
-	var lift_position = target_global_position - Vector2(0, 20)
-	tween.tween_property(card_display, "global_position", lift_position, 0.15) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-
-	# Pause
-	tween.tween_interval(0.08)
-
-	# Slam down
-	tween.tween_property(card_display, "global_position", target_global_position, 0.25) \
-		.set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	# Play the shared lift-and-glide placement animation
+	var tween = play_card_drop_tween(card_display, target_global_position)
 
 	await tween.finished
 
@@ -9957,30 +9944,8 @@ func animate_card_to_slot():
 	selected_card_display.scale = Vector2.ONE  # Reset any selection scaling
 	selected_card_display.global_position = target_global_position  # Start directly over slot
 	
-	# Create animation sequence
-	var tween = create_tween()
-	tween.set_parallel(false)
-	
-	# Step 3: Lift up slightly (20 pixels up)
-	var lift_position = target_global_position - Vector2(0, 20)
-	tween.tween_property(selected_card_display, "global_position", lift_position, 0.15) \
-		.set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
-	
-	# Brief pause at the top
-	tween.tween_interval(0.09)
-	
-	# Step 4: Drop down fast
-	tween.tween_property(selected_card_display, "global_position", target_global_position, 0.15) \
-		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-
-	# Step 5: Bounce UP slightly after impact
-	var bounce_up_position = target_global_position - Vector2(0, 8)
-	tween.tween_property(selected_card_display, "global_position", bounce_up_position, 0.07) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-
-	# Step 6: Settle back down
-	tween.tween_property(selected_card_display, "global_position", target_global_position, 0.12) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	# Play the shared lift-and-glide placement animation
+	var tween = play_card_drop_tween(selected_card_display, target_global_position)
 	
 	# Wait for animation to finish
 	await tween.finished
@@ -11127,3 +11092,35 @@ func get_valid_panel(card_display) -> Panel:
 	if not is_instance_valid(card_display.panel):
 		return null
 	return card_display.panel
+
+func play_card_drop_tween(card_display: CardDisplay, target_global_position: Vector2) -> Tween:
+	"""Shared placement animation: quick approach above the slot, a fast drop
+	covering nearly the full distance, a held catch, then a slow decelerating
+	creep into final position (no impact/bounce)."""
+	var tween = create_tween()
+	tween.set_parallel(false)
+
+	# Quick approach above the slot
+	var lift_position = target_global_position - Vector2(0, 60)
+	tween.tween_property(card_display, "global_position", lift_position, 0.18) \
+		.set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+
+	# Brief pause at the top
+	tween.tween_interval(0.03)
+
+	# Drop - falls nearly all the way down, accelerating
+	var catch_position = target_global_position - Vector2(0, 8)
+	tween.tween_property(card_display, "global_position", catch_position, 0.13) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	# Held catch - the damper grabs it just before it reaches the slot
+	tween.tween_interval(0.2)
+	
+	# Play the slide sound as the final creep begins
+	tween.tween_callback(func(): SoundManagerAutoload.play_card_placed())
+	
+	# Final creep - short distance, slow and decelerating to a stop
+	tween.tween_property(card_display, "global_position", target_global_position, 0.25) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+	return tween
