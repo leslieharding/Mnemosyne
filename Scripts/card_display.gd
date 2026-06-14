@@ -32,7 +32,6 @@ var hover_timer: Timer = null
 var hover_delay: float = 0.15  # 150ms delay before playing sound
 
 #card hover variables
-var shader_material: ShaderMaterial = null
 var is_hovering: bool = false
 var idle_time: float = 0.0
 var idle_enabled: bool = true  # Can be toggled if needed
@@ -51,43 +50,15 @@ func _ready():
 	hover_timer.one_shot = true
 	add_child(hover_timer)
 	
-	
-	setup_hover_shader()
-	
 	# Connect hover signals
 	if panel:
 		panel.mouse_entered.connect(_on_panel_mouse_entered)
 		panel.mouse_exited.connect(_on_panel_mouse_exited)
 
 func _process(delta: float) -> void:
-	# Only process shader for cards in hand
+	# Only process for cards in hand
 	if not is_in_hand:
 		return
-	
-	if not shader_material or not panel:
-		return
-	
-	# Handle hover shader effect
-	if is_hovering:
-		# Get mouse position relative to Panel in global space
-		var panel_global_rect = panel.get_global_rect()
-		var panel_top_left = panel_global_rect.position
-		var mouse_pos = get_global_mouse_position()
-		
-		# Calculate mouse position relative to panel top-left
-		var relative_mouse = mouse_pos - panel_top_left
-		
-		# Normalize to 0-1 range based on panel size
-		var normalized_mouse = Vector2(
-			relative_mouse.x / panel.size.x,
-			relative_mouse.y / panel.size.y
-		)
-		
-		shader_material.set_shader_parameter("mouse_screen_pos", normalized_mouse)
-		shader_material.set_shader_parameter("hovering", 1.0)
-	else:
-		# Reset shader when not hovering
-		shader_material.set_shader_parameter("hovering", 0.0)
 	
 	# Subtle idle bobbing animation
 	if idle_enabled and not is_hovering and not is_selected:
@@ -96,7 +67,6 @@ func _process(delta: float) -> void:
 		var idle_offset_y = sin(idle_time * 3.0) * 0.15
 		position.x += idle_offset_x * delta * 10
 		position.y += idle_offset_y * delta * 10
-
 
 func create_selection_styles():
 	# Default style (from scene)
@@ -191,7 +161,7 @@ func select():
 		deselect()
 		return
 	SoundManagerAutoload.play_on_card_click()
-	play_selection_bounce()
+	play_selection_grow()
 	is_selected = true
 	if panel and selected_style:
 		panel.add_theme_stylebox_override("panel", selected_style)
@@ -258,44 +228,15 @@ func restore_default_style():
 
 
 
-# Play bounce effect when card is selected
-func play_selection_bounce():
-	# Stop any existing animation
+# Grow slightly when card is selected - solid lift, no squash or overshoot
+func play_selection_grow():
 	if selection_tween:
 		selection_tween.kill()
 	
 	selection_tween = create_tween()
-	
-	# Squash: briefly smaller (0.95x)
-	selection_tween.tween_property(self, "scale", Vector2(0.95, 0.95), 0.08).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
-	
-	# Stretch: bounce to larger size (1.15x for selected cards)
-	selection_tween.tween_property(self, "scale", Vector2(1.15, 1.15), 0.15).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	selection_tween.tween_property(self, "scale", Vector2(1.15, 1.15), 0.15) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 
-func setup_hover_shader():
-	# Only apply shader to cards in hand
-	if not is_in_hand:
-		return
-	
-	if not panel:
-		return
-	
-	# Load the shader
-	var shader = load("res://Shaders/card_hover.gdshader")
-	if not shader:
-		print("ERROR: Could not load balatro_hover.gdshader")
-		return
-	
-	# Create shader material
-	shader_material = ShaderMaterial.new()
-	shader_material.shader = shader
-	
-	# Set initial parameters
-	shader_material.set_shader_parameter("hovering", 0.0)
-	shader_material.set_shader_parameter("mouse_screen_pos", Vector2.ZERO)
-	
-	# Apply to panel
-	panel.material = shader_material
 
 func get_panel() -> Panel:
 	if not is_instance_valid(panel):
