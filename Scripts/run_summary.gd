@@ -1,7 +1,6 @@
 # res://Scripts/run_summary.gd
 extends Control
 
-# Constants for progress bar animation
 const XP_PER_LEVEL = 50
 const SEGMENT_COUNT = 10
 const BASE_ANIMATION_DURATION = 1.5
@@ -12,269 +11,152 @@ var god_name: String = "Apollo"
 var deck_index: int = 0
 var victory: bool = true
 
-# Track animation index for staggering
 var card_animation_index: int = 0
 
-# Carousel state
-var _showing_mnemosyne_page: bool = false
-var _mnemosyne_page_animated: bool = false
+# Snapshot of run exp taken BEFORE tracker is cleared
+var _run_exp_snapshot: Dictionary = {}
 
-# Results computed once in _ready, used by both carousel pages
+# Results computed once in _ready
 var _world_level_before: int = 0
 var _world_level_after: int = 0
 var _mnemosyne_upgrades: Array[Dictionary] = []
 
-# References to the two carousel pages and toggle button (set in setup_ui_safely)
-var _card_page: VBoxContainer = null
-var _mnemosyne_page: VBoxContainer = null
-var _carousel_button: Button = null
-
 func _ready():
 	print("==================== RUNSUMMARY _READY START ====================")
-	print("RunSummary _ready() called")
-	
-	# Get parameters from previous scene first
+
 	var params = get_scene_params()
 	god_name = params.get("god", "Apollo")
 	deck_index = params.get("deck_index", 0)
 	victory = params.get("victory", true)
 	var leather_scraps_earned: int = params.get("leather_scraps_earned", 0)
-	
-	print("Run Summary parameters:")
-	print("  God: ", god_name)
-	print("  Deck Index: ", deck_index)
-	print("  Victory: ", victory)
-	
-	# Handle defeat conversations - increment defeat count on loss
+
+	print("Run Summary parameters: God=", god_name, " Deck=", deck_index, " Victory=", victory)
+
 	if not victory:
 		if has_node("/root/ConversationManagerAutoload"):
-			var conv_manager = get_node("/root/ConversationManagerAutoload")
-			conv_manager.increment_defeat_count()
-			print("Defeat count incremented for conversation triggers")
-		else:
-			print("WARNING: ConversationManagerAutoload not found!")
-	
-	# Reset animation index
-	card_animation_index = 0
-	
+			get_node("/root/ConversationManagerAutoload").increment_defeat_count()
+
 	if not victory:
 		SoundManagerAutoload.play_music("defeat_theme", 2.0)
-	
-	# Capture world level BEFORE awarding exp so we know the delta
+
 	var main_level_manager = get_node_or_null("/root/MainLevelAutoload")
 	if main_level_manager:
 		_world_level_before = main_level_manager.main_level
-	
-	# Award all run exp now (moved from button handlers) and clear run tracker
+
+	# SNAPSHOT exp data BEFORE saving/clearing
+	var tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+	if tracker:
+		_run_exp_snapshot = tracker.get_all_experience().duplicate(true)
+		print("Snapshotted exp data: ", _run_exp_snapshot.size(), " cards")
+	else:
+		print("WARNING: RunExperienceTrackerAutoload not found at snapshot time")
+
+	# Now safe to commit and clear
 	save_run_to_global_progress()
-	if has_node("/root/RunExperienceTrackerAutoload"):
-		get_node("/root/RunExperienceTrackerAutoload").clear_run()
-	
-	# Capture world level AFTER awarding exp
+	if tracker:
+		tracker.clear_run()
+
 	if main_level_manager:
 		_world_level_after = main_level_manager.main_level
-	
-	# Apply any Mnemosyne upgrades earned by the world level delta
+
 	var mnemosyne_tracker = get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
 	if mnemosyne_tracker and _world_level_after > _world_level_before:
 		_mnemosyne_upgrades = mnemosyne_tracker.apply_upgrades_for_world_level_range(
 			_world_level_before, _world_level_after
 		)
 		print("Mnemosyne upgrades this run: ", _mnemosyne_upgrades.size())
-	
-	# Set up UI
-	setup_ui_safely()
+
+	await setup_ui_safely()
+
 
 func setup_ui_safely():
 	print("\n=== Setting up UI ===")
-	
-	# Get all required nodes with proper error checking
+
 	var main_container = get_node_or_null("MainContainer")
 	if not main_container:
 		push_error("MainContainer not found!")
-		print("Available children: ", get_children())
 		return
-	
-	print("MainContainer found: ", main_container.name)
-	print("MainContainer children: ", main_container.get_children().map(func(child): return child.name))
-	
+
 	var left_panel = main_container.get_node_or_null("LeftPanel")
 	var right_panel = main_container.get_node_or_null("RightPanel")
-	
-	if not left_panel:
-		push_error("LeftPanel not found!")
+
+	if not left_panel or not right_panel:
+		push_error("LeftPanel or RightPanel not found!")
 		return
-	if not right_panel:
-		push_error("RightPanel not found!")
-		return
-	
-	print("LeftPanel found: ", left_panel.name)
-	print("RightPanel found: ", right_panel.name)
-	print("RightPanel children: ", right_panel.get_children().map(func(child): return child.name))
-	
-	# Get left panel nodes
+
 	var run_details_container = left_panel.get_node_or_null("RunDetailsContainer")
 	if not run_details_container:
 		push_error("RunDetailsContainer not found!")
-		print("LeftPanel children: ", left_panel.get_children().map(func(child): return child.name))
 		return
-	
+
 	var title = left_panel.get_node_or_null("Title")
 	var god_deck_info = run_details_container.get_node_or_null("GodDeckInfo")
 	var outcome_label = run_details_container.get_node_or_null("OutcomeLabel")
-	
+
 	var total_exp_container = left_panel.get_node_or_null("TotalExpContainer")
 	if not total_exp_container:
 		push_error("TotalExpContainer not found!")
-		print("LeftPanel children: ", left_panel.get_children().map(func(child): return child.name))
 		return
-	
+
 	var capture_total = total_exp_container.get_node_or_null("CaptureTotal")
 	var defense_total = total_exp_container.get_node_or_null("DefenseTotal")
-	
-	var button_container = left_panel.get_node_or_null("ButtonContainer")
-	if not button_container:
-		push_error("ButtonContainer not found!")
-		return
-	
-	var new_run_button = button_container.get_node_or_null("NewRunButton")
-	var main_menu_button = button_container.get_node_or_null("MainMenuButton")
-	
-	# Get right panel nodes - FIXED NODE NAME
 	var card_display_container = right_panel.get_node_or_null("CardDetailsContainer")
-	
-	if not card_display_container:
-		push_error("CardDetailsContainer not found in RightPanel!")
-		print("RightPanel children: ", right_panel.get_children().map(func(child): return child.name))
-		return
-	
-	print("CardDetailsContainer found: ", card_display_container.name)
-	
+
 	if not title or not god_deck_info or not outcome_label or not capture_total or not defense_total:
-		push_error("Required UI nodes not found!")
-		print("Missing nodes:")
-		print("  title: ", title != null)
-		print("  god_deck_info: ", god_deck_info != null)
-		print("  outcome_label: ", outcome_label != null)
-		print("  capture_total: ", capture_total != null)
-		print("  defense_total: ", defense_total != null)
+		push_error("Missing required nodes in panels")
 		return
-	
-	
-	
+
 	print("All nodes found successfully!")
-	
-	# Set up left panel content
+
 	var scraps_earned: int = get_scene_params().get("leather_scraps_earned", 0)
 	setup_left_panel_content(title, god_deck_info, outcome_label, capture_total, defense_total, scraps_earned)
-	
-	# Build carousel toggle button at top of RightPanel, before the pages
-	_carousel_button = Button.new()
-	_carousel_button.text = "View Mnemosyne Upgrades →"
-	_carousel_button.custom_minimum_size = Vector2(0, 36)
-	_carousel_button.visible = not _mnemosyne_upgrades.is_empty()
-	_carousel_button.pressed.connect(_on_carousel_button_pressed)
-	right_panel.add_child(_carousel_button)
-	right_panel.move_child(_carousel_button, 0)
-	
-	# Page 1: card XP displays (existing content, wrapped in a container)
-	_card_page = VBoxContainer.new()
-	_card_page.name = "CardPage"
-	_card_page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_card_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	right_panel.add_child(_card_page)
-	setup_card_displays_panel(_card_page)
-	
-	# Page 2: world level + Mnemosyne upgrade results
-	_mnemosyne_page = VBoxContainer.new()
-	_mnemosyne_page.name = "MnemosynePage"
-	_mnemosyne_page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_mnemosyne_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_mnemosyne_page.visible = false
-	right_panel.add_child(_mnemosyne_page)
-	_build_mnemosyne_page_static(_mnemosyne_page)
-	
-	# The old CardDetailsContainer is now unused (pages are direct children of right_panel)
-	# Hide it so it doesn't take up space
-	card_display_container.visible = false
 
-func _on_carousel_button_pressed():
-	_showing_mnemosyne_page = not _showing_mnemosyne_page
-	_card_page.visible = not _showing_mnemosyne_page
-	_mnemosyne_page.visible = _showing_mnemosyne_page
-	if _showing_mnemosyne_page:
-		_carousel_button.text = "← View Card XP"
-		if not _mnemosyne_page_animated:
-			_mnemosyne_page_animated = true
-			_animate_mnemosyne_page(_mnemosyne_page)
-	else:
-		_carousel_button.text = "View Mnemosyne Upgrades →"
+	# Inner HBox so cards and mnemosyne sit side by side inside RightPanel (which is a VBoxContainer)
+	var inner_hbox = HBoxContainer.new()
+	inner_hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	inner_hbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	inner_hbox.add_theme_constant_override("separation", 12)
+	right_panel.add_child(inner_hbox)
 
-func _build_mnemosyne_page_static(container: VBoxContainer):
-	# World level header
-	var world_level_title = Label.new()
-	world_level_title.text = "🌍 World Level"
-	world_level_title.add_theme_font_size_override("font_size", 24)
-	world_level_title.add_theme_color_override("font_color", Color("#DDDDDD"))
-	world_level_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	container.add_child(world_level_title)
-	
-	var main_level_manager = get_node_or_null("/root/MainLevelAutoload")
-	var level_detail = Label.new()
-	if main_level_manager:
-		if _world_level_after > _world_level_before:
-			level_detail.text = "Lv." + str(_world_level_before) + " → Lv." + str(_world_level_after)
-			level_detail.add_theme_color_override("font_color", Color("#00FF88"))
-		else:
-			var exp_display = str(main_level_manager.main_exp) + " / " + str(
-				main_level_manager.XP_THRESHOLDS[min(_world_level_after, main_level_manager.MAX_LEVEL - 1)]
-			) + " XP"
-			level_detail.text = "Lv." + str(_world_level_after) + "  (" + exp_display + ")"
-			level_detail.add_theme_color_override("font_color", Color("#AAAAAA"))
-	else:
-		level_detail.text = "World level data unavailable"
-		level_detail.add_theme_color_override("font_color", Color("#666666"))
-	level_detail.add_theme_font_size_override("font_size", 18)
-	level_detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	container.add_child(level_detail)
-	
-	container.add_child(HSeparator.new())
-	
-	# Mnemosyne upgrade list
-	var upgrades_title = Label.new()
-	upgrades_title.text = "🧠 Mnemosyne Upgrades"
-	upgrades_title.add_theme_font_size_override("font_size", 20)
-	upgrades_title.add_theme_color_override("font_color", Color("#CCAAFF"))
-	upgrades_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	container.add_child(upgrades_title)
-	
-	if _mnemosyne_upgrades.is_empty():
-		var none_label = Label.new()
-		none_label.text = "No new upgrades this run"
-		none_label.add_theme_color_override("font_color", Color("#666666"))
-		none_label.add_theme_font_size_override("font_size", 14)
-		none_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		container.add_child(none_label)
-	else:
-		for upgrade in _mnemosyne_upgrades:
-			var row = Label.new()
-			row.text = upgrade["card_name"] + "  " + upgrade["stat_name"] + " → " + str(upgrade["new_value"])
-			row.add_theme_font_size_override("font_size", 15)
-			row.add_theme_color_override("font_color", Color("#CCCCCC"))
-			row.modulate.a = 0.0  # start invisible; animation fades these in
-			row.name = "UpgradeRow_" + str(upgrade["level"])
-			container.add_child(row)
+	# Card column with scroll
+	var card_scroll = ScrollContainer.new()
+	card_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	card_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	inner_hbox.add_child(card_scroll)
 
-func _animate_mnemosyne_page(container: VBoxContainer):
-	# Fade in each upgrade row with a stagger
-	var delay: float = 0.0
-	for child in container.get_children():
-		if child.name.begins_with("UpgradeRow_"):
-			var tween = create_tween()
-			tween.tween_interval(delay)
-			tween.tween_property(child, "modulate:a", 1.0, 0.35)
-			delay += 0.2
-	# If no rows (no upgrades), nothing to animate
+	var card_vbox = VBoxContainer.new()
+	card_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card_vbox.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	card_vbox.add_theme_constant_override("separation", 12)
+	card_scroll.add_child(card_vbox)
+
+	await setup_card_displays_panel(card_vbox)
+
+	# Mnemosyne column - only added if there is something to show
+	if _world_level_after != _world_level_before or not _mnemosyne_upgrades.is_empty():
+		var mnem_scroll = ScrollContainer.new()
+		mnem_scroll.custom_minimum_size.x = 220
+		mnem_scroll.size_flags_horizontal = Control.SIZE_SHRINK_END
+		mnem_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		mnem_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		inner_hbox.add_child(mnem_scroll)
+
+		var mnem_vbox = VBoxContainer.new()
+		mnem_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		mnem_vbox.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		mnem_vbox.add_theme_constant_override("separation", 8)
+		mnem_scroll.add_child(mnem_vbox)
+
+		_build_mnemosyne_section(mnem_vbox)
+
+	# Hide the old unused container
+	if card_display_container:
+		card_display_container.visible = false
+
+
+
+
 
 func setup_left_panel_content(title_node: Label, god_deck_node: Label, outcome_node: Label, capture_node: Label, defense_node: Label, scraps_earned: int = 0):
 	print("\n=== Setting up left panel content ===")
@@ -298,24 +180,14 @@ func setup_left_panel_content(title_node: Label, god_deck_node: Label, outcome_n
 	
 	outcome_node.add_theme_font_size_override("font_size", 24)
 	
-	# Set up experience totals
-	if has_node("/root/RunExperienceTrackerAutoload"):
-		var tracker = get_node("/root/RunExperienceTrackerAutoload")
-		var totals = tracker.get_total_experience()
-		
-		print("Experience totals: ", totals)
-		
-		# Use unified experience display
-		capture_node.text = "⚡ Total Experience Gained: " + str(totals["total_exp"])
-		capture_node.add_theme_font_size_override("font_size", 16)
-		capture_node.add_theme_color_override("font_color", Color("#FFD700"))
-		
-		# Hide defense total since we're using unified system
-		defense_node.visible = false
-	else:
-		print("Warning: RunExperienceTrackerAutoload not found")
-		capture_node.text = "⚡ Experience data unavailable"
-		defense_node.visible = false
+	# Use snapshot for total exp display (tracker is already cleared by this point)
+	var run_total = 0
+	for card_data in _run_exp_snapshot.values():
+		run_total += card_data.get("total_exp", 0)
+	capture_node.text = "⚡ Total Experience Gained: " + str(run_total)
+	capture_node.add_theme_font_size_override("font_size", 16)
+	capture_node.add_theme_color_override("font_color", Color("#FFD700"))
+	defense_node.visible = false
 	
 	# Show leather scraps reward if any were earned this run
 	if scraps_earned > 0:
@@ -329,6 +201,57 @@ func setup_left_panel_content(title_node: Label, god_deck_node: Label, outcome_n
 	
 	print("Left panel content setup complete")
 
+func _build_mnemosyne_section(container: VBoxContainer):
+	var world_level_title = Label.new()
+	world_level_title.text = "🌍 World Level"
+	world_level_title.add_theme_font_size_override("font_size", 20)
+	world_level_title.add_theme_color_override("font_color", Color("#DDDDDD"))
+	world_level_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	container.add_child(world_level_title)
+
+	var main_level_manager = get_node_or_null("/root/MainLevelAutoload")
+	var level_detail = Label.new()
+	if main_level_manager:
+		if _world_level_after > _world_level_before:
+			level_detail.text = "Lv." + str(_world_level_before) + " → Lv." + str(_world_level_after) + " 🎉"
+			level_detail.add_theme_color_override("font_color", Color("#00FF00"))
+		else:
+			level_detail.text = "Lv." + str(_world_level_after)
+			level_detail.add_theme_color_override("font_color", Color("#CCCCCC"))
+	else:
+		level_detail.text = "World level unavailable"
+		level_detail.add_theme_color_override("font_color", Color("#888888"))
+	level_detail.add_theme_font_size_override("font_size", 16)
+	level_detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	container.add_child(level_detail)
+
+	if _mnemosyne_upgrades.is_empty():
+		var no_upgrade_label = Label.new()
+		no_upgrade_label.text = "No new Mnemosyne upgrades this run"
+		no_upgrade_label.add_theme_color_override("font_color", Color("#888888"))
+		no_upgrade_label.add_theme_font_size_override("font_size", 13)
+		no_upgrade_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		container.add_child(no_upgrade_label)
+		return
+
+	var upgrades_title = Label.new()
+	upgrades_title.text = "✨ Mnemosyne Upgrades"
+	upgrades_title.add_theme_font_size_override("font_size", 16)
+	upgrades_title.add_theme_color_override("font_color", Color("#DDB0FF"))
+	upgrades_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	container.add_child(upgrades_title)
+
+	for upgrade in _mnemosyne_upgrades:
+		var upgrade_label = Label.new()
+		var stat_names = ["North", "East", "South", "West"]
+		var stat_name = stat_names[upgrade.get("stat_index", 0)] if upgrade.get("stat_index", 0) < 4 else "?"
+		var card_name = upgrade.get("card_name", "Unknown")
+		upgrade_label.text = "• " + card_name + " +" + stat_name
+		upgrade_label.add_theme_font_size_override("font_size", 14)
+		upgrade_label.add_theme_color_override("font_color", Color("#CCBBFF"))
+		upgrade_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		container.add_child(upgrade_label)
+
 func get_deck_name() -> String:
 	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
 	var collection: GodCardCollection = load(collection_path)
@@ -336,101 +259,67 @@ func get_deck_name() -> String:
 		return collection.decks[deck_index].deck_name
 	return "Unknown Deck"
 
-func setup_card_displays_panel(container: VBoxContainer):
+func setup_card_displays_panel(container: VBoxContainer)-> void:
 	print("\n=== Setting up card displays panel ===")
-	print("Container: ", container.name if container else "null")
-	
-	# Reset animation index for this batch of cards
+
 	card_animation_index = 0
-	
-	# Clear any existing content
+
 	if container:
 		for child in container.get_children():
 			child.queue_free()
-		print("Cleared existing children from container")
-	else:
-		print("ERROR: Container is null!")
-		return
-	
-	# Check required autoloads
-	var tracker = get_node_or_null("/root/RunExperienceTrackerAutoload")
+
 	var global_tracker = get_node_or_null("/root/GlobalProgressTrackerAutoload")
-	
-	if not tracker:
-		print("ERROR: RunExperienceTrackerAutoload not found")
-		var error_label = Label.new()
-		error_label.text = "RunExperienceTrackerAutoload not available"
-		error_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		error_label.add_theme_color_override("font_color", Color.RED)
-		container.add_child(error_label)
-		return
-	
+
 	if not global_tracker:
-		print("ERROR: GlobalProgressTrackerAutoload not found")
 		var error_label = Label.new()
 		error_label.text = "GlobalProgressTrackerAutoload not available"
-		error_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		error_label.add_theme_color_override("font_color", Color.RED)
 		container.add_child(error_label)
 		return
-	
-	# Get experience data
-	var all_exp = tracker.get_all_experience()
-	print("All experience data: ", all_exp)
-	
-	if all_exp.is_empty():
-		print("No experience data found")
+
+	print("Exp snapshot has ", _run_exp_snapshot.size(), " cards")
+
+	if _run_exp_snapshot.is_empty():
 		var no_exp_label = Label.new()
 		no_exp_label.text = "No experience data found for this run"
 		no_exp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		no_exp_label.add_theme_color_override("font_color", Color("#888888"))
 		container.add_child(no_exp_label)
 		return
-	
-	# Load collection
+
 	var collection_path = "res://Resources/Collections/" + god_name + ".tres"
-	print("Loading collection from: ", collection_path)
-	
 	var collection: GodCardCollection = load(collection_path)
 	if not collection:
-		print("ERROR: Failed to load collection: ", collection_path)
 		var error_label = Label.new()
 		error_label.text = "Failed to load " + god_name + " collection"
-		error_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		error_label.add_theme_color_override("font_color", Color.RED)
 		container.add_child(error_label)
 		return
-	
-	print("Collection loaded successfully with ", collection.cards.size(), " cards")
-	
+
+	print("Collection loaded: ", collection.cards.size(), " cards")
+
 	var animation_jobs: Array = []
 	var cards_with_exp = 0
 
-	for card_index in all_exp:
-		var run_exp_data = all_exp[card_index]
-
-		print("Processing card index: ", card_index, " with exp data: ", run_exp_data)
+	for card_index in _run_exp_snapshot:
+		var run_exp_data = _run_exp_snapshot[card_index]
 
 		if card_index >= collection.cards.size():
-			print("  ERROR: Card index ", card_index, " out of bounds (collection has ", collection.cards.size(), " cards)")
+			print("  Card index ", card_index, " out of bounds, skipping")
 			continue
 
 		var card = collection.cards[card_index]
 		if not card:
-			print("  ERROR: Card at index ", card_index, " is null")
 			continue
 
-		print("  Creating display for: ", card.card_name)
+		# before_total is what global tracker has NOW (already committed) minus what was gained
+		var after_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
+		var after_total = after_exp_data["total_exp"]
+		var total_gain = run_exp_data.get("total_exp", 0)
+		var before_total = after_total - total_gain
 
-		var before_exp_data = global_tracker.get_card_total_experience(god_name, card_index)
-		var before_total = before_exp_data["total_exp"]
-		var total_gain = run_exp_data["total_exp"]
-		var after_total = before_total + total_gain
+		print("  Card: ", card.card_name, " before=", before_total, " gain=", total_gain, " after=", after_total)
 
-		print("    Before total: ", before_total, ", Gain: ", total_gain, ", After total: ", after_total)
-
-		# create_apollo_style_card_display is now sync - returns node immediately
-		# and also returns the progress bar + label refs needed for animation
 		var result = create_apollo_style_card_display(card, card_index, before_total, after_total, total_gain)
 		container.add_child(result["panel"])
 		cards_with_exp += 1
@@ -444,12 +333,8 @@ func setup_card_displays_panel(container: VBoxContainer):
 			"card_name": card.card_name
 		})
 
-		print("    Added card container for: ", card.card_name)
-
-	# Wait one frame so all cards are laid out and visible before animating
 	await get_tree().process_frame
 
-	# Now animate each card sequentially
 	for job in animation_jobs:
 		await animate_progress_bar(
 			job["progress_bar"],
@@ -459,8 +344,7 @@ func setup_card_displays_panel(container: VBoxContainer):
 			job["card_name"]
 		)
 
-	print("Card displays panel setup complete!")
-	print("Created ", cards_with_exp, " displays")
+	print("Card displays complete, created ", cards_with_exp, " displays")
 
 func create_gradient_texture(color1: Color, color2: Color) -> GradientTexture1D:
 	var gradient = Gradient.new()
