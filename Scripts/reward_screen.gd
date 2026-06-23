@@ -15,7 +15,6 @@ var selected_card_index: int = -1
 var cards_container: HBoxContainer
 var card_displays: Array[CardDisplay] = []
 var experience_button: Button  # Single unified experience button
-var mnemosyne_button: Button
 var reward_info_label: Label
 
 var is_perfect_victory: bool = false
@@ -100,8 +99,7 @@ func load_deck_data_sync():
 	# Create card displays synchronously
 	create_card_displays_sync(god_name)
 	
-	# Update Mnemosyne button with current level info
-	update_mnemosyne_button_text()
+	
 
 func setup_reward_interface():
 	print("Setting up reward interface...")
@@ -161,23 +159,7 @@ func setup_reward_interface():
 	
 	exp_section.add_child(exp_button_container)
 	
-	# Mnemosyne section with explicit sizing
-	var mnemosyne_section = VBoxContainer.new()
-	mnemosyne_section.name = "MnemosyneSection"
-	mnemosyne_section.custom_minimum_size = Vector2(400, 80)
-	mnemosyne_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
-	var mnemosyne_label = Label.new()
-	mnemosyne_label.text = "Or enhance Mnemosyne's consciousness:"
-	mnemosyne_label.add_theme_font_size_override("font_size", 16)
-	mnemosyne_label.add_theme_color_override("font_color", Color.WHITE)
-	mnemosyne_section.add_child(mnemosyne_label)
-	
-	mnemosyne_button = Button.new()
-	mnemosyne_button.text = "🧠 Consciousness Boost"
-	mnemosyne_button.custom_minimum_size = Vector2(200, 40)
-	mnemosyne_button.pressed.connect(_on_mnemosyne_button_pressed)
-	mnemosyne_section.add_child(mnemosyne_button)
 	
 	# Info label for showing current selection
 	reward_info_label = Label.new()
@@ -210,15 +192,6 @@ func setup_reward_interface():
 		main_container.move_child(separator2, continue_button_index)
 		continue_button_index += 1
 		
-		main_container.add_child(mnemosyne_section)
-		main_container.move_child(mnemosyne_section, continue_button_index)
-		continue_button_index += 1
-		
-		var separator3 = HSeparator.new()
-		main_container.add_child(separator3)
-		main_container.move_child(separator3, continue_button_index)
-		continue_button_index += 1
-		
 		main_container.add_child(reward_info_label)
 		main_container.move_child(reward_info_label, continue_button_index)
 		
@@ -228,8 +201,6 @@ func setup_reward_interface():
 		main_container.add_child(card_section)
 		main_container.add_child(HSeparator.new())
 		main_container.add_child(exp_section)
-		main_container.add_child(HSeparator.new())
-		main_container.add_child(mnemosyne_section)
 		main_container.add_child(HSeparator.new())
 		main_container.add_child(reward_info_label)
 	
@@ -484,40 +455,7 @@ func create_unified_experience_info_display(card_index: int, tracker, god_name: 
 	return exp_container
 
 
-func update_mnemosyne_button_text():
-	# Safety check
-	if not get_tree():
-		print("Error: No scene tree in update_mnemosyne_button_text")
-		return
-	
-	# Get the Mnemosyne tracker
-	var tracker = get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
-	if not tracker:
-		print("MnemosyneProgressTracker not found for button update")
-		mnemosyne_button.text = "🧠 Mnemosyne Progress\n(Tracker Unavailable)"
-		return
-	
-	var params = get_scene_params()
-	var god_name = params.get("god", "Apollo")
-	var deck_index = params.get("deck_index", 0)
-	
-	# Check if this god/deck can contribute
-	if not tracker.can_contribute(god_name, deck_index):
-		mnemosyne_button.text = "🧠 Mnemosyne Progress\n" + god_name + " Deck " + str(deck_index) + " - Max Contributions Reached"
-		mnemosyne_button.disabled = true
-		return
-	
-	var remaining = tracker.get_remaining_contributions(god_name, deck_index)
-	var next_upgrade = tracker.get_next_upgrade_info()
-	
-	if next_upgrade.is_empty():
-		mnemosyne_button.text = "🧠 Mnemosyne Progress\n(Max Level Reached)"
-		mnemosyne_button.disabled = true
-		return
-	
-	var stat_names = ["North", "East", "South", "West"]
-	var stat_name = stat_names[next_upgrade["stat_index"]]
-	mnemosyne_button.text = "🧠 Mnemosyne Progress\n" + "Next: " + next_upgrade["card_name"] + " " + stat_name + " (" + str(remaining) + " left)"
+
 
 
 # Separate input handlers for wrapper and panel
@@ -599,12 +537,7 @@ func _on_experience_button_pressed():
 	
 	apply_unified_experience_reward()
 
-func _on_mnemosyne_button_pressed():
-	if rewards_remaining <= 0:
-		print("No rewards remaining, cannot claim Mnemosyne reward")
-		return
-	
-	apply_mnemosyne_reward()
+
 
 # UPDATED: Apply unified experience reward
 func apply_unified_experience_reward():
@@ -647,93 +580,24 @@ func apply_unified_experience_reward():
 		# All rewards claimed - finish
 		finish_reward_selection()
 
-func apply_mnemosyne_reward():
-	# Check if tracker exists
-	var tracker = get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
-	if not tracker:
-		print("MnemosyneProgressTracker not found!")
-		return
-	
-	var params = get_scene_params()
-	var god_name = params.get("god", "Apollo")
-	var deck_index = params.get("deck_index", 0)
-	
-	# Check if this god/deck can contribute
-	if not tracker.can_contribute(god_name, deck_index):
-		print("Cannot apply Mnemosyne reward - contribution limit reached for ", god_name, " deck ", deck_index)
-		return
-	
-	# Get upgrade info before applying (for feedback)
-	var upgrade_info = tracker.get_next_upgrade_info()
-	if upgrade_info.is_empty():
-		print("No more Mnemosyne upgrades available")
-		return
-	
-	# Apply the contribution
-	if tracker.apply_contribution(god_name, deck_index):
-		# FIX: Convert stat_index to stat_name
-		var stat_names = ["North", "East", "South", "West"]
-		var stat_name = stat_names[upgrade_info["stat_index"]]
-		var reward_desc = "Mnemosyne: " + upgrade_info["card_name"] + " " + stat_name + " upgraded"
-		claimed_rewards.append(reward_desc)
-		rewards_remaining -= 1
-		
-		print("Applied Mnemosyne reward: ", reward_desc)
-		
-		# Reset selection state
-		selected_card_index = -1
-		
-		# Deselect all cards
-		for display in card_displays:
-			if is_instance_valid(display):
-				display.deselect()
-		
-		# Update UI based on remaining rewards
-		if rewards_remaining > 0:
-			update_for_next_reward()
-		else:
-			finish_reward_selection()
-	else:
-		print("Failed to apply Mnemosyne contribution")
+
 
 func update_for_next_reward():
-	# Re-enable reward options for next selection
-	experience_button.disabled = true  # Will be enabled when card is selected
-	
-	# Only enable Mnemosyne button if it hasn't been claimed yet
-	var mnemosyne_already_claimed = false
-	for reward in claimed_rewards:
-		if reward.contains("Mnemosyne"):
-			mnemosyne_already_claimed = true
-			break
-	
-	mnemosyne_button.disabled = mnemosyne_already_claimed
-	
-	# Update continue button
+	experience_button.disabled = true
 	continue_button.disabled = true
 	continue_button.text = get_continue_button_text()
-	
-	# Update info label to show progress
 	var rewards_claimed_text = "Claimed: " + " | ".join(claimed_rewards)
 	reward_info_label.text = rewards_claimed_text + "\n" + "Choose your next reward"
 	reward_info_label.add_theme_color_override("font_color", Color("#AAAAAA"))
-	
 	print("Updated for next reward - ", rewards_remaining, " remaining")
 
 func finish_reward_selection():
-	# All rewards claimed - finalize
 	experience_button.disabled = true
-	mnemosyne_button.disabled = true
-	
-	# Enable continue button
 	continue_button.disabled = false
 	continue_button.text = "Continue"
-	
-	# Update info label with summary
 	var summary_text = "Rewards Claimed:\n" + "\n".join(claimed_rewards)
 	reward_info_label.text = summary_text
 	reward_info_label.add_theme_color_override("font_color", Color("#66BB6A"))
-	
 	print("All rewards claimed: ", claimed_rewards)
 
 func _on_continue_pressed():

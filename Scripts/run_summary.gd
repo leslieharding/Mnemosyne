@@ -15,6 +15,20 @@ var victory: bool = true
 # Track animation index for staggering
 var card_animation_index: int = 0
 
+# Carousel state
+var _showing_mnemosyne_page: bool = false
+var _mnemosyne_page_animated: bool = false
+
+# Results computed once in _ready, used by both carousel pages
+var _world_level_before: int = 0
+var _world_level_after: int = 0
+var _mnemosyne_upgrades: Array[Dictionary] = []
+
+# References to the two carousel pages and toggle button (set in setup_ui_safely)
+var _card_page: VBoxContainer = null
+var _mnemosyne_page: VBoxContainer = null
+var _carousel_button: Button = null
+
 func _ready():
 	print("==================== RUNSUMMARY _READY START ====================")
 	print("RunSummary _ready() called")
@@ -25,7 +39,6 @@ func _ready():
 	deck_index = params.get("deck_index", 0)
 	victory = params.get("victory", true)
 	var leather_scraps_earned: int = params.get("leather_scraps_earned", 0)
-
 	
 	print("Run Summary parameters:")
 	print("  God: ", god_name)
@@ -47,7 +60,29 @@ func _ready():
 	if not victory:
 		SoundManagerAutoload.play_music("defeat_theme", 2.0)
 	
-	# Set up UI immediately without waiting
+	# Capture world level BEFORE awarding exp so we know the delta
+	var main_level_manager = get_node_or_null("/root/MainLevelAutoload")
+	if main_level_manager:
+		_world_level_before = main_level_manager.main_level
+	
+	# Award all run exp now (moved from button handlers) and clear run tracker
+	save_run_to_global_progress()
+	if has_node("/root/RunExperienceTrackerAutoload"):
+		get_node("/root/RunExperienceTrackerAutoload").clear_run()
+	
+	# Capture world level AFTER awarding exp
+	if main_level_manager:
+		_world_level_after = main_level_manager.main_level
+	
+	# Apply any Mnemosyne upgrades earned by the world level delta
+	var mnemosyne_tracker = get_node_or_null("/root/MnemosyneProgressTrackerAutoload")
+	if mnemosyne_tracker and _world_level_after > _world_level_before:
+		_mnemosyne_upgrades = mnemosyne_tracker.apply_upgrades_for_world_level_range(
+			_world_level_before, _world_level_after
+		)
+		print("Mnemosyne upgrades this run: ", _mnemosyne_upgrades.size())
+	
+	# Set up UI
 	setup_ui_safely()
 
 func setup_ui_safely():
@@ -133,8 +168,113 @@ func setup_ui_safely():
 	var scraps_earned: int = get_scene_params().get("leather_scraps_earned", 0)
 	setup_left_panel_content(title, god_deck_info, outcome_label, capture_total, defense_total, scraps_earned)
 	
-	# Set up right panel with card displays
-	setup_card_displays_panel(card_display_container)
+	# Build carousel toggle button at top of RightPanel, before the pages
+	_carousel_button = Button.new()
+	_carousel_button.text = "View Mnemosyne Upgrades →"
+	_carousel_button.custom_minimum_size = Vector2(0, 36)
+	_carousel_button.visible = not _mnemosyne_upgrades.is_empty()
+	_carousel_button.pressed.connect(_on_carousel_button_pressed)
+	right_panel.add_child(_carousel_button)
+	right_panel.move_child(_carousel_button, 0)
+	
+	# Page 1: card XP displays (existing content, wrapped in a container)
+	_card_page = VBoxContainer.new()
+	_card_page.name = "CardPage"
+	_card_page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_card_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	right_panel.add_child(_card_page)
+	setup_card_displays_panel(_card_page)
+	
+	# Page 2: world level + Mnemosyne upgrade results
+	_mnemosyne_page = VBoxContainer.new()
+	_mnemosyne_page.name = "MnemosynePage"
+	_mnemosyne_page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_mnemosyne_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_mnemosyne_page.visible = false
+	right_panel.add_child(_mnemosyne_page)
+	_build_mnemosyne_page_static(_mnemosyne_page)
+	
+	# The old CardDetailsContainer is now unused (pages are direct children of right_panel)
+	# Hide it so it doesn't take up space
+	card_display_container.visible = false
+
+func _on_carousel_button_pressed():
+	_showing_mnemosyne_page = not _showing_mnemosyne_page
+	_card_page.visible = not _showing_mnemosyne_page
+	_mnemosyne_page.visible = _showing_mnemosyne_page
+	if _showing_mnemosyne_page:
+		_carousel_button.text = "← View Card XP"
+		if not _mnemosyne_page_animated:
+			_mnemosyne_page_animated = true
+			_animate_mnemosyne_page(_mnemosyne_page)
+	else:
+		_carousel_button.text = "View Mnemosyne Upgrades →"
+
+func _build_mnemosyne_page_static(container: VBoxContainer):
+	# World level header
+	var world_level_title = Label.new()
+	world_level_title.text = "🌍 World Level"
+	world_level_title.add_theme_font_size_override("font_size", 24)
+	world_level_title.add_theme_color_override("font_color", Color("#DDDDDD"))
+	world_level_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	container.add_child(world_level_title)
+	
+	var main_level_manager = get_node_or_null("/root/MainLevelAutoload")
+	var level_detail = Label.new()
+	if main_level_manager:
+		if _world_level_after > _world_level_before:
+			level_detail.text = "Lv." + str(_world_level_before) + " → Lv." + str(_world_level_after)
+			level_detail.add_theme_color_override("font_color", Color("#00FF88"))
+		else:
+			var exp_display = str(main_level_manager.main_exp) + " / " + str(
+				main_level_manager.XP_THRESHOLDS[min(_world_level_after, main_level_manager.MAX_LEVEL - 1)]
+			) + " XP"
+			level_detail.text = "Lv." + str(_world_level_after) + "  (" + exp_display + ")"
+			level_detail.add_theme_color_override("font_color", Color("#AAAAAA"))
+	else:
+		level_detail.text = "World level data unavailable"
+		level_detail.add_theme_color_override("font_color", Color("#666666"))
+	level_detail.add_theme_font_size_override("font_size", 18)
+	level_detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	container.add_child(level_detail)
+	
+	container.add_child(HSeparator.new())
+	
+	# Mnemosyne upgrade list
+	var upgrades_title = Label.new()
+	upgrades_title.text = "🧠 Mnemosyne Upgrades"
+	upgrades_title.add_theme_font_size_override("font_size", 20)
+	upgrades_title.add_theme_color_override("font_color", Color("#CCAAFF"))
+	upgrades_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	container.add_child(upgrades_title)
+	
+	if _mnemosyne_upgrades.is_empty():
+		var none_label = Label.new()
+		none_label.text = "No new upgrades this run"
+		none_label.add_theme_color_override("font_color", Color("#666666"))
+		none_label.add_theme_font_size_override("font_size", 14)
+		none_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		container.add_child(none_label)
+	else:
+		for upgrade in _mnemosyne_upgrades:
+			var row = Label.new()
+			row.text = upgrade["card_name"] + "  " + upgrade["stat_name"] + " → " + str(upgrade["new_value"])
+			row.add_theme_font_size_override("font_size", 15)
+			row.add_theme_color_override("font_color", Color("#CCCCCC"))
+			row.modulate.a = 0.0  # start invisible; animation fades these in
+			row.name = "UpgradeRow_" + str(upgrade["level"])
+			container.add_child(row)
+
+func _animate_mnemosyne_page(container: VBoxContainer):
+	# Fade in each upgrade row with a stagger
+	var delay: float = 0.0
+	for child in container.get_children():
+		if child.name.begins_with("UpgradeRow_"):
+			var tween = create_tween()
+			tween.tween_interval(delay)
+			tween.tween_property(child, "modulate:a", 1.0, 0.35)
+			delay += 0.2
+	# If no rows (no upgrades), nothing to animate
 
 func setup_left_panel_content(title_node: Label, god_deck_node: Label, outcome_node: Label, capture_node: Label, defense_node: Label, scraps_earned: int = 0):
 	print("\n=== Setting up left panel content ===")
@@ -555,16 +695,10 @@ func get_scene_params() -> Dictionary:
 
 func _on_new_run_button_pressed() -> void:
 	SoundManagerAutoload.fade_out_music(1.0)
-	save_run_to_global_progress()
-	if has_node("/root/RunExperienceTrackerAutoload"):
-		get_node("/root/RunExperienceTrackerAutoload").clear_run()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 
 func _on_main_menu_button_pressed() -> void:
 	SoundManagerAutoload.fade_out_music(1.0)
-	save_run_to_global_progress()
-	if has_node("/root/RunExperienceTrackerAutoload"):
-		get_node("/root/RunExperienceTrackerAutoload").clear_run()
 	TransitionManagerAutoload.change_scene_to("res://Scenes/MainMenu.tscn")
 
 func save_run_to_global_progress():

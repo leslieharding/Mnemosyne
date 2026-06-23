@@ -7,13 +7,11 @@ signal mnemosyne_ability_unlocked(card_index: int, ability_name: String)
 
 # Save data
 var progression_data: Dictionary = {
-	"current_level": 0,  # Total upgrades applied
-	"god_contributions": {},  # "god_deck" -> contribution_count
+	"current_level": 0,  # Highest world level for which upgrades have been applied
 	"applied_upgrades": []  # Array of upgrade dictionaries for history
 }
 
 # Configuration
-const MAX_CONTRIBUTIONS_PER_DECK = 25
 const BASE_CARD_VALUES = [1, 1, 1, 1]  # N, E, S, W
 const MNEMOSYNE_CARD_COUNT = 5
 
@@ -170,63 +168,51 @@ func _ready():
 
 # === MAIN PROGRESSION FUNCTIONS ===
 
-func can_contribute(god_name: String, deck_index: int) -> bool:
-	var deck_key = god_name + "_deck_" + str(deck_index)
-	var current_contributions = progression_data["god_contributions"].get(deck_key, 0)
-	return current_contributions < MAX_CONTRIBUTIONS_PER_DECK
 
-func get_contribution_count(god_name: String, deck_index: int) -> int:
-	var deck_key = god_name + "_deck_" + str(deck_index)
-	return progression_data["god_contributions"].get(deck_key, 0)
 
-func get_remaining_contributions(god_name: String, deck_index: int) -> int:
-	return MAX_CONTRIBUTIONS_PER_DECK - get_contribution_count(god_name, deck_index)
+func apply_upgrades_for_world_level_range(from_world_level: int, to_world_level: int) -> Array[Dictionary]:
+	var results: Array[Dictionary] = []
+	var stat_names = ["North", "East", "South", "West"]
 
-func apply_contribution(god_name: String, deck_index: int) -> bool:
-	if not can_contribute(god_name, deck_index):
-		print("Cannot contribute - deck limit reached for ", god_name, " deck ", deck_index)
-		return false
-	
-	var deck_key = god_name + "_deck_" + str(deck_index)
-	
-	# Increment contribution count
-	if not deck_key in progression_data["god_contributions"]:
-		progression_data["god_contributions"][deck_key] = 0
-	progression_data["god_contributions"][deck_key] += 1
-	
-	# Advance level
-	progression_data["current_level"] += 1
-	var new_level = progression_data["current_level"]
-	
-	# Apply the upgrade if we have a mapping for this level
-	if new_level in progression_map:
-		var upgrade = progression_map[new_level]
+	if to_world_level <= from_world_level:
+		return results
+
+	for level in range(from_world_level + 1, to_world_level + 1):
+		if not level in progression_map:
+			continue
+
+		var upgrade = progression_map[level]
 		var card_index = upgrade["card_index"]
 		var stat_index = upgrade["stat_index"]
-		
-		# Record the upgrade
+
 		progression_data["applied_upgrades"].append({
-			"level": new_level,
+			"level": level,
 			"card_index": card_index,
 			"stat_index": stat_index,
-			"contributing_god": god_name,
-			"contributing_deck": deck_index,
 			"timestamp": Time.get_datetime_string_from_system()
 		})
-		
+
 		var new_stat_value = get_card_stat_value(card_index, stat_index)
-		
-		print("Applied Mnemosyne upgrade level ", new_level, ": Card ", card_index, " stat ", stat_index, " -> ", new_stat_value)
-		
+
+		print("Applied Mnemosyne upgrade level ", level, ": Card ", card_index, " stat ", stat_index, " -> ", new_stat_value)
+
 		emit_signal("mnemosyne_card_upgraded", card_index, stat_index, new_stat_value)
-		emit_signal("mnemosyne_level_increased", new_level)
-		
+
+		results.append({
+			"level": level,
+			"card_index": card_index,
+			"stat_index": stat_index,
+			"card_name": CARD_NAMES[card_index],
+			"stat_name": stat_names[stat_index],
+			"new_value": new_stat_value
+		})
+
+	if not results.is_empty():
+		progression_data["current_level"] = to_world_level
+		emit_signal("mnemosyne_level_increased", to_world_level)
 		save_progression_data()
-		return true
-	else:
-		print("Warning: No progression mapping for level ", new_level)
-		save_progression_data()
-		return true
+
+	return results
 
 # === BOSS ABILITY SYSTEM ===
 
@@ -421,7 +407,6 @@ func debug_progression_state():
 	print("=== MNEMOSYNE PROGRESSION DEBUG ===")
 	print("Current level: ", get_current_level())
 	print("Applied upgrades: ", progression_data["applied_upgrades"].size())
-	print("God contributions: ", progression_data["god_contributions"])
 	
 	for i in range(MNEMOSYNE_CARD_COUNT):
 		var values = get_card_values(i)
@@ -434,7 +419,6 @@ func debug_progression_state():
 func reset_progression():
 	progression_data = {
 		"current_level": 0,
-		"god_contributions": {},
 		"applied_upgrades": []
 	}
 	save_progression_data()
