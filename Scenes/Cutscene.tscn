@@ -120,25 +120,21 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.101960786, 0.22745098, 0.36078432, 1)
 theme_override_font_sizes/font_size = 16
 label_settings = SubResource("LabelSettings_c1xi3")
-horizontal_alignment = 1
 
 [node name="HSeparator" type="ColorRect" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer" unique_id=1474868605]
 custom_minimum_size = Vector2(120, 2)
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 0
 color = Color(0.36078432, 0.05882353, 0, 1)
 
-[node name="DialogueTextWrapper" type="Control" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer" unique_id=102559926]
+[node name="DialogueTextWrapper" type="Control" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer" unique_id=1283952481]
 layout_mode = 2
 size_flags_vertical = 3
 
 [node name="DialogueText" type="RichTextLabel" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer/DialogueTextWrapper" unique_id=1999437623]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 15.0
-offset_bottom = -13.0
+layout_mode = 0
+offset_right = 1072.0
+offset_bottom = 82.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
@@ -146,7 +142,6 @@ theme_override_colors/default_color = Color(0.47843137, 0.12156863, 0, 1)
 theme_override_constants/line_separation = 2
 bbcode_enabled = true
 fit_content = true
-horizontal_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MainContainer/DialogueArea/MarginContainer/VBoxContainer" unique_id=2111474196]
 layout_mode = 2

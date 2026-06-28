@@ -1182,8 +1182,6 @@ func play_light_page_turn():
 	SoundManagerAutoload.play("light_page_turn")
 
 func refresh_remember_tab():
-	
-	
 	print("=== REFRESH REMEMBER TAB ===")
 	if not remember_tab:
 		print("EARLY RETURN: remember_tab is null")
@@ -1196,59 +1194,104 @@ func refresh_remember_tab():
 	var list = remember_tab.get_node_or_null("ScrollContainer/CutsceneList")
 	if not list:
 		print("EARLY RETURN: CutsceneList node not found")
-		print("Remember tab children: ", remember_tab.get_children())
 		return
-	
-	print("viewed_cutscenes: ", cutscene_manager.viewed_cutscenes)
 
 	# Clear existing entries
 	for child in list.get_children():
 		child.queue_free()
 
-	# Human-readable display names
-	var display_names: Dictionary = {
-		"tutorial_intro": "Tutorial: First Meeting",
-		"opening_awakening": "The Awakening",
-		"first_defeat_conversation": "First Defeat",
-		"second_defeat_conversation": "Second Defeat",
-		"first_boss_loss_conversation": "First Boss Encounter",
-		"first_apollo_boss_win_conversation": "Apollo Defeated",
-		"second_apollo_boss_win_conversation": "Apollo's Second Fall",
-		"first_apollo_boss_loss_conversation": "Fallen to Apollo",
-		"second_apollo_boss_loss_conversation": "Apollo Strikes Again",
-		"first_hermes_boss_loss_conversation": "Fallen to Hermes",
-		"second_hermes_boss_loss_conversation": "Hermes Strikes Again",
-		"first_artemis_boss_loss_conversation": "Fallen to Artemis",
-		"second_artemis_boss_loss_conversation": "Artemis Strikes Again",
-		"first_demeter_defeat_conversation": "Fallen to Demeter",
-	}
+	# ----------------------------------------------------------------
+	# CATEGORIES
+	# Each category is a Dictionary with:
+	#   "title"   - the section heading shown in the UI
+	#   "entries" - ordered Array of [cutscene_id, display_name] pairs
+	#               Add new entries here, in the order you want them shown.
+	# ----------------------------------------------------------------
+	var categories: Array = [
+		{
+			"title": "The Story So Far",
+			"entries": [
+				["tutorial_intro",         "Tutorial: First Meeting"],
+				["opening_awakening",      "The Awakening"],
+				# Add story cutscenes here in narrative order
+			]
+		},
+		{
+			"title": "Other",
+			"entries": [
+				["first_defeat_conversation",            "First Defeat"],
+				["second_defeat_conversation",           "Second Defeat"],
+				["first_boss_loss_conversation",         "First Boss Encounter"],
+				["first_apollo_boss_win_conversation",   "Apollo Defeated"],
+				["second_apollo_boss_win_conversation",  "Apollo's Second Fall"],
+				["first_apollo_boss_loss_conversation",  "Fallen to Apollo"],
+				["second_apollo_boss_loss_conversation", "Apollo Strikes Again"],
+				["first_hermes_boss_loss_conversation",  "Fallen to Hermes"],
+				["second_hermes_boss_loss_conversation", "Hermes Strikes Again"],
+				["first_artemis_boss_loss_conversation", "Fallen to Artemis"],
+				["second_artemis_boss_loss_conversation","Artemis Strikes Again"],
+				["first_demeter_defeat_conversation",    "Fallen to Demeter"],
+				# Add other cutscenes here
+			]
+		},
+	]
+	# ----------------------------------------------------------------
 
-	# Only show cutscenes that have been viewed
 	var any_shown = false
-	for cutscene_id in display_names.keys():
-		if not cutscene_manager.has_viewed_cutscene(cutscene_id):
+
+	for category in categories:
+		# Check if any entry in this category has been viewed
+		var category_has_viewed = false
+		for entry in category["entries"]:
+			if cutscene_manager.has_viewed_cutscene(entry[0]):
+				category_has_viewed = true
+				break
+
+		# Skip the whole section if nothing in it has been seen
+		if not category_has_viewed:
 			continue
 
-		any_shown = true
-		var display_name = display_names.get(cutscene_id, cutscene_id)
-		print("Creating row for: ", cutscene_id)
+		# Section header label
+		var header = Label.new()
+		header.text = category["title"]
+		header.add_theme_color_override("font_color", Color("#1A0F00"))
+		header.add_theme_font_size_override("font_size", 18)
+		list.add_child(header)
 
-		var row = HBoxContainer.new()
-		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		# Separator line beneath header
+		var sep = HSeparator.new()
+		list.add_child(sep)
 
-		var label = Label.new()
-		label.text = display_name
-		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(label)
-		label.add_theme_color_override("font_color", Color("#1A0F00"))
+		# Entries within this category
+		for entry in category["entries"]:
+			var cutscene_id = entry[0]
+			var display_name = entry[1]
 
-		var btn = Button.new()
-		btn.text = "Replay"
-		btn.pressed.connect(_on_replay_cutscene_pressed.bind(cutscene_id))
-		row.add_child(btn)
+			if not cutscene_manager.has_viewed_cutscene(cutscene_id):
+				continue
 
-		list.add_child(row)
-		print("Row added, list child count: ", list.get_child_count())
+			any_shown = true
+
+			var row = HBoxContainer.new()
+			row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+			var label = Label.new()
+			label.text = display_name
+			label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			label.add_theme_color_override("font_color", Color("#1A0F00"))
+			row.add_child(label)
+
+			var btn = Button.new()
+			btn.text = "Replay"
+			btn.pressed.connect(_on_replay_cutscene_pressed.bind(cutscene_id))
+			row.add_child(btn)
+
+			list.add_child(row)
+
+		# Small spacer between categories
+		var spacer = Control.new()
+		spacer.custom_minimum_size = Vector2(0, 12)
+		list.add_child(spacer)
 
 	if not any_shown:
 		var empty_label = Label.new()
