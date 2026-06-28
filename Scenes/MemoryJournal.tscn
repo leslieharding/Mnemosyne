@@ -151,6 +151,31 @@ size_flags_vertical = 3
 [node name="CutsceneList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Remember/ScrollContainer" unique_id=319886566]
 layout_mode = 2
 
+[node name="Achievements" type="HSplitContainer" parent="MainContainer/VBox/TabContainer" unique_id=2106443700]
+visible = false
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 2
+theme_override_constants/separation = 80
+metadata/_tab_index = 4
+
+[node name="LeftScroll" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Achievements" unique_id=2059649893]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LeftList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Achievements/LeftScroll" unique_id=189886331]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="RightScroll" type="ScrollContainer" parent="MainContainer/VBox/TabContainer/Achievements" unique_id=143775639]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RightList" type="VBoxContainer" parent="MainContainer/VBox/TabContainer/Achievements/RightScroll" unique_id=1489674309]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
 [node name="CloseButton" type="Button" parent="MainContainer" unique_id=1007089980]
 z_index = 10
 layout_mode = 2

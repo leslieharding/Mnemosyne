@@ -16,6 +16,8 @@ signal journal_closed()
 @onready var gods_tab = $MainContainer/VBox/TabContainer/Gods
 @onready var mnemosyne_tab = $MainContainer/VBox/TabContainer/Mnemosyne
 @onready var remember_tab = $MainContainer/VBox/TabContainer/Remember
+@onready var achievements_tab = $MainContainer/VBox/TabContainer/Achievements
+
 
 # Animation
 var journal_tween: Tween
@@ -38,6 +40,8 @@ func _ready():
 	# Connect signals
 	close_button.pressed.connect(_on_close_pressed)
 	
+	if has_node("/root/AchievementManagerAutoload"):
+		get_node("/root/AchievementManagerAutoload").achievement_unlocked.connect(_on_achievement_unlocked)
 	
 	# Set up initial state (hidden)
 	modulate.a = 0.0
@@ -109,6 +113,10 @@ func refresh_all_content():
 	refresh_gods_tab()
 	refresh_mnemosyne_tab()
 	refresh_remember_tab()
+	refresh_achievements_tab()
+
+func _on_achievement_unlocked(_achievement_data: Dictionary) -> void:
+	refresh_achievements_tab()
 
 func update_header():
 	if not has_node("/root/MemoryJournalManagerAutoload"):
@@ -1306,3 +1314,105 @@ func _on_replay_cutscene_pressed(cutscene_id: String):
 	cutscene_manager.replay_from_journal = true
 	close_journal()
 	cutscene_manager.play_cutscene(cutscene_id)
+
+func refresh_achievements_tab():
+	if not achievements_tab:
+		return
+	if not has_node("/root/AchievementManagerAutoload"):
+		return
+
+	var achievement_manager = get_node("/root/AchievementManagerAutoload")
+	var left_list = achievements_tab.get_node_or_null("LeftScroll/LeftList")
+	var right_list = achievements_tab.get_node_or_null("RightScroll/RightList")
+	if not left_list or not right_list:
+		return
+
+	# Clear existing entries
+	for child in left_list.get_children():
+		child.queue_free()
+	for child in right_list.get_children():
+		child.queue_free()
+
+	var all_achievements = achievement_manager.get_all_achievements()
+	var total = all_achievements.size()
+	var midpoint = total / 2
+
+	# Header on left page
+	var left_header = Label.new()
+	left_header.text = str(achievement_manager.get_unlock_count()) + " / " + str(total) + " Unlocked"
+	left_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	left_header.add_theme_font_size_override("font_size", 14)
+	left_header.add_theme_color_override("font_color", Color("#C0A060"))
+	left_list.add_child(left_header)
+
+	var left_spacer = Control.new()
+	left_spacer.custom_minimum_size = Vector2(0, 8)
+	left_list.add_child(left_spacer)
+
+	# Header on right page (blank, just for spacing alignment)
+	var right_header = Label.new()
+	right_header.text = " "
+	right_header.add_theme_font_size_override("font_size", 14)
+	right_list.add_child(right_header)
+
+	var right_spacer = Control.new()
+	right_spacer.custom_minimum_size = Vector2(0, 8)
+	right_list.add_child(right_spacer)
+
+	for i in range(total):
+		var achievement = all_achievements[i]
+		var target_list = left_list if i < midpoint else right_list
+		_add_achievement_row(achievement, achievement_manager.is_unlocked(achievement["id"]), target_list)
+
+
+func _add_achievement_row(achievement: Dictionary, unlocked: bool, list: VBoxContainer) -> void:
+	var row = PanelContainer.new()
+	var row_style = StyleBoxFlat.new()
+	if unlocked:
+		row_style.bg_color = Color("#2A2A2A")
+		row_style.border_color = Color("#C0A060")
+	else:
+		row_style.bg_color = Color("#1A1A1A")
+		row_style.border_color = Color("#444444")
+	row_style.border_width_left = 1
+	row_style.border_width_top = 1
+	row_style.border_width_right = 1
+	row_style.border_width_bottom = 1
+	row_style.content_margin_left = 10
+	row_style.content_margin_top = 6
+	row_style.content_margin_right = 10
+	row_style.content_margin_bottom = 6
+	row.add_theme_stylebox_override("panel", row_style)
+
+	var hbox = HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 12)
+	row.add_child(hbox)
+
+	var icon_label = Label.new()
+	icon_label.text = "🏆" if unlocked else "🔒"
+	icon_label.add_theme_font_size_override("font_size", 16)
+	icon_label.custom_minimum_size = Vector2(28, 0)
+	hbox.add_child(icon_label)
+
+	var vbox = VBoxContainer.new()
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hbox.add_child(vbox)
+
+	var name_label = Label.new()
+	name_label.text = achievement["name"]
+	name_label.add_theme_font_size_override("font_size", 13)
+	name_label.add_theme_color_override("font_color", Color("#E8D5A0") if unlocked else Color("#666666"))
+	vbox.add_child(name_label)
+
+	var desc_label = Label.new()
+	desc_label.text = achievement["description"] if achievement["description"] != "" else "???"
+	desc_label.add_theme_font_size_override("font_size", 11)
+	desc_label.add_theme_color_override("font_color", Color("#AAAAAA") if unlocked else Color("#888888"))
+	desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(desc_label)
+
+	list.add_child(row)
+
+	var gap = Control.new()
+	gap.custom_minimum_size = Vector2(0, 4)
+	list.add_child(gap)
