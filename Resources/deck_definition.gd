@@ -81,6 +81,9 @@ func get_unlock_description(god_name: String) -> String:
 func get_power_description() -> String:
 	match deck_power_type:
 		DeckPowerType.SUN_POWER:
+			var optional_tracker = Engine.get_main_loop().root.get_node_or_null("/root/OptionalBattleTrackerAutoload")
+			if optional_tracker and optional_tracker.is_permanently_won("Apollo_The Sun_Cultists of Nyx"):
+				return "☀️ Solar Blessing: 3 random grid spaces are bathed in sunlight, granting +2 to all stats for your cards placed there"
 			return "☀️ Solar Blessing: 3 random grid spaces are bathed in sunlight, granting +1 to all stats for your cards placed there"
 		DeckPowerType.PROPHECY_POWER:
 			return "🔮 Divine Prophecy: You always go first in battle"
