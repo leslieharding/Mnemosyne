@@ -60,10 +60,23 @@ func setup_conversation_definitions():
 	# Demeter specific defeat
 	register_conversation("first_demeter_defeat", Priority.STORY,
 		"Patience and growth in the face of setback.")
-	
-	
-	
-	
+
+# Third early defeat
+	register_conversation("third_run_defeat", Priority.STORY,
+		"A tale of a magic carp and the path to dragonhood.")
+		
+	# Boss win conversations - Hermes, Artemis, Demeter
+	register_conversation("first_hermes_boss_win", Priority.STORY,
+		"Victory over the Hermes boss.")
+		
+	register_conversation("first_artemis_boss_win", Priority.STORY,
+		"Victory over the Artemis boss.")
+		
+	register_conversation("first_demeter_boss_win", Priority.STORY,
+		"Victory over the Demeter boss.")
+
+
+
 
 # Register a conversation definition
 func register_conversation(id: String, priority: Priority, description: String):
@@ -89,16 +102,19 @@ func get_conversation_button_state() -> Dictionary:
 	}
 
 func increment_defeat_count():
-	defeat_count += 1
-	print("Defeat count incremented to: ", defeat_count)
-	
-	# Trigger appropriate conversation based on defeat count
-	if defeat_count == 1:
-		print("Triggering first_run_defeat conversation")
-		trigger_conversation("first_run_defeat")
-	elif defeat_count == 2:
-		print("Triggering second_run_defeat conversation")
-		trigger_conversation("second_run_defeat")
+		defeat_count += 1
+		print("Defeat count incremented to: ", defeat_count)
+		
+		# Trigger appropriate conversation based on defeat count
+		if defeat_count == 1:
+			print("Triggering first_run_defeat conversation")
+			trigger_conversation("first_run_defeat")
+		elif defeat_count == 2:
+			print("Triggering second_run_defeat conversation")
+			trigger_conversation("second_run_defeat")
+		elif defeat_count == 3:
+			print("Triggering third_run_defeat conversation")
+			trigger_conversation("third_run_defeat")
 
 # Trigger a conversation to become available
 func trigger_conversation(conversation_id: String):

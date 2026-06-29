@@ -24,6 +24,7 @@ func load_cutscenes():
 	create_sample_cutscenes()
 
 # Create some sample cutscenes for testing
+# Create some sample cutscenes for testing
 func create_sample_cutscenes():
 	# Load portrait textures
 	var chiron_portrait = load("res://Assets/Images/Chiron.png")
@@ -36,435 +37,134 @@ func create_sample_cutscenes():
 	
 	# Create Chronos character  
 	var chronos = Character.new("Chronos", Color("#1F4A3D"), null, "right")
-	
-	
-	# Tutorial introduction cutscene
-	var tutorial_lines: Array[DialogueLine] = []
-	# Chronos speaks energetically - use faster speeds for excitement
-	tutorial_lines.append(DialogueLine.new(
-		"Chronos", 
-		"[urgent]New![/urgent] Sister dearest. Why won't you join me and the other titans? We have been having [speed:1.5]fun fighting[/speed] all morning",
-		"right",
-		1.0,  # Base typing speed
-		0.0,  # Pre-line delay
-		0.5   # Post-line delay for dramatic pause
-	))
-	
-	# Mnemosyne speaks hesitantly - use slower, more thoughtful pacing
-	tutorial_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"Chronos thank you for inviting me, but{pause:0.8} you know I can't fight, [slow]I can't really do much of anything[/slow].",
-		"left",
-		0.8,  # Slightly slower base speed for uncertainty
-		0.3   # Pre-line delay for hesitation
-	))
-	
-	# Chronos gets frustrated - mix of speeds to show emotion
-	tutorial_lines.append(DialogueLine.new(
-		"Chronos", 
-		"Yes I know that but [urgent]why?[/urgent] You are a titan are you not? We are the [speed:1.3]straining ones![/speed] Fighting is what we do.{pause:1.0} Have you seen Atlas? He's so strong I bet he could hold up the entire world if he tried. 
-",
-		"right",
-		1.0,
-		0.0,
-		0.8   # Longer pause after harsh words
-	))
-	
-	tutorial_lines.append(DialogueLine.new(
-		"Chronos", 
-		"What use is your gift of memory? By all accounts you don't seem to be using your talents anyway, you seem mostly useless, it's vexing. 
-",
-		"right",
-		1.0,
-		0.0,
-		0.8   # Longer pause after harsh words
-	))
-	
-	# Mnemosyne responds sadly - very slow and contemplative
-	tutorial_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"[slow]You're right[/slow], I don't really understand why I am a titan.",
-		"left",
-		0.6,  # Much slower for sadness
-		0.5,  # Pause before speaking
-		1.0   # Long pause after admission
-	))
-	
-	# Chronos tries to be encouraging - building energy
-	tutorial_lines.append(DialogueLine.new(
-		"Chronos", 
-		"None of us understand it New.{pause:0.8} Maybe you just need more [speed:1.4]encouragement[/speed], come [urgent]lets fight![/urgent]",
-		"right",
-		1.2,  # Faster for encouragement
-		0.3,
-		0.5
-	))
-	
 
-	
-	
-	
-	# First conversation with Chiron
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 0 - Tutorial introduction (Mnemosyne and Chronos)
+	# -------------------------------------------------------------------------
+	var tutorial_lines: Array[DialogueLine] = []
+	tutorial_lines.append(DialogueLine.new("Chronos", "New! Sister dearest. Why won't you join me and the other titans? We have been having fun fighting all morning."))
+	tutorial_lines.append(DialogueLine.new("Mnemosyne", "Chronos you know I can't fight, I can't really do much of anything."))
+	tutorial_lines.append(DialogueLine.new("Chronos", "Yes I know that but why? You are a titan are you not? We are the straining ones! Fighting is what we do."))
+	tutorial_lines.append(DialogueLine.new("Chronos", "Before I gelded father he would always go on and on about your potential for power."))
+	tutorial_lines.append(DialogueLine.new("Chronos", "What use is your gift of memory? By all accounts you don't seem to be using your talents anyway, you seem mostly useless, it's vexing."))
+	tutorial_lines.append(DialogueLine.new("Mnemosyne", "You're right, I don't really understand why I am a titan."))
+	tutorial_lines.append(DialogueLine.new("Chronos", "None of us understand it New. Maybe you just need more encouragement, come let's fight!"))
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 1 - Post tutorial (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var opening_lines: Array[DialogueLine] = []
 	opening_lines.append(DialogueLine.new("Chiron", "You fought well Mnemosyne"))
-	opening_lines.append(DialogueLine.new("Mnemosyne", " I don't think I…"))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "I don't think I…."))
 	opening_lines.append(DialogueLine.new("Chiron", "You fought well, with the tools you have available at this time"))
 	opening_lines.append(DialogueLine.new("Chiron", "Given the fullness of said time, Chronos would do best to avoid you."))
-	opening_lines.append(DialogueLine.new("Mnemosyne", "Hold on; who are you? How do you know me?"))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "Hold on… who are you? How do you know me?"))
 	opening_lines.append(DialogueLine.new("Chiron", "So it's true then, what an honour. To speak to the Titaness of memory before she understands the extent of her power. My name is Chiron."))
-	opening_lines.append(DialogueLine.new("Mnemosyne", "And you are a..."))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "And you are a….."))
 	opening_lines.append(DialogueLine.new("Chiron", "A centaur, yes"))
-	opening_lines.append(DialogueLine.new("Mnemosyne", "Sorry for being so crude"))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "Sorry"))
 	opening_lines.append(DialogueLine.new("Chiron", "How fascinating, you know one day it will be me apologising to you for the incompleteness of my thought"))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "Okay enough please, you have to tell me what you mean by all this"))
-	opening_lines.append(DialogueLine.new("Chiron", "Chaos, the Fate’s, Moros if you will, whatever source you want to invoke has decided your realm would be that of memory.  More than that, a divine infinite capacity to remember and learn."))
+	opening_lines.append(DialogueLine.new("Chiron", "Chaos, the Fate's, Moros if you will, whatever source you want to invoke has decided your realm would be that of memory. More than that, a divine infinite capacity to remember and learn."))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "So I can learn? That's it?"))
-	opening_lines.append(DialogueLine.new("Chiron", "Why yes but can't you see what that means? You are immortal, you will live forever. Forever is a long time to learn, to improve. "))
-	opening_lines.append(DialogueLine.new("Chiron", "Chronos as divine a being he undoubtedly is, doesn't have this potential. What you see now is what you will get come millenia."))
-	opening_lines.append(DialogueLine.new("Chiron", "So in a cosmic sense the only way you could possibly ever lose to someone like Chronos is to never do anything. You could take a step once every hundred years and eventually you would win. "))
+	opening_lines.append(DialogueLine.new("Chiron", "Why yes but can't you see what that means? You are immortal, you will live forever. Forever is a long time to learn, to improve."))
+	opening_lines.append(DialogueLine.new("Chiron", "Chronos as divine a being my father undoubtedly is, doesn't have this potential. What you see now is what you will get come millenia."))
+	opening_lines.append(DialogueLine.new("Chiron", "So in a cosmic sense the only way you could possibly ever lose to someone like Chronos is to never do anything. You could take a step once every hundred years and eventually you would win."))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "Well okay I must say when you put it like that it's quite encouraging, but I don't really know where to start."))
-	opening_lines.append(DialogueLine.new("Chiron", "It feels a little ridiculous me telling you of all people how to learn"))
-	opening_lines.append(DialogueLine.new("Chiron", "But when I learn something new, I usually find someone I trust and ask them to teach me."))
+	opening_lines.append(DialogueLine.new("Chiron", "When I learn something new, I usually find someone I trust and ask them to teach me."))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "So will you then? Teach me?"))
-	opening_lines.append(DialogueLine.new("Chiron", "Of course I will. Who would be foolish enough to pass up such an opportunity. Where should we start?"))
+	opening_lines.append(DialogueLine.new("Chiron", "Of course I will. It will be fun to mess with dad. What do you want to learn?"))
 	opening_lines.append(DialogueLine.new("Mnemosyne", "I want to be able to stand up for myself, I want to show Chronos i'm worthy of being a Titan"))
-	opening_lines.append(DialogueLine.new("Chiron", "As I just mentioned, first find a trustworthy mentor, rely on their knowledge and skills - while learning. You will find eventually your own strength is all that is required. "))
-	opening_lines.append(DialogueLine.new("Chiron", "Go and visit Apollo, he owes me one for Asclepius."))
-	opening_lines.append(DialogueLine.new("Mnemosyne", "Thank you Chiron. "))
-	opening_lines.append(DialogueLine.new("Chiron", "I’ll be here when you need me."))
+	opening_lines.append(DialogueLine.new("Chiron", "As I just mentioned, first find a trustworthy mentor, rely on their knowledge and skills - while learning. You will find eventually your own strength is all that is required."))
+	opening_lines.append(DialogueLine.new("Chiron", "Go and visit Apollo, he owes me for Asclepius."))
+	opening_lines.append(DialogueLine.new("Mnemosyne", "Thank you Chiron."))
+	opening_lines.append(DialogueLine.new("Chiron", "I'll be here when you need me."))
 
 
-	# First defeat conversation 
+	# -------------------------------------------------------------------------
+	# CUTSCENE 2 - First defeat (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var first_defeat_lines: Array[DialogueLine] = []
+	first_defeat_lines.append(DialogueLine.new("Chiron", "Back already New? Come on in and rest."))
+	first_defeat_lines.append(DialogueLine.new("Mnemosyne", "I didn't do so well Chiron"))
+	first_defeat_lines.append(DialogueLine.new("Chiron", "Tell me what happened?"))
+	first_defeat_lines.append(DialogueLine.new("Mnemosyne", "I was defeated. Quite easily it seems, nothing was achieved."))
+	first_defeat_lines.append(DialogueLine.new("Chiron", "Nothing was achieved?"))
+	first_defeat_lines.append(DialogueLine.new("Chiron", "Hmmm colour me confused…."))
+	first_defeat_lines.append(DialogueLine.new("Mnemosyne", "How so?"))
+	first_defeat_lines.append(DialogueLine.new("Chiron", "Word has come to me Phoebus Apollo has agreed to be your ally. Only someone as mighty as a Titan could consider such a union, with an Olympian no less, as nothing."))
+	first_defeat_lines.append(DialogueLine.new("Mnemosyne", "Well…."))
+	first_defeat_lines.append(DialogueLine.new("Chiron", "I am also informed that your confederates on this joint quest have also improved their experience through combat under your guidance."))
+	first_defeat_lines.append(DialogueLine.new("Chiron", "I'm told they can't wait to see what strength and abilities future ventures with you will yield them."))
+	first_defeat_lines.append(DialogueLine.new("Mnemosyne", "…….."))
+	first_defeat_lines.append(DialogueLine.new("Mnemosyne", "It's just defeating Chronos feels as far away as ever"))
+	first_defeat_lines.append(DialogueLine.new("Chiron", "You wish to defeat Chronos do you?"))
+	first_defeat_lines.append(DialogueLine.new("Mnemosyne", "Well, yeah  --"))
+	first_defeat_lines.append(DialogueLine.new("Chiron", "And I wish Selene would respond to my requests for an evening together. But worthwhile tasks take time and effort."))
+	first_defeat_lines.append(DialogueLine.new("Chiron", "Your journey has but begun, give yourself some grace."))
+	first_defeat_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of inspiration I'm ready to try again."))
+	first_defeat_lines.append(DialogueLine.new("Chiron", "I'll be here when you need me."))
 
-	# Create the full conversation with proper pacing and emotional beats
-	first_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Back already New? Come on in and rest.",
-		"right",
-		1.0,
-		0.0,
-		0.5
-	))
 
-	first_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"[slow]I didn't do so well Chiron[/slow]",
-		"left",
-		0.8,
-		0.3,
-		0.8
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Tell me what happened?",
-		"right",
-		0.9,
-		0.2,
-		0.5
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"I was defeated.{pause:0.8} [slow]Quite easily it seems, nothing was achieved.[/slow]",
-		"left",
-		0.7,
-		0.3,
-		1.0
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Nothing was achieved?",
-		"right",
-		1.0,
-		0.3,
-		0.8
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Hmmm{pause:0.5} colour me confused….",
-		"right",
-		0.9,
-		0.2,
-		0.8
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"How so?",
-		"left",
-		1.0,
-		0.2,
-		0.5
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Word has come to me [speed:1.2]Phoebus Apollo[/speed] has agreed to be your ally.{pause:1.0} Only someone as mighty as a Titan could consider such a union, with an Olympian no less, as [slow]nothing[/slow].",
-		"right",
-		0.9,
-		0.3,
-		1.2
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"Well….",
-		"left",
-		0.8,
-		0.5,
-		0.8
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"I am also informed that your confederates on this joint quest have also improved their experience through combat under your guidance.",
-		"right",
-		1.0,
-		0.2,
-		0.8
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"I'm told they [speed:1.3]can't wait[/speed] to see what strength and abilities future ventures with you will yield them.",
-		"right",
-		1.1,
-		0.1,
-		1.0
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"……..{pause:2.0}",
-		"left",
-		0.5,
-		0.5,
-		1.5
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Sorry for being so direct.{pause:0.8} But we talked earlier about victory being assured if you only took one step every hundred years.",
-		"right",
-		0.9,
-		0.3,
-		0.8
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Yet in a cosmic blink of an eye you have already taken several,{pause:0.5} I can't help but celebrate,{pause:0.3} [speed:1.4]how could I not?[/speed]",
-		"right",
-		1.0,
-		0.2,
-		1.2
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"Thank you for your kind words Chiron.",
-		"left",
-		0.9,
-		0.8,
-		0.8
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"I can feel the pull of [speed:1.2]Ananke[/speed] and with your gift of inspiration{pause:0.5} I'm ready to try again.",
-		"left",
-		1.0,
-		0.3,
-		0.8
-	))
-
-	first_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"[slow]I'll be here when you need me.[/slow]",
-		"right",
-		0.7,
-		0.5,
-		1.0
-	))
-	# Second defeat conversation - NEW ADDITION
+	# -------------------------------------------------------------------------
+	# CUTSCENE 3 - Second defeat (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var second_defeat_lines: Array[DialogueLine] = []
+	second_defeat_lines.append(DialogueLine.new("Mnemosyne", "Chiron! Are you there?"))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "New?"))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "Come on in, come on in. How goes your latest adventure?"))
+	second_defeat_lines.append(DialogueLine.new("Mnemosyne", "I am reluctant to say, for I return, once again, cloaked in defeat and failure."))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "You consider your latest attempt a failure? And that this is a bad thing? Hmmm most curious"))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "Have you ever met your sister-in-law Pandora?"))
+	second_defeat_lines.append(DialogueLine.new("Mnemosyne", "No I haven't."))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "But are you aware of her role in ending the golden age of man?"))
+	second_defeat_lines.append(DialogueLine.new("Mnemosyne", "It is said overpowering curiosity led her to open a sacred pithos containing all the ills and evils of the world."))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "Indeed."))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "Strife. Pain. Murder. Lies. Ruin. Oath Breaking. Grief. Famine."))
+	second_defeat_lines.append(DialogueLine.new("Mnemosyne", "Good memory dear friend, but I don't know what you are getting at here."))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "You were right to state all ills and evils were released. But I ask you, where among them is failure?"))
+	second_defeat_lines.append(DialogueLine.new("Mnemosyne", "I…… well."))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "It's not there is it? What are we to make of that?"))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "Had failure been evil would it not have been there hand in hand with Eris?"))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "The interpretation is obvious. Failure is not evil let alone bad. The primordial evils understood this."))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "It is only through the eyes of failure one can begin to see success."))
+	second_defeat_lines.append(DialogueLine.new("Mnemosyne", "So what then? I am to court defeat?"))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "You should both avoid being defeated and avoid wallowing in defeat with equal ferocity."))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "See failure as a necessary fee for success."))
+	second_defeat_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of clarity I'm ready to try again."))
+	second_defeat_lines.append(DialogueLine.new("Chiron", "I'll be here when you need me."))
 
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"New! Come on in, come on in",
-		"right",
-		1.1,
-		0.0,
-		0.5
-	))
 
-	second_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"Chiron, you are so positive but{pause:0.5} [slow]it is with ill tidings I return[/slow]",
-		"left",
-		0.8,
-		0.3,
-		0.8
-	))
+	# -------------------------------------------------------------------------
+	# CUTSCENE 4 - Third defeat (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
+	var third_defeat_lines: Array[DialogueLine] = []
+	third_defeat_lines.append(DialogueLine.new("Chiron", "New! Come on in, come on in"))
+	third_defeat_lines.append(DialogueLine.new("Mnemosyne", "Chiron, you are so positive but it is with ill tidings I return"))
+	third_defeat_lines.append(DialogueLine.new("Mnemosyne", "For I am once again, defeated."))
+	third_defeat_lines.append(DialogueLine.new("Chiron", "Tell me about your last adventure, you must!"))
+	third_defeat_lines.append(DialogueLine.new("Mnemosyne", "There's not much to tell unfortunately, that is the point"))
+	third_defeat_lines.append(DialogueLine.new("Chiron", "You remind me of a tale from the east. Would you believe it? Whole worlds exist beyond the wine dark sea."))
+	third_defeat_lines.append(DialogueLine.new("Chiron", "But anyway, to the east there was once a fish."))
+	third_defeat_lines.append(DialogueLine.new("Mnemosyne", "A fish?"))
+	third_defeat_lines.append(DialogueLine.new("Chiron", "well more specifically a carp, but more importantly the carp was magic"))
+	third_defeat_lines.append(DialogueLine.new("Mnemosyne", "A magic carp?"))
+	third_defeat_lines.append(DialogueLine.new("Chiron", "Indeed."))
+	third_defeat_lines.append(DialogueLine.new("Chiron", "In the beginning the carp could do nothing, it could but splash around, the effect was negligible."))
+	third_defeat_lines.append(DialogueLine.new("Chiron", "Once it had run out of the energy to splash, it found it could struggle. It would hurt itself whilst struggling but at least it could make progress."))
+	third_defeat_lines.append(DialogueLine.new("Chiron", "Eventually after struggling for some time it learned it could tackle. It remained slow progress but lightning quick compared to memories of splashing."))
+	third_defeat_lines.append(DialogueLine.new("Chiron", "One day after tackling a particularly challenging adversary. The carp transformed into a massive dragon, powerful and fearsome."))
+	third_defeat_lines.append(DialogueLine.new("Mnemosyne", "It's a lovely tale Chiron. Am I to interpret I am a carp splashing so to speak?"))
+	third_defeat_lines.append(DialogueLine.new("Chiron", "Splashing yes, struggling maybe, tackling soon. But blessedly on one's way to dragonhood."))
+	third_defeat_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of perseverance I'm ready to try again."))
+	third_defeat_lines.append(DialogueLine.new("Chiron", "I'll be here when you need me."))
 
-	second_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"For I am once again, defeated.",
-		"left",
-		0.7,
-		0.2,
-		1.0
-	))
 
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Tell me about your last adventure, [speed:1.3]you must![/speed]",
-		"right",
-		1.0,
-		0.2,
-		0.5
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"There's not much to tell unfortunately,{pause:0.8} [slow]that is the point[/slow]",
-		"left",
-		0.8,
-		0.3,
-		1.0
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"You remind me of a tale from the east.{pause:0.5} Would you believe it? [speed:1.2]Whole worlds exist beyond the wine dark sea.[/speed]",
-		"right",
-		0.9,
-		0.3,
-		0.8
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"But anyway, to the east there was once a fish.",
-		"right",
-		1.0,
-		0.2,
-		0.8
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"A fish?",
-		"left",
-		1.0,
-		0.3,
-		0.5
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Well more specifically a carp, but more importantly{pause:0.5} [speed:1.2]the carp was magic[/speed]",
-		"right",
-		0.9,
-		0.2,
-		0.8
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"A magic carp?",
-		"left",
-		1.0,
-		0.3,
-		0.5
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Indeed. The carp was forced to fight! Often against it's will.",
-		"right",
-		1.0,
-		0.2,
-		0.8
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"In the beginning the carp could do nearly nothing,{pause:0.5} more specifically it could splash around,{pause:0.3} [slow]the effect was negligible.[/slow]",
-		"right",
-		0.9,
-		0.2,
-		1.0
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Once it had run out of the energy to splash, it found it could struggle.{pause:0.8} It would hurt itself whilst struggling but{pause:0.5} at least it could make progress.",
-		"right",
-		0.9,
-		0.2,
-		1.0
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Eventually after struggling for some time it learned it could tackle.{pause:0.5} It was still slow progress but [speed:1.3]lightning quick[/speed] compared to memories of splashing.",
-		"right",
-		1.0,
-		0.2,
-		1.0
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"One day after tackling a particularly challenging adversary{pause:1.0} [speed:1.4]The carp transformed into a massive dragon, powerful and fearsome.[/speed]",
-		"right",
-		0.9,
-		0.3,
-		1.2
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"It's a lovely tale Chiron.{pause:0.8} Am I to interpret{pause:0.5} [slow]I am a carp splashing so to speak?[/slow]",
-		"left",
-		0.8,
-		0.3,
-		1.0
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Splashing yes, struggling maybe.{pause:0.8} But [speed:1.2]blessedly[/speed] on one's way to dragoonhood.",
-		"right",
-		0.9,
-		0.3,
-		1.2
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"I can feel the pull of [speed:1.2]Ananke[/speed] and with your gift of inspiration{pause:0.5} I'm ready to try again.",
-		"left",
-		1.0,
-		0.3,
-		0.8
-	))
-
-	second_defeat_lines.append(DialogueLine.new(
-		"Chiron", 
-		"[slow]I can be found in this locale whence my presence is required.[/slow]",
-		"right",
-		0.7,
-		0.5,
-		1.0
-	))
-	
-	#4
+	# -------------------------------------------------------------------------
+	# CUTSCENE 5 - First Apollo boss win (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var first_apollo_boss_win_lines: Array[DialogueLine] = []
 	first_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "Hello New! Come on in, I can't wait to hear what you have been up to"))
 	first_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Hi there Chiron. I have been toiling under the guidance of the shining one"))
@@ -484,12 +184,13 @@ func create_sample_cutscenes():
 	first_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "So it is guilt then? From which he suffers?"))
 	first_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "The events are agreed upon, sure. As to the reasoning I cannot say. Only Apollo can tell you that and I won't litigate those that are absent."))
 	first_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "I would ask you to speak with him. Seek to understand, not judge and the answers will come"))
-	first_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "If I can help the sun rise anew I will."))
-	first_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "Together I'm sure we can do it."))
 	first_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of determination I'm ready to try again."))
 	first_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "I'll be here when you need me."))
 
-	#5
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 6 - Second Apollo boss win (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var second_apollo_boss_win_lines: Array[DialogueLine] = []
 	second_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "Why hello New, nice to see you - but is everything okay? You look ….. Troubled?"))
 	second_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "I had the opportunity to broach things with Apollo"))
@@ -501,11 +202,11 @@ func create_sample_cutscenes():
 	second_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "Interesting, what was his explanation?"))
 	second_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Apollo feels his actions are justified in light of Coronis' faithlessness"))
 	second_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "You feel this is unfair?"))
-	second_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Dare I say it about the god of reason. But I suspect he is being unreasonable."))
+	second_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Dare I say it about the god of reason. But I do."))
 	second_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "Go on"))
 	second_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Coronis is visited upon by Apollo who then departs. There is no sworn covenant, no offer of marriage, no clarity he would even return. In the unknown was she meant to simply wait and hope? Pregnant and alone?"))
 	second_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Seeking reliable support seems not only natural but sensible does it not? Apollo hardly put off his other romances during this time, it just all feels a little bit…… a little bit…."))
-	second_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "It's better the words come from your immortal mouth than mine."))
+	second_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "It's better the words come from your mouth than mine."))
 	second_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Hypocritical."))
 	second_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "Apollo is grappling between his sense of wounded pride and an internal suspicion of wrongdoing. In his heart of hearts he knows the punishment was too harsh but he dare not admit it for fear of losing face."))
 	second_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "Until the discord between these two positions is erased the torture will continue."))
@@ -513,153 +214,46 @@ func create_sample_cutscenes():
 	second_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "Apollo should look to the constellation Corvus the crow, offer his apologies, admit fault, then and only then will he be free from this burden. If you cannot convince him, don't feel so bad, he is immortal after all and will find this peace eventually."))
 	second_apollo_boss_win_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of illumination I'm ready to try again."))
 	second_apollo_boss_win_lines.append(DialogueLine.new("Chiron", "I'll be here when you need me."))
-	
-	
-	#6
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 7 - First Apollo boss loss (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var first_apollo_boss_loss_lines: Array[DialogueLine] = []
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "New! Come on in, you look… perturbed"))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "I came up against a foe, I could not see who they were."))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Nor did I recognise any of the forces used against me, such powers I had never seen before."))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "Describe them if you will"))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "A giant, whose blows rang out with such force they could still be felt many moments after they had landed. A woman slender, but sharp…. sharp in every way you could imagine."))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "But most perplexing was their leader. It seemed they could predict my every move, I found myself second guessing my plays. In the chaos, I was defeated."))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "Predicting your moves you say? Could sister Phoebe be playing a joke on you? Who else could out predict the God of Augury himself?"))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "Did you notice anything else out of the ordinary?"))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Well sometimes I got the feeling I was being watched. But I can't know for sure how relevant that is."))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "You should trust your instinct. The sense of being watched came to you for a reason. Perhaps this foe is no divinator but a simple spy."))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "Hmmmm…. Observing your tactics prior to engaging you. They are taking you seriously as an enemy which paints them as intelligent."))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "I will need to meditate on what this portends, in the meantime, try again, you must!"))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of inspiration I'm ready to try again."))
+	first_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "I'll be here when you need me."))
 
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Chiron", 
-		"New! Come on in, you look{pause:0.5} [slow]perturbed[/slow]",
-		"right",
-		1.0,
-		0.0,
-		0.8
-	))
 
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"I came up against a foe,{pause:0.8} [slow]I could not see who they were.[/slow]",
-		"left",
-		0.8,
-		0.3,
-		1.0
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"Nor did I recognise any of the forces used against me,{pause:0.5} such powers I had never seen before.",
-		"left",
-		0.9,
-		0.2,
-		0.8
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Describe them if you will",
-		"right",
-		1.0,
-		0.3,
-		0.5
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"A giant, whose blows rang out with such force they could still be felt many moments after they had landed.{pause:1.0} A woman slender, but [urgent]sharp[/urgent]…. [slow]sharp in every way you could imagine.[/slow]",
-		"left",
-		0.9,
-		0.2,
-		1.2
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"But most perplexing was their leader.{pause:0.8} It seemed they could [speed:1.3]predict my every move[/speed], I found myself second guessing my plays.{pause:1.0} [slow]In the chaos I was defeated.[/slow]",
-		"left",
-		0.8,
-		0.3,
-		1.5
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Predicting your moves you say?{pause:0.5} Could sister [speed:1.2]Phoebe[/speed] be playing a joke on you?{pause:0.8} Who else could out predict the God of Augury himself?",
-		"right",
-		0.9,
-		0.3,
-		1.0
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Did you notice anything else out of the ordinary?",
-		"right",
-		1.0,
-		0.5,
-		0.8
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"Well sometimes I got the feeling I was being watched.{pause:0.8} But I can't know for sure how relevant that is.",
-		"left",
-		0.9,
-		0.3,
-		0.8
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Chiron", 
-		"You should [speed:1.2]trust your instinct[/speed].{pause:0.5} The sense of being watched came to you for a reason.{pause:0.8} Perhaps this foe is no divinator but a [slow]simple spy.[/slow]",
-		"right",
-		1.0,
-		0.2,
-		1.0
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Chiron", 
-		"Hmmmm{pause:1.0} Observing your tactics prior to engaging you.{pause:0.8} They are taking you seriously as an enemy which paints them as [speed:1.3]intelligent[/speed].",
-		"right",
-		0.9,
-		0.3,
-		1.2
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Chiron", 
-		"I will need to meditate on what this portends,{pause:0.8} in the meantime, [urgent]try again, you must![/urgent]",
-		"right",
-		1.0,
-		0.3,
-		0.8
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Mnemosyne", 
-		"I can feel the pull of [speed:1.2]Ananke[/speed] and with your gift of inspiration{pause:0.5} I'm ready to try again.",
-		"left",
-		1.0,
-		0.3,
-		0.8
-	))
-
-	first_apollo_boss_loss_lines.append(DialogueLine.new(
-		"Chiron", 
-		"[slow]I'll be here when you need me.[/slow]",
-		"right",
-		0.7,
-		0.5,
-		1.0
-	))
-	
-	#7
+	# -------------------------------------------------------------------------
+	# CUTSCENE 8 - Second Apollo boss loss (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var second_apollo_boss_loss_lines: Array[DialogueLine] = []
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Right! Chiron, I'm back."))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "New, why hello. How are things?"))
-	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "I'm frustrated, I encountered that mysterious foe again."))
+	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "I encountered that mysterious foe again."))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "And based on your frustration, you did not fare well?"))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "I fell prey to their machinations once again."))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "I have been thinking on what you told me last time, but what new information were you able to glean from this encounter?"))
-	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "This enemy seems to be able to predict my moves, when they do so my forces are ambushed upon arrival and are rendered practically useless."))
+	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "This enemy seems to be able to predict my moves, when they do so my forces are ambushed upon arrival and are rendered practically useless. I can then hear him laughing."))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "You still have the sense of being watched in the lead up to the battle?"))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "I do, strongly."))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "Could it be possible they watch you to learn your preferred battle tactics? The order in which you deploy your troops and where you station them?"))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Then….. Using that information, know where to lay in wait?"))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "Based on what you say it sounds likely."))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "How do we turn this suspicion to practical account?"))
-	second_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "We could poison the information. Trick them into thinking our dominant strategy is one way then switching it up during the final showdown."))
+	second_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "We could poison the information. Trick them into thinking our dominant strategy is one way then switching it up during the final encounter."))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "That may mean battling suboptimally on purpose. Which runs the risk of defeat to a lesser foe."))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "Indeed it would be a fine line to walk"))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Impressive Chiron."))
@@ -668,8 +262,11 @@ func create_sample_cutscenes():
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "With this information you will find your mettle more than enough."))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of stratagem I'm ready to try again."))
 	second_apollo_boss_loss_lines.append(DialogueLine.new("Chiron", "I'll be here when you need me."))
-	
-	#8
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 9 - First Hermes boss loss (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var first_hermes_boss_loss_lines: Array[DialogueLine] = []
 	first_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Chiron my friend, I come seeking advice"))
 	first_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "New! Come on in, I just sent Jason home for the day. What should we think about?"))
@@ -683,7 +280,7 @@ func create_sample_cutscenes():
 	first_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "Quite rude I must say."))
 	first_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "But I too have bad news."))
 	first_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "You do?"))
-	first_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "I think I also know what's happening. And…."))
+	first_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "I think I know what's happening too. And…."))
 	first_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "and…?"))
 	first_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "I'm also not going to tell you."))
 	first_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "!?!?!?"))
@@ -691,8 +288,11 @@ func create_sample_cutscenes():
 	first_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "You're lucky I like you so much Chiron"))
 	first_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of independence I'm ready to try again"))
 	first_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "I will be here when you need me."))
-	
-	#9
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 10 - Second Hermes boss loss (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var second_hermes_boss_loss_lines: Array[DialogueLine] = []
 	second_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "New! What a pleasure come on in"))
 	second_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "But oh - the look on your face! Wait, wait, wait, Let me guess."))
@@ -705,15 +305,18 @@ func create_sample_cutscenes():
 	second_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Yes, I do"))
 	second_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "What is your interpretation?"))
 	second_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "This enemy employs deception with respect to their relative strengths"))
-	second_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Weaker units whilst still functionally behaving weakly have the outward appearance of strength."))
+	second_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "What is weak appears strong, what is strong appears weak"))
 	second_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "The facade is further deepened with abilities that reinforce this perception."))
 	second_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "Our faith in your ability to solve the conundrum has been duly rewarded."))
 	second_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "Odysseus may have been laughing before. But I bet he is already quietly invoking your guidance when he forms a plan."))
 	second_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "Armed with this information, go forth and crush them."))
 	second_hermes_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of faith I'm ready to try again"))
 	second_hermes_boss_loss_lines.append(DialogueLine.new("Chiron", "I will be here when you need me."))
-	
-	#10
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 11 - First Artemis boss loss (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var first_artemis_boss_loss_lines: Array[DialogueLine] = []
 	first_artemis_boss_loss_lines.append(DialogueLine.new("Chiron", "Hello New! Is that you out there? Come on in"))
 	first_artemis_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Chiron, I come in need of your strategic wisdom once more."))
@@ -734,8 +337,11 @@ func create_sample_cutscenes():
 	first_artemis_boss_loss_lines.append(DialogueLine.new("Chiron", "Try fighting again and if you run into trouble we could discuss the battle and its outcome in a purely hypothetical fashion of course."))
 	first_artemis_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of temperance I'm ready to try again"))
 	first_artemis_boss_loss_lines.append(DialogueLine.new("Chiron", "I will be here when you need me."))
-	
-	#11
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 12 - Second Artemis boss loss (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var second_artemis_boss_loss_lines: Array[DialogueLine] = []
 	second_artemis_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Chiron I once again return with the need for advice"))
 	second_artemis_boss_loss_lines.append(DialogueLine.new("Chiron", "Very nice to see you New! What should we discuss?"))
@@ -747,7 +353,7 @@ func create_sample_cutscenes():
 	second_artemis_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "My opponent seems to turn my strengths against me."))
 	second_artemis_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Even if I coordinate an attack and capture the enemy forces, they perform a retreat that is so smooth it could only be planned. Then they retaliate with great ferocity."))
 	second_artemis_boss_loss_lines.append(DialogueLine.new("Chiron", "I can think of a few ways of dealing with what you are describing, if I can think of them I bet you can too."))
-	second_artemis_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Well I had thought of using the coordinated attack early when there are less foes present, but even if they don't get the advantage of the planned retreat, I have used my trump care to no avail."))
+	second_artemis_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "Well I had thought of using the coordinated attack early when there are less foes present, but even if they don't get the advantage of the planned retreat, I have used my trump card to no avail."))
 	second_artemis_boss_loss_lines.append(DialogueLine.new("Chiron", "What else had you considered?"))
 	second_artemis_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "If I use the coordinated attack as the last movement of the battle, the opponent wouldn't get a chance to counter."))
 	second_artemis_boss_loss_lines.append(DialogueLine.new("Chiron", "Hmmm, indeed that sounds correct. The wise masters of old first put themselves beyond the possibility of defeat before acting, your description would be in accordance with this."))
@@ -759,13 +365,16 @@ func create_sample_cutscenes():
 	second_artemis_boss_loss_lines.append(DialogueLine.new("Chiron", "Indeed, with this in mind, return to lay in wait once more."))
 	second_artemis_boss_loss_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of patience I'm ready to try again"))
 	second_artemis_boss_loss_lines.append(DialogueLine.new("Chiron", "I will be here when you need me."))
-	
-	#12
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 13 - First Demeter defeat (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
 	var first_demeter_defeat_lines: Array[DialogueLine] = []
 	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "New!? Is that you? I missed you! Come on in, come on in. Where have you been?"))
 	first_demeter_defeat_lines.append(DialogueLine.new("Mnemosyne", "I have been blessed to be training under the guidance of Demeter"))
 	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "How fares the protectorate of fertile fecundity?"))
-	first_demeter_defeat_lines.append(DialogueLine.new("Mnemosyne", "She has quite an extreme attachment to Persephone. Her grief at her absence is quite chilling."))
+	first_demeter_defeat_lines.append(DialogueLine.new("Mnemosyne", "She has quite an extreme attachment to Persephone."))
 	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "It is known that during winter we are subject to Demeter's mourning for the loss of Persephone."))
 	first_demeter_defeat_lines.append(DialogueLine.new("Mnemosyne", "I expected the goddess to be well….. stronger."))
 	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "What a curious thing to say."))
@@ -773,7 +382,7 @@ func create_sample_cutscenes():
 	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "Fascinating. Do you not think Hyperion could say the same thing about you?"))
 	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "\"New is great and all but after witnessing the power of the other Titans I was a little underwhelmed\""))
 	first_demeter_defeat_lines.append(DialogueLine.new("Mnemosyne", "…… I didn't mean it that way."))
-	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "Seed turns to shoot before solid timber."))
+	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "Seed turns to shoot before timber most solid."))
 	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "It is in both yours and Demeter's potential for growth in which your strength lies."))
 	first_demeter_defeat_lines.append(DialogueLine.new("Mnemosyne", "How Epimethean of me."))
 	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "But how Promethean of you to recognise the error in your thinking when it is revealed."))
@@ -783,60 +392,269 @@ func create_sample_cutscenes():
 	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "You will see you and your niece have more in common than you realise."))
 	first_demeter_defeat_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of patience I'm ready to try again"))
 	first_demeter_defeat_lines.append(DialogueLine.new("Chiron", "I will be here when you need me."))
-	
-	
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 14 - Post Chronos victory (Mnemosyne and Odin)
+	# -------------------------------------------------------------------------
+	# Odin has no portrait asset yet - using null like Chronos
+	var odin = Character.new("Odin", Color("#1F4A3D"), null, "right")
+
+	var post_chronos_victory_lines: Array[DialogueLine] = []
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "Chiron my friend you won't believe what just happened! I finally did it!"))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "….."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "Chiron?"))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "….."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "….."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "….."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "You know I had to sacrifice one of my eyes to get Muninn to sit on my shoulder?"))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "Who goes there!?"))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "Peace friend. They call me Wanderer, Warrior was my father"))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "Where is Chiron?"))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "If you are asking about this cave's owner. He had already joined Thiazi's eyes by the time we arrived"))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "You are standing in a site of great import, a place of power, its rightful owner absent. Riddles will not be abided Stranger. Explain yourself"))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "Forgive me it is another land from which I hail. I appreciate my words and their weaving are thus unfamiliar."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "I did not know Chiron. But I can see from your face that the distance and depth of your relationship was close and cavernous. Out of this respect I will tread carefully."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "It seems he has passed from this world."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "Chiron…… Dead?"))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "You must be mistaken for he is immortal."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "He was gone when you arrived. He will just be out, his return imminent."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "I'm sorry. Huginn here has since been and returned to me with confirmation. A venom to rival Jormungandr drove him to request death. It was granted."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "Fear not he is honoured in death and remains immortal. He has joined the stars."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "I…I… I can't believe it."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "*points* You can see him there, the horse man. He's easy to spot for he is next to the moon. It seems she is visiting him this eve."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "……."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "You finally did it my friend."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "I would not normally intrude on those in the throws of grief. I hope it demonstrates the urgency of my cause that I still do so."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "It is your guidance of which I seek."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "Me? We do not know each other, in what manner could I be helpful?"))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "Ragnarok comes, the end times."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "Having searched the worlds beholden to Igdrasil I have not found a way to prevent it. In my desperation I cast the net wider and Muninn led me here."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "I arrived to discover the Master of Memory, Mnemosyne, had not only contended with our greatest enemy, but defeat him in what is now routine."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "So here I stand as Odin. The All-Father. The One-Eyed. Beseeching you to take up our cause. Come with me to Vigrid and together let us destroy Loki."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "……."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "Stirring words Odin"))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "Those victories you hold in such high regard. They are a product of the tutelage gifted to me by Chiron."))
+	post_chronos_victory_lines.append(DialogueLine.new("Mnemosyne", "To respect and honor that gift. I will come."))
+	post_chronos_victory_lines.append(DialogueLine.new("Odin", "Blessed be. To Vigrid! To Destiny! To Ragnarok!"))
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 15 - First Hermes boss win (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
+	var first_hermes_boss_win_lines: Array[DialogueLine] = []
+	first_hermes_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Chiron!?"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "Did you see him?"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Mnemosyne", "What do you mean? Who?"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "Autolycus!"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "I watched him the whole time. But he still managed to steal my Hens Teeth!"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Hens Teeth? Autolycus doesn't strike me as the potion brewing type"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "He's not! He just steals it for fun! It's tradition at this point. I turned when I heard you arrive and that was all the distraction he needed."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "He puts it back a few days later just to mess with me."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "Bah! He is a son of Hermes after all, what can you do?"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "Plus it's hard to stay too mad. He came to me to tend his wounds but also to gloat."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Mnemosyne", "What about?"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "His recent expeditionary success. Under your guidance."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Why yes we defeated the mysterious foe, it's hardly defeating Chronos mind you."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "People are starting to whisper New."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Mnemosyne", "What do you mean?"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "Your father Ouranus, when he was lord of us all, spoke of your power."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "If he is to be believed you are the most powerful among us."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Mnemosyne", "I too, find that hard to believe, I mean, look at me."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "You had spent so long in a near dormant state that eventually the claims to your power were forgotten."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "Chronos, fearful of this prophecy, quietly visited you, but seeing your apparent weakness, laughed off his fathers words."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "Zeus, the same paranoia upon him, also visited you. He uhhhh…. quite liked what he saw and the world was blessed with the 9 muses."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "With your recent victories, the whispers are wondering if maybe old Uranus was right all along."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Whispers or not. My goal remains the same, besting Chronos."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "I never doubted your conviction. Plus our arrangement is working out very well for me in kind."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Mnemosyne", "How so?"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "Selene"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "She responded to my last message"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "She is interested to know what it's like to tutor the titan of memory."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Do I sense a date on the horizon?"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "She hasn't yet agreed to meet, but she is interested in me, which is more than I could say before."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "Now kindly get back out there and amaze a few more people would you? Especially if the moon is watching."))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of determination I'm ready to try again"))
+	first_hermes_boss_win_lines.append(DialogueLine.new("Chiron", "I will be here when you need me."))
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 16 - First Artemis boss win (Mnemosyne and Chiron)
+	# -------------------------------------------------------------------------
+	var first_artemis_boss_win_lines: Array[DialogueLine] = []
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "New! Won't you come on in, how nice to have you visit"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "You're in a good mood Chiron"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "Am I? Why shouldn't I be? I certainly won't apologise for being so"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "It's not a problem, quite the opposite. It's nice to see you so excited."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "Enough about me. I want to hear about your latest victory!"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "I prevailed in my latest encounter with the mysterious foe."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "More evidence emerges attesting to your growing mastery."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "It's nice, but I still don't really get it Chiron"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "What do you mean?"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "I spent eons an afterthought of the cosmos"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "You are wondering what the source of your sudden power is?"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Well… yes"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "Over what realm do you have dominion?"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Memory, as you well know"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "At the beginning of all things, there was, how do I put this? Very little to remember. Barely anything had happened after all."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "Is it then not surprising that the steward of memory was, at that time, of little consequence?"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "….."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "Since Prometheus gifted divine fire to humans there has been more to know, more desire for memory."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "The ability to Randomly Access Memory has thus become more important than ever before"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "It's only natural it's presiding deity should rise in turn."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "My power derives from my usefulness? Relevance?"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "There are many paths to power New, usefulness is but one of them."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "There's still something I don't understand"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "Yes?"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "I came straight here to tell you about my latest victory, but somehow you already knew."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "You got me New. I had indeed been informed."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "Care to explain?"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "As your last expedition was with Artemis, naturally her silver sister Selene was watching. It is from her the news of your victory came."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "The good mood is suddenly starting to make more sense now"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "Aphrodite be blessed! She not only messaged me, but did so first, unprompted."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "Unprompted, New."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "That's wonderful friend, surely a meeting is in your future"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "One can dare to dream. I better send you one your way New, else you will be stuck here watching me smile until the end of time."))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Mnemosyne", "I can feel the pull of Ananke and with your gift of mirth I'm ready to try again"))
+	first_artemis_boss_win_lines.append(DialogueLine.new("Chiron", "I will be here when you need me."))
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 17 - First Demeter boss win (Mnemosyne and Chiron)
+	# No dialogue written in script yet - placeholder
+	# -------------------------------------------------------------------------
+	var first_demeter_boss_win_lines: Array[DialogueLine] = []
+	first_demeter_boss_win_lines.append(DialogueLine.new("Chiron", "..."))
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 18 - First Muninn vision (Mnemosyne and Odin)
+	# -------------------------------------------------------------------------
+	var first_muninn_vision_lines: Array[DialogueLine] = []
+	first_muninn_vision_lines.append(DialogueLine.new("Odin", "O'er Mithgarth Hugin and Munin both each day set forth to fly; For Hugin I fear lest he come not home, but for Munin my care is more"))
+	first_muninn_vision_lines.append(DialogueLine.new("Odin", "Grímnismál, stanza 20"))
+
+
+	# -------------------------------------------------------------------------
+	# CUTSCENE 19 - Second Muninn vision (Mnemosyne and Odin)
+	# -------------------------------------------------------------------------
+	var second_muninn_vision_lines: Array[DialogueLine] = []
+	second_muninn_vision_lines.append(DialogueLine.new("Odin", "No greater lord of deception exists beyond Loki, lie smith."))
+	second_muninn_vision_lines.append(DialogueLine.new("Odin", "He tests his plans with counter plans as naturally as you or I would breathe."))
+	second_muninn_vision_lines.append(DialogueLine.new("Odin", "For even as he plotted his escape in salmon form he was also creating the first net. Scheming, imagining, how a salmon could possibly be caught."))
+	second_muninn_vision_lines.append(DialogueLine.new("Odin", "Not one second later his thoughts had turned to how to avoid a net as a salmon, such is the depth of trickery at his disposal."))
+	second_muninn_vision_lines.append(DialogueLine.new("Odin", "Lost in machination he did not hear us approach till it was nearly too late."))
+	second_muninn_vision_lines.append(DialogueLine.new("Odin", "We arrived to see the hastily burnt invention in the hearth. Kvasir, the wise, was able to divine its meaning and the wolf's father was imprisoned."))
+	second_muninn_vision_lines.append(DialogueLine.new("Odin", "Loki's irresistible genius was the seat of his downfall."))
+	second_muninn_vision_lines.append(DialogueLine.new("Odin", "Now as he plans for Ragnarok. He is making the same mistake."))
+	second_muninn_vision_lines.append(DialogueLine.new("Odin", "He is forming plans within plans within counterplans."))
+	second_muninn_vision_lines.append(DialogueLine.new("Odin", "But much like a net, oh blood brother, you are showing us the source of our salvation."))
+	# -------------------------------------------------------------------------
+	# CUTSCENE 20 - Third Muninn vision (Mnemosyne and Odin)
+	# -------------------------------------------------------------------------
+	var third_muninn_vision_lines: Array[DialogueLine] = []
+	third_muninn_vision_lines.append(DialogueLine.new("Odin", "But straight thereafter shall Vidar stride forth and set one foot upon the lower jaw of the Wolf"))
+	third_muninn_vision_lines.append(DialogueLine.new("Odin", "On that foot he has the shoe, materials for which have been gathering throughout all time. It is the waste pieces that people cut from their shoes at the toe and heel."))
+	third_muninn_vision_lines.append(DialogueLine.new("Odin", "Therefore anyone that is concerned to give assistance to the Aesir must throw these pieces away."))
+	third_muninn_vision_lines.append(DialogueLine.new("Odin", "With one hand he will grasp the Wolf's upper jaw and tear apart its mouth, and this will cause the Wolf's death"))
+	third_muninn_vision_lines.append(DialogueLine.new("Odin", "Gylfaginning, Stanza 51, Of Ragnarokr"))
+	# -------------------------------------------------------------------------
+	# CUTSCENE 21 - Fourth Muninn vision (Mnemosyne and Odin)
+	# -------------------------------------------------------------------------
+	var fourth_muninn_vision_lines: Array[DialogueLine] = []
+	fourth_muninn_vision_lines.append(DialogueLine.new("Odin", "Then shall come to pass these tidings also: all the earth shall tremble so, that trees shall be torn up from the earth, and the crags fall to ruin; and all fetters and bonds shall be broken and rent."))
+	fourth_muninn_vision_lines.append(DialogueLine.new("Odin", "Gylfaginning, Stanza 51, Of Ragnarokr"))
+
+	# =========================================================================
+	# Register all cutscenes
+	# =========================================================================
+
 	# dialogue index 0
 	var tutorial_cutscene = CutsceneData.new("tutorial_intro", [mnemosyne, chronos], tutorial_lines)
 	cutscenes["tutorial_intro"] = tutorial_cutscene
-	
-	#dialogue index 1
+
+	# dialogue index 1
 	var opening_awakening_cutscene = CutsceneData.new("opening_awakening", [mnemosyne, chiron], opening_lines)
 	cutscenes["opening_awakening"] = opening_awakening_cutscene
-	
+
 	# dialogue index 2
 	var first_defeat_cutscene = CutsceneData.new("first_defeat_conversation", [mnemosyne, chiron], first_defeat_lines)
 	cutscenes["first_defeat_conversation"] = first_defeat_cutscene
-	
+
 	# dialogue index 3
 	var second_defeat_cutscene = CutsceneData.new("second_defeat_conversation", [mnemosyne, chiron], second_defeat_lines)
 	cutscenes["second_defeat_conversation"] = second_defeat_cutscene
-	
-	#dialogue index 4
+
+	# dialogue index 4
+	var third_defeat_cutscene = CutsceneData.new("third_defeat_conversation", [mnemosyne, chiron], third_defeat_lines)
+	cutscenes["third_defeat_conversation"] = third_defeat_cutscene
+
+	# dialogue index 5
 	var first_apollo_boss_win_cutscene = CutsceneData.new("first_apollo_boss_win_conversation", [mnemosyne, chiron], first_apollo_boss_win_lines)
 	cutscenes["first_apollo_boss_win_conversation"] = first_apollo_boss_win_cutscene
-	
-	#dialogue index 5
+
+	# dialogue index 6
 	var second_apollo_boss_win_cutscene = CutsceneData.new("second_apollo_boss_win_conversation", [mnemosyne, chiron], second_apollo_boss_win_lines)
 	cutscenes["second_apollo_boss_win_conversation"] = second_apollo_boss_win_cutscene
-	
-	# dialogue index 6 
+
+	# dialogue index 7
 	var first_apollo_boss_loss_cutscene = CutsceneData.new("first_apollo_boss_loss_conversation", [mnemosyne, chiron], first_apollo_boss_loss_lines)
 	cutscenes["first_apollo_boss_loss_conversation"] = first_apollo_boss_loss_cutscene
-	
-	# dialogue index 7 
+
+	# dialogue index 8
 	var second_apollo_boss_loss_cutscene = CutsceneData.new("second_apollo_boss_loss_conversation", [mnemosyne, chiron], second_apollo_boss_loss_lines)
 	cutscenes["second_apollo_boss_loss_conversation"] = second_apollo_boss_loss_cutscene
-	
-	# dialogue index 8 
+
+	# dialogue index 9
 	var first_hermes_boss_loss_cutscene = CutsceneData.new("first_hermes_boss_loss_conversation", [mnemosyne, chiron], first_hermes_boss_loss_lines)
 	cutscenes["first_hermes_boss_loss_conversation"] = first_hermes_boss_loss_cutscene
-	
-	# dialogue index 9 
+
+	# dialogue index 10
 	var second_hermes_boss_loss_cutscene = CutsceneData.new("second_hermes_boss_loss_conversation", [mnemosyne, chiron], second_hermes_boss_loss_lines)
 	cutscenes["second_hermes_boss_loss_conversation"] = second_hermes_boss_loss_cutscene
-	
-	# dialogue index 10 
+
+	# dialogue index 11
 	var first_artemis_boss_loss_cutscene = CutsceneData.new("first_artemis_boss_loss_conversation", [mnemosyne, chiron], first_artemis_boss_loss_lines)
 	cutscenes["first_artemis_boss_loss_conversation"] = first_artemis_boss_loss_cutscene
-	
-	# dialogue index 11 
+
+	# dialogue index 12
 	var second_artemis_boss_loss_cutscene = CutsceneData.new("second_artemis_boss_loss_conversation", [mnemosyne, chiron], second_artemis_boss_loss_lines)
 	cutscenes["second_artemis_boss_loss_conversation"] = second_artemis_boss_loss_cutscene
-	
-	# dialogue index 12 
+
+	# dialogue index 13
 	var first_demeter_defeat = CutsceneData.new("first_demeter_defeat_conversation", [mnemosyne, chiron], first_demeter_defeat_lines)
 	cutscenes["first_demeter_defeat_conversation"] = first_demeter_defeat
 	
+	# dialogue index 14
+	var post_chronos_victory_cutscene = CutsceneData.new("post_chronos_victory", [mnemosyne, odin], post_chronos_victory_lines)
+	cutscenes["post_chronos_victory"] = post_chronos_victory_cutscene
+
+	# dialogue index 15
+	var first_hermes_boss_win_cutscene = CutsceneData.new("first_hermes_boss_win_conversation", [mnemosyne, chiron], first_hermes_boss_win_lines)
+	cutscenes["first_hermes_boss_win_conversation"] = first_hermes_boss_win_cutscene
+
+	# dialogue index 16
+	var first_artemis_boss_win_cutscene = CutsceneData.new("first_artemis_boss_win_conversation", [mnemosyne, chiron], first_artemis_boss_win_lines)
+	cutscenes["first_artemis_boss_win_conversation"] = first_artemis_boss_win_cutscene
+
+	# dialogue index 17
+	var first_demeter_boss_win_cutscene = CutsceneData.new("first_demeter_boss_win_conversation", [mnemosyne, chiron], first_demeter_boss_win_lines)
+	cutscenes["first_demeter_boss_win_conversation"] = first_demeter_boss_win_cutscene
+
+	# dialogue index 18
+	var first_muninn_vision_cutscene = CutsceneData.new("first_muninn_vision", [mnemosyne, odin], first_muninn_vision_lines)
+	cutscenes["first_muninn_vision"] = first_muninn_vision_cutscene
+
+	# dialogue index 19
+	var second_muninn_vision_cutscene = CutsceneData.new("second_muninn_vision", [mnemosyne, odin], second_muninn_vision_lines)
+	cutscenes["second_muninn_vision"] = second_muninn_vision_cutscene
+
+	# dialogue index 20
+	var third_muninn_vision_cutscene = CutsceneData.new("third_muninn_vision", [mnemosyne, odin], third_muninn_vision_lines)
+	cutscenes["third_muninn_vision"] = third_muninn_vision_cutscene
+
+	# dialogue index 21
+	var fourth_muninn_vision_cutscene = CutsceneData.new("fourth_muninn_vision", [mnemosyne, odin], fourth_muninn_vision_lines)
+	cutscenes["fourth_muninn_vision"] = fourth_muninn_vision_cutscene
 
 
 # Main function to trigger a cutscene

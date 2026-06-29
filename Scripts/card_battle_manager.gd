@@ -2202,6 +2202,12 @@ func end_game():
 		turn_manager.end_game()
 		
 		await get_tree().create_timer(3.0).timeout
+		
+		if scores.player > scores.opponent:
+			if has_node("/root/CutsceneManagerAutoload"):
+				get_node("/root/CutsceneManagerAutoload").play_cutscene("post_chronos_victory")
+				return
+		
 		TransitionManagerAutoload.change_scene_to("res://Scenes/GameModeSelect.tscn")
 		return
 	
@@ -4627,9 +4633,46 @@ func record_enemy_encounter(victory: bool):
 								# Second Apollo boss victory with different deck
 								print("Triggering second_apollo_boss_win conversation")
 								conv_manager.trigger_conversation("second_apollo_boss_win")
-			else:
-				# Boss loss - check for conversation triggers
-				print("Checking boss loss conversation triggers for: ", boss_name)
+							else:
+								# Third Apollo deck victory - unlock first Muninn vision
+								if has_node("/root/CutsceneManagerAutoload"):
+									var cs_manager = get_node("/root/CutsceneManagerAutoload")
+									if not cs_manager.has_viewed_cutscene("first_muninn_vision"):
+										cs_manager.viewed_cutscenes.append("first_muninn_vision")
+										cs_manager.save_viewed_cutscenes()
+										print("First Muninn vision unlocked")
+				elif boss_name == "Hermes":
+					print("Triggering first_hermes_boss_win conversation")
+					conv_manager.trigger_conversation("first_hermes_boss_win")
+					# Unlock second Muninn vision
+					if has_node("/root/CutsceneManagerAutoload"):
+						var cs_manager = get_node("/root/CutsceneManagerAutoload")
+						if not cs_manager.has_viewed_cutscene("second_muninn_vision"):
+							cs_manager.viewed_cutscenes.append("second_muninn_vision")
+							cs_manager.save_viewed_cutscenes()
+							print("Second Muninn vision unlocked")
+				
+				elif boss_name == "Artemis":
+					print("Triggering first_artemis_boss_win conversation")
+					conv_manager.trigger_conversation("first_artemis_boss_win")
+					# Unlock third Muninn vision
+					if has_node("/root/CutsceneManagerAutoload"):
+						var cs_manager = get_node("/root/CutsceneManagerAutoload")
+						if not cs_manager.has_viewed_cutscene("third_muninn_vision"):
+							cs_manager.viewed_cutscenes.append("third_muninn_vision")
+							cs_manager.save_viewed_cutscenes()
+							print("Third Muninn vision unlocked")
+				
+				elif boss_name == "Demeter":
+					print("Triggering first_demeter_boss_win conversation")
+					conv_manager.trigger_conversation("first_demeter_boss_win")
+					# Unlock fourth Muninn vision
+					if has_node("/root/CutsceneManagerAutoload"):
+						var cs_manager = get_node("/root/CutsceneManagerAutoload")
+						if not cs_manager.has_viewed_cutscene("fourth_muninn_vision"):
+							cs_manager.viewed_cutscenes.append("fourth_muninn_vision")
+							cs_manager.save_viewed_cutscenes()
+							print("Fourth Muninn vision unlocked")
 				
 				if boss_loss_tracker:
 					# Record the loss

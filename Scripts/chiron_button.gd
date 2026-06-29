@@ -186,6 +186,16 @@ func start_chiron_conversation(conv_id: String, conv_data: Dictionary):
 		# Demeter conversations
 		"first_demeter_defeat":
 			cutscene_id = "first_demeter_defeat_conversation"
+		# Third early defeat
+		"third_run_defeat":
+			cutscene_id = "third_defeat_conversation"
+		# Boss win conversations
+		"first_hermes_boss_win":
+			cutscene_id = "first_hermes_boss_win_conversation"
+		"first_artemis_boss_win":
+			cutscene_id = "first_artemis_boss_win_conversation"
+		"first_demeter_boss_win":
+			cutscene_id = "first_demeter_boss_win_conversation"
 		_:
 			print("Unknown conversation ID: ", conv_id)
 			return

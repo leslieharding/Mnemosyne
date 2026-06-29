@@ -1221,11 +1221,23 @@ func refresh_remember_tab():
 			"entries": [
 				["tutorial_intro",         "Tutorial: First Meeting"],
 				["opening_awakening",      "The Awakening"],
-				# Add story cutscenes here in narrative order
+				["first_hermes_boss_win_conversation",   "Hermes Defeated"],
+				["first_artemis_boss_win_conversation",  "Artemis Defeated"],
+				["first_demeter_boss_win_conversation",  "Demeter Defeated"],
+				["post_chronos_victory",                 "The Wanderer Arrives"]
 			]
 		},
 		{
-			"title": "Other",
+			"title": "Visions of Muninn",
+			"entries": [
+				["first_muninn_vision",  "Huginn and Muninn"],
+				["second_muninn_vision", "The Lie Smith"],
+				["third_muninn_vision",  "Vidar's Shoe"],
+				["fourth_muninn_vision", "All Bonds Broken"],
+			]
+		},
+		{
+			"title": "Tutelage",
 			"entries": [
 				["first_defeat_conversation",            "First Defeat"],
 				["second_defeat_conversation",           "Second Defeat"],
@@ -1242,6 +1254,7 @@ func refresh_remember_tab():
 				# Add other cutscenes here
 			]
 		},
+		
 	]
 	# ----------------------------------------------------------------
 
