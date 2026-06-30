@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="GodCardCollection" load_steps=21 format=3 uid="uid://bohl4fgw1kxqu"]
+[gd_resource type="Resource" script_class="GodCardCollection" format=3 uid="uid://bohl4fgw1kxqu"]
 
 [ext_resource type="Script" uid="uid://lhqcxql28o5c" path="res://Resources/card_resource.gd" id="1_36081"]
 [ext_resource type="Script" uid="uid://bx8x0dmil6800" path="res://Resources/card_ability.gd" id="2_kjwo2"]
@@ -8,7 +8,9 @@
 [ext_resource type="Script" uid="uid://bdwr18g3ouvfo" path="res://Resources/god_card_collection.gd" id="3_kjwo2"]
 [ext_resource type="Script" uid="uid://btc6badlhckoc" path="res://Resources/Abilities/trojan_horse_ability.gd" id="5_py8us"]
 [ext_resource type="Script" uid="uid://dkf8lottce2c5" path="res://Resources/Abilities/trojan_horse_reversal_ability.gd" id="6_da35i"]
+[ext_resource type="Script" uid="uid://doof7kcsh7nb" path="res://Resources/Abilities/wrestle_ability.gd" id="6_fmj61"]
 [ext_resource type="Script" uid="uid://8hwwassnaxkb" path="res://Resources/Abilities/pierce_ability.gd" id="7_fmj61"]
+[ext_resource type="Script" uid="uid://d1m8carhhdy0w" path="res://Resources/Abilities/disarray_ability.gd" id="7_xo81a"]
 
 [sub_resource type="Resource" id="Resource_063ny"]
 script = ExtResource("3_cbhf8")
@@ -39,18 +41,32 @@ description = "Duplicitous? Me? The plan came to me through the wisdom of Athena
 abilities = Array[ExtResource("2_kjwo2")]([SubResource("Resource_7lkoc")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
+[sub_resource type="Resource" id="Resource_36g6i"]
+script = ExtResource("6_fmj61")
+ability_name = "Pankration"
+description = "If you cannot win direct combat, compare your other 3 stats, best out of 3 wins. "
+metadata/_custom_type_script = "uid://doof7kcsh7nb"
+
 [sub_resource type="Resource" id="Resource_ayhf2"]
 script = ExtResource("1_36081")
 card_name = "Theseus"
 values = Array[int]([5, 5, 5, 5])
 description = "Ship? By heavens no. I'll be taking the road like a true Athenian. "
+abilities = Array[ExtResource("2_kjwo2")]([SubResource("Resource_36g6i")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
+
+[sub_resource type="Resource" id="Resource_xo81a"]
+script = ExtResource("7_xo81a")
+ability_name = "Panic"
+description = "Your opponents next card also attacks friendly cards as well as enemies"
+metadata/_custom_type_script = "uid://d1m8carhhdy0w"
 
 [sub_resource type="Resource" id="Resource_fmj61"]
 script = ExtResource("1_36081")
 card_name = "Pan"
 values = Array[int]([6, 6, 5, 5])
 description = "Come along its so peaceful in the woods. No need to Panic. "
+abilities = Array[ExtResource("2_kjwo2")]([SubResource("Resource_xo81a")])
 metadata/_custom_type_script = "uid://lhqcxql28o5c"
 
 [sub_resource type="Resource" id="Resource_a1wyq"]
@@ -59,7 +75,7 @@ ability_name = "Pierce"
 description = "This unit's attack range is 2, but can only attack through occupied squares."
 metadata/_custom_type_script = "uid://8hwwassnaxkb"
 
-[sub_resource type="Resource" id="Resource_xo81a"]
+[sub_resource type="Resource" id="Resource_iq3w0"]
 script = ExtResource("1_36081")
 card_name = "Eudorus"
 values = Array[int]([2, 7, 3, 6])
@@ -94,6 +110,6 @@ metadata/_custom_type_script = "uid://c4u8pww3jsm12"
 [resource]
 script = ExtResource("3_kjwo2")
 god_name = "Hermes"
-cards = Array[ExtResource("1_36081")]([SubResource("Resource_py8us"), SubResource("Resource_da35i"), SubResource("Resource_ayhf2"), SubResource("Resource_fmj61"), SubResource("Resource_xo81a"), SubResource("Resource_82qut")])
+cards = Array[ExtResource("1_36081")]([SubResource("Resource_py8us"), SubResource("Resource_da35i"), SubResource("Resource_ayhf2"), SubResource("Resource_fmj61"), SubResource("Resource_iq3w0"), SubResource("Resource_82qut")])
 decks = Array[ExtResource("2_yru28")]([SubResource("Resource_cbhf8")])
 metadata/_custom_type_script = "uid://bdwr18g3ouvfo"
