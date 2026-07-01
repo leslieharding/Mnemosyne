@@ -630,54 +630,19 @@ func show_capture_highlight(
 	old_owner_is_player: bool,
 	new_owner_is_player: bool
 ):
-	if not card_display or not card_display.panel:
-		print("VisualEffectsManager: No valid card display for capture wipe")
+	if not card_display:
+		print("VisualEffectsManager: No valid card display for capture flip")
 		return
 	
-	print("VisualEffectsManager: Starting capture wipe - direction: ", get_direction_name(capture_direction))
-	
-	# Load the wipe material
-	var wipe_material_template = load("res://Materials/capture_wipe_material.tres")
-	if not wipe_material_template:
-		print("VisualEffectsManager: Could not load capture wipe material")
-		return
-	
-	# Create independent copy
-	var wipe_material = wipe_material_template.duplicate()
-	
-	# Set wipe direction
-	wipe_material.set_shader_parameter("wipe_direction", capture_direction)
-	
-	# Set colors - bright and saturated
+	# Set colors - bright and saturated (same palette as before)
 	var old_color = Color(0.2, 0.5, 1.0, 1) if old_owner_is_player else Color(1.0, 0.3, 0.3, 1)
 	var new_color = Color(0.2, 0.5, 1.0, 1) if new_owner_is_player else Color(1.0, 0.3, 0.3, 1)
 	
-	wipe_material.set_shader_parameter("old_color", old_color)
-	wipe_material.set_shader_parameter("new_color", new_color)
-	wipe_material.set_shader_parameter("progress", 0.0)
+	print("VisualEffectsManager: Flip from ", old_color, " to ", new_color)
 	
-	print("VisualEffectsManager: Wipe from ", old_color, " to ", new_color)
+	await card_display.play_flip_animation(old_color, new_color)
 	
-	# Apply shader
-	card_display.panel.material = wipe_material
-	
-	# Animate wipe from 0 to 1 with strong ease-in (starts VERY slow, then accelerates)
-	var tween = create_tween()
-	tween.tween_method(
-		func(value: float):
-			if is_instance_valid(card_display) and is_instance_valid(card_display.panel) and card_display.panel.material:
-				card_display.panel.material.set_shader_parameter("progress", value),
-		0.0,
-		1.0,
-		CAPTURE_HIGHLIGHT_DURATION
-	).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_EXPO)
-	
-	# Clean up
-	tween.tween_callback(func():
-		if is_instance_valid(card_display) and is_instance_valid(card_display.panel):
-			card_display.panel.material = null
-			print("VisualEffectsManager: Capture wipe complete")
-	)
+	print("VisualEffectsManager: Capture flip complete")
 
 # Initialize screen shake with the target node to shake
 func setup_screen_shake(target_node: Node):

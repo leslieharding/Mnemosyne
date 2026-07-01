@@ -2,10 +2,13 @@
 
 [ext_resource type="Script" uid="uid://bhy4ca4xh6wgg" path="res://Scripts/game_mode_select.gd" id="1_3aue6"]
 [ext_resource type="Script" uid="uid://cww2cxqfgy5s5" path="res://Scripts/chiron_button.gd" id="2_1fq1s"]
-[ext_resource type="Texture2D" uid="uid://0pb0be2ju7ye" path="res://Assets/Images/Hero_Selection-export.png" id="2_x5d8l"]
+[ext_resource type="Texture2D" uid="uid://bcjnejccvyrbv" path="res://Assets/Images/god_select_background.png" id="2_pygnc"]
 [ext_resource type="Script" uid="uid://uriqrs6jmhvb" path="res://Scripts/chronos_button.gd" id="3_cn38a"]
 [ext_resource type="Shader" uid="uid://cj06coiouh3vc" path="res://Shaders/hover_highlight.gdshader" id="5_u4vls"]
 [ext_resource type="PackedScene" uid="uid://5tws4ffpt061" path="res://Scenes/JournalButton.tscn" id="6_pygnc"]
+[ext_resource type="Texture2D" uid="uid://dvcigx2rvnmn6" path="res://Assets/Images/Aphrodite.png" id="6_u4vls"]
+[ext_resource type="Texture2D" uid="uid://bxo3is7g6uvl8" path="res://Assets/Images/Dionysus.png" id="7_qbekx"]
+[ext_resource type="Texture2D" uid="uid://d2q5m6csh7qpb" path="res://Assets/Images/Athena.png" id="8_ok7rk"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qbekx"]
 shader = ExtResource("5_u4vls")
@@ -112,7 +115,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_x5d8l")
+texture = ExtResource("2_pygnc")
 expand_mode = 3
 stretch_mode = 4
 
@@ -202,20 +205,32 @@ texture = SubResource("CompressedTexture2D_7djtl")
 [node name="Aphrodite" type="TextureRect" parent="." unique_id=406263017]
 material = SubResource("ShaderMaterial_jvq57")
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 650.0
+offset_top = 240.0
+offset_right = 774.0
+offset_bottom = 463.0
+texture = ExtResource("6_u4vls")
+stretch_mode = 5
 
 [node name="Dionysus" type="TextureRect" parent="." unique_id=1157268764]
 material = SubResource("ShaderMaterial_64ylo")
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 802.0
+offset_top = 249.0
+offset_right = 916.0
+offset_bottom = 458.0
+texture = ExtResource("7_qbekx")
+stretch_mode = 5
 
 [node name="Athena" type="TextureRect" parent="." unique_id=876686929]
 material = SubResource("ShaderMaterial_ec8fm")
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 917.0
+offset_top = 233.0
+offset_right = 1077.0
+offset_bottom = 480.0
+texture = ExtResource("8_ok7rk")
+stretch_mode = 5
 
 [node name="ApolloButton" type="Button" parent="." unique_id=1630226650]
 modulate = Color(1, 1, 1, 0)

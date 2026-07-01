@@ -2,10 +2,10 @@ extends Control
 
 # UI References
 @onready var menu_container = $MenuContainer
-@onready var new_game_button = $MenuContainer/NewGameButton
-@onready var continue_button = $MenuContainer/ContinueButton
-@onready var settings_button = $MenuContainer/SettingsButton
-@onready var quit_button = $MenuContainer/QuitButton
+@onready var new_game_button = $MenuContainer/ButtonsContainer/NewGameButton
+@onready var continue_button = $MenuContainer/ButtonsContainer/ContinueButton
+@onready var settings_button = $MenuContainer/ButtonsContainer/SettingsButton
+@onready var quit_button = $MenuContainer/ButtonsContainer/QuitButton
 
 # Confirmation dialog for new game
 var confirmation_dialog: ConfirmationDialog
@@ -129,11 +129,11 @@ func setup_menu_based_on_save_data():
 func setup_first_time_player_menu():
 	print("Setting up menu for first-time player")
 	
-	# Move New Game button to top position (index 1, after the title)
-	menu_container.move_child(new_game_button, 1)
+	# Move Continue button to top position (after the title and spacer)
+	menu_container.move_child(continue_button, 3)
 	
-	# Move Continue button to second position
-	menu_container.move_child(continue_button, 2)
+	# Move New Game button to second position
+	menu_container.move_child(new_game_button, 1)
 	
 	# Disable continue button and make it gray
 	continue_button.disabled = true
@@ -146,11 +146,11 @@ func setup_first_time_player_menu():
 func setup_returning_player_menu():
 	print("Setting up menu for returning player")
 	
-	# Move Continue button to top position (index 1, after the title)
-	menu_container.move_child(continue_button, 1)
+	# Move New Game button to top position (after the title and spacer)
+	menu_container.move_child(new_game_button, 3)
 	
-	# Move New Game button to second position
-	menu_container.move_child(new_game_button, 2)
+	# Move Continue button to second position
+	menu_container.move_child(continue_button, 1)
 	
 	# Enable continue button and restore normal appearance
 	continue_button.disabled = false

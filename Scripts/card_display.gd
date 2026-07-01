@@ -12,12 +12,20 @@ signal card_unhovered()
 @onready var south_power = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/SouthPower
 @onready var west_power = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/WestPower
 @onready var card_name_label = $Panel/MarginContainer/CardNameLabel
+@onready var flip_sprite = $FlipSprite
+@onready var flip_anim_player = $AnimationPlayer
 
 var original_rotation: float = 0.0  # Store the card's fan rotation when in hand
 
 # Animation
 var hover_tween: Tween
 var selection_tween: Tween
+
+# Capture flip animation
+var flip_new_color: Color = Color.WHITE
+var panel_original_position: Vector2
+var panel_original_scale: Vector2
+var panel_original_rotation: float
 
 # Card data and state
 var card_data: CardResource
@@ -34,7 +42,7 @@ var hover_delay: float = 0.15  # 150ms delay before playing sound
 #card hover variables
 var is_hovering: bool = false
 var idle_time: float = 0.0
-var idle_enabled: bool = true  # Can be toggled if needed
+var idle_enabled: bool = false  # Can be toggled if needed
 
 # Selection styles
 var selected_style: StyleBoxFlat
@@ -54,6 +62,11 @@ func _ready():
 	if panel:
 		panel.mouse_entered.connect(_on_panel_mouse_entered)
 		panel.mouse_exited.connect(_on_panel_mouse_exited)
+	
+	# Store Panel's correct resting transform so the flip animation can restore it afterward
+	panel_original_position = panel.position
+	panel_original_scale = panel.scale
+	panel_original_rotation = panel.rotation
 
 func _process(delta: float) -> void:
 	# Only process for cards in hand
@@ -242,6 +255,33 @@ func get_panel() -> Panel:
 	if not is_instance_valid(panel):
 		return null
 	return panel
+
+func play_flip_animation(old_color: Color, new_color: Color) -> void:
+	if not flip_sprite or not flip_anim_player:
+		print("CardDisplay: Flip sprite or AnimationPlayer missing, skipping flip")
+		return
+
+	flip_sprite.modulate = old_color
+	flip_new_color = new_color
+	
+	# Raise this card above its neighbours on the board for the duration of the flip
+	z_index = 100
+
+	flip_anim_player.play("card_flip")
+	await flip_anim_player.animation_finished
+	
+	# Snap Panel back to its correct resting transform - undoes any drift
+	# left over from positioning it to line up with the flip during testing
+	panel.position = panel_original_position
+	panel.scale = panel_original_scale
+	panel.rotation = panel_original_rotation
+	
+	# Restore normal draw order now that the flip is done
+	z_index = 0
+
+func _on_flip_midpoint() -> void:
+	if flip_sprite:
+		flip_sprite.modulate = flip_new_color
 
 func adjust_card_name_size() -> void:
 	if not card_name_label:
