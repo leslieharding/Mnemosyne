@@ -19,7 +19,7 @@ const OPTIONAL_BATTLE_DEFINITIONS: Dictionary = {
 		"enemy_name": "The Wrong Note",
 		"enemy_difficulty": 2,
 		"display_name": "The Wrong Note",
-		"reward_description": "A new tab unlocks in the Memory Journal",
+		"reward_description": "The rhythm no longer breaks when a beat is missed",
 	},
 	"Artemis_The Hunt_Acteon": {
 		"god": "Artemis",
@@ -144,7 +144,7 @@ func _apply_sun_bonus():
 	print("OptionalBattleTracker: Sun bonus applied - sunlit cards will now grant +2 instead of +1")
 
 func _apply_wrong_note_bonus():
-	print("OptionalBattleTracker: Wrong Note bonus - PLACEHOLDER - music journal tab not yet implemented")
+	print("OptionalBattleTracker: Wrong Note bonus applied - rhythm boost no longer resets when a beat is missed")
 
 func _apply_acteon_bonus():
 	print("OptionalBattleTracker: Acteon bonus - PLACEHOLDER - not yet implemented")

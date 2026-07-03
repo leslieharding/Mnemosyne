@@ -94,7 +94,10 @@ func get_power_description() -> String:
 		DeckPowerType.COORDINATE_POWER:
 			return "🎯 Coordinate: Once per battle, play twice in a row"	
 		DeckPowerType.RHYTHM_POWER:
-			return "🎵 Rhythm: Each turn, a random empty slot pulses with rhythm. Playing a card there grants +X to all stats, where X doubles with each successful use (starts at +1)"	
+			var optional_tracker = Engine.get_main_loop().root.get_node_or_null("/root/OptionalBattleTrackerAutoload")
+			if optional_tracker and optional_tracker.is_permanently_won("Apollo_Natural Harmonics_The Wrong Note"):
+				return "🎵 Rhythm: Each turn, a random empty slot pulses with rhythm. Playing a card there grants +X to all stats, where X doubles with each successful use (starts at +1). The rhythm never breaks."
+			return "🎵 Rhythm: Each turn, a random empty slot pulses with rhythm. Playing a card there grants +X to all stats, where X doubles with each successful use (starts at +1). Missing a beat resets the rhythm."
 		DeckPowerType.NONE:
 			return ""
 		_:

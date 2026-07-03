@@ -87,6 +87,7 @@ var hidden_opponent_cards = [] # Positions of hidden opponent cards
 # Rhythm power variables
 var rhythm_slot: int = -1  # Current rhythm slot position (-1 means none)
 var rhythm_boost_value: int = 1  # Current boost value (doubles on use)
+var rhythm_slot_activated_this_cycle: bool = false  # Was the current rhythm slot played in before it gets reassigned?
 
 var coordinate_turns_remaining: int = 0  # Track how many coordinate turns left
 var artemis_counter_turns_remaining: int = 0  # Track Artemis boss counter turns
@@ -1109,8 +1110,15 @@ func _on_turn_changed(is_player_turn: bool):
 			# Clear previous rhythm slot visual if it exists
 			if rhythm_slot >= 0:
 				clear_rhythm_slot_visual(rhythm_slot)
+				# Rhythm breaks if the slot went unused - unless the Wrong Note upgrade is earned
+				if not rhythm_slot_activated_this_cycle and not has_wrong_note_upgrade():
+					rhythm_boost_value = 1
+					print("🎵 Rhythm broken - boost reset to +1")
+					if notification_manager:
+						notification_manager.show_notification("🎵 The rhythm breaks...")
 			# Assign new rhythm slot
 			assign_new_rhythm_slot()
+			rhythm_slot_activated_this_cycle = false
 		process_tremors_for_player(Owner.PLAYER)
 		process_volleys_for_player(Owner.PLAYER)
 		enable_player_input()
@@ -8412,7 +8420,8 @@ func create_battle_snapshot():
 		"coordinate_used": coordinate_used,
 		"is_coordination_active": is_coordination_active,
 		"rhythm_slot": rhythm_slot,
-		"rhythm_boost_value": rhythm_boost_value
+		"rhythm_boost_value": rhythm_boost_value,
+		"rhythm_slot_activated_this_cycle": rhythm_slot_activated_this_cycle,
 	}
 	
 	# Snapshot experience tracker state
@@ -8552,6 +8561,7 @@ func restore_battle_from_snapshot() -> bool:
 		is_coordination_active = deck_power_state.get("is_coordination_active", false)
 		rhythm_slot = deck_power_state.get("rhythm_slot", -1)
 		rhythm_boost_value = deck_power_state.get("rhythm_boost_value", 1)
+		rhythm_slot_activated_this_cycle = deck_power_state.get("rhythm_slot_activated_this_cycle", false)
 		is_artemis_boss_battle = deck_power_state.get("is_artemis_boss_battle", false) 
 		artemis_boss_counter_triggered = deck_power_state.get("artemis_boss_counter_triggered", false)
 		current_season = deck_power_state.get("current_season", Season.SUMMER)  
@@ -9090,6 +9100,12 @@ func apply_rhythm_boost(card_data: CardResource) -> bool:
 		card_data.values[2] += effective_boost  # South
 		card_data.values[3] += effective_boost  # West
 	
+	# Mark this slot as used so the reset check at next reassignment leaves the boost alone.
+	# Discordant plays do NOT count as a "kept rhythm" - the boost still resets even though
+	# the player played there, since Wrong Note is actively corrupting the beat.
+	if not discordant_active:
+		rhythm_slot_activated_this_cycle = true
+
 	# Double the boost value for next use (magnitude increases regardless of sign)
 	rhythm_boost_value *= 2
 	print("Rhythm boost magnitude increased to: ", rhythm_boost_value)
@@ -11167,3 +11183,9 @@ func play_card_drop_tween(card_display: CardDisplay, target_global_position: Vec
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 	return tween
+
+func has_wrong_note_upgrade() -> bool:
+	var optional_tracker = get_node_or_null("/root/OptionalBattleTrackerAutoload")
+	if optional_tracker:
+		return optional_tracker.is_permanently_won("Apollo_Natural Harmonics_The Wrong Note")
+	return false
