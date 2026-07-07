@@ -1,8 +1,8 @@
 extends Node
 
 const CARD_FLICK_VARIATIONS = 5
-const LEVEL_UP_VARIATIONS = 4
 const CARD_PLACED_VARIATIONS = 2
+const LEVEL_UP_VARIATIONS = 3
 const CARD_THUD_VARIATIONS = 4
 
 # Sound effect paths - change sounds here in one place
@@ -34,8 +34,7 @@ const SOUNDS = {
 	"level_up_1": "res://Assets/SoundEffects/level_up_1.wav",
 	"level_up_2": "res://Assets/SoundEffects/level_up_2.wav",
 	"level_up_3": "res://Assets/SoundEffects/level_up_3.wav",
-	"level_up_4": "res://Assets/SoundEffects/level_up_4.wav",
-	"level_up_final": "res://Assets/SoundEffects/level_up_final.wav",
+
 	
 	
 	
@@ -367,13 +366,9 @@ func play_card_flick():
 	var sound_key = "on_card_clicked_" + str(variation)
 	play_randomized_subtle(sound_key)
 
-func play_level_up_sound(pitch: float = 1.0, volume_db: float = 0.0, is_final: bool = false):
-	var sound_key: String
-	if is_final:
-		sound_key = "level_up_final"
-	else:
-		var variation = randi_range(1, LEVEL_UP_VARIATIONS)
-		sound_key = "level_up_" + str(variation)
+func play_level_up_sound(pitch: float = 1.0, volume_db: float = 0.0, sequence_index: int = 1):
+	var variation = ((sequence_index - 1) % LEVEL_UP_VARIATIONS) + 1
+	var sound_key = "level_up_" + str(variation)
 
 	if not SOUNDS.has(sound_key):
 		push_error("Level up sound not found: " + sound_key)

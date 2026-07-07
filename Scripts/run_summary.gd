@@ -433,11 +433,10 @@ func animate_progress_bar(
 			print("LEVELUP DETECTED: ", state[0], " -> ", current_level, " | levels_crossed so far: ", state[1])
 			state[0] = current_level
 			state[1] += 1
-			var is_final_level_up = (state[0] == after_level and level_ups >= 3)
 			var pitch = clampf(1.0 + (state[1] - 1) * 0.06, 1.0, 1.3)
 			var vol = clampf((state[1] - 1) * 0.8, 0.0, 3.0)
-			print("PLAYING SOUND: is_final=", is_final_level_up, " pitch=", pitch, " vol=", vol)
-			SoundManagerAutoload.play_level_up_sound(pitch, vol, is_final_level_up)
+			print("PLAYING SOUND: pitch=", pitch, " vol=", vol)
+			SoundManagerAutoload.play_level_up_sound(pitch, vol, state[1])
 			level_label.text = card_name + " (Lv." + str(state[0]) + ")"
 		, 0.0, float(total_gain), duration)
 
