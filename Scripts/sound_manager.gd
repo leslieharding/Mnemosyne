@@ -100,9 +100,11 @@ var card_hover_sound_playing: bool = false
 var god_hover_player: AudioStreamPlayer = null
 var god_hover_fade_tween: Tween = null
 
-# Deck selection sound tracking
 var deck_select_player: AudioStreamPlayer = null
 var deck_select_fade_tween: Tween = null
+
+# Dedicated level-up player so it never collides with the shared sfx pool
+var level_up_player: AudioStreamPlayer = null
 
 func _ready():
 	# Create a pool of AudioStreamPlayer nodes
@@ -128,6 +130,11 @@ func _ready():
 	deck_select_player = AudioStreamPlayer.new()
 	deck_select_player.bus = "Sounds"
 	add_child(deck_select_player)
+
+	# Create dedicated level-up player
+	level_up_player = AudioStreamPlayer.new()
+	level_up_player.bus = "Sounds"
+	add_child(level_up_player)
 	
 	# Create music player
 	music_player = AudioStreamPlayer.new()
@@ -374,13 +381,10 @@ func play_level_up_sound(pitch: float = 1.0, volume_db: float = 0.0, sequence_in
 		push_error("Level up sound not found: " + sound_key)
 		return
 
-	var player = sfx_players[current_player_index]
-	current_player_index = (current_player_index + 1) % max_players
-
-	player.pitch_scale = pitch
-	player.volume_db = volume_db
-	player.stream = load(SOUNDS[sound_key])
-	player.play()
+	level_up_player.pitch_scale = pitch
+	level_up_player.volume_db = volume_db
+	level_up_player.stream = load(SOUNDS[sound_key])
+	level_up_player.play()
 
 func play_card_placed():
 	var variation = randi_range(1, CARD_PLACED_VARIATIONS)
