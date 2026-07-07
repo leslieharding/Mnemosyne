@@ -29,11 +29,10 @@ func execute(context: Dictionary) -> bool:
 	# Store original values for logging
 	var original_values = placed_card.values.duplicate()
 	
-	# Wait for combat to complete before reducing stats
-	# This allows the card to use its full power during initial combat
-	await game_manager.get_tree().process_frame
+	# NOTE: this ability is now invoked explicitly by card_battle_manager
+	# right after resolve_combat() runs, so no frame delay is needed here.
 	
-	# Verify the card still exists at this position after combat
+	# Verify the card still exists at this position (it may have been captured during combat)
 	var current_card = game_manager.get_card_at_position(grid_position)
 	if not current_card or current_card != placed_card:
 		print("RecklessAssaultAbility: Card no longer at position ", grid_position, " - checking all positions")

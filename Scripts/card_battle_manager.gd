@@ -2010,7 +2010,16 @@ func _on_opponent_card_placed(grid_index: int):
 			"game_manager": self,
 			"card_level": opponent_card_level
 		}
-		await opponent_card_data.execute_abilities(CardAbility.TriggerType.ON_PLAY, ability_context, opponent_card_level)
+		
+		# Execute ON_PLAY abilities EXCEPT Reckless Assault (must run after combat)
+		var opponent_abilities = opponent_card_data.get_available_abilities(opponent_card_level)
+		for ability in opponent_abilities:
+			if ability.trigger_condition == CardAbility.TriggerType.ON_PLAY:
+				if ability.ability_name == "Reckless Assault":
+					print("Skipping Reckless Assault during ON_PLAY - will run after combat")
+					continue
+				print("Executing ability: ", ability.ability_name, " (", ability.description, ")")
+				await ability.execute(ability_context)
 	
 	# Connect hover signals for opponent cards too
 	card_display.card_hovered.connect(_on_card_hovered)
@@ -2044,7 +2053,7 @@ func _on_opponent_card_placed(grid_index: int):
 	var captures = resolve_combat(grid_index, Owner.OPPONENT, opponent_card_data)
 	if captures > 0:
 		print("Opponent captured ", captures, " cards!")
-	
+	trigger_reckless_assault_if_present(grid_index, opponent_card_data, opponent_card_level)
 	# The Stretcher: reshape the cards it fought, AFTER combat
 	for ability in opponent_card_data.get_available_abilities(opponent_card_level):
 		if ability is StretcherAbility:
@@ -4038,6 +4047,11 @@ func place_card_on_grid():
 					print("Skipping Aristeia during ON_PLAY - will check after combat")
 					continue
 				
+				# Skip Reckless Assault here - it must run AFTER combat resolves
+				if ability.ability_name == "Reckless Assault":
+					print("Skipping Reckless Assault during ON_PLAY - will run after combat")
+					continue
+				
 				print("Executing ability: ", ability.ability_name, " (", ability.description, ")")
 				
 				# Check if this is Queen of the Underworld (Persephone's ability)
@@ -4080,7 +4094,7 @@ func place_card_on_grid():
 		captures = resolve_combat(current_grid_index, Owner.PLAYER, card_data)
 		if captures > 0:
 			print("Player captured ", captures, " cards!")
-	
+		trigger_reckless_assault_if_present(current_grid_index, card_data, card_level)
 	else:
 		# Card was replaced (e.g. Persephone summoned an ally) - the replace function is async
 		# Wait for it to fully complete (including Torches/other ON_PLAY abilities) before continuing
@@ -11189,3 +11203,19 @@ func has_wrong_note_upgrade() -> bool:
 	if optional_tracker:
 		return optional_tracker.is_permanently_won("Apollo_Natural Harmonics_The Wrong Note")
 	return false
+
+func trigger_reckless_assault_if_present(grid_position: int, card_data: CardResource, card_level: int) -> void:
+	if not card_data.has_ability_type(CardAbility.TriggerType.ON_PLAY, card_level):
+		return
+	
+	var abilities = card_data.get_available_abilities(card_level)
+	for ability in abilities:
+		if ability.ability_name == "Reckless Assault":
+			var context = {
+				"placed_card": card_data,
+				"grid_position": grid_position,
+				"game_manager": self,
+				"card_level": card_level
+			}
+			ability.execute(context)
+			break
