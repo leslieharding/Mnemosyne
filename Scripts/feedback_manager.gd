@@ -117,6 +117,7 @@ func build_overlay():
 	category_option.add_item("Bug")
 	category_option.add_item("Balance")
 	category_option.add_item("Visual")
+	category_option.add_item("Content Suggestion")
 	category_option.add_item("Other")
 	vbox.add_child(category_option)
 
