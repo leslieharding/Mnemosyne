@@ -130,7 +130,7 @@ func _on_journal_button_pressed(initial_tab: String = ""):
 	get_parent().layer = 100
 	
 	# Show journal with proper animation by calling its show_journal method
-	journal_instance.show_journal("")
+	journal_instance.show_journal(initial_tab)
 	
 	# Hide notifications when opened
 	hide_notification()
