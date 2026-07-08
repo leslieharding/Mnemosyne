@@ -138,8 +138,12 @@ func get_mnemosyne_values() -> Array[int]:
 	var card_index = get_meta("mnemosyne_card_index")
 	
 	# Get values from MnemosyneProgressTracker
-	# Note: Can't use get_node_or_null here since CardResource is not a Node
-	var tracker = Engine.get_singleton("MnemosyneProgressTrackerAutoload")
+	# Note: CardResource is not a Node, so we reach the autoload via the
+	# running SceneTree instead of get_node()/Engine.get_singleton() (the
+	# latter only works for explicitly-registered Engine singletons, which
+	# normal autoloads are not).
+	var tree = Engine.get_main_loop() as SceneTree
+	var tracker = tree.root.get_node_or_null("MnemosyneProgressTrackerAutoload") if tree else null
 	if not tracker:
 		print("Warning: MnemosyneProgressTracker not found")
 		return values.duplicate()
@@ -153,9 +157,8 @@ func get_mnemosyne_abilities() -> Array[CardAbility]:
 	
 	var card_index = get_meta("mnemosyne_card_index")
 	
-	# Get abilities from MnemosyneProgressTracker
-	# Note: Can't use get_node_or_null here since CardResource is not a Node
-	var tracker = Engine.get_singleton("MnemosyneProgressTrackerAutoload")
+	var tree = Engine.get_main_loop() as SceneTree
+	var tracker = tree.root.get_node_or_null("MnemosyneProgressTrackerAutoload") if tree else null
 	if not tracker:
 		print("Warning: MnemosyneProgressTracker not found")
 		return abilities.duplicate()

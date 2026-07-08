@@ -2851,6 +2851,9 @@ func load_player_deck(deck_index: int):
 				player_deck = collection.get_deck(0)
 				deck_card_indices = deck_def.card_indices.duplicate()
 				
+				if god_to_use == "Mnemosyne":
+					tag_mnemosyne_cards(player_deck, deck_card_indices)
+				
 				# Initialize deck power (even in tutorial mode)
 				initialize_deck_power(deck_def)
 				
@@ -2907,6 +2910,9 @@ func load_player_deck(deck_index: int):
 		var deck_def = collection.decks[deck_index]
 		deck_card_indices = deck_def.card_indices.duplicate()
 		player_deck = collection.get_deck(deck_index)
+		
+		if current_god == "Mnemosyne":
+			tag_mnemosyne_cards(player_deck, deck_card_indices)
 		
 		# Initialize deck power
 		initialize_deck_power(deck_def)
@@ -11219,3 +11225,9 @@ func trigger_reckless_assault_if_present(grid_position: int, card_data: CardReso
 			}
 			ability.execute(context)
 			break
+
+func tag_mnemosyne_cards(deck: Array[CardResource], indices: Array[int]) -> void:
+	for i in range(deck.size()):
+		if deck[i]:
+			deck[i].set_meta("is_mnemosyne_card", true)
+			deck[i].set_meta("mnemosyne_card_index", indices[i])
