@@ -1837,9 +1837,11 @@ func update_board_visuals():
 				# Force apply the correct ownership styling
 				if grid_ownership[i] == Owner.PLAYER:
 					card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+					card_display.set_owner_background(true)    # NEW
 					print("Applied PLAYER styling to card at position ", i)
 				elif grid_ownership[i] == Owner.OPPONENT:
 					card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+					card_display.set_owner_background(false)   # NEW
 					print("Applied OPPONENT styling to card at position ", i)
 				else:
 					print("Warning: Card at position ", i, " has no clear owner")
@@ -2646,7 +2648,7 @@ func create_grid_styles():
 	
 	# Player card style (blue border)
 	player_card_style = StyleBoxFlat.new()
-	player_card_style.bg_color = Color("#444444")
+	player_card_style.bg_color = Color(0, 0, 0, 0) 
 	player_card_style.border_width_left = 2
 	player_card_style.border_width_top = 2
 	player_card_style.border_width_right = 2
@@ -2655,7 +2657,7 @@ func create_grid_styles():
 	
 	# Opponent card style (red border)
 	opponent_card_style = StyleBoxFlat.new()
-	opponent_card_style.bg_color = Color("#444444")
+	opponent_card_style.bg_color = Color(0, 0, 0, 0) 
 	opponent_card_style.border_width_left = 2
 	opponent_card_style.border_width_top = 2
 	opponent_card_style.border_width_right = 2
@@ -8201,8 +8203,10 @@ func execute_camouflage_capture(camouflage_slot: int, captured_owner: Owner):
 	# Apply correct styling
 	if camouflaged_owner == Owner.PLAYER:
 		captured_card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+		captured_card_display.set_owner_background(true)   
 	else:
 		captured_card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+		captured_card_display.set_owner_background(false)  
 	
 	# Find next available slot for the camouflaged card
 	var next_slot = find_next_available_slot(camouflage_slot)
@@ -8221,8 +8225,10 @@ func execute_camouflage_capture(camouflage_slot: int, captured_owner: Owner):
 		# Apply correct styling to revealed camouflaged card
 		if camouflaged_owner == Owner.PLAYER:
 			camouflaged_card_display.panel.add_theme_stylebox_override("panel", player_card_style)
+			camouflaged_card_display.set_owner_background(true)    
 		else:
 			camouflaged_card_display.panel.add_theme_stylebox_override("panel", opponent_card_style)
+			camouflaged_card_display.set_owner_background(false)   
 	
 	# Remove camouflage effect
 	active_camouflage_slots.erase(camouflage_slot)
@@ -8351,8 +8357,10 @@ func reveal_camouflaged_card(card_display: CardDisplay):
 		var owner = grid_ownership[grid_position]
 		if owner == Owner.PLAYER:
 			p.add_theme_stylebox_override("panel", player_card_style)
+			card_display.set_owner_background(true)    
 		else:
 			p.add_theme_stylebox_override("panel", opponent_card_style)
+			card_display.set_owner_background(false)   
 	
 	print("Revealed camouflaged card: ", card_display.get_card_data().card_name if card_display.get_card_data() else "Unknown")
 

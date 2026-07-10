@@ -5,6 +5,11 @@ class_name CardDisplay
 signal card_hovered(card_data: CardResource)
 signal card_unhovered()
 
+@export var player_bg_texture: Texture2D
+@export var opponent_bg_texture: Texture2D
+
+
+
 # UI References
 @onready var panel = $Panel
 @onready var north_power = $Panel/MarginContainer/PowerDisplayContainer/GridContainer/NorthPower
@@ -14,8 +19,11 @@ signal card_unhovered()
 @onready var card_name_label = $Panel/MarginContainer/CardNameLabel
 @onready var flip_sprite = $FlipSprite
 @onready var flip_anim_player = $AnimationPlayer
+@onready var background_art: TextureRect = $Panel/BackgroundArt
 
 var original_rotation: float = 0.0  # Store the card's fan rotation when in hand
+
+
 
 # Animation
 var hover_tween: Tween
@@ -94,6 +102,7 @@ func create_selection_styles():
 	default_style.corner_radius_top_right = 4
 	default_style.corner_radius_bottom_right = 4
 	default_style.corner_radius_bottom_left = 4
+	default_style.bg_color = Color(0, 0, 0, 0)
 	
 	# Selected style (same background, only border changes)
 	selected_style = default_style.duplicate()
@@ -102,7 +111,7 @@ func create_selection_styles():
 	selected_style.border_width_top = 6
 	selected_style.border_width_right = 6
 	selected_style.border_width_bottom = 6
-	
+	selected_style.bg_color = Color(0, 0, 0, 0)
 
 
 
@@ -116,6 +125,7 @@ func setup(card: CardResource, level: int = 1, god: String = "", index: int = -1
 	
 	# Store whether this is an opponent card for display purposes
 	set_meta("is_opponent_card", is_opponent_card)
+	set_owner_background(not is_opponent_card) 
 	
 	update_display()
 
@@ -330,3 +340,8 @@ func adjust_card_name_size() -> void:
 			var word_width = font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
 			if word_width > longest_word_width:
 				longest_word_width = word_width
+
+func set_owner_background(is_player: bool):
+	if not background_art:
+		return
+	background_art.texture = player_bg_texture if is_player else opponent_bg_texture
