@@ -31,6 +31,7 @@ var selection_tween: Tween
 
 # Capture flip animation
 var flip_new_color: Color = Color.WHITE
+var flip_new_owner_is_player: bool = true
 var panel_original_position: Vector2
 var panel_original_scale: Vector2
 var panel_original_rotation: float
@@ -271,20 +272,47 @@ func get_panel() -> Panel:
 		return null
 	return panel
 
-func play_flip_animation(old_color: Color, new_color: Color) -> void:
+func play_flip_animation(old_color: Color, new_color: Color, new_owner_is_player: bool = true) -> void:
 	if not flip_sprite or not flip_anim_player:
 		print("CardDisplay: Flip sprite or AnimationPlayer missing, skipping flip")
 		return
 
 	flip_sprite.modulate = old_color
 	flip_new_color = new_color
-	
+	flip_new_owner_is_player = new_owner_is_player
+
+	# The grid slot behind us is a SEPARATE Panel from our own - it isn't part
+	# of the flip animation and isn't hidden by it, so it sits there showing
+	# a background colour the whole time the card is flipping in the air.
+	# Swap it to the neutral empty-slot colour for the duration of the flip.
+	var parent_slot = get_parent()
+	if parent_slot is Panel:
+		var neutral_style = StyleBoxFlat.new()
+		neutral_style.bg_color = Color("#444444")
+		neutral_style.border_color = Color("#666666")
+		neutral_style.border_width_left = 1
+		neutral_style.border_width_top = 1
+		neutral_style.border_width_right = 1
+		neutral_style.border_width_bottom = 1
+		parent_slot.add_theme_stylebox_override("panel", neutral_style)
+
 	# Raise this card above its neighbours on the board for the duration of the flip
 	z_index = 100
 
 	flip_anim_player.play("card_flip")
 	await flip_anim_player.animation_finished
-	
+
+	# Flip is done - restore the slot's background now, coloured for the new owner
+	if parent_slot is Panel:
+		var final_style = StyleBoxFlat.new()
+		final_style.bg_color = Color("#3B545E") if new_owner_is_player else Color("#76382A")
+		final_style.border_color = Color(0.133333, 0.4, 0.666667, 1) if new_owner_is_player else Color("#FF4444")
+		final_style.border_width_left = 2
+		final_style.border_width_top = 2
+		final_style.border_width_right = 2
+		final_style.border_width_bottom = 2
+		parent_slot.add_theme_stylebox_override("panel", final_style)
+
 	# Snap Panel back to its correct resting transform - undoes any drift
 	# left over from positioning it to line up with the flip during testing
 	panel.position = panel_original_position

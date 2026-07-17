@@ -640,7 +640,7 @@ func show_capture_highlight(
 	
 	print("VisualEffectsManager: Flip from ", old_color, " to ", new_color)
 	
-	await card_display.play_flip_animation(old_color, new_color)
+	await card_display.play_flip_animation(old_color, new_color, new_owner_is_player)
 	
 	print("VisualEffectsManager: Capture flip complete")
 

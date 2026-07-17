@@ -1492,6 +1492,9 @@ func resolve_combat(grid_index: int, attacking_owner: Owner, attacking_card: Car
 				var old_owner_was_player = (grid_ownership[captured_index] == Owner.PLAYER)
 				var new_owner_is_player = (attacking_owner == Owner.PLAYER)
 				
+				var captured_slot = grid_slots[captured_index]
+				captured_slot.add_theme_stylebox_override("panel", player_card_style if new_owner_is_player else opponent_card_style)
+				
 				# Show the directional capture highlight
 				visual_effects_manager.show_capture_highlight(
 					captured_card_display,
