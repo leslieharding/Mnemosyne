@@ -55,6 +55,7 @@ var idle_enabled: bool = false  # Can be toggled if needed
 # Selection styles
 var selected_style: StyleBoxFlat
 var default_style: StyleBoxFlat
+var current_panel_bg_color: Color = Color(0, 0, 0, 0)
 
 func _ready():
 	# Create selection styles
@@ -187,7 +188,9 @@ func select():
 	play_selection_grow()
 	is_selected = true
 	if panel and selected_style:
-		panel.add_theme_stylebox_override("panel", selected_style)
+		var style = selected_style.duplicate()
+		style.bg_color = current_panel_bg_color
+		panel.add_theme_stylebox_override("panel", style)
 	
 	# Bring card to front by moving it to the end of parent's children
 	if get_parent():
@@ -201,7 +204,9 @@ func deselect():
 	print("DESELECT called on card: ", card_data.card_name if card_data else "Unknown", " | Current scale: ", scale)
 	is_selected = false
 	if panel and default_style:
-		panel.add_theme_stylebox_override("panel", default_style)
+		var style = default_style.duplicate()
+		style.bg_color = current_panel_bg_color
+		panel.add_theme_stylebox_override("panel", style)
 	
 	# Return to normal size smoothly
 	if selection_tween:
@@ -344,4 +349,33 @@ func adjust_card_name_size() -> void:
 func set_owner_background(is_player: bool):
 	if not background_art:
 		return
-	background_art.texture = player_bg_texture if is_player else opponent_bg_texture
+	# Textures disabled for now while testing flat colours - re-enable this line later:
+	# background_art.texture = player_bg_texture if is_player else opponent_bg_texture
+	background_art.visible = false
+	apply_stat_font_color()
+	apply_owner_panel_color(is_player)
+
+func apply_owner_panel_color(is_player: bool):
+	if not panel:
+		return
+	var style = panel.get_theme_stylebox("panel")
+	if style is StyleBoxFlat:
+		style = style.duplicate()
+	else:
+		style = StyleBoxFlat.new()
+	style.bg_color = Color("#3B545E") if is_player else Color("#76382A")
+	current_panel_bg_color = style.bg_color
+	panel.add_theme_stylebox_override("panel", style)
+
+func apply_stat_font_color():
+	var stat_color = Color("#C0AB8E")
+	if card_name_label:
+		card_name_label.add_theme_color_override("font_color", stat_color)
+	if north_power:
+		north_power.add_theme_color_override("font_color", stat_color)
+	if east_power:
+		east_power.add_theme_color_override("font_color", stat_color)
+	if south_power:
+		south_power.add_theme_color_override("font_color", stat_color)
+	if west_power:
+		west_power.add_theme_color_override("font_color", stat_color)

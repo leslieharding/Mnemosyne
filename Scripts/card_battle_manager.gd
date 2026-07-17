@@ -2646,18 +2646,18 @@ func create_grid_styles():
 	selected_grid_style.border_width_bottom = 2
 	selected_grid_style.border_color = Color("#44AAFF")  # Bright blue highlight
 	
-	# Player card style (blue border)
+	# Player card style
 	player_card_style = StyleBoxFlat.new()
-	player_card_style.bg_color = Color(0, 0, 0, 0) 
+	player_card_style.bg_color = Color("#3B545E")
 	player_card_style.border_width_left = 2
 	player_card_style.border_width_top = 2
 	player_card_style.border_width_right = 2
 	player_card_style.border_width_bottom = 2
 	player_card_style.border_color = Color(0.133333, 0.4, 0.666667, 1)
 	
-	# Opponent card style (red border)
+	# Opponent card style
 	opponent_card_style = StyleBoxFlat.new()
-	opponent_card_style.bg_color = Color(0, 0, 0, 0) 
+	opponent_card_style.bg_color = Color("#76382A")
 	opponent_card_style.border_width_left = 2
 	opponent_card_style.border_width_top = 2
 	opponent_card_style.border_width_right = 2
