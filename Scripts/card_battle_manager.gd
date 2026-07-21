@@ -1656,8 +1656,7 @@ func resolve_standard_combat(grid_index: int, attacking_owner: Owner, attacking_
 									print("ExploitAbility: Updated CardDisplay visual for doubled attack")
 									break
 							
-							# Mark exploit as used
-							ExploitAbility.mark_exploit_used(attacking_card)
+							
 							
 					# Check for Edge ability - doubles attack when targeting edge slots (1, 3, 5, 7)
 					if EdgeAbility.has_edge_active(attacking_card):
