@@ -139,6 +139,10 @@ func perform_treacherous_attacks(treacherous_card: CardResource, treacherous_pos
 					
 					# Check if treacherous attack wins
 					if attack_value > defense_value:
+						if game_manager.check_for_cheat_death(adj_index, adjacent_card, treacherous_position, treacherous_card):
+							print("TreacheryAbility: Capture prevented by defensive ability")
+							continue
+						
 						print("TreacheryAbility: Treacherous attack successful - capturing ", adjacent_card.card_name)
 						
 						# Capture the enemy card

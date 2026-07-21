@@ -80,6 +80,11 @@ func execute(context: Dictionary) -> bool:
 	else:
 		counter_capture_owner = game_manager.Owner.PLAYER
 	
+	# Check for capture prevention on the counter-captured card before applying
+	if game_manager.check_for_cheat_death(capturing_position, capturing_card, captured_position, captured_card):
+		print("ToxicAbility: Counter-capture prevented by defensive ability")
+		return true
+	
 	# Apply the counter-capture
 	game_manager.set_card_ownership(capturing_position, counter_capture_owner)
 	

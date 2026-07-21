@@ -137,6 +137,10 @@ func attempt_pursuit_combat(attacker_position: int, defender_position: int, dire
 	
 	# Check if attacker wins
 	if attacker_value > defender_value:
+		if game_manager.check_for_cheat_death(defender_position, defender_card, attacker_position, attacker_card):
+			print("Pursuit combat prevented by defensive ability")
+			return false
+		
 		print("Pursuit combat successful! Capturing target.")
 		
 		# Change ownership of the target card

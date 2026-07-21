@@ -162,6 +162,11 @@ func execute_charge_capture(attacker_position: int, defender_position: int, dire
 	
 	# Change ownership of the target card
 	var attacker_owner = game_manager.get_owner_at_position(attacker_position)
+	
+	if game_manager.check_for_cheat_death(defender_position, defender_card, attacker_position, attacker_card):
+		print("ChargeAbility: Capture prevented by defensive ability")
+		return false
+	
 	game_manager.set_card_ownership(defender_position, attacker_owner)
 	
 	# Execute ON_CAPTURE abilities on the captured card if it has any

@@ -5333,6 +5333,11 @@ func execute_immediate_hunt(target_position: int):
 	
 	# Resolve hunt combat
 	if hunter_stats.value > hunted_stats.value:
+		# Check for capture prevention before capturing
+		if check_for_cheat_death(target_position, hunted_card, current_hunter_position, current_hunter_card):
+			print("Hunt capture prevented by defensive ability")
+			return
+		
 		print("Hunt successful! Capturing hunted card")
 		
 		# Capture the hunted card
@@ -5469,6 +5474,11 @@ func execute_trap_hunt_combat(target_position: int, hunted_card: CardResource, h
 			# FIXED: Only show notification if Artemis isn't unlocked yet
 			if progress_tracker.should_show_artemis_notification() and notification_manager:
 				notification_manager.show_notification("Artemis was watching")
+		
+		# Check for capture prevention before capturing
+		if check_for_cheat_death(target_position, hunted_card, hunt_data.hunter_position, hunter_card):
+			print("Hunt trap capture prevented by defensive ability")
+			return
 		
 		# Capture the hunted card
 		set_card_ownership(target_position, hunt_data.hunter_owner)
@@ -8971,6 +8981,13 @@ func process_single_volley(volley_id: int, volley_data: Dictionary):
 	print("Volley combat: Attacker ", attacker_value, " vs Defender ", defender_value)
 	
 	if attacker_value > defender_value:
+		# Check for capture prevention (Elusive, Cheat Death, Sanctuary, etc.) before capturing
+		if check_for_cheat_death(target_index, target_card, source_position, source_card):
+			print("Volley capture prevented by defensive ability")
+			if notification_manager:
+				notification_manager.show_notification("Volley deflected!")
+			return
+		
 		# Capture the target
 		print("Volley captured enemy card at position ", target_index)
 		
@@ -11095,7 +11112,9 @@ func execute_trap_combat(target_position: int, hunted_card: CardResource, trap_d
 			progress_tracker.record_trap_fallen_for("trap", "Player's card caught in enemy trap")
 			if progress_tracker.should_show_artemis_notification() and notification_manager:
 				notification_manager.show_notification("Artemis was watching")
-
+		if check_for_cheat_death(target_position, hunted_card, trap_data.trapper_position, trapper_card):
+			print("Hunt trap capture prevented by defensive ability")
+			return
 		set_card_ownership(target_position, trap_data.trapper_owner)
 
 		if trap_data.trapper_owner == Owner.PLAYER:
