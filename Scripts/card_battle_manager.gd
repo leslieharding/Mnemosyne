@@ -4398,6 +4398,13 @@ func handle_passive_abilities_on_capture(grid_position: int, card_data: CardReso
 		if hunt_data.hunter_position == grid_position:
 			print("Removing hunt trap due to hunter capture")
 			remove_hunt_trap(target_pos)
+	
+	# Check if captured card had any active traps and remove them
+	for target_pos in active_traps.keys():
+		var trap_data = active_traps[target_pos]
+		if trap_data.trapper_position == grid_position:
+			print("Removing trap due to trapper capture")
+			remove_trap(target_pos)
 
 # Refresh all passive abilities (useful when ownership changes)
 func refresh_all_passive_abilities():
